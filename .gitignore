@@ -12,3 +12,5 @@ src/**/obj/
 src/**/bin/
 project.lock.json
 /.dnx/
+bin/
+obj/

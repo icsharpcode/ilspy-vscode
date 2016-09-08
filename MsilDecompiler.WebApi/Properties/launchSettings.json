@@ -18,9 +18,9 @@
     },
     "MsilDecompiler.WebApi": {
       "commandName": "Project",
-      "commandLineArgs": "--AssemblyPath e:/temp/lib/netstandard1.3/Mono.Cecil.dll",
+      "commandLineArgs": "--AssemblyPath e:/temp/MsilDecompiler.MsilSpy.dll",
       "launchBrowser": true,
-      "launchUrl": "http://localhost:5000/api/values",
+      "launchUrl": "http://localhost:5000/api/decompile",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

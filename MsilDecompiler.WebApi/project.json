@@ -12,7 +12,12 @@
     "Microsoft.Extensions.Logging.Debug": "1.0.0",
     "Microsoft.Extensions.Options.ConfigurationExtensions": "1.0.0",
     "Serilog.Extensions.Logging": "1.2.0",
-    "Serilog.Sinks.ColoredConsole": "2.0.0"
+    "Serilog.Sinks.ColoredConsole": "2.0.0",
+    "MsilDecompiler.MsilSpy": {
+      "target": "project",
+      "version": ""
+    },
+    "Microsoft.AspNetCore.Diagnostics": "1.0.0"
   },
 
   "tools": {
@@ -21,6 +26,8 @@
 
   "frameworks": {
     "net46": {
+      "dependencies": {
+      }
     }
   },
 

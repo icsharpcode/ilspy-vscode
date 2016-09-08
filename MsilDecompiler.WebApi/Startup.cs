@@ -14,7 +14,7 @@ namespace MsilDecompiler.WebApi
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env, ISourceAssemblyConfiguration sourceAssemblyConfiguration)
+        public Startup(IHostingEnvironment env)
         {
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
@@ -29,8 +29,6 @@ namespace MsilDecompiler.WebApi
                 .AddEnvironmentVariables();
 
             Configuration = builder.Build();
-
-            var path = sourceAssemblyConfiguration.SourceAssemblyFilePath;
         }
 
         public IConfigurationRoot Configuration { get; }
@@ -48,6 +46,15 @@ namespace MsilDecompiler.WebApi
             //loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
             loggerFactory.AddSerilog();
+
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler("/Home/Error");
+            }
 
             app.UseMvc();
         }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using MsilDecompiler.WebApi.Configuration;
+using MsilDecompiler.WebApi.Providers;
 
 namespace MsilDecompiler.WebApi
 {
@@ -17,7 +18,8 @@ namespace MsilDecompiler.WebApi
                 .UseStartup<Startup>()
                 .ConfigureServices(services => services
                     .AddSingleton(new ConsoleArgs(args))
-                    .AddSingleton<ISourceAssemblyConfiguration, ConsoleSourceAssemblyConfiguration>())
+                    .AddSingleton<IDecompilationConfiguration, ConsoleSettingsConfiguration>()
+                    .AddSingleton<IDecompilationProvider, DecompilationProvider>())
                 .Build();
 
             host.Run();

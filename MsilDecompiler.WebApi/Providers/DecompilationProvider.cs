@@ -13,7 +13,6 @@ namespace MsilDecompiler.WebApi.Providers
     public class DecompilationProvider : IDecompilationProvider
     {
         private ILogger _logger;
-        private Dictionary<string, MetadataToken> _memberCache;
         private Dictionary<MetadataToken, IMetadataTokenProvider> _tokenToProviderMap;
         private AssemblyDefinition _assemblyDefinition;
         private IDecompilationConfiguration _decompilationConfiguration;
@@ -54,14 +53,20 @@ namespace MsilDecompiler.WebApi.Providers
 
         public void PopulateTokenToProviderMap(AssemblyDefinition assemblyDefinition)
         {
-            _tokenToProviderMap.Add(assemblyDefinition.MetadataToken, assemblyDefinition);
-            foreach(var moduleDefinition in _assemblyDefinition.Modules)
+            TryAddToProviderMap(assemblyDefinition);
+            foreach (var moduleDefinition in _assemblyDefinition.Modules)
             {
-                foreach(var typeDefinition in moduleDefinition.Types)
+                foreach (var typeDefinition in moduleDefinition.Types)
                 {
                     PopulateTokenToProviderMap(typeDefinition);
                 }
             }
+        }
+
+        private void TryAddToProviderMap(IMetadataTokenProvider provider)
+        {
+            if (!_tokenToProviderMap.ContainsKey(provider.MetadataToken))
+                _tokenToProviderMap.Add(provider.MetadataToken, provider);
         }
 
         private void PopulateTokenToProviderMap(TypeDefinition typeDefinition)
@@ -71,26 +76,26 @@ namespace MsilDecompiler.WebApi.Providers
                 return;
             }
 
-            _tokenToProviderMap.Add(typeDefinition.MetadataToken, typeDefinition);
+            TryAddToProviderMap(typeDefinition);
 
             foreach (var methodDefinition in typeDefinition.Methods)
             {
-                _tokenToProviderMap.Add(methodDefinition.MetadataToken, methodDefinition);
+                TryAddToProviderMap(methodDefinition);
             }
 
             foreach (var eventDefinition in typeDefinition.Events)
             {
-                _tokenToProviderMap.Add(eventDefinition.MetadataToken, eventDefinition);
+                TryAddToProviderMap(eventDefinition);
             }
 
             foreach (var fieldDefinition in typeDefinition.Fields)
             {
-                _tokenToProviderMap.Add(fieldDefinition.MetadataToken, fieldDefinition);
+                TryAddToProviderMap(fieldDefinition);
             }
 
             foreach (var propertyDefinition in typeDefinition.Properties)
             {
-                _tokenToProviderMap.Add(propertyDefinition.MetadataToken, propertyDefinition);
+                TryAddToProviderMap(propertyDefinition);
             }
 
             foreach (var nestedType in typeDefinition.NestedTypes)
@@ -195,17 +200,17 @@ namespace MsilDecompiler.WebApi.Providers
 
                 foreach (var eventDefinition in typeDefinition.Events)
                 {
-                    _tokenToProviderMap.Add(eventDefinition.MetadataToken, eventDefinition);
+                    TryAddToProviderMap(eventDefinition);
                 }
 
                 foreach (var fieldDefinition in typeDefinition.Fields)
                 {
-                    _tokenToProviderMap.Add(fieldDefinition.MetadataToken, fieldDefinition);
+                    TryAddToProviderMap(fieldDefinition);
                 }
 
                 foreach (var propertyDefinition in typeDefinition.Properties)
                 {
-                    _tokenToProviderMap.Add(propertyDefinition.MetadataToken, propertyDefinition);
+                    TryAddToProviderMap(propertyDefinition);
                 }
 
                 foreach (var nestedType in typeDefinition.NestedTypes)

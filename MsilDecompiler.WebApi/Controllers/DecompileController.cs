@@ -33,7 +33,8 @@ namespace MsilDecompiler.WebApi.Controllers
             return _decompilationProvider.GetCode(type, rid);
         }
 
-        public string GetChildren(TokenType type, uint rid)
+        [HttpGet("types/{type}/{rid}/members")]
+        public IEnumerable<Tuple<string, MetadataToken>> GetChildren(TokenType type, uint rid)
         {
             return _decompilationProvider.GetChildren(type, rid);
         }

@@ -21,22 +21,28 @@ namespace MsilDecompiler.WebApi.Controllers
             _logger = loggerFactory.CreateLogger<DecompileController>();
         }
 
+        [HttpGet("assembly")]
+        public string GetAssembly()
+        {
+            return _decompilationProvider.GetCode(TokenType.Assembly, 0);
+        }
+
         [HttpGet("types")]
         public IEnumerable<Tuple<string, MetadataToken>> Get()
         {
             return _decompilationProvider.GetTypeTuples();
         }
 
-        [HttpGet("types/{type}/{rid}")]
-        public string Get(TokenType type, uint rid)
+        [HttpGet("types/{rid}")]
+        public string Get(uint rid)
         {
-            return _decompilationProvider.GetCode(type, rid);
+            return _decompilationProvider.GetCode(TokenType.TypeDef, rid);
         }
 
-        [HttpGet("types/{type}/{rid}/members")]
-        public IEnumerable<Tuple<string, MetadataToken>> GetChildren(TokenType type, uint rid)
+        [HttpGet("types/{rid}/members")]
+        public IEnumerable<Tuple<string, MetadataToken>> GetChildren(uint rid)
         {
-            return _decompilationProvider.GetChildren(type, rid);
+            return _decompilationProvider.GetChildren(TokenType.TypeDef, rid);
         }
     }
 }

@@ -184,6 +184,11 @@ namespace MsilDecompiler.WebApi.Providers
 
         public string GetCode(TokenType type, uint rid)
         {
+            if (rid == 0)
+            {
+                return GetCSharpCode(_assemblyDefinition);
+            }
+
             var provider = _tokenToProviderMap[new MetadataToken(type, rid)];
             return GetCSharpCode(provider);
         }

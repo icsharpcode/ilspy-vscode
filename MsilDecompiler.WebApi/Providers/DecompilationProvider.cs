@@ -193,6 +193,22 @@ namespace MsilDecompiler.WebApi.Providers
             return GetCSharpCode(provider);
         }
 
+        public string GetMemberCode(MetadataToken token)
+        {
+            var tokenType = token.TokenType;
+            if (tokenType != TokenType.Event &&
+                tokenType != TokenType.Field &&
+                tokenType != TokenType.Property &&
+                tokenType != TokenType.Method &&
+                tokenType != TokenType.TypeDef)
+            {
+                return string.Empty;
+            }
+
+            var provider = _tokenToProviderMap[token];
+            return GetCSharpCode(provider);
+        }
+
         public IEnumerable<Tuple<string, MetadataToken>> GetChildren(TokenType type, uint rid)
         {
             var typeDefinition = _tokenToProviderMap[new MetadataToken(type, rid)] as TypeDefinition;

@@ -44,5 +44,20 @@ namespace MsilDecompiler.WebApi.Controllers
         {
             return _decompilationProvider.GetChildren(TokenType.TypeDef, rid);
         }
+
+        [HttpGet("types/{typeRid}/members/{memberRid}")]
+        public string GetMemberCode(uint typeRid, uint memberRid)
+        {
+            var members = _decompilationProvider.GetChildren(TokenType.TypeDef, typeRid);
+            foreach(var member in members)
+            {
+                if (member.Item2.RID == memberRid)
+                {
+                    return _decompilationProvider.GetMemberCode(member.Item2);
+                }
+            }
+
+            return string.Empty;
+        }
     }
 }

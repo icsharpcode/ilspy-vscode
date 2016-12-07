@@ -56,7 +56,7 @@ function getLaunchPath(platformInfo: PlatformInformation): string {
     const binPath = util.getBinPath();
 
     return platformInfo.isWindows()
-        ? path.join(binPath, 'omnisharp', 'OmniSharp.exe')
+        ? path.join(binPath, 'msildecompiler', 'MsilDecompiler.WebApi.exe')
         : path.join(binPath, 'run');
 }
 
@@ -128,7 +128,7 @@ function canLaunchMono(): Promise<void> {
                 resolve();
             }
             else {
-                reject(new Error('Cannot start Omnisharp because Mono version >=4.0.1 is required.'));
+                reject(new Error('Cannot start MsilDecompiler because Mono version >=4.6.0 is required.'));
             }
         });
     });

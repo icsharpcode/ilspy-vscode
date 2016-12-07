@@ -11,7 +11,8 @@ export class Options {
     constructor(
         public path?: string,
         public useMono?: boolean,
-        public loggingLevel?: string) { }
+        public loggingLevel?: string,
+        public assemblyLoadTimeout?: number) { }
 
     public static Read(): Options {
 
@@ -19,11 +20,12 @@ export class Options {
 
         const path = msildecompilerConfig.get<string>('path');
 
-        const useMono =msildecompilerConfig.get<boolean>('useMono');
+        const useMono = msildecompilerConfig.get<boolean>('useMono');
+
+        const assemblyLoadTimeout = msildecompilerConfig.get<number>('projectLoadTimeout', 60);
 
         const loggingLevel = msildecompilerConfig.get<string>('loggingLevel');
 
-
-        return new Options(path, useMono, loggingLevel);
+        return new Options(path, useMono, loggingLevel, assemblyLoadTimeout);
     }
 }

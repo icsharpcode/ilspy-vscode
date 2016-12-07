@@ -3,13 +3,24 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import TelemetryReporter from 'vscode-extension-telemetry';
+import * as util from './common';
+import { Logger } from './logger';
+import { PlatformInformation } from './platform';
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
+let _channel: vscode.OutputChannel = null;
+
 export function activate(context: vscode.ExtensionContext) {
 
-    // Use the console to output diagnostic information (console.log) and errors (console.error)
-    // This line of code will only be executed once when your extension is activated
+    const extensionId = 'jeremymeng.msil-decompiler';
+    const extension = vscode.extensions.getExtension(extensionId);
+    const extensionVersion = extension.packageJSON.version;
+
+    util.setExtensionPath(extension.extensionPath);
+
+    _channel = vscode.window.createOutputChannel('C#');
+
+    let logger = new Logger(text => _channel.append(text));
+
     console.log('Congratulations, your extension "msil-decompiler" is now active!');
 
     // The command has been defined in the package.json file

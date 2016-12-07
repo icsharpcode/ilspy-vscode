@@ -1,0 +1,427 @@
+
+import { EventEmitter } from 'events';
+import { ChildProcess, exec } from 'child_process';
+import { ReadLine, createInterface } from 'readline';
+import { launchMsilDecompiler } from './launcher';
+import { Options } from './options';
+import { Logger } from '../logger';
+import { DelayTracker } from './delayTracker';
+import TelemetryReporter from 'vscode-extension-telemetry';
+import * as path from 'path';
+import * as protocol from './protocol';
+import { Request } from './request';
+import * as vscode from 'vscode';
+
+enum ServerState {
+    Starting,
+    Started,
+    Stopped
+}
+
+module Events {
+    export const StateChanged = 'stateChanged';
+
+    export const StdOut = 'stdout';
+    export const StdErr = 'stderr';
+
+    export const Error = 'Error';
+    export const ServerError = 'ServerError';
+
+    export const BeforeServerInstall = 'BeforeServerInstall';
+    export const BeforeServerStart = 'BeforeServerStart';
+    export const ServerStart = 'ServerStart';
+    export const ServerStop = 'ServerStop';
+
+    export const Started = 'started';
+}
+
+const TelemetryReportingDelay = 2 * 60 * 1000; // two minutes
+
+export class MsilDecompilerServer {
+
+    private static _nextId = 1;
+
+    private _debugMode: boolean = false;
+
+    private _readLine: ReadLine;
+    private _disposables: vscode.Disposable[] = [];
+
+    private _reporter: TelemetryReporter;
+    private _delayTrackers: { [requestName: string]: DelayTracker };
+    private _telemetryIntervalId: NodeJS.Timer = undefined;
+
+    private _eventBus = new EventEmitter();
+    private _state: ServerState = ServerState.Stopped;
+    private _channel: vscode.OutputChannel;
+    private _logger: Logger;
+
+    private _isDebugEnable: boolean = false;
+
+    private _serverProcess: ChildProcess;
+    private _options: Options;
+
+    private _assemblyPath: string;
+
+    constructor(reporter: TelemetryReporter) {
+        this._reporter = reporter;
+
+        this._channel = vscode.window.createOutputChannel('MsilDecompiler Log');
+        this._logger = new Logger(message => this._channel.append(message));
+
+        const logger = this._debugMode
+            ? this._logger
+            : new Logger(message => { });
+    }
+
+    public isRunning(): boolean {
+        return this._state === ServerState.Started;
+    }
+
+    private _getState(): ServerState {
+        return this._state;
+    }
+
+    private _setState(value: ServerState): void {
+        if (typeof value !== 'undefined' && value !== this._state) {
+            this._state = value;
+            this._fireEvent(Events.StateChanged, this._state);
+        }
+    }
+
+    private _reportTelemetry() {
+        //this._reporter.sendTelemetryEvent(eventName, null, measures);
+    }
+
+    public getChannel(): vscode.OutputChannel {
+        return this._channel;
+    }
+
+    public isDebugEnable(): boolean {
+        return this._isDebugEnable;
+    }
+
+    // --- eventing
+
+    public onStdout(listener: (e: string) => any, thisArg?: any) {
+        return this._addListener(Events.StdOut, listener, thisArg);
+    }
+
+    public onStderr(listener: (e: string) => any, thisArg?: any) {
+        return this._addListener(Events.StdErr, listener, thisArg);
+    }
+
+    public onServerError(listener: (err: any) => any, thisArg?: any) {
+        return this._addListener(Events.ServerError, listener, thisArg);
+    }
+
+    public onBeforeServerInstall(listener: () => any) {
+        return this._addListener(Events.BeforeServerInstall, listener);
+    }
+
+    public onBeforeServerStart(listener: (e: string) => any) {
+        return this._addListener(Events.BeforeServerStart, listener);
+    }
+
+    public onServerStart(listener: (e: string) => any) {
+        return this._addListener(Events.ServerStart, listener);
+    }
+
+    public onServerStop(listener: () => any) {
+        return this._addListener(Events.ServerStop, listener);
+    }
+
+    public onMsilDecompilerStart(listener: () => any) {
+        return this._addListener(Events.Started, listener);
+    }
+
+    private _addListener(event: string, listener: (e: any) => any, thisArg?: any): vscode.Disposable {
+        listener = thisArg ? listener.bind(thisArg) : listener;
+        this._eventBus.addListener(event, listener);
+        return new vscode.Disposable(() => this._eventBus.removeListener(event, listener));
+    }
+
+    protected _fireEvent(event: string, args: any): void {
+        this._eventBus.emit(event, args);
+    }
+
+    // --- start, stop, and connect
+
+    private _start(assemblyPath: string): Promise<void> {
+        this._setState(ServerState.Starting);
+        this._assemblyPath = assemblyPath;
+
+        const cwd = path.dirname(assemblyPath);
+        let args = [
+            '--AssemblyPath', assemblyPath
+        ];
+
+        this._options = Options.Read();
+
+        if (this._options.loggingLevel === 'verbose') {
+            args.push('-v');
+        }
+
+        this._logger.appendLine(`Starting MsilDecompiler server at ${new Date().toLocaleString()}`);
+        this._logger.increaseIndent();
+        this._logger.appendLine(`Target: ${assemblyPath}`);
+        this._logger.decreaseIndent();
+        this._logger.appendLine();
+
+        this._fireEvent(Events.BeforeServerStart, assemblyPath);
+
+        return launchMsilDecompiler(cwd, args).then(value => {
+            if (value.usingMono) {
+                this._logger.appendLine(`MsilDecompiler server started wth Mono`);
+            }
+            else {
+                this._logger.appendLine(`MsilDecompiler server started`);
+            }
+
+            this._logger.increaseIndent();
+            this._logger.appendLine(`Path: ${value.command}`);
+            this._logger.appendLine(`PID: ${value.process.pid}`);
+            this._logger.decreaseIndent();
+            this._logger.appendLine();
+
+            this._serverProcess = value.process;
+            this._setState(ServerState.Started);
+            this._fireEvent(Events.ServerStart, assemblyPath);
+
+            return this._doConnect();
+        }).then(() => {
+            // Start telemetry reporting
+            this._telemetryIntervalId = setInterval(() => this._reportTelemetry(), TelemetryReportingDelay);
+        }).catch(err => {
+            this._fireEvent(Events.ServerError, err);
+            return this.stop();
+        });
+    }
+
+    public stop(): Promise<void> {
+
+        while (this._disposables.length) {
+            this._disposables.pop().dispose();
+        }
+
+        let cleanupPromise: Promise<void>;
+
+        if (this._telemetryIntervalId !== undefined) {
+            // Stop reporting telemetry
+            clearInterval(this._telemetryIntervalId);
+            this._telemetryIntervalId = undefined;
+            this._reportTelemetry();
+        }
+
+        if (!this._serverProcess) {
+            // nothing to kill
+            cleanupPromise = Promise.resolve();
+        }
+        else if (process.platform === 'win32') {
+            // when killing a process in windows its child
+            // processes are *not* killed but become root
+            // processes. Therefore we use TASKKILL.EXE
+            cleanupPromise = new Promise<void>((resolve, reject) => {
+                const killer = exec(`taskkill /F /T /PID ${this._serverProcess.pid}`, (err, stdout, stderr) => {
+                    if (err) {
+                        return reject(err);
+                    }
+                });
+
+                killer.on('exit', resolve);
+                killer.on('error', reject);
+            });
+        }
+        else {
+            // Kill Unix process
+            this._serverProcess.kill('SIGTERM');
+            cleanupPromise = Promise.resolve();
+        }
+
+        return cleanupPromise.then(() => {
+            this._serverProcess = null;
+            this._setState(ServerState.Stopped);
+            this._fireEvent(Events.ServerStop, this);
+        });
+    }
+
+    public restart(assemblyPath: string = this._assemblyPath): Promise<void> {
+        if (assemblyPath) {
+            return this.stop().then(() => {
+                this._start(assemblyPath);
+            });
+        }
+    }
+
+    // --- requests et al
+
+    public makeRequest<TResponse>(command: string, data?: any, token?: vscode.CancellationToken): Promise<TResponse> {
+
+        if (this._getState() !== ServerState.Started) {
+            return Promise.reject<TResponse>('server has been stopped or not started');
+        }
+
+        let startTime: number;
+        let request: Request;
+
+        let promise = new Promise<TResponse>((resolve, reject) => {
+            startTime = Date.now();
+
+            request = {
+                command,
+                data,
+                onSuccess: value => resolve(value),
+                onError: err => reject(err)
+            };
+
+            //this._requestQueue.enqueue(request);
+        });
+
+        if (token) {
+            token.onCancellationRequested(() => {
+                //this._requestQueue.cancelRequest(request);
+            });
+        }
+
+        return promise.then(response => {
+            let endTime = Date.now();
+            let elapsedTime = endTime - startTime;
+            //this._recordRequestDelay(command, elapsedTime);
+
+            return response;
+        });
+    }
+
+    private _doConnect(): Promise<void> {
+
+        this._serverProcess.stderr.on('data', (data: any) => {
+            this._fireEvent('stderr', String(data));
+        });
+
+        this._readLine = createInterface({
+            input: this._serverProcess.stdout,
+            output: this._serverProcess.stdin,
+            terminal: false
+        });
+
+        const promise = new Promise<void>((resolve, reject) => {
+            let listener: vscode.Disposable;
+
+            // Convert the timeout from the seconds to milliseconds, which is required by setTimeout().
+            const timeoutDuration = this._options.assemblyLoadTimeout * 1000;
+
+            // timeout logic
+            const handle = setTimeout(() => {
+                if (listener) {
+                    listener.dispose();
+                }
+
+                reject(new Error("MsilDecompiler server load timed out. Use the 'msildecompiler.assemblyLoadTimeout' setting to override the default delay (one minute)."));
+            }, timeoutDuration);
+
+            // handle started-event
+            listener = this.onMsilDecompilerStart(() => {
+                if (listener) {
+                    listener.dispose();
+                }
+
+                clearTimeout(handle);
+                resolve();
+            });
+        });
+
+        const lineReceived = this._onLineReceived.bind(this);
+
+        this._readLine.addListener('line', lineReceived);
+
+        this._disposables.push(new vscode.Disposable(() => {
+            this._readLine.removeListener('line', lineReceived);
+        }));
+
+        return promise;
+    }
+
+    private _onLineReceived(line: string) {
+        if (line[0] !== '{') {
+            this._logger.appendLine(line);
+            return;
+        }
+
+        let packet: protocol.WireProtocol.Packet;
+        try {
+            packet = JSON.parse(line);
+        }
+        catch (err) {
+            // This isn't JSON
+            return;
+        }
+
+        if (!packet.Type) {
+            // Bogus packet
+            return;
+        }
+
+        switch (packet.Type) {
+            case 'response':
+                this._handleResponsePacket(<protocol.WireProtocol.ResponsePacket>packet);
+                break;
+            default:
+                console.warn(`Unknown packet type: ${packet.Type}`);
+                break;
+        }
+    }
+
+    private _handleResponsePacket(packet: protocol.WireProtocol.ResponsePacket) {
+        const request = null; //this._requestQueue.dequeue(packet.Command, packet.Request_seq);
+
+        if (!request) {
+            this._logger.appendLine(`Received response for ${packet.Command} but could not find request.`);
+            return;
+        }
+
+        if (this._debugMode) {
+            this._logger.appendLine(`handleResponse: ${packet.Command} (${packet.Request_seq})`);
+        }
+
+        if (packet.Success) {
+            request.onSuccess(packet.Body);
+        }
+        else {
+            request.onError(packet.Message || packet.Body);
+        }
+
+        //this._requestQueue.drain();
+    }
+
+    private _makeRequest(request: Request) {
+        const id = MsilDecompilerServer._nextId++;
+
+        const requestPacket: protocol.WireProtocol.RequestPacket = {
+            Type: 'request',
+            Seq: id,
+            Command: request.command,
+            Arguments: request.data
+        };
+
+        if (this._debugMode) {
+            this._logger.append(`makeRequest: ${request.command} (${id})`);
+            if (request.data) {
+                this._logger.append(`, data=${JSON.stringify(request.data)}`);
+            }
+            this._logger.appendLine();
+        }
+
+        this._serverProcess.stdin.write(JSON.stringify(requestPacket) + '\n');
+
+        return id;
+    }
+
+    private _logOutput(logLevel: string, name: string, message: string) {
+
+        const output = `[${logLevel}:${name}] ${message}`;
+
+        // strip stuff like: /codecheck: 200 339ms
+        if (this._debugMode) {
+            this._logger.appendLine(output);
+        }
+    }
+}

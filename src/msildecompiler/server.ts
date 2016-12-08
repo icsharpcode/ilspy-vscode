@@ -2,7 +2,7 @@
 import { EventEmitter } from 'events';
 import { ChildProcess, exec } from 'child_process';
 import { ReadLine, createInterface } from 'readline';
-import { launchMsilDecompiler } from './launcher';
+import { launchMsilDecompiler, findAssemblies } from './launcher';
 import { Options } from './options';
 import { Logger } from '../logger';
 import { DelayTracker } from './delayTracker';
@@ -244,12 +244,19 @@ export class MsilDecompilerServer {
         });
     }
 
-    public restart(assemblyPath: string = this._assemblyPath): Promise<void> {
-        if (assemblyPath) {
-            return this.stop().then(() => {
-                this._start(assemblyPath);
-            });
-        }
+    public restart(): Promise<void> {
+        findAssemblies().then(assemblies => {
+            return vscode.window.showQuickPick(assemblies);
+        }).then(assembly => {
+            this._assemblyPath = assembly;
+            if (this._assemblyPath) {
+                return this.stop().then(() => {
+                    this._start(this._assemblyPath);
+                });
+            }
+        });
+
+        return;
     }
 
     // --- requests et al

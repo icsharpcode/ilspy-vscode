@@ -16,7 +16,7 @@ namespace MsilDecompiler.WebApi.Providers
         private Dictionary<MetadataToken, IMetadataTokenProvider> _tokenToProviderMap;
         private AssemblyDefinition _assemblyDefinition;
         private IDecompilationConfiguration _decompilationConfiguration;
-        private CSharpLanguage _csharpLanuage;
+        private Language _language;
 
         public bool IsDotNetAssembly { get; private set; }
 
@@ -24,7 +24,7 @@ namespace MsilDecompiler.WebApi.Providers
         {
             _logger = loggerFactory.CreateLogger<DecompilationProvider>();
             _decompilationConfiguration = decompilationConfiguration;
-            _csharpLanuage = new CSharpLanguage();
+            _language = new CSharpLanguage();
 
             Initialize();
         }
@@ -150,27 +150,27 @@ namespace MsilDecompiler.WebApi.Providers
                 var settings = _decompilationConfiguration.DecompilerSettings;
                 if (t is AssemblyDefinition)
                 {
-                    _csharpLanuage.DecompileAssembly(t as AssemblyDefinition, output, settings);
+                    _language.DecompileAssembly(t as AssemblyDefinition, output, settings);
                 }
                 else if (t is TypeDefinition)
                 {
-                    _csharpLanuage.DecompileType(t as TypeDefinition, output, settings);
+                    _language.DecompileType(t as TypeDefinition, output, settings);
                 }
                 else if (t is MethodDefinition)
                 {
-                    _csharpLanuage.DecompileMethod(t as MethodDefinition, output, settings);
+                    _language.DecompileMethod(t as MethodDefinition, output, settings);
                 }
                 else if (t is FieldDefinition)
                 {
-                    _csharpLanuage.DecompileField(t as FieldDefinition, output, settings);
+                    _language.DecompileField(t as FieldDefinition, output, settings);
                 }
                 else if (t is EventDefinition)
                 {
-                    _csharpLanuage.DecompileEvent(t as EventDefinition, output, settings);
+                    _language.DecompileEvent(t as EventDefinition, output, settings);
                 }
                 else if (t is PropertyDefinition)
                 {
-                    _csharpLanuage.DecompileProperty(t as PropertyDefinition, output, settings);
+                    _language.DecompileProperty(t as PropertyDefinition, output, settings);
                 }
 
                 return writer.ToString();
@@ -179,7 +179,7 @@ namespace MsilDecompiler.WebApi.Providers
 
         public IEnumerable<Tuple<string, MetadataToken>> GetTypeTuples()
         {
-            return GetTypes().Select(t => Tuple.Create(_csharpLanuage.FormatTypeName(t), t.MetadataToken));
+            return GetTypes().Select(t => Tuple.Create(_language.FormatTypeName(t), t.MetadataToken));
         }
 
         public string GetCode(TokenType type, uint rid)
@@ -216,7 +216,7 @@ namespace MsilDecompiler.WebApi.Providers
             {
                 foreach (var methodDefinition in typeDefinition.Methods)
                 {
-                    yield return Tuple.Create(_csharpLanuage.FormatMethodName(methodDefinition), methodDefinition.MetadataToken);
+                    yield return Tuple.Create(_language.FormatMethodName(methodDefinition), methodDefinition.MetadataToken);
                 }
 
                 foreach (var eventDefinition in typeDefinition.Events)
@@ -243,7 +243,7 @@ namespace MsilDecompiler.WebApi.Providers
 
         public string GetMethodText(MethodDefinition methodDefinition)
         {
-            return _csharpLanuage.FormatMethodName(methodDefinition);
+            return _language.FormatMethodName(methodDefinition);
         }
 
         private IEnumerable<TypeDefinition> GetNestedTypes(TypeDefinition typeDefinition)

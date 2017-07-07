@@ -1,4 +1,4 @@
-﻿namespace MsilDecompiler.WebApi.Configuration
+﻿namespace MsilDecompiler.Host.Configuration
 {
     public class ConsoleArgs
     {

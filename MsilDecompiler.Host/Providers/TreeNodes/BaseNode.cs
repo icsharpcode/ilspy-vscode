@@ -6,7 +6,7 @@ using ICSharpCode.Decompiler;
 using Mono.Cecil;
 using MsilDecompiler.MsilSpy;
 
-namespace MsilDecompiler.WebApi.Providers
+namespace MsilDecompiler.Host.Providers
 {
     public abstract class BaseNode
     {

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Mono.Cecil;
-using MsilDecompiler.WebApi.Providers;
+using MsilDecompiler.Host.Providers;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
-namespace MsilDecompiler.WebApi.Controllers
+namespace MsilDecompiler.Host.Controllers
 {
     [Route("api/[controller]")]
     public class DecompileController : Controller

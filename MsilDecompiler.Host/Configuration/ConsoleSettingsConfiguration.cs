@@ -1,7 +1,7 @@
 ﻿using ICSharpCode.Decompiler;
 using Microsoft.Extensions.Configuration;
 
-namespace MsilDecompiler.WebApi.Configuration
+namespace MsilDecompiler.Host.Configuration
 {
     public class ConsoleSettingsConfiguration: IDecompilationConfiguration
     {

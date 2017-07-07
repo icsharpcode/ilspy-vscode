@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Mono.Cecil;
 
-namespace MsilDecompiler.WebApi.Providers
+namespace MsilDecompiler.Host.Providers
 {
     public interface IDecompilationProvider
     {

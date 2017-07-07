@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using ICSharpCode.Decompiler;
 using MsilDecompiler.MsilSpy;
 
-namespace MsilDecompiler.WebApi.Providers
+namespace MsilDecompiler.Host.Providers
 {
     public class NamespaceNode : BaseNode
     {

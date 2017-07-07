@@ -6,21 +6,22 @@ using ICSharpCode.Decompiler;
 using Microsoft.Extensions.Logging;
 using Mono.Cecil;
 using MsilDecompiler.MsilSpy;
-using MsilDecompiler.WebApi.Configuration;
+using MsilDecompiler.Host.Configuration;
+using OmniSharp.Host.Services;
 
-namespace MsilDecompiler.WebApi.Providers
+namespace MsilDecompiler.Host.Providers
 {
     public class DecompilationProvider : IDecompilationProvider
     {
         private ILogger _logger;
         private Dictionary<MetadataToken, IMetadataTokenProvider> _tokenToProviderMap;
         private AssemblyDefinition _assemblyDefinition;
-        private IDecompilationConfiguration _decompilationConfiguration;
+        private IMsilDecompilerEnvironment _decompilationConfiguration;
         private Language _language;
 
         public bool IsDotNetAssembly { get; private set; }
 
-        public DecompilationProvider(IDecompilationConfiguration decompilationConfiguration, ILoggerFactory loggerFactory)
+        public DecompilationProvider(IMsilDecompilerEnvironment decompilationConfiguration, ILoggerFactory loggerFactory)
         {
             _logger = loggerFactory.CreateLogger<DecompilationProvider>();
             _decompilationConfiguration = decompilationConfiguration;
@@ -35,7 +36,9 @@ namespace MsilDecompiler.WebApi.Providers
             {
                 try
                 {
-                    _assemblyDefinition = AssemblyDefinition.ReadAssembly(_decompilationConfiguration.FilePath, new ReaderParameters { AssemblyResolver = new MyDefaultAssemblyResolver() });
+                    _assemblyDefinition = AssemblyDefinition.ReadAssembly(
+                        _decompilationConfiguration.AssemblyPath,
+                        new ReaderParameters { AssemblyResolver = new MyDefaultAssemblyResolver() });
                     if (_assemblyDefinition != null)
                     {
                         IsDotNetAssembly = true;
@@ -46,7 +49,7 @@ namespace MsilDecompiler.WebApi.Providers
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError("An exception occurred when reading assembly {assembly}: {exception}", _decompilationConfiguration.FilePath, ex);
+                    _logger.LogError("An exception occurred when reading assembly {assembly}: {exception}", _decompilationConfiguration.AssemblyPath, ex);
                 }
             }
         }

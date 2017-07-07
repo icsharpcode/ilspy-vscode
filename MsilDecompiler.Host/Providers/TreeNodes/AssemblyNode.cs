@@ -3,7 +3,7 @@ using ICSharpCode.Decompiler;
 using Mono.Cecil;
 using MsilDecompiler.MsilSpy;
 
-namespace MsilDecompiler.WebApi.Providers
+namespace MsilDecompiler.Host.Providers
 {
     public class AssemblyNode : BaseNode
     {

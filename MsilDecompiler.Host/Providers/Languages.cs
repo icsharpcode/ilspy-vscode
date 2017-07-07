@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using MsilDecompiler.MsilSpy;
 
-namespace MsilDecompiler.WebApi.Providers
+namespace MsilDecompiler.Host.Providers
 {
     public static class Languages
     {

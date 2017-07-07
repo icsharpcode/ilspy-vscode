@@ -3,9 +3,9 @@
   <PropertyGroup>
     <TargetFramework>net46</TargetFramework>
     <PreserveCompilationContext>true</PreserveCompilationContext>
-    <AssemblyName>MsilDecompiler.WebApi</AssemblyName>
+    <AssemblyName>MsilDecompiler.Host</AssemblyName>
     <OutputType>Exe</OutputType>
-    <PackageId>MsilDecompiler.WebApi</PackageId>
+    <PackageId>MsilDecompiler.Host</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,12 +16,15 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MsilDecompiler.MsilSpy\MsilDecompiler.MsilSpy.csproj" />
+    <ProjectReference Include="..\OmniSharp.Abstractions\OmniSharp.Abstractions.csproj" />
+    <ProjectReference Include="..\OmniSharp.Stdio\OmniSharp.Stdio.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="1.1.3" />
     <PackageReference Include="Microsoft.AspNetCore.Server.IISIntegration" Version="1.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="1.1.2" />
+    <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="1.1.2" />

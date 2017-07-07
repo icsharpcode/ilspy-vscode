@@ -6,7 +6,8 @@ import TelemetryReporter from 'vscode-extension-telemetry';
 import * as util from './common';
 import { Logger } from './logger';
 import { PlatformInformation } from './platform';
-import { MsilDecompilerServer } from './msildecompiler/server'
+import { MsilDecompilerServer } from './msildecompiler/server';
+import * as serverUtils from './msildecompiler/utils';
 
 let _channel: vscode.OutputChannel = null;
 
@@ -34,7 +35,20 @@ export function activate(context: vscode.ExtensionContext) {
     let disposable = vscode.commands.registerCommand('msildecompiler.decompileAssembly', () => {
         // The code you place here will be executed every time your command is executed
 
-        server.restart();
+        server.restart().then(
+            () => {
+                serverUtils.decompileAssembly(server, { }).then(
+                (value) => {
+                    logger.appendLine(value.Decompiled);
+                },
+                (rejected) => {
+                    logger.appendLine(rejected);
+                });
+            },
+            (reason) => {
+                logger.appendLine(reason);
+            }
+        );
     });
 
     context.subscriptions.push(disposable);

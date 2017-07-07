@@ -1,5 +1,8 @@
 {
   "dependencies": {
     "semver": "registry:npm/semver#5.0.0+20160723033700"
+  },
+  "globalDependencies": {
+    "node-fetch": "registry:dt/node-fetch#0.0.0+20160711094047"
   }
 }

@@ -22,7 +22,7 @@ export class Options {
 
         const useMono = msildecompilerConfig.get<boolean>('useMono');
 
-        const assemblyLoadTimeout = msildecompilerConfig.get<number>('projectLoadTimeout', 60);
+        const assemblyLoadTimeout = msildecompilerConfig.get<number>('assemblyLoadTimeout', 60);
 
         const loggingLevel = msildecompilerConfig.get<string>('loggingLevel');
 

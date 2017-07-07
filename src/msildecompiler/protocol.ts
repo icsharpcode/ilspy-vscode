@@ -10,9 +10,9 @@
 export module Requests {
     export const DecompileAssembly = '/assembly';
     export const GetTypes = '/types';
-    export const DecopmileType = '/types/{rid}';
-    export const GetMembers = '/types/{rid}/members';
-    export const DecompileMember = '/types/{typeRid}/members/{memberRid}';
+    export const DecopmileType = '/type';
+    export const GetMembers = '/members';
+    export const DecompileMember = '/member';
 }
 
 export namespace WireProtocol {
@@ -34,26 +34,62 @@ export namespace WireProtocol {
         Message: string;
         Body: any;
     }
+
+    export interface EventPacket extends Packet {
+        Event: string;
+        Body: any;
+    }
 }
+
 
 export interface Request {
-    Filename: string;
-    Line?: number;
-    Column?: number;
-    Buffer?: string;
 }
 
-export interface AssemblyArgument {
+export interface DecompileAssemblyRequest extends Request {
 }
 
-export interface TypesArgument {
+export interface DecompileAssemblyResponse {
+    Decompiled: string;
 }
 
-export interface TypeArgument {
-    TypeRuntimeId: number;
+export interface GetTypesRequest extends Request {
 }
 
-export interface MemberArgument {
-    TypeRuntimeId: number;
-    MemberRuntimeId: number;
+export interface MetadataToken {
+    RID: number;
+    TokenType: number;
+}
+
+export interface TypeData {
+    Name: string;
+    Token: MetadataToken;
+}
+
+export interface GetTypesResponse {
+    Types: TypeData[];
+}
+
+export interface DecompileTypeRequest extends Request {
+    Rid: number;
+}
+
+export interface DecompileTypeResponse {
+    Decompiled: string;
+}
+
+export interface GetMembersRequest extends Request {
+    Rid: number;
+}
+
+export interface GetMembersResponse {
+    Types: TypeData[];
+}
+
+export interface DecompileMemberRequest extends Request {
+    TypeRid: number;
+    MemberRid: number;
+}
+
+export interface DecompileMemberResponse {
+    Decompiled: string;
 }

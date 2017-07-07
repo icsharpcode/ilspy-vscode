@@ -6,10 +6,11 @@ import { launchMsilDecompiler, findAssemblies } from './launcher';
 import { Options } from './options';
 import { Logger } from '../logger';
 import { DelayTracker } from './delayTracker';
+import { Request, RequestProcessor } from './requestProcessor';
 import TelemetryReporter from 'vscode-extension-telemetry';
+import * as os from 'os';
 import * as path from 'path';
 import * as protocol from './protocol';
-import { Request } from './request';
 import * as vscode from 'vscode';
 
 enum ServerState {
@@ -35,6 +36,10 @@ module Events {
     export const Started = 'started';
 }
 
+module Constants {
+
+}
+
 const TelemetryReportingDelay = 2 * 60 * 1000; // two minutes
 
 export class MsilDecompilerServer {
@@ -53,6 +58,7 @@ export class MsilDecompilerServer {
     private _eventBus = new EventEmitter();
     private _state: ServerState = ServerState.Stopped;
     private _channel: vscode.OutputChannel;
+    private _requestProcessor: RequestProcessor;
     private _logger: Logger;
 
     private _isDebugEnable: boolean = false;
@@ -71,6 +77,8 @@ export class MsilDecompilerServer {
         const logger = this._debugMode
             ? this._logger
             : new Logger(message => { });
+
+        this._requestProcessor = new RequestProcessor(logger, request => this._makeRequest(request));
     }
 
     public isRunning(): boolean {
@@ -152,18 +160,17 @@ export class MsilDecompilerServer {
 
         const cwd = path.dirname(assemblyPath);
         let args = [
-            '--AssemblyPath', assemblyPath
+            '--assembly', assemblyPath,
+            '--stdio',
+            '--encoding', 'utf-8',
+            //TODO: '--loglevel', this._options.loggingLevel
         ];
 
         this._options = Options.Read();
 
-        if (this._options.loggingLevel === 'verbose') {
-            args.push('-v');
-        }
-
         this._logger.appendLine(`Starting MsilDecompiler server at ${new Date().toLocaleString()}`);
         this._logger.increaseIndent();
-        this._logger.appendLine(`Target: ${assemblyPath}`);
+        this._logger.appendLine(`Assebmly to decompile: ${assemblyPath}`);
         this._logger.decreaseIndent();
         this._logger.appendLine();
 
@@ -245,18 +252,26 @@ export class MsilDecompilerServer {
     }
 
     public restart(): Promise<void> {
-        findAssemblies().then(assemblies => {
-            return vscode.window.showQuickPick(assemblies);
-        }).then(assembly => {
-            this._assemblyPath = assembly;
-            if (this._assemblyPath) {
-                return this.stop().then(() => {
-                    this._start(this._assemblyPath);
-                });
-            }
+        return new Promise<void>((resolve, reject) => {
+            findAssemblies()
+              .then(assemblies => {
+                return vscode.window.showQuickPick(assemblies);
+              })
+            .then(assembly => {
+                this._assemblyPath = assembly;
+                if (this._assemblyPath) {
+                    return this.stop().then(() => {
+                        this._start(this._assemblyPath).then(
+                            () => {
+                                resolve();
+                            },
+                            (reason) => {
+                                reject();
+                            });
+                    });
+                }
+            });
         });
-
-        return;
     }
 
     // --- requests et al
@@ -280,19 +295,19 @@ export class MsilDecompilerServer {
                 onError: err => reject(err)
             };
 
-            //this._requestQueue.enqueue(request);
+            this._requestProcessor.processRequest(request);
         });
 
         if (token) {
             token.onCancellationRequested(() => {
-                //this._requestQueue.cancelRequest(request);
+                //TODO: this._requestQueue.cancelRequest(request);
             });
         }
 
         return promise.then(response => {
             let endTime = Date.now();
             let elapsedTime = endTime - startTime;
-            //this._recordRequestDelay(command, elapsedTime);
+            //TODO: this._recordRequestDelay(command, elapsedTime);
 
             return response;
         });
@@ -303,6 +318,7 @@ export class MsilDecompilerServer {
         this._serverProcess.stderr.on('data', (data: any) => {
             this._fireEvent('stderr', String(data));
         });
+
 
         this._readLine = createInterface({
             input: this._serverProcess.stdout,
@@ -371,14 +387,35 @@ export class MsilDecompilerServer {
             case 'response':
                 this._handleResponsePacket(<protocol.WireProtocol.ResponsePacket>packet);
                 break;
+            case 'event':
+                this._handleEventPacket(<protocol.WireProtocol.EventPacket>packet);
+                break;
             default:
                 console.warn(`Unknown packet type: ${packet.Type}`);
                 break;
         }
     }
 
+    private _onDataReceived(line: string) {
+        if (line[0] !== '{') {
+            this._logger.appendLine(line);
+            return;
+        }
+
+        let packet: any;
+        try {
+            packet = JSON.parse(line);
+        }
+        catch (err) {
+            // This isn't JSON
+            return;
+        }
+
+        this._handleResponsePacket(<protocol.WireProtocol.ResponsePacket>packet);
+    }
+
     private _handleResponsePacket(packet: protocol.WireProtocol.ResponsePacket) {
-        const request = null; //this._requestQueue.dequeue(packet.Command, packet.Request_seq);
+        const request = null; //TODO: this._requestQueue.dequeue(packet.Command, packet.Request_seq);
 
         if (!request) {
             this._logger.appendLine(`Received response for ${packet.Command} but could not find request.`);
@@ -397,6 +434,17 @@ export class MsilDecompilerServer {
         }
 
         //this._requestQueue.drain();
+    }
+
+    private _handleEventPacket(packet: protocol.WireProtocol.EventPacket): void {
+        if (packet.Event === 'log') {
+            const entry = <{ LogLevel: string; Name: string; Message: string; }>packet.Body;
+            this._logOutput(entry.LogLevel, entry.Name, entry.Message);
+        }
+        else {
+            // fwd all other events
+            this._fireEvent(packet.Event, packet.Body);
+        }
     }
 
     private _makeRequest(request: Request) {
@@ -422,12 +470,34 @@ export class MsilDecompilerServer {
         return id;
     }
 
+    private static getLogLevelPrefix(logLevel: string) {
+        switch (logLevel) {
+            case "TRACE": return "trce";
+            case "DEBUG": return "dbug";
+            case "INFORMATION": return "info";
+            case "WARNING": return "warn";
+            case "ERROR": return "fail";
+            case "CRITICAL": return "crit";
+            default: throw new Error(`Unknown log level value: ${logLevel}`);
+        }
+    }
+
+    private _isFilterableOutput(logLevel: string, name: string, message: string) {
+        // filter messages like: /codecheck: 200 339ms
+        const timing200Pattern = /^\/[\/\w]+: 200 \d+ms/;
+
+        return logLevel === "INFORMATION"
+            && name === "MsilDecompilerServer.Middleware.LoggingMiddleware"
+            && timing200Pattern.test(message);
+    }
+
     private _logOutput(logLevel: string, name: string, message: string) {
+        if (this._debugMode || !this._isFilterableOutput(logLevel, name, message)) {
+            let output = `[${MsilDecompilerServer.getLogLevelPrefix(logLevel)}]: ${name}${os.EOL}${message}`;
 
-        const output = `[${logLevel}:${name}] ${message}`;
+            const newLinePlusPadding = os.EOL + "        ";
+            output = output.replace(os.EOL, newLinePlusPadding);
 
-        // strip stuff like: /codecheck: 200 339ms
-        if (this._debugMode) {
             this._logger.appendLine(output);
         }
     }

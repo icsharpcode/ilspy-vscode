@@ -1,42 +1,54 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26114.2
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{0AD6272D-38C2-4003-B214-7AF3CF9122FA}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{ABD044C4-D8BD-478E-9E83-83E0D2C7A6B9}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C431902B-34F0-4C4C-8A3C-5513BE55A3D4}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
 	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "MsilDecompiler.WebApi", "MsilDecompiler.WebApi\MsilDecompiler.WebApi.xproj", "{97A49CB3-9749-4446-9101-33EE274E8557}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MsilDecompiler.MsilSpy", "MsilDecompiler.MsilSpy\MsilDecompiler.MsilSpy.csproj", "{C4EF72E0-0C68-4F0E-B896-E622FE533379}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "MsilDecompiler.MsilSpy", "MsilDecompiler.MsilSpy\MsilDecompiler.MsilSpy.xproj", "{2465D79E-3F84-49E7-984E-2564FF38B89A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MsilDecompiler.WebApi", "MsilDecompiler.WebApi\MsilDecompiler.WebApi.csproj", "{576F88D2-53B8-436E-8B41-38F5EE04874C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{97A49CB3-9749-4446-9101-33EE274E8557}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{97A49CB3-9749-4446-9101-33EE274E8557}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{97A49CB3-9749-4446-9101-33EE274E8557}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{97A49CB3-9749-4446-9101-33EE274E8557}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2465D79E-3F84-49E7-984E-2564FF38B89A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2465D79E-3F84-49E7-984E-2564FF38B89A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2465D79E-3F84-49E7-984E-2564FF38B89A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2465D79E-3F84-49E7-984E-2564FF38B89A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4EF72E0-0C68-4F0E-B896-E622FE533379}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4EF72E0-0C68-4F0E-B896-E622FE533379}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4EF72E0-0C68-4F0E-B896-E622FE533379}.Debug|x64.ActiveCfg = Debug|x64
+		{C4EF72E0-0C68-4F0E-B896-E622FE533379}.Debug|x64.Build.0 = Debug|x64
+		{C4EF72E0-0C68-4F0E-B896-E622FE533379}.Debug|x86.ActiveCfg = Debug|x86
+		{C4EF72E0-0C68-4F0E-B896-E622FE533379}.Debug|x86.Build.0 = Debug|x86
+		{C4EF72E0-0C68-4F0E-B896-E622FE533379}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4EF72E0-0C68-4F0E-B896-E622FE533379}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4EF72E0-0C68-4F0E-B896-E622FE533379}.Release|x64.ActiveCfg = Release|x64
+		{C4EF72E0-0C68-4F0E-B896-E622FE533379}.Release|x64.Build.0 = Release|x64
+		{C4EF72E0-0C68-4F0E-B896-E622FE533379}.Release|x86.ActiveCfg = Release|x86
+		{C4EF72E0-0C68-4F0E-B896-E622FE533379}.Release|x86.Build.0 = Release|x86
+		{576F88D2-53B8-436E-8B41-38F5EE04874C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{576F88D2-53B8-436E-8B41-38F5EE04874C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{576F88D2-53B8-436E-8B41-38F5EE04874C}.Debug|x64.ActiveCfg = Debug|x64
+		{576F88D2-53B8-436E-8B41-38F5EE04874C}.Debug|x64.Build.0 = Debug|x64
+		{576F88D2-53B8-436E-8B41-38F5EE04874C}.Debug|x86.ActiveCfg = Debug|x86
+		{576F88D2-53B8-436E-8B41-38F5EE04874C}.Debug|x86.Build.0 = Debug|x86
+		{576F88D2-53B8-436E-8B41-38F5EE04874C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{576F88D2-53B8-436E-8B41-38F5EE04874C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{576F88D2-53B8-436E-8B41-38F5EE04874C}.Release|x64.ActiveCfg = Release|x64
+		{576F88D2-53B8-436E-8B41-38F5EE04874C}.Release|x64.Build.0 = Release|x64
+		{576F88D2-53B8-436E-8B41-38F5EE04874C}.Release|x86.ActiveCfg = Release|x86
+		{576F88D2-53B8-436E-8B41-38F5EE04874C}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{97A49CB3-9749-4446-9101-33EE274E8557} = {0AD6272D-38C2-4003-B214-7AF3CF9122FA}
-		{2465D79E-3F84-49E7-984E-2564FF38B89A} = {0AD6272D-38C2-4003-B214-7AF3CF9122FA}
 	EndGlobalSection
 EndGlobal

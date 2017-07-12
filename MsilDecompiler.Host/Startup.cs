@@ -70,6 +70,10 @@ namespace MsilDecompiler.Host
 
             app.UseExceptionHandler("/error");
             app.UseMiddleware<AssemblyMiddleware>();
+            app.UseMiddleware<GetTypesMiddleware>();
+            app.UseMiddleware<DecompileTypeMiddleware>();
+            app.UseMiddleware<GetMembersMiddleware>();
+            app.UseMiddleware<DecompileMemberMiddleware>();
             app.UseMiddleware<StopServerMiddleware>();
 
             var logger = loggerFactory.CreateLogger<Startup>();

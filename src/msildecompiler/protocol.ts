@@ -48,7 +48,7 @@ export interface Request {
 export interface DecompileAssemblyRequest extends Request {
 }
 
-export interface DecompileAssemblyResponse {
+export interface DecompileResponse {
     Decompiled: string;
 }
 
@@ -73,23 +73,15 @@ export interface DecompileTypeRequest extends Request {
     Rid: number;
 }
 
-export interface DecompileTypeResponse {
-    Decompiled: string;
-}
-
 export interface GetMembersRequest extends Request {
     Rid: number;
 }
 
 export interface GetMembersResponse {
-    Types: TypeData[];
+    Members: TypeData[];
 }
 
 export interface DecompileMemberRequest extends Request {
     TypeRid: number;
     MemberRid: number;
-}
-
-export interface DecompileMemberResponse {
-    Decompiled: string;
 }

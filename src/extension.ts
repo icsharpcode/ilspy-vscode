@@ -35,20 +35,21 @@ export function activate(context: vscode.ExtensionContext) {
     let disposable = vscode.commands.registerCommand('msildecompiler.decompileAssembly', () => {
         // The code you place here will be executed every time your command is executed
 
-        server.restart().then(
-            () => {
+        server.restart().then(() => {
                 serverUtils.decompileAssembly(server, { }).then(
-                (value) => {
-                    logger.appendLine(value.Decompiled);
-                },
-                (rejected) => {
-                    logger.appendLine(rejected);
+                    (value) => {
+                        logger.appendLine(value.Decompiled);
+                    },
+                    (rejected) => {
+                        logger.appendLine(rejected);
                 });
-            },
-            (reason) => {
-                logger.appendLine(reason);
-            }
-        );
+        }).then(() =>
+            serverUtils.getTypes(server, { }).then(value =>
+                value.Types.forEach(t =>logger.appendLine(`${t.Name}, ${t.Token}`))
+            )
+        ).catch(error => {
+            logger.appendLine(error);
+        });
     });
 
     context.subscriptions.push(disposable);

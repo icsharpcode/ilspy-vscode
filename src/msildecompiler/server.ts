@@ -6,7 +6,7 @@ import { launchMsilDecompiler, findAssemblies } from './launcher';
 import { Options } from './options';
 import { Logger } from '../logger';
 import { DelayTracker } from './delayTracker';
-import { Request, RequestProcessor } from './requestProcessor';
+import { Request, RequestQueueCollection } from './requestQueue';
 import TelemetryReporter from 'vscode-extension-telemetry';
 import * as os from 'os';
 import * as path from 'path';
@@ -46,7 +46,7 @@ export class MsilDecompilerServer {
 
     private static _nextId = 1;
 
-    private _debugMode: boolean = false;
+    private _debugMode: boolean = true;
 
     private _readLine: ReadLine;
     private _disposables: vscode.Disposable[] = [];
@@ -58,7 +58,7 @@ export class MsilDecompilerServer {
     private _eventBus = new EventEmitter();
     private _state: ServerState = ServerState.Stopped;
     private _channel: vscode.OutputChannel;
-    private _requestProcessor: RequestProcessor;
+    private _requestQueue: RequestQueueCollection;
     private _logger: Logger;
 
     private _isDebugEnable: boolean = false;
@@ -78,7 +78,7 @@ export class MsilDecompilerServer {
             ? this._logger
             : new Logger(message => { });
 
-        this._requestProcessor = new RequestProcessor(logger, request => this._makeRequest(request));
+        this._requestQueue = new RequestQueueCollection(logger, 8, request => this._makeRequest(request));
     }
 
     public isRunning(): boolean {
@@ -198,6 +198,8 @@ export class MsilDecompilerServer {
         }).then(() => {
             // Start telemetry reporting
             this._telemetryIntervalId = setInterval(() => this._reportTelemetry(), TelemetryReportingDelay);
+        }).then(() => {
+            this._requestQueue.drain();
         }).catch(err => {
             this._fireEvent(Events.ServerError, err);
             return this.stop();
@@ -295,12 +297,12 @@ export class MsilDecompilerServer {
                 onError: err => reject(err)
             };
 
-            this._requestProcessor.processRequest(request);
+            this._requestQueue.enqueue(request);
         });
 
         if (token) {
             token.onCancellationRequested(() => {
-                //TODO: this._requestQueue.cancelRequest(request);
+                this._requestQueue.cancelRequest(request);
             });
         }
 
@@ -415,7 +417,7 @@ export class MsilDecompilerServer {
     }
 
     private _handleResponsePacket(packet: protocol.WireProtocol.ResponsePacket) {
-        const request = null; //TODO: this._requestQueue.dequeue(packet.Command, packet.Request_seq);
+        const request = this._requestQueue.dequeue(packet.Command, packet.Request_seq);
 
         if (!request) {
             this._logger.appendLine(`Received response for ${packet.Command} but could not find request.`);
@@ -433,7 +435,7 @@ export class MsilDecompilerServer {
             request.onError(packet.Message || packet.Body);
         }
 
-        //this._requestQueue.drain();
+        this._requestQueue.drain();
     }
 
     private _handleEventPacket(packet: protocol.WireProtocol.EventPacket): void {

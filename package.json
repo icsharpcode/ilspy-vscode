@@ -16,6 +16,14 @@
     ],
     "main": "./out/src/extension",
     "contributes": {
+        "views": {
+            "explorer": [
+                {
+                    "id": "msilDecompiledMembers",
+                    "name": "Decompiled Members"
+                }
+            ]
+        },
         "commands": [{
             "command": "msildecompiler.decompileAssembly",
             "title": "Decompile IL Assembly",

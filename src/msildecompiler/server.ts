@@ -2,7 +2,7 @@
 import { EventEmitter } from 'events';
 import { ChildProcess, exec } from 'child_process';
 import { ReadLine, createInterface } from 'readline';
-import { launchMsilDecompiler, findAssemblies } from './launcher';
+import { launchMsilDecompiler } from './launcher';
 import { Options } from './options';
 import { Logger } from '../logger';
 import { DelayTracker } from './delayTracker';
@@ -79,6 +79,10 @@ export class MsilDecompilerServer {
             : new Logger(message => { });
 
         this._requestQueue = new RequestQueueCollection(logger, 8, request => this._makeRequest(request));
+    }
+
+    public get assemblyPath() {
+        return this._assemblyPath;
     }
 
     public isRunning(): boolean {
@@ -253,26 +257,20 @@ export class MsilDecompilerServer {
         });
     }
 
-    public restart(): Promise<void> {
+    public restart(assemblyPath: string): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            findAssemblies()
-              .then(assemblies => {
-                return vscode.window.showQuickPick(assemblies);
-              })
-            .then(assembly => {
-                this._assemblyPath = assembly;
-                if (this._assemblyPath) {
-                    return this.stop().then(() => {
-                        this._start(this._assemblyPath).then(
-                            () => {
-                                resolve();
-                            },
-                            (reason) => {
-                                reject();
-                            });
-                    });
-                }
-            });
+            this._assemblyPath = assemblyPath;
+            if (this._assemblyPath) {
+                return this.stop().then(() => {
+                    this._start(this._assemblyPath).then(
+                        () => {
+                            resolve();
+                        },
+                        (reason) => {
+                            reject();
+                        });
+                });
+            }
         });
     }
 

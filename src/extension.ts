@@ -8,8 +8,11 @@ import { Logger } from './logger';
 import { PlatformInformation } from './platform';
 import { MsilDecompilerServer } from './msildecompiler/server';
 import * as serverUtils from './msildecompiler/utils';
+import { DecompiledTreeProvider, MemberNode } from './msildecompiler/decompiledTreeProvider';
+import { Options } from './msildecompiler/options';
 
 let _channel: vscode.OutputChannel = null;
+let textEditor: vscode.TextEditor = null;
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -26,35 +29,90 @@ export function activate(context: vscode.ExtensionContext) {
     let logger = new Logger(text => _channel.append(text));
 
     const server = new MsilDecompilerServer(reporter);
+    let decompileTreeProvider = new DecompiledTreeProvider(server);
 
     console.log('Congratulations, your extension "msil-decompiler" is now active!');
+
+    decompileTreeProvider = new DecompiledTreeProvider(server);
+    let _treeDisposable = vscode.window.registerTreeDataProvider("msilDecompiledMembers", decompileTreeProvider);
+    context.subscriptions.push(_treeDisposable);
 
     // The command has been defined in the package.json file
     // Now provide the implementation of the command with  registerCommand
     // The commandId parameter must match the command field in package.json
     let disposable = vscode.commands.registerCommand('msildecompiler.decompileAssembly', () => {
         // The code you place here will be executed every time your command is executed
-
-        server.restart().then(() => {
-                serverUtils.decompileAssembly(server, { }).then(
-                    (value) => {
-                        logger.appendLine(value.Decompiled);
-                    },
-                    (rejected) => {
-                        logger.appendLine(rejected);
-                });
-        }).then(() =>
-            serverUtils.getTypes(server, { }).then(value =>
-                value.Types.forEach(t =>logger.appendLine(`${t.Name}, ${t.Token}`))
-            )
-        ).catch(error => {
-            logger.appendLine(error);
+        pickAssembly().then(assembly => {
+            server.restart(assembly).then(() => {
+                decompileTreeProvider.refresh();
+            });
         });
     });
+
+    context.subscriptions.push(disposable);
+
+    let lastSelectedNode: MemberNode = null;
+
+    disposable = vscode.commands.registerCommand('showDecompiledCode', (node: MemberNode) => {
+        if (lastSelectedNode === node) {
+            return;
+        }
+
+        lastSelectedNode = node;
+        if (node.decompiled) {
+            showCode(node.decompiled);
+        }
+        else {
+            decompileTreeProvider.getCode(node).then(code => {
+                node.decompiled = code;
+                showCode(node.decompiled);
+            });
+        }
+	});
 
     context.subscriptions.push(disposable);
 }
 
 // this method is called when your extension is deactivated
 export function deactivate() {
+}
+
+function showCode(code: string) {
+    if (!textEditor) {
+        vscode.workspace.openTextDocument(
+            {
+                "content": code,
+                "language": "csharp"
+            }
+        ).then(document => {
+            vscode.window.showTextDocument(document).then(editor => textEditor = editor);
+        });
+    }
+    else {
+        vscode.commands.executeCommand("editor.action.selectAll").then(() =>{
+            textEditor.edit(editBuilder => editBuilder.replace(textEditor.selection, code));
+            vscode.commands.executeCommand("cursorMove", {"to": "viewPortTop"});
+        });
+    }
+}
+
+function pickAssembly(): Thenable<string> {
+    return findAssemblies().then(assemblies => {
+        return vscode.window.showQuickPick(assemblies);
+    });
+}
+
+function findAssemblies(): Thenable<string[]> {
+    if (!vscode.workspace.rootPath) {
+        return Promise.resolve([]);
+    }
+
+    const options = Options.Read();
+
+    return vscode.workspace.findFiles(
+        /*include*/ '{**/*.dll,**/*.exe,**/*.winrt,**/*.netmodule}',
+        /*exclude*/ '{**/node_modules/**,**/.git/**,**/bower_components/**}')
+    .then(resources => {
+        return resources.map(uri => uri.fsPath);
+    });
 }

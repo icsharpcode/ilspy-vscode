@@ -10,27 +10,6 @@ import * as vscode from 'vscode';
 import * as util from '../common';
 import { Options } from './options';
 
-/**
- * Returns a list of potential targets on which OmniSharp can be launched.
- * This includes `project.json` files, `*.sln` files (if any `*.csproj` files are found), and the root folder
- * (if it doesn't contain a `project.json` file, but `project.json` files exist). In addition, the root folder
- * is included if there are any `*.csproj` files present, but a `*.sln* file is not found.
- */
-export function findAssemblies(): Thenable<string[]> {
-    if (!vscode.workspace.rootPath) {
-        return Promise.resolve([]);
-    }
-
-    const options = Options.Read();
-
-    return vscode.workspace.findFiles(
-        /*include*/ '{**/*.dll,**/*.exe,**/*.winrt,**/*.netmodule}',
-        /*exclude*/ '{**/node_modules/**,**/.git/**,**/bower_components/**}')
-    .then(resources => {
-        return resources.map(uri => uri.fsPath);
-    });
-}
-
 export interface LaunchResult {
     process: ChildProcess;
     command: string;

@@ -1,5 +1,6 @@
 import { ExtensionContext, TreeDataProvider, EventEmitter, TreeItem, Event, window, TreeItemCollapsibleState, Uri, commands, workspace, TextDocumentContentProvider, CancellationToken, ProviderResult } from 'vscode';
 import { MsilDecompilerServer } from './server';
+import { TokenType } from './tokenType';
 import * as serverUtils from './utils';
 import * as protocol from './protocol';
 import * as path from 'path';
@@ -7,7 +8,7 @@ import * as path from 'path';
 export class MemberNode {
     private _decompiled: string = null;
 
-    constructor(private _name: string, private _rid: number, private _tokenType: string, private _parentRid : number) {
+    constructor(private _name: string, private _rid: number, private _tokenType: TokenType, private _parentRid : number) {
     }
 
     public get name(): string {
@@ -18,8 +19,8 @@ export class MemberNode {
         return this._rid;
     }
 
-    public get type(): string {
-        return this._tokenType.toString();
+    public get type(): TokenType {
+        return this._tokenType;
     }
 
     public get decompiled(): string {
@@ -31,7 +32,8 @@ export class MemberNode {
     }
 
     public get isType() : boolean {
-        return this.type === "33554432" || this.type === "Assembly";
+        return this.type === TokenType.TypeDef
+         || this.type === TokenType.Assembly;
     }
 
     public get parent(): number {
@@ -69,7 +71,7 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, Tex
 	public getChildren(element?: MemberNode): MemberNode[] | Thenable<MemberNode[]> {
 		if (!element) {
             return [
-                new MemberNode(this.server.assemblyPath, -1, "Assembly", -2)
+                new MemberNode(this.server.assemblyPath, -1, TokenType.Assembly, -2)
             ];
 		}
         else if (element.rid === -1) {
@@ -81,14 +83,14 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, Tex
 
     getTypes(): Thenable<MemberNode[]> {
         return serverUtils.getTypes(this.server, { }).then(result => {
-            return result.Types.map(t => new MemberNode(t.Name, t.Token.RID, t.Token.TokenType.toString(), -1));
+            return result.Types.map(t => new MemberNode(t.Name, t.Token.RID, t.Token.TokenType, -1));
         });
     }
 
     getMembers(element: MemberNode): Thenable<MemberNode[]> {
         if (element.isType) {
             return serverUtils.getMembers(this.server, { "Rid": element.rid }).then(result => {
-                return result.Members.map(m => new MemberNode(m.Name, m.Token.RID, m.Token.TokenType.toString(), element.rid));
+                return result.Members.map(m => new MemberNode(m.Name, m.Token.RID, m.Token.TokenType, element.rid));
             });
         }
         else {

@@ -7,11 +7,9 @@ import * as util from './common';
 import { Logger } from './logger';
 import { PlatformInformation } from './platform';
 import { MsilDecompilerServer } from './msildecompiler/server';
-import * as serverUtils from './msildecompiler/utils';
 import { DecompiledTreeProvider, MemberNode } from './msildecompiler/decompiledTreeProvider';
 import { Options } from './msildecompiler/options';
 
-let _channel: vscode.OutputChannel = null;
 let textEditor: vscode.TextEditor = null;
 
 export function activate(context: vscode.ExtensionContext) {
@@ -23,10 +21,6 @@ export function activate(context: vscode.ExtensionContext) {
     const reporter = new TelemetryReporter(extensionId, extensionVersion, aiKey);
 
     util.setExtensionPath(extension.extensionPath);
-
-    _channel = vscode.window.createOutputChannel('Msil Decompiler');
-
-    let logger = new Logger(text => _channel.append(text));
 
     const server = new MsilDecompilerServer(reporter);
     let decompileTreeProvider = new DecompiledTreeProvider(server);

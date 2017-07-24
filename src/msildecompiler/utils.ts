@@ -2,7 +2,6 @@
 
 import { MsilDecompilerServer } from './server';
 import * as protocol from './protocol';
-import * as vscode from 'vscode';
 
 export function decompileAssembly(server: MsilDecompilerServer, request: protocol.DecompileAssemblyRequest) {
     return server.makeRequest<protocol.DecompileResponse>(protocol.Requests.DecompileAssembly, request);

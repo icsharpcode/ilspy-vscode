@@ -31,7 +31,7 @@ export class MemberNode {
         this._decompiled = val;
     }
 
-    public get isType() : boolean {
+    public get isTypeDefOrAssembly() : boolean {
         return this.type === TokenType.TypeDef
          || this.type === TokenType.Assembly;
     }
@@ -55,15 +55,15 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, Tex
     public getTreeItem(element: MemberNode): TreeItem {
         return {
             label: element.name,
-            collapsibleState: element.isType ? TreeItemCollapsibleState.Collapsed : void 0,
+            collapsibleState: element.isTypeDefOrAssembly ? TreeItemCollapsibleState.Collapsed : void 0,
             command: {
 				command: 'showDecompiledCode',
 				arguments: [element],
 				title: 'Decompile'
 			},
             iconPath: {
-				light: element.isType ? path.join(__filename, '..', '..', '..', 'resources', 'light', 'folder.svg') : path.join(__filename, '..', '..', '..', 'resources', 'light', 'document.svg'),
-				dark: element.isType ? path.join(__filename, '..', '..', '..', 'resources', 'dark', 'folder.svg') : path.join(__filename, '..', '..', '..', 'resources', 'dark', 'document.svg')
+				light: element.isTypeDefOrAssembly ? path.join(__filename, '..', '..', '..', 'resources', 'light', 'folder.svg') : path.join(__filename, '..', '..', '..', 'resources', 'light', 'document.svg'),
+				dark: element.isTypeDefOrAssembly ? path.join(__filename, '..', '..', '..', 'resources', 'dark', 'folder.svg') : path.join(__filename, '..', '..', '..', 'resources', 'dark', 'document.svg')
 			}
         };
     }
@@ -88,7 +88,7 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, Tex
     }
 
     getMembers(element: MemberNode): Thenable<MemberNode[]> {
-        if (element.isType) {
+        if (element.isTypeDefOrAssembly) {
             return serverUtils.getMembers(this.server, { "Rid": element.rid }).then(result => {
                 return result.Members.map(m => new MemberNode(m.Name, m.Token.RID, m.Token.TokenType, element.rid));
             });
@@ -103,7 +103,7 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, Tex
             return serverUtils.decompileAssembly(this.server, { }).then(result => result.Decompiled);
         }
 
-        if (element.isType) {
+        if (element.isTypeDefOrAssembly) {
             return serverUtils.decompileType(this.server, {"Rid": element.rid}).then(result => result.Decompiled);
         }
         else {

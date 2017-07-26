@@ -140,6 +140,36 @@ namespace MsilDecompiler.MsilSpy
             return type.Name;
         }
 
+        public virtual string FormatEventName(EventDefinition @event)
+        {
+            if (@event == null)
+            {
+                throw new ArgumentNullException(nameof(@event));
+            }
+
+            return @event.Name;
+        }
+
+        public virtual string FormatPropertyName(PropertyDefinition property)
+        {
+            if (property == null)
+            {
+                throw new ArgumentNullException(nameof(property));
+            }
+
+            return property.Name;
+        }
+
+        public virtual string FormatFieldName(FieldDefinition field)
+        {
+            if (field == null)
+            {
+                throw new ArgumentNullException(nameof(field));
+            }
+
+            return field.Name;
+        }
+
         /// <summary>
         /// Used for WPF keyboard navigation.
         /// </summary>

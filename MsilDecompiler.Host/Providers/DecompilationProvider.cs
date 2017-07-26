@@ -17,6 +17,8 @@ namespace MsilDecompiler.Host.Providers
         private Dictionary<MetadataToken, IMetadataTokenProvider> _tokenToProviderMap;
         private AssemblyDefinition _assemblyDefinition;
         private IMsilDecompilerEnvironment _decompilationConfiguration;
+
+        //TODO: change to a list of supported languages
         private Language _language;
 
         public bool IsDotNetAssembly { get; private set; }
@@ -224,22 +226,22 @@ namespace MsilDecompiler.Host.Providers
 
                 foreach (var eventDefinition in typeDefinition.Events)
                 {
-                    TryAddToProviderMap(eventDefinition);
+                    yield return Tuple.Create(_language.FormatEventName(eventDefinition), eventDefinition.MetadataToken);
                 }
 
                 foreach (var fieldDefinition in typeDefinition.Fields)
                 {
-                    TryAddToProviderMap(fieldDefinition);
+                    yield return Tuple.Create(_language.FormatFieldName(fieldDefinition), fieldDefinition.MetadataToken);
                 }
 
                 foreach (var propertyDefinition in typeDefinition.Properties)
                 {
-                    TryAddToProviderMap(propertyDefinition);
+                    yield return Tuple.Create(_language.FormatPropertyName(propertyDefinition), propertyDefinition.MetadataToken);
                 }
 
                 foreach (var nestedType in typeDefinition.NestedTypes)
                 {
-                    PopulateTokenToProviderMap(nestedType);
+                    yield return Tuple.Create(_language.FormatTypeName(nestedType), nestedType.MetadataToken);
                 }
             }
         }

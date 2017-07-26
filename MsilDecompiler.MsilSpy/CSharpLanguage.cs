@@ -52,7 +52,17 @@ namespace MsilDecompiler.MsilSpy
             if (method == null)
                 throw new ArgumentNullException(nameof(method));
 
-            return (method.IsConstructor) ? method.DeclaringType.Name : method.Name;
+            if (method.IsConstructor)
+            {
+                return method.IsStatic ? "cctor" : "ctor";
+            }
+            else
+            {
+                var fullname = method.FullName;
+                var parts = fullname.Split(new[] { " ", "::" }, StringSplitOptions.None);
+
+                return parts[2];
+            }
         }
 
         public override string FormatPropertyName(PropertyDefinition property, bool? isIndexer = default(bool?))

@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using MsilDecompiler.Host.Providers;
-using System.Linq;
 using Mono.Cecil;
 
 namespace MsilDecompiler.Host
@@ -30,7 +29,8 @@ namespace MsilDecompiler.Host
                     var members = _decompilationProvider.GetChildren(TokenType.TypeDef, requestData.TypeRid);
                     foreach (var member in members)
                     {
-                        if (member.Item2.RID == requestData.MemberRid)
+                        if (member.Item2.RID == requestData.MemberRid
+                            && member.Item2.TokenType == (TokenType)requestData.MemberType)
                         {
                             await Task.Run(() =>
                             {
@@ -43,7 +43,7 @@ namespace MsilDecompiler.Host
 
                     await Task.Run(() =>
                     {
-                        var message = $"Error: could not find member matching (type: {requestData.TypeRid}, member: {requestData.MemberRid}).";
+                        var message = $"Error: could not find member matching (type: {requestData.TypeRid}, member: {((TokenType)requestData.MemberType).ToString()}:{requestData.MemberRid}).";
                         MiddlewareHelpers.WriteTo(httpContext.Response, message);
                     });
                     return;

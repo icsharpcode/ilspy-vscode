@@ -129,24 +129,6 @@ namespace MsilDecompiler.Host.Providers
             }
         }
 
-        private TypeDefinition GetType(string fullTypeName)
-        {
-            var type = GetTypes().SingleOrDefault(t => t.FullName == fullTypeName);
-            return type;
-        }
-
-        private IEnumerable<MethodDefinition> GetMethods(string fullTypename)
-        {
-            var typeDefinition = GetType(fullTypename);
-            if (typeDefinition != null && typeDefinition.HasMethods)
-            {
-                foreach (var methodDefinition in typeDefinition.Methods)
-                {
-                    yield return methodDefinition;
-                }
-            }
-        }
-
         private string GetCSharpCode<T>(T t)
         {
             using (StringWriter writer = new StringWriter())

@@ -83,5 +83,6 @@ export interface GetMembersResponse {
 
 export interface DecompileMemberRequest extends Request {
     TypeRid: number;
+    MemberType: number;
     MemberRid: number;
 }

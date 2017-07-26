@@ -155,7 +155,7 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, Tex
             return serverUtils.decompileType(this.server, {"Rid": element.rid}).then(result => result.Decompiled);
         }
         else {
-            return serverUtils.decompileMember(this.server, {"TypeRid": element.parent, "MemberRid": element.rid}).then(result => result.Decompiled);
+            return serverUtils.decompileMember(this.server, {"TypeRid": element.parent, "MemberType": element.type, "MemberRid": element.rid}).then(result => result.Decompiled);
         }
     }
 

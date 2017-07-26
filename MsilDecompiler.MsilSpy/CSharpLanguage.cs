@@ -165,7 +165,7 @@ namespace MsilDecompiler.MsilSpy
 
         public override void DecompileMethod(MethodDefinition method, ITextOutput output, DecompilerSettings settings)
         {
-            WriteCommentLine(output, TypeToString(method.DeclaringType, includeNamespace: true));
+            WriteCommentLine(output, $"Containing type: {TypeToString(method.DeclaringType, includeNamespace: true)}");
             AstBuilder codeDomBuilder = CreateAstBuilder(settings, currentType: method.DeclaringType, isSingleMember: true);
             if (method.IsConstructor && !method.IsStatic && !method.DeclaringType.IsValueType)
             {
@@ -178,6 +178,39 @@ namespace MsilDecompiler.MsilSpy
                 codeDomBuilder.AddMethod(method);
                 RunTransformsAndGenerateCode(codeDomBuilder, output, settings);
             }
+        }
+
+        public override void DecompileField(FieldDefinition field, ITextOutput output, DecompilerSettings settings)
+        {
+            WriteCommentLine(output, $"Containing type: {TypeToString(field.DeclaringType, includeNamespace: true)}");
+            AstBuilder codeDomBuilder = CreateAstBuilder(settings, currentType: field.DeclaringType, isSingleMember: true);
+            if (field.IsLiteral)
+            {
+                codeDomBuilder.AddField(field);
+            }
+            else
+            {
+                // also decompile ctors so that the field initializer can be shown
+                AddFieldsAndCtors(codeDomBuilder, field.DeclaringType, field.IsStatic);
+            }
+
+            RunTransformsAndGenerateCode(codeDomBuilder, output, settings, new SelectFieldTransform(field));
+        }
+
+        public override void DecompileEvent(EventDefinition ev, ITextOutput output, DecompilerSettings settings)
+        {
+            WriteCommentLine(output, TypeToString(ev.DeclaringType, includeNamespace: true));
+            AstBuilder codeDomBuilder = CreateAstBuilder(settings, currentType: ev.DeclaringType, isSingleMember: true);
+            codeDomBuilder.AddEvent(ev);
+            RunTransformsAndGenerateCode(codeDomBuilder, output, settings);
+        }
+
+        public override void DecompileProperty(PropertyDefinition property, ITextOutput output, DecompilerSettings settings)
+        {
+            WriteCommentLine(output, TypeToString(property.DeclaringType, includeNamespace: true));
+            AstBuilder codeDomBuilder = CreateAstBuilder(settings, currentType: property.DeclaringType, isSingleMember: true);
+            codeDomBuilder.AddProperty(property);
+            RunTransformsAndGenerateCode(codeDomBuilder, output, settings);
         }
 
         public static string GetPlatformDisplayName(ModuleDefinition module)
@@ -278,6 +311,30 @@ namespace MsilDecompiler.MsilSpy
             }
         }
 
+        /// <summary>
+        /// Removes all top-level members except for the specified fields.
+        /// </summary>
+        sealed class SelectFieldTransform : IAstTransform
+        {
+            readonly FieldDefinition field;
+
+            public SelectFieldTransform(FieldDefinition field)
+            {
+                this.field = field;
+            }
+
+            public void Run(AstNode compilationUnit)
+            {
+                foreach (var child in compilationUnit.Children)
+                {
+                    if (child is EntityDeclaration)
+                    {
+                        if (child.Annotation<FieldDefinition>() != field)
+                            child.Remove();
+                    }
+                }
+            }
+        }
         AstBuilder CreateAstBuilder(DecompilerSettings settings, ModuleDefinition currentModule = null, TypeDefinition currentType = null, bool isSingleMember = false)
         {
             if (currentModule == null)

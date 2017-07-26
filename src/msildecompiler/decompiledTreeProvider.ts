@@ -41,6 +41,12 @@ export class MemberNode {
     }
 }
 
+
+ interface ThemableTreeIconPath {
+    light: string;
+    dark: string;
+}
+
 export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, TextDocumentContentProvider {
 	private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
 	readonly onDidChangeTreeData: Event<any> = this._onDidChangeTreeData.event;
@@ -61,14 +67,56 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, Tex
 				arguments: [element],
 				title: 'Decompile'
 			},
-            iconPath: {
-				light: element.isTypeDefOrAssembly ? path.join(__filename, '..', '..', '..', 'resources', 'light', 'folder.svg') : path.join(__filename, '..', '..', '..', 'resources', 'light', 'document.svg'),
-				dark: element.isTypeDefOrAssembly ? path.join(__filename, '..', '..', '..', 'resources', 'dark', 'folder.svg') : path.join(__filename, '..', '..', '..', 'resources', 'dark', 'document.svg')
-			}
+            iconPath: this.getIconByTokenType(element.type)
+        };
+    }
+
+    getIconByTokenType(type: TokenType): ThemableTreeIconPath {
+        let name: string = null;
+
+        switch (type) {
+            case TokenType.Assembly:
+                name = "Document";
+                break;
+            case TokenType.Event:
+                name = "Event";
+                break;
+            case TokenType.Field:
+                name = "Field";
+                break;
+            case TokenType.Method:
+                name = "Method";
+                break;
+            case TokenType.TypeDef:
+                name = "Class";
+                break;
+            case TokenType.LocalConstant:
+                name = "Constant";
+                break;
+            case TokenType.Property:
+                name = "Property";
+                break;
+            default:
+                name = "Misc";
+                break;
+        }
+
+        let normalName = name + "_16x.svg";
+        let inverseName = name + "_inverse_16x.svg";
+        let lightIconPath = path.join(__dirname, '..', '..', '..', 'resources', normalName);
+        let darkIconPath = path.join(__dirname, '..', '..', '..', 'resources', inverseName);
+
+        return {
+            light: lightIconPath,
+            dark: darkIconPath
         };
     }
 
 	public getChildren(element?: MemberNode): MemberNode[] | Thenable<MemberNode[]> {
+        if (!this.server.assemblyPath) {
+             return [];
+        }
+
 		if (!element) {
             return [
                 new MemberNode(this.server.assemblyPath, -1, TokenType.Assembly, -2)

@@ -24,30 +24,28 @@ export function activate(context: vscode.ExtensionContext) {
 
     const server = new MsilDecompilerServer(reporter);
     let decompileTreeProvider = new DecompiledTreeProvider(server);
+    const disposables: vscode.Disposable[] = [];
 
     console.log('Congratulations, your extension "msil-decompiler" is now active!');
 
     decompileTreeProvider = new DecompiledTreeProvider(server);
-    let _treeDisposable = vscode.window.registerTreeDataProvider("msilDecompiledMembers", decompileTreeProvider);
-    context.subscriptions.push(_treeDisposable);
+    disposables.push(vscode.window.registerTreeDataProvider("msilDecompiledMembers", decompileTreeProvider));
 
     // The command has been defined in the package.json file
     // Now provide the implementation of the command with  registerCommand
     // The commandId parameter must match the command field in package.json
-    let disposable = vscode.commands.registerCommand('msildecompiler.decompileAssembly', () => {
+    disposables.push(vscode.commands.registerCommand('msildecompiler.decompileAssembly', () => {
         // The code you place here will be executed every time your command is executed
         pickAssembly().then(assembly => {
             server.restart(assembly).then(() => {
                 decompileTreeProvider.refresh();
             });
         });
-    });
-
-    context.subscriptions.push(disposable);
+    }));
 
     let lastSelectedNode: MemberNode = null;
 
-    disposable = vscode.commands.registerCommand('showDecompiledCode', (node: MemberNode) => {
+    disposables.push(vscode.commands.registerCommand('showDecompiledCode', (node: MemberNode) => {
         if (lastSelectedNode === node) {
             return;
         }
@@ -62,9 +60,13 @@ export function activate(context: vscode.ExtensionContext) {
                 showCode(node.decompiled);
             });
         }
-	});
+	}));
 
-    context.subscriptions.push(disposable);
+    disposables.push(new vscode.Disposable(() => {
+        server.stop();
+    }));
+
+    context.subscriptions.push(...disposables);
 }
 
 // this method is called when your extension is deactivated

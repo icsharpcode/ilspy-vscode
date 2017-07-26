@@ -1,4 +1,21 @@
-A back end service to provide MSIL decompilations
+# MsilDecompiler.Host
+
+A back end service to provide MSIL decompilations.
+
+```
+Usage:  [options]
+
+Options:
+  -? | -h | --help   Show help information
+  -a | --assembly    Path to the managed assembly to decompile
+  -p | --port        MsilDecompiler port (defaults to 2000).
+  -l | --loglevel    Level of logging (defaults to 'Information').
+  -v | --verbose     Explicitly set 'Debug' log level.
+  -hpid | --hostPID  Host process ID.
+  -stdio | --stdio   Use STDIO over HTTP as MsilDecompiler communication protocol.
+  -e | --encoding    Input / output encoding for STDIO protocol.
+  -i | --interface   Server interface address (defaults to 'localhost').
+```
 
 Supported commands are of the following format
 

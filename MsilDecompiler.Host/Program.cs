@@ -74,7 +74,7 @@ namespace MsilDecompiler.Host
             var logLevelOption = msilDecompilerApp.Option("-l | --loglevel", "Level of logging (defaults to 'Information').", CommandOptionType.SingleValue);
             var verboseOption = msilDecompilerApp.Option("-v | --verbose", "Explicitly set 'Debug' log level.", CommandOptionType.NoValue);
             var hostPidOption = msilDecompilerApp.Option("-hpid | --hostPID", "Host process ID.", CommandOptionType.SingleValue);
-            var stdioOption = msilDecompilerApp.Option("-stdio | --stdio", "Use STDIO over HTTP as MsilDecompiler commincation protocol.", CommandOptionType.NoValue);
+            var stdioOption = msilDecompilerApp.Option("-stdio | --stdio", "Use STDIO over HTTP as MsilDecompiler communication protocol.", CommandOptionType.NoValue);
             var encodingOption = msilDecompilerApp.Option("-e | --encoding", "Input / output encoding for STDIO protocol.", CommandOptionType.SingleValue);
             var serverInterfaceOption = msilDecompilerApp.Option("-i | --interface", "Server interface address (defaults to 'localhost').", CommandOptionType.SingleValue);
 

@@ -26,3 +26,15 @@ Supported commands are of the following format
 {"Seq":4,"Command":"/members",Arguments:{"Rid":2}}
 {"Seq":4,"Command":"/member",Arguments:{"TypeRid":2,"MemberType":67108864,"MemberRid":1}}
 ```
+
+
+# Develop
+
+To build the solution,
+
+```
+git clone <REPO_URL>
+git submodule init
+git submodule update
+msbuild MsilDecompiler.sln
+```

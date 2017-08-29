@@ -16,8 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MsilDecompiler.MsilSpy\MsilDecompiler.MsilSpy.csproj" />
-    <ProjectReference Include="..\OmniSharp.Abstractions\OmniSharp.Abstractions.csproj" />
-    <ProjectReference Include="..\OmniSharp.Stdio\OmniSharp.Stdio.csproj" />
+    <ProjectReference Include="..\omnisharp-roslyn\src\OmniSharp.Stdio\OmniSharp.Stdio.csproj" />
   </ItemGroup>
 
   <ItemGroup>

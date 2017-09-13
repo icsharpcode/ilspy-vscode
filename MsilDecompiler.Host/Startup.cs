@@ -69,21 +69,24 @@ namespace MsilDecompiler.Host
             loggerFactory.AddSerilog();
 
             app.UseExceptionHandler("/error");
-            app.UseMiddleware<AssemblyMiddleware>();
-            app.UseMiddleware<GetTypesMiddleware>();
+
+            // TODO: dynamically load all of our middleware.
+            app.UseMiddleware<AddAssemblyMiddleware>();
+            app.UseMiddleware<DecompileAssemblyMiddleware>();
+            app.UseMiddleware<ListTypesMiddleware>();
             app.UseMiddleware<DecompileTypeMiddleware>();
-            app.UseMiddleware<GetMembersMiddleware>();
+            app.UseMiddleware<ListMembersMiddleware>();
             app.UseMiddleware<DecompileMemberMiddleware>();
             app.UseMiddleware<StopServerMiddleware>();
 
             var logger = loggerFactory.CreateLogger<Startup>();
             if (_env.TransportType == TransportType.Stdio)
             {
-                logger.LogInformation($"MsilDecompiler server running using {nameof(TransportType.Stdio)} for assembly '{_env.AssemblyPath}'.");
+                logger.LogInformation($"MsilDecompiler server running using {nameof(TransportType.Stdio)}.");
             }
             else
             {
-                logger.LogInformation($"MsilDecompiler server running on port '{_env.Port}' for assembly '{_env.AssemblyPath}'.");
+                logger.LogInformation($"MsilDecompiler server running on port '{_env.Port}'.");
             }
 
             app.UseMvc();

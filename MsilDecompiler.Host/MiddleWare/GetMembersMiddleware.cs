@@ -22,13 +22,13 @@ namespace MsilDecompiler.Host
             if (httpContext.Request.Path.HasValue)
             {
                 var endpoint = httpContext.Request.Path.Value;
-                if (endpoint == MsilDecompilerEndpoints.Members)
+                if (endpoint == MsilDecompilerEndpoints.ListMembers)
                 {
                     await Task.Run(() =>
                     {
-                        var rid = JsonHelper.DeserializeRequestObject(httpContext.Request.Body)
-                            .ToObject<DecompileTypeRequest>().Rid;
-                        var members = _decompilationProvider.GetChildren(TokenType.TypeDef, rid);
+                        var requestObject = JsonHelper.DeserializeRequestObject(httpContext.Request.Body)
+                            .ToObject<GetMembersRequest>();
+                        var members = _decompilationProvider.GetChildren(requestObject.AssemblyPath, TokenType.TypeDef, requestObject.Rid);
                         var data = new { Members = members.Select(tuple => new MemberData { Name = tuple.Item1, Token = tuple.Item2 }) };
                         MiddlewareHelpers.WriteTo(httpContext.Response, data);
                     });

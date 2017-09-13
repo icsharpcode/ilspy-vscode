@@ -117,8 +117,7 @@ namespace MsilDecompiler.MsilSpy
             StringWriter w = new StringWriter();
             if (type.IsByReference)
             {
-                ParameterDefinition pd = typeAttributes as ParameterDefinition;
-                if (pd != null && (!pd.IsIn && pd.IsOut))
+                if (typeAttributes is ParameterDefinition pd && (!pd.IsIn && pd.IsOut))
                     w.Write("out ");
                 else
                     w.Write("ref ");
@@ -293,8 +292,7 @@ namespace MsilDecompiler.MsilSpy
                 ConstructorDeclaration ctorDecl = null;
                 foreach (var node in compilationUnit.Children)
                 {
-                    ConstructorDeclaration ctor = node as ConstructorDeclaration;
-                    if (ctor != null)
+                    if (node is ConstructorDeclaration ctor)
                     {
                         if (ctor.Annotation<MethodDefinition>() == ctorDef)
                         {
@@ -307,8 +305,7 @@ namespace MsilDecompiler.MsilSpy
                         }
                     }
                     // Remove any fields without initializers
-                    FieldDeclaration fd = node as FieldDeclaration;
-                    if (fd != null && fd.Variables.All(v => v.Initializer.IsNull))
+                    if (node is FieldDeclaration fd && fd.Variables.All(v => v.Initializer.IsNull))
                         fd.Remove();
                 }
                 if (ctorDecl.Initializer.ConstructorInitializerType == ConstructorInitializerType.This)

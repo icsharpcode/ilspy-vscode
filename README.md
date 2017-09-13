@@ -20,11 +20,12 @@ Options:
 Supported commands are of the following format
 
 ```javascript
-{"Seq":1,"Command":"/assembly"}
-{"Seq":2,"Command":"/types"}
-{"Seq":3,"Command":"/type",Arguments:{"Rid":2}}
-{"Seq":4,"Command":"/members",Arguments:{"Rid":2}}
-{"Seq":4,"Command":"/member",Arguments:{"TypeRid":2,"MemberType":67108864,"MemberRid":1}}
+{"Seq":1,"Command":"/addassembly",Arguments:{"AssemblyPath":"E:\\temp\\test.dll"}}
+{"Seq":2,"Command":"/decompileassembly",Arguments:{"AssemblyPath":"E:\\temp\\test.dll"}}
+{"Seq":3,"Command":"/listtypes",Arguments:{"AssemblyPath":"E:\\temp\\test.dll"}}
+{"Seq":4,"Command":"/decompiletype",Arguments:{"AssemblyPath":"E:\\temp\\test.dll","Rid":2}}
+{"Seq":5,"Command":"/listmembers",Arguments:{"AssemblyPath":"E:\\temp\\test.dll","Rid":2}}
+{"Seq":6,"Command":"/decompilemember",Arguments:{"AssemblyPath":"E:\\temp\\test.dll","TypeRid":2,"MemberType":67108864,"MemberRid":1}}
 ```
 
 

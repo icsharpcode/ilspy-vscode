@@ -6,12 +6,12 @@ using Mono.Cecil;
 
 namespace MsilDecompiler.Host
 {
-    public class DecompileTypeMiddleware
+    public class ListMembersMiddleware
     {
         private readonly RequestDelegate _next;
         private readonly IDecompilationProvider _decompilationProvider;
 
-        public DecompileTypeMiddleware(RequestDelegate next, IDecompilationProvider decompilationProvider)
+        public ListMembersMiddleware(RequestDelegate next, IDecompilationProvider decompilationProvider)
         {
             _next = next;
             _decompilationProvider = decompilationProvider;
@@ -22,16 +22,15 @@ namespace MsilDecompiler.Host
             if (httpContext.Request.Path.HasValue)
             {
                 var endpoint = httpContext.Request.Path.Value;
-                if (endpoint == MsilDecompilerEndpoints.DecompileType)
+                if (endpoint == MsilDecompilerEndpoints.ListMembers)
                 {
                     await Task.Run(() =>
                     {
                         var requestObject = JsonHelper.DeserializeRequestObject(httpContext.Request.Body)
-                            .ToObject<DecompileTypeRequest>();
-                        var rid = JsonHelper.DeserializeRequestObject(httpContext.Request.Body)
-                            .ToObject<DecompileTypeRequest>().Rid;
-                        var code = new DecompileCode { Decompiled = _decompilationProvider.GetCode(requestObject.AssemblyPath, TokenType.TypeDef, rid) };
-                        MiddlewareHelpers.WriteTo(httpContext.Response, code);
+                            .ToObject<ListMembersRequest>();
+                        var members = _decompilationProvider.GetChildren(requestObject.AssemblyPath, TokenType.TypeDef, requestObject.Rid);
+                        var data = new { Members = members.Select(tuple => new MemberData { Name = tuple.Item1, Token = tuple.Item2 }) };
+                        MiddlewareHelpers.WriteTo(httpContext.Response, data);
                     });
                     return;
                 }

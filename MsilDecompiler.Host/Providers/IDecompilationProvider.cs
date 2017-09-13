@@ -6,9 +6,10 @@ namespace MsilDecompiler.Host.Providers
 {
     public interface IDecompilationProvider
     {
-        IEnumerable<Tuple<string, MetadataToken>> GetTypeTuples();
-        string GetMemberCode(MetadataToken token);
-        string GetCode(TokenType type, uint rid);
-        IEnumerable<Tuple<string, MetadataToken>> GetChildren(TokenType type, uint rid);
+        bool AddAssembly(string path);
+        IEnumerable<Tuple<string, MetadataToken>> GetTypeTuples(string assemblyPath);
+        string GetMemberCode(string assemblyPath, MetadataToken memberToken);
+        string GetCode(string assemblyPath, TokenType tokenType, uint rid);
+        IEnumerable<Tuple<string, MetadataToken>> GetChildren(string assemblyPath, TokenType tokenType, uint rid);
     }
 }

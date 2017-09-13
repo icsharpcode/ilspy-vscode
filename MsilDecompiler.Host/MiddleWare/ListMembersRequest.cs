@@ -1,6 +1,6 @@
 ﻿namespace MsilDecompiler.Host
 {
-    public class GetMembersRequest : RequestBase
+    public class ListMembersRequest : RequestBase
     {
         public uint Rid { get; set; }
     }

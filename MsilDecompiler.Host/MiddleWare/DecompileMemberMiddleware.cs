@@ -21,12 +21,12 @@ namespace MsilDecompiler.Host
             if (httpContext.Request.Path.HasValue)
             {
                 var endpoint = httpContext.Request.Path.Value;
-                if (endpoint == MsilDecompilerEndpoints.Member)
+                if (endpoint == MsilDecompilerEndpoints.DecompileMember)
                 {
                     DecompileMemberRequest requestData = JsonHelper.DeserializeRequestObject(httpContext.Request.Body)
                         .ToObject<DecompileMemberRequest>();
 
-                    var members = _decompilationProvider.GetChildren(TokenType.TypeDef, requestData.TypeRid);
+                    var members = _decompilationProvider.GetChildren(requestData.AssemblyPath, TokenType.TypeDef, requestData.TypeRid);
                     foreach (var member in members)
                     {
                         if (member.Item2.RID == requestData.MemberRid
@@ -34,7 +34,7 @@ namespace MsilDecompiler.Host
                         {
                             await Task.Run(() =>
                             {
-                                var code = new DecompileCode { Decompiled = _decompilationProvider.GetMemberCode(member.Item2) };
+                                var code = new DecompileCode { Decompiled = _decompilationProvider.GetMemberCode(requestData.AssemblyPath, member.Item2) };
                                 MiddlewareHelpers.WriteTo(httpContext.Response, code);
                             });
                             return;

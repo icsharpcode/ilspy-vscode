@@ -30,8 +30,7 @@ namespace MsilDecompiler.Host
                     // Ensure we have an acceptable lower limit on the threadpool size to avoid deadlocks and ThreadPool starvation.
                     const int MIN_WORKER_THREADS = 8;
 
-                    int currentWorkerThreads, currentCompletionPortThreads;
-                    System.Threading.ThreadPool.GetMinThreads(out currentWorkerThreads, out currentCompletionPortThreads);
+                    System.Threading.ThreadPool.GetMinThreads(out int currentWorkerThreads, out int currentCompletionPortThreads);
 
                     if (currentWorkerThreads < MIN_WORKER_THREADS)
                     {

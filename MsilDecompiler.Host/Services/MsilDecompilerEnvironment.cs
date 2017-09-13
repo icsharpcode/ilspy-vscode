@@ -34,11 +34,6 @@ namespace OmniSharp.Host.Services
                 AssemblyPath = path;
             }
 
-            if (AssemblyPath == null)
-            {
-                throw new ArgumentException("MsilDecompiler host only supports being launched with a path to a managed assembly file.", nameof(path));
-            }
-
             Port = port;
             HostProcessId = hostPid;
             LogLevel = traceType;

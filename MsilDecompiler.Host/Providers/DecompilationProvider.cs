@@ -6,7 +6,6 @@ using ICSharpCode.Decompiler;
 using Microsoft.Extensions.Logging;
 using Mono.Cecil;
 using MsilDecompiler.MsilSpy;
-using MsilDecompiler.Host.Configuration;
 using OmniSharp.Host.Services;
 
 namespace MsilDecompiler.Host.Providers
@@ -14,8 +13,8 @@ namespace MsilDecompiler.Host.Providers
     public class DecompilationProvider : IDecompilationProvider
     {
         private ILogger _logger;
-        private Dictionary<MetadataToken, IMetadataTokenProvider> _tokenToProviderMap;
-        private AssemblyDefinition _assemblyDefinition;
+        private Dictionary<AssemblyDefinition, Dictionary<MetadataToken, IMetadataTokenProvider>> _tokenToProviderMap;
+        private Dictionary<string, AssemblyDefinition> _assemblyDefinitions = new Dictionary<string, AssemblyDefinition>();
         private IMsilDecompilerEnvironment _decompilationConfiguration;
 
         //TODO: change to a list of supported languages
@@ -34,92 +33,111 @@ namespace MsilDecompiler.Host.Providers
 
         private void Initialize()
         {
-            if (_assemblyDefinition == null)
-            {
-                try
-                {
-                    _assemblyDefinition = AssemblyDefinition.ReadAssembly(
-                        _decompilationConfiguration.AssemblyPath,
-                        new ReaderParameters { AssemblyResolver = new MyDefaultAssemblyResolver() });
-                    if (_assemblyDefinition != null)
-                    {
-                        IsDotNetAssembly = true;
-                        _tokenToProviderMap = new Dictionary<MetadataToken, IMetadataTokenProvider>();
-                    }
+            _tokenToProviderMap = new Dictionary<AssemblyDefinition, Dictionary<MetadataToken, IMetadataTokenProvider>>();
 
-                    PopulateTokenToProviderMap(_assemblyDefinition);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError("An exception occurred when reading assembly {assembly}: {exception}", _decompilationConfiguration.AssemblyPath, ex);
-                }
+            if (!string.IsNullOrEmpty(_decompilationConfiguration.AssemblyPath))
+            {
+                TryLoadAssembly(_decompilationConfiguration.AssemblyPath);
             }
         }
 
-        public void PopulateTokenToProviderMap(AssemblyDefinition assemblyDefinition)
+        public bool AddAssembly(string path)
         {
-            TryAddToProviderMap(assemblyDefinition);
-            foreach (var moduleDefinition in _assemblyDefinition.Modules)
+            return TryLoadAssembly(path);
+        }
+
+        private bool TryLoadAssembly(string path)
+        {
+            try
+            {
+                var assemblyDefinition = AssemblyDefinition.ReadAssembly(
+                    path,
+                    new ReaderParameters { AssemblyResolver = new MyDefaultAssemblyResolver() });
+                if (assemblyDefinition != null)
+                {
+                    IsDotNetAssembly = true;
+                    _assemblyDefinitions[path] = assemblyDefinition;
+                    PopulateTokenToProviderMap(assemblyDefinition);
+
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("An exception occurred when reading assembly {assembly}: {exception}", path, ex);
+            }
+
+            return false;
+        }
+
+        private void PopulateTokenToProviderMap(AssemblyDefinition assemblyDefinition)
+        {
+            AddToProviderMap(assemblyDefinition, assemblyDefinition);
+            foreach (var moduleDefinition in assemblyDefinition.Modules)
             {
                 foreach (var typeDefinition in moduleDefinition.Types)
                 {
-                    PopulateTokenToProviderMap(typeDefinition);
+                    PopulateTokenToProviderMap(assemblyDefinition, typeDefinition);
                 }
             }
         }
 
-        private void TryAddToProviderMap(IMetadataTokenProvider provider)
+        private void AddToProviderMap(AssemblyDefinition assembly, IMetadataTokenProvider provider)
         {
-            if (!_tokenToProviderMap.ContainsKey(provider.MetadataToken))
-                _tokenToProviderMap.Add(provider.MetadataToken, provider);
+            if (!_tokenToProviderMap.ContainsKey(assembly))
+            {
+                _tokenToProviderMap.Add(assembly, new Dictionary<MetadataToken, IMetadataTokenProvider>());
+            }
+
+            _tokenToProviderMap[assembly][provider.MetadataToken] = provider;
         }
 
-        private void PopulateTokenToProviderMap(TypeDefinition typeDefinition)
+        private void PopulateTokenToProviderMap(AssemblyDefinition assembly, TypeDefinition typeDefinition)
         {
             if (typeDefinition == null)
             {
                 return;
             }
 
-            TryAddToProviderMap(typeDefinition);
+            AddToProviderMap(assembly, typeDefinition);
 
             foreach (var methodDefinition in typeDefinition.Methods)
             {
-                TryAddToProviderMap(methodDefinition);
+                AddToProviderMap(assembly, methodDefinition);
             }
 
             foreach (var eventDefinition in typeDefinition.Events)
             {
-                TryAddToProviderMap(eventDefinition);
+                AddToProviderMap(assembly, eventDefinition);
             }
 
             foreach (var fieldDefinition in typeDefinition.Fields)
             {
-                TryAddToProviderMap(fieldDefinition);
+                AddToProviderMap(assembly, fieldDefinition);
             }
 
             foreach (var propertyDefinition in typeDefinition.Properties)
             {
-                TryAddToProviderMap(propertyDefinition);
+                AddToProviderMap(assembly, propertyDefinition);
             }
 
             foreach (var nestedType in typeDefinition.NestedTypes)
             {
-                PopulateTokenToProviderMap(nestedType);
+                PopulateTokenToProviderMap(assembly, nestedType);
             }
         }
 
-        private IEnumerable<ModuleDefinition> GetModules()
+        private IEnumerable<ModuleDefinition> GetModules(AssemblyDefinition assembly)
         {
-            foreach (var moduleDefinition in _assemblyDefinition.Modules)
+            foreach (var moduleDefinition in ((AssemblyDefinition)_tokenToProviderMap[assembly][assembly.MetadataToken]).Modules)
             {
                 yield return moduleDefinition;
             }
         }
 
-        private IEnumerable<TypeDefinition> GetTypes()
+        private IEnumerable<TypeDefinition> GetTypes(AssemblyDefinition assembly)
         {
-            foreach (var moduleDefinition in GetModules())
+            foreach (var moduleDefinition in GetModules(assembly))
             {
                 foreach (var typeDefinition in moduleDefinition.Types)
                 {
@@ -164,23 +182,39 @@ namespace MsilDecompiler.Host.Providers
             }
         }
 
-        public IEnumerable<Tuple<string, MetadataToken>> GetTypeTuples()
+        public IEnumerable<Tuple<string, MetadataToken>> GetTypeTuples(string assemblyPath)
         {
-            return GetTypes().Select(t => Tuple.Create(_language.FormatTypeName(t), t.MetadataToken));
+            return GetTypeTuples(_assemblyDefinitions[assemblyPath]);
         }
 
-        public string GetCode(TokenType type, uint rid)
+        private IEnumerable<Tuple<string, MetadataToken>> GetTypeTuples(AssemblyDefinition assembly)
+        {
+            return GetTypes(assembly).Select(t => Tuple.Create(_language.FormatTypeName(t), t.MetadataToken));
+        }
+
+
+        public string GetCode(string assemblyPath, TokenType type, uint rid)
+        {
+            return GetCode(_assemblyDefinitions[assemblyPath], type, rid);
+        }
+
+        private string GetCode(AssemblyDefinition assembly, TokenType type, uint rid)
         {
             if (rid == 0)
             {
-                return GetCSharpCode(_assemblyDefinition);
+                return GetCSharpCode(assembly);
             }
 
-            var provider = _tokenToProviderMap[new MetadataToken(type, rid)];
+            var provider = _tokenToProviderMap[assembly][new MetadataToken(type, rid)];
             return GetCSharpCode(provider);
         }
 
-        public string GetMemberCode(MetadataToken token)
+        public string GetMemberCode(string assemblyPath, MetadataToken token)
+        {
+            return GetMemberCode(_assemblyDefinitions[assemblyPath], token);
+        }
+
+        private string GetMemberCode(AssemblyDefinition assembly, MetadataToken token)
         {
             var tokenType = token.TokenType;
             if (tokenType != TokenType.Event &&
@@ -192,14 +226,18 @@ namespace MsilDecompiler.Host.Providers
                 return string.Empty;
             }
 
-            var provider = _tokenToProviderMap[token];
+            var provider = _tokenToProviderMap[assembly][token];
             return GetCSharpCode(provider);
         }
 
-        public IEnumerable<Tuple<string, MetadataToken>> GetChildren(TokenType type, uint rid)
+        public IEnumerable<Tuple<string, MetadataToken>> GetChildren(string assemblyPath, TokenType tokenType, uint rid)
         {
-            var typeDefinition = _tokenToProviderMap[new MetadataToken(type, rid)] as TypeDefinition;
-            if (typeDefinition != null)
+            return GetChildren(_assemblyDefinitions[assemblyPath], tokenType, rid);
+        }
+
+        private IEnumerable<Tuple<string, MetadataToken>> GetChildren(AssemblyDefinition assembly, TokenType type, uint rid)
+        {
+            if (_tokenToProviderMap[assembly][new MetadataToken(type, rid)] is TypeDefinition typeDefinition)
             {
                 foreach (var methodDefinition in typeDefinition.Methods)
                 {

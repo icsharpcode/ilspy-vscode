@@ -1,16 +1,15 @@
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using MsilDecompiler.Host.Providers;
-using Mono.Cecil;
 
 namespace MsilDecompiler.Host
 {
-    public class AssemblyMiddleware
+    public class AddAssemblyMiddleware
     {
         private readonly RequestDelegate _next;
         private readonly IDecompilationProvider _decompilationProvider;
 
-        public AssemblyMiddleware(RequestDelegate next, IDecompilationProvider decompilationProvider)
+        public AddAssemblyMiddleware(RequestDelegate next, IDecompilationProvider decompilationProvider)
         {
             _next = next;
             _decompilationProvider = decompilationProvider;
@@ -21,12 +20,14 @@ namespace MsilDecompiler.Host
             if (httpContext.Request.Path.HasValue)
             {
                 var endpoint = httpContext.Request.Path.Value;
-                if (endpoint == MsilDecompilerEndpoints.Assembly)
+                if (endpoint == MsilDecompilerEndpoints.AddAssembly)
                 {
                     await Task.Run(() =>
                     {
-                        var code = new DecompileCode { Decompiled = _decompilationProvider.GetCode(TokenType.Assembly, 0) };
-                        MiddlewareHelpers.WriteTo(httpContext.Response, code);
+                        var requestObject = JsonHelper.DeserializeRequestObject(httpContext.Request.Body)
+                            .ToObject<AddAssemblyRequest>();
+                        var result = _decompilationProvider.AddAssembly(requestObject.AssemblyPath);
+                        MiddlewareHelpers.WriteTo(httpContext.Response, result);
                     });
                     return;
                 }

@@ -1,14 +1,14 @@
-import { ExtensionContext, TreeDataProvider, EventEmitter, TreeItem, Event, window, TreeItemCollapsibleState, Uri, commands, workspace, TextDocumentContentProvider, CancellationToken, ProviderResult } from 'vscode';
+import { TreeDataProvider, EventEmitter, TreeItem, Event, TreeItemCollapsibleState, Uri, TextDocumentContentProvider, CancellationToken, ProviderResult } from 'vscode';
 import { MsilDecompilerServer } from './server';
 import { TokenType } from './tokenType';
 import * as serverUtils from './utils';
-import * as protocol from './protocol';
 import * as path from 'path';
+import * as protocol from './protocol';
 
 export class MemberNode {
     private _decompiled: string = null;
 
-    constructor(private _name: string, private _rid: number, private _tokenType: TokenType, private _parentRid : number) {
+    constructor(private _assembly, private _name: string, private _rid: number, private _tokenType: TokenType, private _parentRid : number) {
     }
 
     public get name(): string {
@@ -39,6 +39,10 @@ export class MemberNode {
     public get parent(): number {
         return this._parentRid;
     }
+
+    public get assembly(): string {
+        return this._assembly;
+    }
 }
 
 
@@ -57,6 +61,14 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, Tex
 	public refresh(): void {
 		this._onDidChangeTreeData.fire();
 	}
+
+    public addAssembly(assembly: string): Thenable<boolean> {
+        let escaped: string = assembly.replace(/\\/g, "\\\\",);
+        this.server.assemblyPaths.add(escaped);
+        return serverUtils.addAssembly(this.server, { "AssemblyPath": escaped }).then(response => {
+            return response.Added;
+        });
+    }
 
     public getTreeItem(element: MemberNode): TreeItem {
         return {
@@ -113,32 +125,36 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, Tex
     }
 
 	public getChildren(element?: MemberNode): MemberNode[] | Thenable<MemberNode[]> {
-        if (!this.server.assemblyPath) {
+        if (this.server.assemblyPaths.size <= 0) {
              return [];
         }
 
-		if (!element) {
-            return [
-                new MemberNode(this.server.assemblyPath, -1, TokenType.Assembly, -2)
-            ];
+        // Nothing yet so add assembly nodes
+        if (!element) {
+            let result = [];
+            for (let e of this.server.assemblyPaths) {
+                result.push(new MemberNode(e, e, -1, TokenType.Assembly, -2));
+            }
+
+            return result;
 		}
         else if (element.rid === -1) {
-            return this.getTypes();
+            return this.getTypes(element.assembly);
         } else {
             return this.getMembers(element);
         }
 	}
 
-    getTypes(): Thenable<MemberNode[]> {
-        return serverUtils.getTypes(this.server, { }).then(result => {
-            return result.Types.map(t => new MemberNode(t.Name, t.Token.RID, t.Token.TokenType, -1));
+    getTypes(assembly: string): Thenable<MemberNode[]> {
+        return serverUtils.getTypes(this.server, { "AssemblyPath": assembly }).then(result => {
+            return result.Types.map(t => new MemberNode(assembly, t.Name, t.Token.RID, t.Token.TokenType, -1));
         });
     }
 
     getMembers(element: MemberNode): Thenable<MemberNode[]> {
         if (element.isTypeDefOrAssembly) {
-            return serverUtils.getMembers(this.server, { "Rid": element.rid }).then(result => {
-                return result.Members.map(m => new MemberNode(m.Name, m.Token.RID, m.Token.TokenType, element.rid));
+            return serverUtils.getMembers(this.server, {"AssemblyPath": element.assembly, "Rid": element.rid }).then(result => {
+                return result.Members.map(m => new MemberNode(element.assembly, m.Name, m.Token.RID, m.Token.TokenType, element.rid));
             });
         }
         else {
@@ -148,14 +164,14 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, Tex
 
     public getCode(element?: MemberNode): Thenable<string> {
         if (element.rid === -1) {
-            return serverUtils.decompileAssembly(this.server, { }).then(result => result.Decompiled);
+            return serverUtils.decompileAssembly(this.server, { "AssemblyPath": element.assembly }).then(result => result.Decompiled);
         }
 
         if (element.isTypeDefOrAssembly) {
-            return serverUtils.decompileType(this.server, {"Rid": element.rid}).then(result => result.Decompiled);
+            return serverUtils.decompileType(this.server, {"AssemblyPath": element.assembly, "Rid": element.rid}).then(result => result.Decompiled);
         }
         else {
-            return serverUtils.decompileMember(this.server, {"TypeRid": element.parent, "MemberType": element.type, "MemberRid": element.rid}).then(result => result.Decompiled);
+            return serverUtils.decompileMember(this.server, {"AssemblyPath": element.assembly, "TypeRid": element.parent, "MemberType": element.type, "MemberRid": element.rid}).then(result => result.Decompiled);
         }
     }
 

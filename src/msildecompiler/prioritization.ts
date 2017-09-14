@@ -11,11 +11,12 @@ const priorityCommands = [
 ];
 
 const normalCommands = [
+    protocol.Requests.AddAssembly,
     protocol.Requests.DecompileAssembly,
     protocol.Requests.DecompileMember,
     protocol.Requests.DecopmileType,
-    protocol.Requests.GetMembers,
-    protocol.Requests.GetTypes,
+    protocol.Requests.ListMembers,
+    protocol.Requests.ListTypes,
 ];
 
 const prioritySet = new Set<string>(priorityCommands);

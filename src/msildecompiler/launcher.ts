@@ -6,7 +6,6 @@ import { spawn, ChildProcess } from 'child_process';
 import { satisfies } from 'semver';
 import { PlatformInformation } from '../platform';
 import * as path from 'path';
-import * as vscode from 'vscode';
 import * as util from '../common';
 import { Options } from './options';
 

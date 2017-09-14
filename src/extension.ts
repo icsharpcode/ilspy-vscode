@@ -37,9 +37,22 @@ export function activate(context: vscode.ExtensionContext) {
     disposables.push(vscode.commands.registerCommand('msildecompiler.decompileAssembly', () => {
         // The code you place here will be executed every time your command is executed
         pickAssembly().then(assembly => {
-            server.restart(assembly).then(() => {
-                decompileTreeProvider.refresh();
-            });
+            if (!server.isRunning()) {
+                server.restart().then(() => {
+                    decompileTreeProvider.addAssembly(assembly).then(added => {
+                        if (added) {
+                            decompileTreeProvider.refresh();
+                        }
+                    });
+                });
+            }
+            else {
+                decompileTreeProvider.addAssembly(assembly).then(res => {
+                    if (res) {
+                        decompileTreeProvider.refresh();
+                    }
+                });
+            }
         });
     }));
 

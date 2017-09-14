@@ -8,11 +8,12 @@
 'use strict';
 
 export module Requests {
-    export const DecompileAssembly = '/assembly';
-    export const GetTypes = '/types';
-    export const DecopmileType = '/type';
-    export const GetMembers = '/members';
-    export const DecompileMember = '/member';
+    export const AddAssembly = '/addassembly';
+    export const DecompileAssembly = '/decompileassembly';
+    export const ListTypes = '/listtypes';
+    export const DecopmileType = '/decompiletype';
+    export const ListMembers = '/listmembers';
+    export const DecompileMember = '/decompilemember';
 }
 
 export namespace WireProtocol {
@@ -43,6 +44,14 @@ export namespace WireProtocol {
 
 
 export interface Request {
+    AssemblyPath: string;
+}
+
+export interface AddAssemblyRequest extends Request {
+}
+
+export interface AddAssemblyResponse {
+    Added: boolean;
 }
 
 export interface DecompileAssemblyRequest extends Request {
@@ -52,7 +61,7 @@ export interface DecompileResponse {
     Decompiled: string;
 }
 
-export interface GetTypesRequest extends Request {
+export interface ListTypesRequest extends Request {
 }
 
 export interface MetadataToken {
@@ -60,25 +69,25 @@ export interface MetadataToken {
     TokenType: number;
 }
 
-export interface TypeData {
+export interface MemberData {
     Name: string;
     Token: MetadataToken;
 }
 
-export interface GetTypesResponse {
-    Types: TypeData[];
+export interface ListTypesResponse {
+    Types: MemberData[];
 }
 
 export interface DecompileTypeRequest extends Request {
     Rid: number;
 }
 
-export interface GetMembersRequest extends Request {
+export interface ListMembersRequest extends Request {
     Rid: number;
 }
 
-export interface GetMembersResponse {
-    Members: TypeData[];
+export interface ListMembersResponse {
+    Members: MemberData[];
 }
 
 export interface DecompileMemberRequest extends Request {

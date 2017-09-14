@@ -9,7 +9,6 @@ import { DelayTracker } from './delayTracker';
 import { Request, RequestQueueCollection } from './requestQueue';
 import TelemetryReporter from 'vscode-extension-telemetry';
 import * as os from 'os';
-import * as path from 'path';
 import * as protocol from './protocol';
 import * as vscode from 'vscode';
 
@@ -66,7 +65,7 @@ export class MsilDecompilerServer {
     private _serverProcess: ChildProcess;
     private _options: Options;
 
-    private _assemblyPath: string;
+    private _assemblyPaths: Set<string> = new Set<string>();
 
     constructor(reporter: TelemetryReporter) {
         this._reporter = reporter;
@@ -81,8 +80,8 @@ export class MsilDecompilerServer {
         this._requestQueue = new RequestQueueCollection(logger, 8, request => this._makeRequest(request));
     }
 
-    public get assemblyPath() {
-        return this._assemblyPath;
+    public get assemblyPaths() {
+        return this._assemblyPaths;
     }
 
     public isRunning(): boolean {
@@ -158,13 +157,11 @@ export class MsilDecompilerServer {
 
     // --- start, stop, and connect
 
-    private _start(assemblyPath: string): Promise<void> {
+    private _start(): Promise<void> {
         this._setState(ServerState.Starting);
-        this._assemblyPath = assemblyPath;
+        this._assemblyPaths.clear();
 
-        const cwd = path.dirname(assemblyPath);
         let args = [
-            '--assembly', assemblyPath,
             '--stdio',
             '--encoding', 'utf-8',
             //TODO: '--loglevel', this._options.loggingLevel
@@ -174,12 +171,12 @@ export class MsilDecompilerServer {
 
         this._logger.appendLine(`Starting MsilDecompiler server at ${new Date().toLocaleString()}`);
         this._logger.increaseIndent();
-        this._logger.appendLine(`Assebmly to decompile: ${assemblyPath}`);
         this._logger.decreaseIndent();
         this._logger.appendLine();
 
-        this._fireEvent(Events.BeforeServerStart, assemblyPath);
+        this._fireEvent(Events.BeforeServerStart, 0);
 
+        const cwd = "";
         return launchMsilDecompiler(cwd, args).then(value => {
             if (value.usingMono) {
                 this._logger.appendLine(`MsilDecompiler server started wth Mono`);
@@ -196,7 +193,7 @@ export class MsilDecompilerServer {
 
             this._serverProcess = value.process;
             this._setState(ServerState.Started);
-            this._fireEvent(Events.ServerStart, assemblyPath);
+            this._fireEvent(Events.ServerStart, 0);
 
             return this._doConnect();
         }).then(() => {
@@ -257,20 +254,18 @@ export class MsilDecompilerServer {
         });
     }
 
-    public restart(assemblyPath: string): Promise<void> {
+    public restart(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            this._assemblyPath = assemblyPath;
-            if (this._assemblyPath) {
-                return this.stop().then(() => {
-                    this._start(this._assemblyPath).then(
-                        () => {
-                            resolve();
-                        },
-                        (reason) => {
-                            reject();
-                        });
-                });
-            }
+            this._assemblyPaths.clear();
+            return this.stop().then(() => {
+                this._start().then(
+                    () => {
+                        resolve();
+                    },
+                    (reason) => {
+                        reject();
+                    });
+            });
         });
     }
 

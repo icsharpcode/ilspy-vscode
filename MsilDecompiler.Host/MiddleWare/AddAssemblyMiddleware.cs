@@ -27,7 +27,7 @@ namespace MsilDecompiler.Host
                         var requestObject = JsonHelper.DeserializeRequestObject(httpContext.Request.Body)
                             .ToObject<AddAssemblyRequest>();
                         var result = _decompilationProvider.AddAssembly(requestObject.AssemblyPath);
-                        MiddlewareHelpers.WriteTo(httpContext.Response, result);
+                        MiddlewareHelpers.WriteTo(httpContext.Response, new { Added = result });
                     });
                     return;
                 }

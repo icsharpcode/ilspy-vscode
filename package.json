@@ -12,7 +12,8 @@
     ],
     "aiKey": "",
     "activationEvents": [
-        "onCommand:msildecompiler.decompileAssembly"
+        "onCommand:msildecompiler.decompileAssemblyInWorkspace",
+        "onCommand:msildecompiler.decompileAssemblyPromptForFilePath"
     ],
     "main": "./out/src/extension",
     "contributes": {
@@ -25,8 +26,13 @@
             ]
         },
         "commands": [{
-            "command": "msildecompiler.decompileAssembly",
-            "title": "Decompile IL Assembly",
+            "command": "msildecompiler.decompileAssemblyInWorkspace",
+            "title": "Decompile IL Assembly in Current Workspace",
+            "category": "MSIL Decompiler"
+        },
+        {
+            "command": "msildecompiler.decompileAssemblyPromptForFilePath",
+            "title": "Decompile Given IL Assembly",
             "category": "MSIL Decompiler"
         }]
     },

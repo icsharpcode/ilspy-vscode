@@ -34,25 +34,16 @@ export function activate(context: vscode.ExtensionContext) {
     // The command has been defined in the package.json file
     // Now provide the implementation of the command with  registerCommand
     // The commandId parameter must match the command field in package.json
-    disposables.push(vscode.commands.registerCommand('msildecompiler.decompileAssembly', () => {
+    disposables.push(vscode.commands.registerCommand('msildecompiler.decompileAssemblyInWorkspace', () => {
         // The code you place here will be executed every time your command is executed
         pickAssembly().then(assembly => {
-            if (!server.isRunning()) {
-                server.restart().then(() => {
-                    decompileTreeProvider.addAssembly(assembly).then(added => {
-                        if (added) {
-                            decompileTreeProvider.refresh();
-                        }
-                    });
-                });
-            }
-            else {
-                decompileTreeProvider.addAssembly(assembly).then(res => {
-                    if (res) {
-                        decompileTreeProvider.refresh();
-                    }
-                });
-            }
+            decompileFile(assembly);
+        });
+    }));
+
+    disposables.push(vscode.commands.registerCommand('msildecompiler.decompileAssemblyPromptForFilePath', () => {
+        promptForAssemblyFilePath().then(filePath => {
+            decompileFile(filePath);
         });
     }));
 
@@ -80,6 +71,24 @@ export function activate(context: vscode.ExtensionContext) {
     }));
 
     context.subscriptions.push(...disposables);
+
+    function decompileFile(assembly: string) {
+        if(!server.isRunning()) {
+            server.restart().then(() => {
+                decompileTreeProvider.addAssembly(assembly).then(added => {
+                    if(added) {
+                        decompileTreeProvider.refresh();
+                }});
+            });
+        }
+        else {
+            decompileTreeProvider.addAssembly(assembly).then(res => {
+                if(res) {
+                    decompileTreeProvider.refresh();
+                }
+            });
+        }
+    }
 }
 
 // this method is called when your extension is deactivated
@@ -124,4 +133,14 @@ function findAssemblies(): Thenable<string[]> {
     .then(resources => {
         return resources.map(uri => uri.fsPath);
     });
+}
+
+function promptForAssemblyFilePath(): Thenable<string> {
+    return vscode.window.showInputBox(
+        /*options*/ {
+            prompt: 'Fill in the full path to the managed assembly',
+            ignoreFocusOut: true,
+            placeHolder: 'full/path/to/the/assembly'
+        }
+    );
 }

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net46</TargetFramework>
-    <AssemblyName>MsilDecompiler.MsilSpy</AssemblyName>
+    <AssemblyName>ILSpy.MsilSpy</AssemblyName>
     <PackageId>MsilDecompiler.MsilSpy</PackageId>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>

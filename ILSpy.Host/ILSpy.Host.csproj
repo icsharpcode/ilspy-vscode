@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net46</TargetFramework>
     <PreserveCompilationContext>true</PreserveCompilationContext>
-    <AssemblyName>MsilDecompiler.Host</AssemblyName>
+    <AssemblyName>ILSpy.Host</AssemblyName>
     <OutputType>Exe</OutputType>
     <PackageId>MsilDecompiler.Host</PackageId>
   </PropertyGroup>
@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MsilDecompiler.MsilSpy\MsilDecompiler.MsilSpy.csproj" />
+    <ProjectReference Include="..\ILSpy.MsilSpy\ILSpy.MsilSpy.csproj" />
     <ProjectReference Include="..\omnisharp-roslyn\src\OmniSharp.Stdio\OmniSharp.Stdio.csproj" />
   </ItemGroup>
 

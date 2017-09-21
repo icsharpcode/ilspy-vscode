@@ -18,7 +18,7 @@ export function activate(context: vscode.ExtensionContext) {
     const extension = vscode.extensions.getExtension(extensionId);
     const extensionVersion = extension.packageJSON.version;
     const aiKey = extension.packageJSON.aiKey;
-    const reporter = new TelemetryReporter(extensionId, extensionVersion, aiKey);
+    const reporter = null; //new TelemetryReporter(extensionId, extensionVersion, aiKey);
 
     util.setExtensionPath(extension.extensionPath);
 

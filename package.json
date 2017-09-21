@@ -10,7 +10,7 @@
     "categories": [
         "Other"
     ],
-    "aiKey": "AIF-a6a1bece-21b4-4260-91fe-f9f0479f0cf0",
+    "aiKey": "",
     "activationEvents": [
         "onCommand:msildecompiler.decompileAssembly"
     ],

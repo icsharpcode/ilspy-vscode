@@ -55,7 +55,7 @@ function getLaunchPath(platformInfo: PlatformInformation): string {
     const binPath = util.getBinPath();
 
     return platformInfo.isWindows()
-        ? path.join(binPath, 'msildecompiler', 'MsilDecompiler.Host.exe')
+        ? path.join(binPath, 'msildecompiler', 'ILSpy.Host.exe')
         : path.join(binPath, 'run');
 }
 

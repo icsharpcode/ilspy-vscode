@@ -28,9 +28,10 @@ namespace MsilDecompiler.Host
                     {
                         var requestObject = JsonHelper.DeserializeRequestObject(httpContext.Request.Body)
                             .ToObject<DecompileTypeRequest>();
-                        var rid = JsonHelper.DeserializeRequestObject(httpContext.Request.Body)
-                            .ToObject<DecompileTypeRequest>().Rid;
-                        var code = new DecompileCode { Decompiled = _decompilationProvider.GetCode(requestObject.AssemblyPath, TokenType.TypeDef, rid) };
+                        var code = new DecompileCode
+                        {
+                            Decompiled = _decompilationProvider.GetCode(requestObject.AssemblyPath, TokenType.TypeDef, requestObject.Rid)
+                        };
                         MiddlewareHelpers.WriteTo(httpContext.Response, code);
                     });
                     return;

@@ -29,7 +29,7 @@ namespace MsilDecompiler.Host
                         var requestObject = JsonHelper.DeserializeRequestObject(httpContext.Request.Body)
                             .ToObject<ListMembersRequest>();
                         var members = _decompilationProvider.GetChildren(requestObject.AssemblyPath, TokenType.TypeDef, requestObject.Rid);
-                        var data = new { Members = members.Select(tuple => new MemberData { Name = tuple.Item1, Token = tuple.Item2 }) };
+                        var data = new  ListMembersResponse { Members = members };
                         MiddlewareHelpers.WriteTo(httpContext.Response, data);
                     });
                     return;

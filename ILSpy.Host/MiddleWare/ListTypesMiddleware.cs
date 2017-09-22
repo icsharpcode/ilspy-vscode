@@ -29,7 +29,7 @@ namespace MsilDecompiler.Host
                             .ToObject<ListTypesRequest>();
                         var assemblyPath = requestObject.AssemblyPath;
                         var types = _decompilationProvider.GetTypeTuples(assemblyPath);
-                        var data = new { Types = types.Select<global::System.Tuple<string, global::Mono.Cecil.MetadataToken>, global::MsilDecompiler.Host.MemberData>(tuple => new global::MsilDecompiler.Host.MemberData { Name = tuple.Item1, Token = tuple.Item2 }) };
+                        var data = new ListTypesResponse { Types = types };
                         MiddlewareHelpers.WriteTo(httpContext.Response, data);
                     });
                     return;

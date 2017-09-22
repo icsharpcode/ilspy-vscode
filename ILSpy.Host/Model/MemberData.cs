@@ -7,5 +7,7 @@ namespace MsilDecompiler.Host
         public string Name { get; set; }
 
         public MetadataToken Token { get; set; }
+
+        public TypeDefSubKind TypeSubKind { get; set; }
     }
 }

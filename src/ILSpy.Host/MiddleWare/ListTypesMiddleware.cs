@@ -28,7 +28,7 @@ namespace MsilDecompiler.Host
                         var requestObject = JsonHelper.DeserializeRequestObject(httpContext.Request.Body)
                             .ToObject<ListTypesRequest>();
                         var assemblyPath = requestObject.AssemblyPath;
-                        var types = _decompilationProvider.GetTypeTuples(assemblyPath);
+                        var types = _decompilationProvider.ListTypes(assemblyPath);
                         var data = new ListTypesResponse { Types = types };
                         MiddlewareHelpers.WriteTo(httpContext.Response, data);
                     });

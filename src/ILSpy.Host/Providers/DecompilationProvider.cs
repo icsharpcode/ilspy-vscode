@@ -64,7 +64,7 @@ namespace MsilDecompiler.Host.Providers
             }
             catch (Exception ex)
             {
-                _logger.LogError("An exception occurred when reading assembly {assembly}: {exception}", path, ex);
+                _logger?.LogError("An exception occurred when reading assembly {assembly}: {exception}", path, ex);
             }
 
             return false;
@@ -182,7 +182,7 @@ namespace MsilDecompiler.Host.Providers
             }
         }
 
-        public IEnumerable<MemberData> GetTypeTuples(string assemblyPath)
+        public IEnumerable<MemberData> ListTypes(string assemblyPath)
         {
             return GetTypeTuples(_assemblyDefinitions[assemblyPath]);
         }

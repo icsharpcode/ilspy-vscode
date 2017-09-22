@@ -64,7 +64,7 @@ namespace MsilDecompiler.Host.Providers
             }
             catch (Exception ex)
             {
-                _logger.LogError("An exception occurred when reading assembly {assembly}: {exception}", path, ex);
+                _logger?.LogError("An exception occurred when reading assembly {assembly}: {exception}", path, ex);
             }
 
             return false;
@@ -182,16 +182,42 @@ namespace MsilDecompiler.Host.Providers
             }
         }
 
-        public IEnumerable<Tuple<string, MetadataToken>> GetTypeTuples(string assemblyPath)
+        public IEnumerable<MemberData> ListTypes(string assemblyPath)
         {
             return GetTypeTuples(_assemblyDefinitions[assemblyPath]);
         }
 
-        private IEnumerable<Tuple<string, MetadataToken>> GetTypeTuples(AssemblyDefinition assembly)
+        private IEnumerable<MemberData> GetTypeTuples(AssemblyDefinition assembly)
         {
-            return GetTypes(assembly).Select(t => Tuple.Create(_language.FormatTypeName(t), t.MetadataToken));
+            return GetTypes(assembly).Select(t => new MemberData()
+            {
+                Name = t.Name,
+                Token = t.MetadataToken,
+                TypeSubKind = GetTypeSubKind(t)
+            });
         }
 
+        private TypeDefSubKind GetTypeSubKind(TypeDefinition t)
+        {
+            if (t.IsInterface)
+            {
+                return TypeDefSubKind.Interface;
+            }
+            else if (t.IsEnum)
+            {
+                return TypeDefSubKind.Enum;
+            }
+            else if (t.IsClass && t.IsValueType)
+            {
+                return TypeDefSubKind.Structure;
+            }
+            else if (t.IsClass)
+            {
+                return TypeDefSubKind.Class;
+            }
+
+            return TypeDefSubKind.None;
+        }
 
         public string GetCode(string assemblyPath, TokenType type, uint rid)
         {
@@ -230,38 +256,63 @@ namespace MsilDecompiler.Host.Providers
             return GetCSharpCode(provider);
         }
 
-        public IEnumerable<Tuple<string, MetadataToken>> GetChildren(string assemblyPath, TokenType tokenType, uint rid)
+        public IEnumerable<MemberData> GetChildren(string assemblyPath, TokenType tokenType, uint rid)
         {
             return GetChildren(_assemblyDefinitions[assemblyPath], tokenType, rid);
         }
 
-        private IEnumerable<Tuple<string, MetadataToken>> GetChildren(AssemblyDefinition assembly, TokenType type, uint rid)
+        private IEnumerable<MemberData> GetChildren(AssemblyDefinition assembly, TokenType type, uint rid)
         {
             if (_tokenToProviderMap[assembly][new MetadataToken(type, rid)] is TypeDefinition typeDefinition)
             {
                 foreach (var methodDefinition in typeDefinition.Methods)
                 {
-                    yield return Tuple.Create(_language.FormatMethodName(methodDefinition), methodDefinition.MetadataToken);
+                    yield return new MemberData
+                    {
+                        Name = _language.FormatMethodName(methodDefinition),
+                        Token = methodDefinition.MetadataToken,
+                        TypeSubKind = TypeDefSubKind.None
+                    };
                 }
 
                 foreach (var eventDefinition in typeDefinition.Events)
                 {
-                    yield return Tuple.Create(_language.FormatEventName(eventDefinition), eventDefinition.MetadataToken);
+                    yield return new MemberData
+                    {
+                        Name = _language.FormatEventName(eventDefinition),
+                        Token = eventDefinition.MetadataToken,
+                        TypeSubKind = TypeDefSubKind.None
+                    };
                 }
 
                 foreach (var fieldDefinition in typeDefinition.Fields)
                 {
-                    yield return Tuple.Create(_language.FormatFieldName(fieldDefinition), fieldDefinition.MetadataToken);
+                    yield return new MemberData
+                    {
+                        Name = _language.FormatFieldName(fieldDefinition),
+                        Token = fieldDefinition.MetadataToken,
+                        TypeSubKind = TypeDefSubKind.None
+                    };
                 }
 
                 foreach (var propertyDefinition in typeDefinition.Properties)
                 {
-                    yield return Tuple.Create(_language.FormatPropertyName(propertyDefinition), propertyDefinition.MetadataToken);
+                    yield return new MemberData
+                    {
+                        Name = _language.FormatPropertyName(propertyDefinition),
+                        Token = propertyDefinition.MetadataToken,
+                        TypeSubKind = TypeDefSubKind.None
+                    };
                 }
 
                 foreach (var nestedType in typeDefinition.NestedTypes)
                 {
-                    yield return Tuple.Create(_language.FormatTypeName(nestedType), nestedType.MetadataToken);
+                    yield return new MemberData
+                    {
+                        Name = _language.FormatTypeName(nestedType),
+                        Token = nestedType.MetadataToken,
+                        TypeSubKind = GetTypeSubKind(nestedType)
+                    };
                 }
             }
         }

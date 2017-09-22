@@ -29,12 +29,12 @@ namespace MsilDecompiler.Host
                     var members = _decompilationProvider.GetChildren(requestData.AssemblyPath, TokenType.TypeDef, requestData.TypeRid);
                     foreach (var member in members)
                     {
-                        if (member.Item2.RID == requestData.MemberRid
-                            && member.Item2.TokenType == (TokenType)requestData.MemberType)
+                        if (member.Token.RID == requestData.MemberRid
+                            && member.Token.TokenType == (TokenType)requestData.MemberType)
                         {
                             await Task.Run(() =>
                             {
-                                var code = new DecompileCode { Decompiled = _decompilationProvider.GetMemberCode(requestData.AssemblyPath, member.Item2) };
+                                var code = new DecompileCode { Decompiled = _decompilationProvider.GetMemberCode(requestData.AssemblyPath, member.Token) };
                                 MiddlewareHelpers.WriteTo(httpContext.Response, code);
                             });
                             return;

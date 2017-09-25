@@ -70,10 +70,10 @@ namespace ILSpy.Host.Tests
 
             // Assert
             Assert.NotEmpty(types);
-            Assert.True(types.Single(t => t.Name.Equals("C")).TypeSubKind == TypeDefSubKind.Class);
-            Assert.True(types.Single(t => t.Name.Equals("S")).TypeSubKind == TypeDefSubKind.Structure);
-            Assert.True(types.Single(t => t.Name.Equals("I")).TypeSubKind == TypeDefSubKind.Interface);
-            Assert.True(types.Single(t => t.Name.Equals("E")).TypeSubKind == TypeDefSubKind.Enum);
+            Assert.True(types.Single(t => t.Name.Equals("C")).MemberSubKind == MemberSubKind.Class);
+            Assert.True(types.Single(t => t.Name.Equals("S")).MemberSubKind == MemberSubKind.Structure);
+            Assert.True(types.Single(t => t.Name.Equals("I")).MemberSubKind == MemberSubKind.Interface);
+            Assert.True(types.Single(t => t.Name.Equals("E")).MemberSubKind == MemberSubKind.Enum);
         }
 
         [Fact]

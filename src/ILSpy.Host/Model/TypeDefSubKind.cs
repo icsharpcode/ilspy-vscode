@@ -1,6 +1,6 @@
 ﻿namespace MsilDecompiler.Host
 {
-    public enum TypeDefSubKind
+    public enum MemberSubKind
     {
         None = 0x0000,
         Class = 0x0001,

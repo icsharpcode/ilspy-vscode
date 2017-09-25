@@ -193,30 +193,30 @@ namespace MsilDecompiler.Host.Providers
             {
                 Name = t.Name,
                 Token = t.MetadataToken,
-                TypeSubKind = GetTypeSubKind(t)
+                MemberSubKind = GetMemberSubKind(t)
             });
         }
 
-        private TypeDefSubKind GetTypeSubKind(TypeDefinition t)
+        private MemberSubKind GetMemberSubKind(TypeDefinition t)
         {
             if (t.IsInterface)
             {
-                return TypeDefSubKind.Interface;
+                return MemberSubKind.Interface;
             }
             else if (t.IsEnum)
             {
-                return TypeDefSubKind.Enum;
+                return MemberSubKind.Enum;
             }
             else if (t.IsClass && t.IsValueType)
             {
-                return TypeDefSubKind.Structure;
+                return MemberSubKind.Structure;
             }
             else if (t.IsClass)
             {
-                return TypeDefSubKind.Class;
+                return MemberSubKind.Class;
             }
 
-            return TypeDefSubKind.None;
+            return MemberSubKind.None;
         }
 
         public string GetCode(string assemblyPath, TokenType type, uint rid)
@@ -271,7 +271,7 @@ namespace MsilDecompiler.Host.Providers
                     {
                         Name = _language.FormatMethodName(methodDefinition),
                         Token = methodDefinition.MetadataToken,
-                        TypeSubKind = TypeDefSubKind.None
+                        MemberSubKind = MemberSubKind.None
                     };
                 }
 
@@ -281,7 +281,7 @@ namespace MsilDecompiler.Host.Providers
                     {
                         Name = _language.FormatEventName(eventDefinition),
                         Token = eventDefinition.MetadataToken,
-                        TypeSubKind = TypeDefSubKind.None
+                        MemberSubKind = MemberSubKind.None
                     };
                 }
 
@@ -291,7 +291,7 @@ namespace MsilDecompiler.Host.Providers
                     {
                         Name = _language.FormatFieldName(fieldDefinition),
                         Token = fieldDefinition.MetadataToken,
-                        TypeSubKind = TypeDefSubKind.None
+                        MemberSubKind = MemberSubKind.None
                     };
                 }
 
@@ -301,7 +301,7 @@ namespace MsilDecompiler.Host.Providers
                     {
                         Name = _language.FormatPropertyName(propertyDefinition),
                         Token = propertyDefinition.MetadataToken,
-                        TypeSubKind = TypeDefSubKind.None
+                        MemberSubKind = MemberSubKind.None
                     };
                 }
 
@@ -311,7 +311,7 @@ namespace MsilDecompiler.Host.Providers
                     {
                         Name = _language.FormatTypeName(nestedType),
                         Token = nestedType.MetadataToken,
-                        TypeSubKind = GetTypeSubKind(nestedType)
+                        MemberSubKind = GetMemberSubKind(nestedType)
                     };
                 }
             }

@@ -7,6 +7,8 @@
 
 'use strict';
 
+import { MemberSubKind } from './memberSubKind';
+
 export module Requests {
     export const AddAssembly = '/addassembly';
     export const DecompileAssembly = '/decompileassembly';
@@ -72,6 +74,7 @@ export interface MetadataToken {
 export interface MemberData {
     Name: string;
     Token: MetadataToken;
+    MemberSubKind: MemberSubKind;
 }
 
 export interface ListTypesResponse {

@@ -32,7 +32,7 @@
         },
         {
             "command": "msildecompiler.decompileAssemblyPromptForFilePath",
-            "title": "Decompile Given IL Assembly",
+            "title": "Decompile IL Assembly of a given path",
             "category": "MSIL Decompiler"
         }]
     },

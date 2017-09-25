@@ -36,3 +36,4 @@ export enum TokenType
 
         String = 0x70000000,
 }
+

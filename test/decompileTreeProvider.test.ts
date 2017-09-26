@@ -8,23 +8,20 @@ suite("Member Node Tests", () => {
     test("Assembly node returns true for isType", () => {
         const node = new MemberNode("assembly", "name", 0, TokenType.Assembly, MemberSubKind.None, -1);
 
-        expect(node.isTypeDefOrAssembly).to.be.a('boolean');
-        expect(node.isTypeDefOrAssembly).to.equal(true);
+        expect(node.isTypeDefOrAssembly).to.be.a('boolean').that.equal(true);
     });
 
     test("Type node returns true for isType", () => {
         const node = new MemberNode("assembly", "name", 0, TokenType.TypeDef, MemberSubKind.Class, 0);
 
-        expect(node.isTypeDefOrAssembly).to.be.a('boolean');
-        expect(node.isTypeDefOrAssembly).to.equal(true);
+        expect(node.isTypeDefOrAssembly).to.be.a('boolean').that.equal(true);
     });
 
 
     test("Other nodes return false for isType", () => {
-        const node = new MemberNode("assembly", "name", 0, TokenType.MemberRef, MemberSubKind.Class, 0);
+        const node = new MemberNode("assembly", "name", 0, TokenType.MemberRef, MemberSubKind.None, 0);
 
-        expect(node.isTypeDefOrAssembly).to.be.a('boolean');
-        expect(node.isTypeDefOrAssembly).to.equal(false);
+        expect(node.isTypeDefOrAssembly).to.be.a('boolean').that.equal(false);
     });
 });
 

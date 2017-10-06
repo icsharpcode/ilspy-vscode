@@ -107,10 +107,14 @@ function showCode(code: string) {
         });
     }
     else {
-        vscode.commands.executeCommand("editor.action.selectAll").then(() =>{
-            textEditor.edit(editBuilder => editBuilder.replace(textEditor.selection, code));
-            vscode.commands.executeCommand("cursorMove", {"to": "viewPortTop"});
-        });
+        const firstLine = textEditor.document.lineAt(0);
+        const lastLine = textEditor.document.lineAt(textEditor.document.lineCount - 1);
+        const range = new vscode.Range(0,
+            firstLine.range.start.character,
+            textEditor.document.lineCount - 1,
+            lastLine.range.end.character);
+        textEditor.edit(editBuilder => editBuilder.replace(range, code));
+        vscode.commands.executeCommand("cursorMove", {"to": "viewPortTop"});
     }
 }
 

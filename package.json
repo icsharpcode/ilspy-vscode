@@ -1,13 +1,20 @@
 {
     "name": "msil-decompiler",
     "displayName": "MSIL Decompiler",
-    "description": "A decompiler for MSIL assemblies",
+    "description": "A prototype decompiler extension for MSIL assemblies, powered by ILSpy API",
     "version": "0.0.1",
     "publisher": "jeremymeng",
-    "engines": {
+    "preview": true,
+    "license": "SEE LICENSE",
+    "repository": {
+        "type": "git",
+        "url": ""
+      },
+      "engines": {
         "vscode": "^1.13.0"
     },
     "categories": [
+        "Languages",
         "Other"
     ],
     "aiKey": "",
@@ -32,7 +39,7 @@
         },
         {
             "command": "msildecompiler.decompileAssemblyPromptForFilePath",
-            "title": "Decompile IL Assembly of a given path",
+            "title": "Decompile IL Assembly from a Given Path",
             "category": "MSIL Decompiler"
         }]
     },
@@ -59,5 +66,16 @@
         "tslint-microsoft-contrib": "^2.0.12",
         "@types/node": "^6.0.40",
         "@types/mocha": "^2.2.32"
-    }
+    },
+    "runtimeDependencies": [
+        {
+          "description": "ILSpy Server Host for Windows (.NET 4.6)",
+          "url": "https://ilspyhostdownload.blob.core.windows.net/ilspyhostdownload/ilspyhost-net46-Release-9db791a945ff3b60f92f47177c442a6390ae6a51.zip",
+          "installPath": "./bin/msildecompiler",
+          "platforms": [
+            "win32"
+          ],
+          "installTestPath": "./bin/msildecompiler/ILSpy.Host.exe"
+        }
+    ]
 }

@@ -2,7 +2,7 @@
     "name": "msil-decompiler",
     "displayName": "MSIL Decompiler",
     "description": "A prototype decompiler extension for MSIL assemblies, powered by ILSpy API",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "publisher": "jeremymeng",
     "preview": true,
     "license": "SEE LICENSE",

@@ -46,7 +46,9 @@ function launch(cwd: string, args: string[]): Promise<LaunchResult> {
             return launchWindows(launchPath, cwd, args);
         }
         else {
-            return launchNix(launchPath, cwd, args);
+            return launchNixMono(launchPath, cwd, args);
+            // TODO: use the following after we have native built binaries and don't need Mono any more
+            // return launchNix(launchPath, cwd, args);
         }
     });
 }
@@ -54,9 +56,7 @@ function launch(cwd: string, args: string[]): Promise<LaunchResult> {
 function getLaunchPath(platformInfo: PlatformInformation): string {
     const binPath = util.getBinPath();
 
-    return platformInfo.isWindows()
-        ? path.join(binPath, 'msildecompiler', 'ILSpy.Host.exe')
-        : path.join(binPath, 'run');
+    return path.join(binPath, 'msildecompiler', 'ILSpy.Host.exe');
 }
 
 function launchWindows(launchPath: string, cwd: string, args: string[]): LaunchResult {

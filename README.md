@@ -5,9 +5,16 @@ Welcome to the msil-decompiler extension for Visual Studio Code! This prototype 
 * `msildecompiler.decompileAssemblyPromptForFilePath` - Decompile an MSIL assembly from a user-input full path.
 * `msildecompiler.decompileAssemblyInWorkspace` - Decompile a MSIL assembly inside of current Visual Studio Code workspace.
 
+## Requirements
+
+* Windows - no other pre-requisites
+* Linux/MacOS - requires Mono version >= 4.6.0.
+
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
+### 0.0.2
+
+Enable *Nix support using Mono.
 
 ### 0.0.1
 

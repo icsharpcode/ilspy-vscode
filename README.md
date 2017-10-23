@@ -36,4 +36,4 @@ To **test** do the following: `npm run test` or <kbd>F5</kbd> in VS Code with th
 
 ## License
 
-TBD
+[MIT license](LICENSE.TXT).

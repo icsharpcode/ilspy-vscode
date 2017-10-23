@@ -1,3 +1,8 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
 // from https://raw.githubusercontent.com/jbevain/cecil/505b07d6974d8405a63124139733c6fdc0e67bc7/Mono.Cecil.Metadata/TokenType.cs
 export enum TokenType
 {

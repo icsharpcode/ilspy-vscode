@@ -1,3 +1,8 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
 // Many code snippets are copied from https://github.com/OmniSharp/omnisharp-vscode/blob/master/src/omnisharp/launcher.ts
 
 'use strict';

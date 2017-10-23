@@ -15,30 +15,18 @@ namespace ILSpy.Host
         {
         }
 
-        public override string EndPoint => MsilDecompilerEndpoints.DecompileType;
+        public override string EndpointName => MsilDecompilerEndpoints.DecompileType;
 
-        public async Task Invoke(HttpContext httpContext)
+        public override object Handle(HttpContext httpContext)
         {
-            if (httpContext.Request.Path.HasValue)
+            var requestObject = JsonHelper.DeserializeRequestObject(httpContext.Request.Body)
+                .ToObject<DecompileTypeRequest>();
+            var code = new DecompileCode
             {
-                var endpoint = httpContext.Request.Path.Value;
-                if (endpoint == EndPoint)
-                {
-                    await Task.Run(() =>
-                    {
-                        var requestObject = JsonHelper.DeserializeRequestObject(httpContext.Request.Body)
-                            .ToObject<DecompileTypeRequest>();
-                        var code = new DecompileCode
-                        {
-                            Decompiled = _decompilationProvider.GetCode(requestObject.AssemblyPath, TokenType.TypeDef, requestObject.Rid)
-                        };
-                        MiddlewareHelpers.WriteTo(httpContext.Response, code);
-                    });
-                    return;
-                }
-            }
+                Decompiled = _decompilationProvider.GetCode(requestObject.AssemblyPath, TokenType.TypeDef, requestObject.Rid)
+            };
 
-            await _next(httpContext);
+            return code;
         }
     }
 }

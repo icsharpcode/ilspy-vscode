@@ -11,6 +11,7 @@ using OmniSharp;
 using OmniSharp.Stdio.Services;
 using OmniSharp.Stdio.Logging;
 using OmniSharp.Host.Services;
+using ILSpy.Host.MiddleWare;
 
 namespace ILSpy.Host
 {
@@ -72,13 +73,9 @@ namespace ILSpy.Host
 
             app.UseExceptionHandler("/error");
 
-            // TODO: dynamically load all of our middleware.
-            app.UseMiddleware<AddAssemblyMiddleware>();
-            app.UseMiddleware<DecompileAssemblyMiddleware>();
-            app.UseMiddleware<ListTypesMiddleware>();
-            app.UseMiddleware<DecompileTypeMiddleware>();
-            app.UseMiddleware<ListMembersMiddleware>();
-            app.UseMiddleware<DecompileMemberMiddleware>();
+            // Loading all endpoint middleware that implements BaseMiddleWare.
+            app.UseEndpointMiddleware();
+
             app.UseMiddleware<StopServerMiddleware>();
 
             var logger = loggerFactory.CreateLogger<Startup>();

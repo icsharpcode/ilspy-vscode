@@ -2,6 +2,7 @@
 
 using Microsoft.AspNetCore.Http;
 using ILSpy.Host.Providers;
+using System.Threading.Tasks;
 
 namespace ILSpy.Host
 {
@@ -10,12 +11,14 @@ namespace ILSpy.Host
         protected readonly RequestDelegate _next;
         protected readonly IDecompilationProvider _decompilationProvider;
 
-        public abstract string EndPoint { get; }
+        public abstract string EndpointName { get; }
 
         public BaseMiddleware(RequestDelegate next, IDecompilationProvider decompilationProvider)
         {
             _next = next;
             _decompilationProvider = decompilationProvider;
         }
+
+        public abstract object Handle(HttpContext httpContext);
     }
 }

@@ -14,43 +14,26 @@ namespace ILSpy.Host
         {
         }
 
-        public override string EndPoint => MsilDecompilerEndpoints.DecompileMember;
+        public override string EndpointName => MsilDecompilerEndpoints.DecompileMember;
 
-        public async Task Invoke(HttpContext httpContext)
+        public override object Handle(HttpContext httpContext)
         {
-            if (httpContext.Request.Path.HasValue)
+            DecompileMemberRequest requestData = JsonHelper.DeserializeRequestObject(httpContext.Request.Body)
+                .ToObject<DecompileMemberRequest>();
+
+            var members = _decompilationProvider.GetChildren(requestData.AssemblyPath, TokenType.TypeDef, requestData.TypeRid);
+            foreach (var member in members)
             {
-                var endpoint = httpContext.Request.Path.Value;
-                if (endpoint == EndPoint)
+                if (member.Token.RID == requestData.MemberRid
+                    && member.Token.TokenType == (TokenType)requestData.MemberType)
                 {
-                    DecompileMemberRequest requestData = JsonHelper.DeserializeRequestObject(httpContext.Request.Body)
-                        .ToObject<DecompileMemberRequest>();
-
-                    var members = _decompilationProvider.GetChildren(requestData.AssemblyPath, TokenType.TypeDef, requestData.TypeRid);
-                    foreach (var member in members)
-                    {
-                        if (member.Token.RID == requestData.MemberRid
-                            && member.Token.TokenType == (TokenType)requestData.MemberType)
-                        {
-                            await Task.Run(() =>
-                            {
-                                var code = new DecompileCode { Decompiled = _decompilationProvider.GetMemberCode(requestData.AssemblyPath, member.Token) };
-                                MiddlewareHelpers.WriteTo(httpContext.Response, code);
-                            });
-                            return;
-                        }
-                    }
-
-                    await Task.Run(() =>
-                    {
-                        var message = $"Error: could not find member matching (type: {requestData.TypeRid}, member: {((TokenType)requestData.MemberType).ToString()}:{requestData.MemberRid}).";
-                        MiddlewareHelpers.WriteTo(httpContext.Response, message);
-                    });
-                    return;
+                    var code = new DecompileCode { Decompiled = _decompilationProvider.GetMemberCode(requestData.AssemblyPath, member.Token) };
+                    return code;
                 }
             }
 
-            await _next(httpContext);
+            var message = $"Error: could not find member matching (type: {requestData.TypeRid}, member: {((TokenType)requestData.MemberType).ToString()}:{requestData.MemberRid}).";
+            return message;
         }
     }
 }

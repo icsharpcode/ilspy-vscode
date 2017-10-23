@@ -1,4 +1,6 @@
-﻿using ICSharpCode.Decompiler;
+﻿// See the LICENSE file in the project root for more information.
+
+using ICSharpCode.Decompiler;
 using Microsoft.Extensions.Configuration;
 
 namespace MsilDecompiler.Host.Configuration

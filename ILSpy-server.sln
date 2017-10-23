@@ -1,11 +1,12 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.15
+VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C431902B-34F0-4C4C-8A3C-5513BE55A3D4}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
+		LICENSE.TXT = LICENSE.TXT
 		README.md = README.md
 		version.json = version.json
 	EndProjectSection
@@ -26,7 +27,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OmniSharp.Stdio", "omnishar
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestAssembly", "test\TestAssembly\TestAssembly.csproj", "{98030DE1-DC87-4E74-8201-FE8E93E826B5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ILSpy.Host.Tests", "test\ILSpy.Host.Tests\ILSpy.Host.Tests.csproj", "{E563593F-7948-446D-9F73-69C18B6DCBA9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ILSpy.Host.Tests", "test\ILSpy.Host.Tests\ILSpy.Host.Tests.csproj", "{E563593F-7948-446D-9F73-69C18B6DCBA9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

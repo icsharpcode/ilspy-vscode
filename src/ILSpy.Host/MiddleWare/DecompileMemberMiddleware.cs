@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿// See the LICENSE file in the project root for more information.
+
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using MsilDecompiler.Host.Providers;
 using Mono.Cecil;

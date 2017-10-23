@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿// See the LICENSE file in the project root for more information.
+
+using Microsoft.Extensions.Logging;
 using Mono.Cecil;
 using Moq;
 using MsilDecompiler.Host;

@@ -1,4 +1,6 @@
-﻿using Mono.Cecil;
+﻿// See the LICENSE file in the project root for more information.
+
+using Mono.Cecil;
 
 namespace MsilDecompiler.Host
 {

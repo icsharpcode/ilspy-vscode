@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿// See the LICENSE file in the project root for more information.
+
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.IO;
 

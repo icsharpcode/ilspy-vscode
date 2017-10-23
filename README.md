@@ -1,6 +1,8 @@
-# MsilDecompiler.Host
+# MSIL decompilation back end
 
-A back end service to provide MSIL decompilations.
+## ILSpy.Host
+
+A back end service to provide MSIL decompilations using ILSpy API.
 
 ```
 Usage:  [options]
@@ -28,8 +30,7 @@ Supported commands are of the following format
 {"Seq":6,"Command":"/decompilemember",Arguments:{"AssemblyPath":"E:\\temp\\TestAssembly.dll","TypeRid":2,"MemberType":100663296,"MemberRid":1}}
 ```
 
-
-# Develop
+## Develop
 
 To build the solution,
 
@@ -39,3 +40,6 @@ git submodule init
 git submodule update
 msbuild MsilDecompiler.sln
 ```
+## License
+
+[MIT license](LICENSE.TXT).

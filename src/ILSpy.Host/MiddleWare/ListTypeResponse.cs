@@ -2,7 +2,7 @@
 
 using System.Collections.Generic;
 
-namespace MsilDecompiler.Host
+namespace ILSpy.Host
 {
     public class ListTypeResponse
     {

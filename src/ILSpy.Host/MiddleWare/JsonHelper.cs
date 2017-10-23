@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.IO;
 
-namespace MsilDecompiler.Host
+namespace ILSpy.Host
 {
     static public class JsonHelper
     {

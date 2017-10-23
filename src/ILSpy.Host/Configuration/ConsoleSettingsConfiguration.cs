@@ -3,7 +3,7 @@
 using ICSharpCode.Decompiler;
 using Microsoft.Extensions.Configuration;
 
-namespace MsilDecompiler.Host.Configuration
+namespace ILSpy.Host.Configuration
 {
     public class ConsoleSettingsConfiguration: IDecompilationConfiguration
     {

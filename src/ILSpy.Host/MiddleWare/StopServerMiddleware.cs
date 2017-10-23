@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 
-namespace MsilDecompiler.Host
+namespace ILSpy.Host
 {
     public class StopServerMiddleware
     {

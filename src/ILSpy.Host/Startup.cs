@@ -12,7 +12,7 @@ using OmniSharp.Stdio.Services;
 using OmniSharp.Stdio.Logging;
 using OmniSharp.Host.Services;
 
-namespace MsilDecompiler.Host
+namespace ILSpy.Host
 {
     public class Startup
     {

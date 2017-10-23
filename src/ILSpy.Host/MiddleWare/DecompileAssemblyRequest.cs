@@ -1,6 +1,6 @@
 ﻿// See the LICENSE file in the project root for more information.
 
-namespace MsilDecompiler.Host
+namespace ILSpy.Host
 {
     public class DecompileAssemblyRequest : RequestBase
     {

@@ -2,28 +2,26 @@
 
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using MsilDecompiler.Host.Providers;
+using ILSpy.Host.Providers;
 using Mono.Cecil;
 
-namespace MsilDecompiler.Host
+namespace ILSpy.Host
 {
-    public class DecompileAssemblyMiddleware
+    public class DecompileAssemblyMiddleware : BaseMiddleware
     {
-        private readonly RequestDelegate _next;
-        private readonly IDecompilationProvider _decompilationProvider;
-
         public DecompileAssemblyMiddleware(RequestDelegate next, IDecompilationProvider decompilationProvider)
+            : base(next, decompilationProvider)
         {
-            _next = next;
-            _decompilationProvider = decompilationProvider;
         }
+
+        public override string EndPoint => MsilDecompilerEndpoints.DecompileAssembly;
 
         public async Task Invoke(HttpContext httpContext)
         {
             if (httpContext.Request.Path.HasValue)
             {
                 var endpoint = httpContext.Request.Path.Value;
-                if (endpoint == MsilDecompilerEndpoints.DecompileAssembly)
+                if (endpoint == EndPoint)
                 {
                     await Task.Run(() =>
                     {

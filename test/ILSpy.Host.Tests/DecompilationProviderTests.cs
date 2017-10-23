@@ -3,8 +3,8 @@
 using Microsoft.Extensions.Logging;
 using Mono.Cecil;
 using Moq;
-using MsilDecompiler.Host;
-using MsilDecompiler.Host.Providers;
+using ILSpy.Host;
+using ILSpy.Host.Providers;
 using OmniSharp.Host.Services;
 using System;
 using System.IO;

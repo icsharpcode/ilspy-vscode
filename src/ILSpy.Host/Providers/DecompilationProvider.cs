@@ -10,7 +10,7 @@ using Mono.Cecil;
 using MsilDecompiler.MsilSpy;
 using OmniSharp.Host.Services;
 
-namespace MsilDecompiler.Host.Providers
+namespace ILSpy.Host.Providers
 {
     public class DecompilationProvider : IDecompilationProvider
     {

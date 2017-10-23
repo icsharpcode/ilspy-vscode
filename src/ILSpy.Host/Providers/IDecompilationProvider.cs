@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using Mono.Cecil;
 
-namespace MsilDecompiler.Host.Providers
+namespace ILSpy.Host.Providers
 {
     public interface IDecompilationProvider
     {

@@ -2,28 +2,26 @@
 
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using MsilDecompiler.Host.Providers;
+using ILSpy.Host.Providers;
 using System.Linq;
 
-namespace MsilDecompiler.Host
+namespace ILSpy.Host
 {
-    public class ListTypesMiddleware
+    public class ListTypesMiddleware : BaseMiddleware
     {
-        private readonly RequestDelegate _next;
-        private readonly IDecompilationProvider _decompilationProvider;
-
         public ListTypesMiddleware(RequestDelegate next, IDecompilationProvider decompilationProvider)
+            : base(next, decompilationProvider)
         {
-            _next = next;
-            _decompilationProvider = decompilationProvider;
         }
+
+        public override string EndPoint => MsilDecompilerEndpoints.ListTypes;
 
         public async Task Invoke(HttpContext httpContext)
         {
             if (httpContext.Request.Path.HasValue)
             {
                 var endpoint = httpContext.Request.Path.Value;
-                if (endpoint == MsilDecompilerEndpoints.ListTypes)
+                if (endpoint == EndPoint)
                 {
                     await Task.Run(() =>
                     {

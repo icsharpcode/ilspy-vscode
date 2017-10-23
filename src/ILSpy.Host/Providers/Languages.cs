@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using MsilDecompiler.MsilSpy;
 
-namespace MsilDecompiler.Host.Providers
+namespace ILSpy.Host.Providers
 {
     public static class Languages
     {

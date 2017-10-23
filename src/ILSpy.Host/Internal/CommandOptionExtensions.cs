@@ -3,7 +3,7 @@
 using System.ComponentModel;
 using Microsoft.Extensions.CommandLineUtils;
 
-namespace MsilDecompiler.Host.Internal
+namespace ILSpy.Host.Internal
 {
     internal static class CommandOptionExtensions
     {

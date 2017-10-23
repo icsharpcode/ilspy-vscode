@@ -2,7 +2,7 @@
 
 using ICSharpCode.Decompiler;
 
-namespace MsilDecompiler.Host.Configuration
+namespace ILSpy.Host.Configuration
 {
     public interface IDecompilationConfiguration
     {

@@ -2,7 +2,7 @@
 
 using Mono.Cecil;
 
-namespace MsilDecompiler.Host
+namespace ILSpy.Host
 {
     public class MemberData
     {

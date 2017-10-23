@@ -5,7 +5,7 @@ using System.Text;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 
-namespace MsilDecompiler.Host
+namespace ILSpy.Host
 {
     public static class MiddlewareHelpers
     {

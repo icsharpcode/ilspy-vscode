@@ -1,6 +1,6 @@
 ﻿// See the LICENSE file in the project root for more information.
 
-namespace MsilDecompiler.Host.Configuration
+namespace ILSpy.Host.Configuration
 {
     public class ConsoleArgs
     {

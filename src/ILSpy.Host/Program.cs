@@ -5,8 +5,8 @@ using Microsoft.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using MsilDecompiler.Host.Internal;
-using MsilDecompiler.Host.Providers;
+using ILSpy.Host.Internal;
+using ILSpy.Host.Providers;
 using OmniSharp;
 using OmniSharp.Host.Services;
 using OmniSharp.Stdio;
@@ -17,7 +17,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
-namespace MsilDecompiler.Host
+namespace ILSpy.Host
 {
     public class Program
     {

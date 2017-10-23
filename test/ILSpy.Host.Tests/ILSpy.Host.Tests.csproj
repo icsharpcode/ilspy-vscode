@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net46</TargetFramework>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="1.1.2" />
     <PackageReference Include="Moq" Version="4.7.99" />
     <PackageReference Include="xunit" Version="2.3.0-beta5-build3769" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0-beta5-build3769" />

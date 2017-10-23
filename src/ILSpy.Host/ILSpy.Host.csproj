@@ -6,6 +6,7 @@
     <AssemblyName>ILSpy.Host</AssemblyName>
     <OutputType>Exe</OutputType>
     <PackageId>MsilDecompiler.Host</PackageId>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>

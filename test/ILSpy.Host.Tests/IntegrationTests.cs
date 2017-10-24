@@ -82,33 +82,9 @@ namespace ILSpy.Host.Tests
 
             var payload2 = new { AssemblyPath = _filePath, Rid = 2 };
             decompiledCode = await PostRequest<DecompileCode>("/decompiletype", payload2);
-            Assert.Contains(@"using System;
-
-namespace TestAssembly
-{
-	public class C
-	{
-		private int _ProgId;
-
-		public int ProgId
-		{
-			get
-			{
-				return this._ProgId;
-			}
-			set
-			{
-				this._ProgId = value;
-			}
-		}
-
-		public C(int ProgramId)
-		{
-			this.ProgId = ProgramId;
-		}
-	}
-}
-", decompiledCode.Decompiled);
+            Assert.Contains(@"namespace TestAssembly", decompiledCode.Decompiled);
+            Assert.Contains(@"public class C", decompiledCode.Decompiled);
+            Assert.Contains(@"public C(int ProgramId)", decompiledCode.Decompiled);
 
             var data2 = await PostRequest<ListMembersResponse>("/listmembers", payload2);
 

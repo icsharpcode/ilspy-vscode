@@ -1,0 +1,17 @@
+version: 0.0.1.{branch}-{build}
+pull_requests:
+  do_not_increment_build_number: true
+branches:
+  only:
+  - master
+image: Visual Studio 2017
+init:
+- cmd: 
+before_build:
+- cmd: >-
+    git submodule update --init --recursive
+
+    nuget restore
+build:
+  project: ILSpy-server.sln
+  verbosity: minimal

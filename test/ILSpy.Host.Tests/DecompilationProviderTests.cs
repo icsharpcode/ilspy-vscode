@@ -3,10 +3,8 @@
 using Microsoft.Extensions.Logging;
 using Mono.Cecil;
 using Moq;
-using ILSpy.Host;
 using ILSpy.Host.Providers;
 using OmniSharp.Host.Services;
-using System;
 using System.IO;
 using System.Linq;
 using Xunit;
@@ -37,7 +35,7 @@ namespace ILSpy.Host.Tests
         public void AddValidAssemblyShouldSucceed()
         {
             // Arrange
-            var provider = new DecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
+            var provider = new SimpleDecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
 
             // Act
             var added = provider.AddAssembly(new FileInfo(testAssemblyPath).FullName);
@@ -50,7 +48,7 @@ namespace ILSpy.Host.Tests
         public void AddInValidAssemblyShouldFail()
         {
             // Arrange
-            var provider = new DecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
+            var provider = new SimpleDecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
 
             // Act
             var added = provider.AddAssembly("../non/existant/path.dll");
@@ -63,7 +61,7 @@ namespace ILSpy.Host.Tests
         public void ListOfTypesFromValidAssembly()
         {
             // Arrange
-            var provider = new DecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
+            var provider = new SimpleDecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
 
             // Act
             string assemblyPath = new FileInfo(testAssemblyPath).FullName;
@@ -82,7 +80,7 @@ namespace ILSpy.Host.Tests
         public void DecompileAssembly()
         {
             // Arrange
-            var provider = new DecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
+            var provider = new SimpleDecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
 
             // Act
             string assemblyPath = new FileInfo(testAssemblyPath).FullName;
@@ -91,8 +89,58 @@ namespace ILSpy.Host.Tests
 
             // Assert
             Assert.Contains("// TestAssembly, Version=", code);
-            Assert.Contains("[assembly: AssemblyProduct(\"TestAssembly\")]", code);
-            Assert.Contains("[assembly: AssemblyTitle(\"TestAssembly\")]", code);
+            Assert.Contains("// Architecture: AnyCPU (64-bit preferred)", code);
+            Assert.Contains("// Runtime: .NET 4.0", code);
+        }
+
+        [Fact]
+        public void ListOfMembersOfAType()
+        {
+            // Arrange
+            var provider = new SimpleDecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
+
+            // Act
+            string assemblyPath = new FileInfo(testAssemblyPath).FullName;
+            var added = provider.AddAssembly(assemblyPath);
+            var types = provider.ListTypes(assemblyPath).ToList();
+
+            // Assert
+            var type = types.Single(t => t.Name.Equals("C"));
+            var members = provider.GetChildren(assemblyPath, type.Token.TokenType, type.Token.RID).ToArray();
+
+            Assert.NotEmpty(members);
+            Assert.Equal(".ctor", members[0].Name);
+            Assert.Equal(TokenType.Method, members[0].Token.TokenType);
+
+            Assert.Equal("_ProgId", members[1].Name);
+            Assert.Equal(TokenType.Field, members[1].Token.TokenType);
+
+            Assert.Equal("ProgId", members[2].Name);
+            Assert.Equal(TokenType.Property, members[2].Token.TokenType);
+        }
+
+        [Fact]
+        public void DecompileOneMember()
+        {
+            // Arrange
+            var provider = new SimpleDecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
+
+            // Act
+            string assemblyPath = new FileInfo(testAssemblyPath).FullName;
+            var added = provider.AddAssembly(assemblyPath);
+            var types = provider.ListTypes(assemblyPath).ToList();
+
+            // Assert
+            var type = types.Single(t => t.Name.Equals("C"));
+            var members = provider.GetChildren(assemblyPath, type.Token.TokenType, type.Token.RID).ToArray();
+
+            Assert.NotEmpty(members);
+            var decompiled = provider.GetMemberCode(assemblyPath, members[0].Token);
+            Assert.Equal(@"public C(int ProgramId)
+{
+	this.ProgId = ProgramId;
+}
+", decompiled);
         }
     }
 }

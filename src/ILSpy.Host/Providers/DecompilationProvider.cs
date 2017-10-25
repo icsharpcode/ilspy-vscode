@@ -1,5 +1,5 @@
 ﻿// See the LICENSE file in the project root for more information.
-
+#if false
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -356,27 +356,7 @@ namespace ILSpy.Host.Providers
                 catch { }
                 return null;
             }
-
-            public override AssemblyDefinition Resolve(string fullName)
-            {
-                try
-                {
-                    return base.Resolve(fullName);
-                }
-                catch { }
-                return null;
-            }
-
-            public override AssemblyDefinition Resolve(string fullName, ReaderParameters parameters)
-            {
-                try
-                {
-                    return base.Resolve(fullName, parameters);
-                }
-                catch { }
-                return null;
-            }
         }
-
     }
 }
+#endif

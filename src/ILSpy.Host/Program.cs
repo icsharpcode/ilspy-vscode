@@ -114,7 +114,7 @@ namespace ILSpy.Host
                     {
                         serviceCollection.AddSingleton<IMsilDecompilerEnvironment>(env);
                         serviceCollection.AddSingleton<ISharedTextWriter>(writer);
-                        serviceCollection.AddSingleton<IDecompilationProvider, DecompilationProvider>();
+                        serviceCollection.AddSingleton<IDecompilationProvider, SimpleDecompilationProvider>();
                     })
                     .UseStartup(typeof(Startup));
 

@@ -108,10 +108,14 @@ namespace ILSpy.Host.Tests
             Assert.Equal(MemberSubKind.None, m3.MemberSubKind);
             Assert.Equal(TokenType.Property, m3.Token.TokenType);
 
-            var payload3 = new { AssemblyPath = _filePath, TypeRid = 2, MemberType = 100663296, MemberRid = 2 };
+            var payload3 = new { AssemblyPath = _filePath, TypeRid = 2, MemberType = 100663296, MemberRid = 3 };
             decompiledCode = await PostRequest<DecompileCode>("/decompilemember", payload3);
 
-            Assert.Contains("public void set_ProgId(int value)", decompiledCode.Decompiled);
+            Assert.Equal(@"public C(int ProgramId)
+{
+	this.ProgId = ProgramId;
+}
+", decompiledCode.Decompiled);
         }
 
         private async Task<T> PostRequest<T>(string endpoint, object payload)
@@ -123,9 +127,34 @@ namespace ILSpy.Host.Tests
 
             var traceWriter = new Newtonsoft.Json.Serialization.MemoryTraceWriter();
             JsonSerializerSettings settings = new JsonSerializerSettings { TraceWriter = traceWriter, TypeNameHandling = TypeNameHandling.Objects };
+            settings.Converters.Add(new TestMetadataTokenConverter());
             var result = JsonConvert.DeserializeObject<T>(responseString, settings);
             var s = traceWriter.ToString();
             return result;
+        }
+
+        // For unknown reason the default converter couldn't deserialize MetadataToken.
+        // This works around the issue.
+        private class TestMetadataTokenConverter : JsonConverter
+        {
+            public override bool CanConvert(Type objectType)
+            {
+                return objectType == typeof(MetadataToken);
+            }
+
+            public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+            {
+                var jsonObject = Newtonsoft.Json.Linq.JObject.Load(reader);
+                var properties = jsonObject.Properties().ToList();
+                var tokenType = (TokenType)(uint)properties[1].Value;
+                var rid = (uint)properties[0].Value;
+                return new MetadataToken(tokenType, rid);
+            }
+
+            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

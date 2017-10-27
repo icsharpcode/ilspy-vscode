@@ -35,5 +35,10 @@ namespace TestAssembly
         {
             ProgId = ProgramId;
         }
+
+        public class NestedC
+        {
+            public void M() { }
+        }
     }
 }

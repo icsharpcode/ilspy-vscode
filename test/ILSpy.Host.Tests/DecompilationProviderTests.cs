@@ -106,17 +106,21 @@ namespace ILSpy.Host.Tests
 
             // Assert
             var type = types.Single(t => t.Name.Equals("C"));
-            var members = provider.GetChildren(assemblyPath, type.Token.TokenType, type.Token.RID).ToArray();
+            var members = provider.GetChildren(assemblyPath, type.Token.TokenType, type.Token.RID);
 
             Assert.NotEmpty(members);
-            Assert.Equal(".ctor", members[0].Name);
-            Assert.Equal(TokenType.Method, members[0].Token.TokenType);
+            var m1 = members.Single(m => m.Name.Equals(".ctor"));
+            Assert.Equal(TokenType.Method, m1.Token.TokenType);
 
-            Assert.Equal("_ProgId", members[1].Name);
-            Assert.Equal(TokenType.Field, members[1].Token.TokenType);
+            var m2 = members.Single(m => m.Name.Equals("_ProgId"));
+            Assert.Equal(TokenType.Field, m2.Token.TokenType);
 
-            Assert.Equal("ProgId", members[2].Name);
-            Assert.Equal(TokenType.Property, members[2].Token.TokenType);
+            var m3 = members.Single(m => m.Name.Equals("ProgId"));
+            Assert.Equal(TokenType.Property, m3.Token.TokenType);
+
+            var m4 = members.Single(m => m.Name.Equals("NestedC"));
+            Assert.Equal(TokenType.TypeDef, m4.Token.TokenType);
+            Assert.Equal(MemberSubKind.Class, m4.MemberSubKind);
         }
 
         [Fact]
@@ -130,15 +134,42 @@ namespace ILSpy.Host.Tests
             var added = provider.AddAssembly(assemblyPath);
             var types = provider.ListTypes(assemblyPath).ToList();
 
-            // Assert
             var type = types.Single(t => t.Name.Equals("C"));
             var members = provider.GetChildren(assemblyPath, type.Token.TokenType, type.Token.RID).ToArray();
 
+            // Assert
             Assert.NotEmpty(members);
-            var decompiled = provider.GetMemberCode(assemblyPath, members[0].Token);
+            var m1 = members.Single(m => m.Name.Equals(".ctor"));
+            var decompiled = provider.GetMemberCode(assemblyPath, m1.Token);
             Assert.Equal(@"public C(int ProgramId)
 {
 	this.ProgId = ProgramId;
+}
+", decompiled);
+        }
+
+        [Fact(Skip = "nested type not working?")]
+        public void DecompileNestedClass()
+        {
+            // Arrange
+            var provider = new SimpleDecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
+
+            // Act
+            string assemblyPath = new FileInfo(testAssemblyPath).FullName;
+            var added = provider.AddAssembly(assemblyPath);
+            var types = provider.ListTypes(assemblyPath).ToList();
+
+            var type = types.Single(t => t.Name.Equals("C"));
+            var members = provider.GetChildren(assemblyPath, type.Token.TokenType, type.Token.RID).ToArray();
+
+            // Assert
+            Assert.NotEmpty(members);
+            var m1 = members.Single(m => m.Name.Equals("NestedC"));
+            var decompiled = provider.GetMemberCode(assemblyPath, m1.Token);
+            Assert.Equal(
+@"public class NestedC
+{
+    public void M() { }
 }
 ", decompiled);
         }

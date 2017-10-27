@@ -94,17 +94,22 @@ namespace ILSpy.Host.Providers
         {
             var module = _moduleDefinitions[assemblyPath];
             var dc = _decompilers[module];
-            var tds = dc.ListContent(new HashSet<TypeKind>() { TypeKind.Class, TypeKind.Interface, TypeKind.Enum, TypeKind.Delegate, TypeKind.Struct });
-            var c = tds.FirstOrDefault(t =>
-            {
-                var cecilType = dc.TypeSystem.GetCecil(t);
-                return cecilType?.MetadataToken.TokenType == tokenType
-                    && cecilType?.MetadataToken.RID == rid;
-            });
+            var c = _tokenToProviderMap[module][new MetadataToken(tokenType, rid)] as ITypeDefinition;
 
             return c == null
                 ? new List<MemberData>()
-                : c.Members.Select(m =>
+                : c.NestedTypes.Select(typeDefinition =>
+                    {
+                        var cecilType = dc.TypeSystem.GetCecil(typeDefinition);
+                        return new MemberData
+                        {
+                            Name = typeDefinition.Name,
+                            Token = cecilType.MetadataToken,
+                            MemberSubKind = cecilType.GetMemberSubKind()
+                        };
+                    }
+                    ).Union(
+                c.Members.Select(m =>
                 {
                     var cecilRef = dc.TypeSystem.GetCecil(m);
                     return new MemberData
@@ -113,7 +118,7 @@ namespace ILSpy.Host.Providers
                         Token = cecilRef.MetadataToken,
                         MemberSubKind = MemberSubKind.None
                     };
-                });
+                }));
         }
 
         public string GetCode(string assemblyPath, TokenType tokenType, uint rid)
@@ -125,15 +130,7 @@ namespace ILSpy.Host.Providers
             }
             else if (tokenType == TokenType.TypeDef)
             {
-                var dc = _decompilers[module];
-                var tds = dc.ListContent(new HashSet<TypeKind>() { TypeKind.Class, TypeKind.Interface, TypeKind.Enum, TypeKind.Delegate, TypeKind.Struct });
-                var c = tds.FirstOrDefault(t =>
-                {
-                    var cecilType = dc.TypeSystem.GetCecil(t);
-                    return cecilType?.MetadataToken.TokenType == tokenType
-                        && cecilType?.MetadataToken.RID == rid;
-                });
-
+                var c = _tokenToProviderMap[module][new MetadataToken(tokenType, rid)];
                 return GetEntityCode(module, c);
             }
 

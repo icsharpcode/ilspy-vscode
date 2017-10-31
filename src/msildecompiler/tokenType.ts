@@ -40,5 +40,8 @@ export enum TokenType
 		CustomDebugInformation = 0x37000000,
 
         String = 0x70000000,
+
+        // Added for namespace nodes
+        Namespace = 0x71000000
 }
 

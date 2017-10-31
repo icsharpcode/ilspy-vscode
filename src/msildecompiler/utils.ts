@@ -18,6 +18,9 @@ export function decompileAssembly(server: MsilDecompilerServer, request: protoco
     return server.makeRequest<protocol.DecompileResponse>(protocol.Requests.DecompileAssembly, request);
 }
 
+export function listNamespaces(server: MsilDecompilerServer, request: protocol.ListNamespacesRequest) {
+    return server.makeRequest<protocol.ListNamespacesResponse>(protocol.Requests.ListNamespaces, request);
+}
 export function getTypes(server: MsilDecompilerServer, request: protocol.ListTypesRequest) {
     return server.makeRequest<protocol.ListTypesResponse>(protocol.Requests.ListTypes, request);
 }

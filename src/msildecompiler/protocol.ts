@@ -12,6 +12,7 @@ import { MemberSubKind } from './memberSubKind';
 export module Requests {
     export const AddAssembly = '/addassembly';
     export const DecompileAssembly = '/decompileassembly';
+    export const ListNamespaces = '/listnamespaces';
     export const ListTypes = '/listtypes';
     export const DecopmileType = '/decompiletype';
     export const ListMembers = '/listmembers';
@@ -63,7 +64,15 @@ export interface DecompileResponse {
     Decompiled: string;
 }
 
+export interface ListNamespacesRequest extends Request {
+}
+
+export interface ListNamespacesResponse {
+    Namespaces: string[];
+}
+
 export interface ListTypesRequest extends Request {
+    Namespace: string;
 }
 
 export interface MetadataToken {

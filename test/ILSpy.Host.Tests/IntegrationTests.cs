@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Mono.Cecil;
 using Moq;
 using Newtonsoft.Json;
 using OmniSharp.Host.Services;
@@ -27,7 +29,7 @@ namespace ILSpy.Host.Tests
         private readonly Mock<IMsilDecompilerEnvironment> _mockEnv;
         private readonly Mock<ISharedTextWriter> _mockWriter;
         private Mock<ILoggerFactory> _mockLoggerFactory;
-        private readonly DecompilationProvider _decompilationProvider;
+        private readonly SimpleDecompilationProvider _decompilationProvider;
         private readonly string _filePath;
 
         public IntegrationTests()
@@ -42,7 +44,7 @@ namespace ILSpy.Host.Tests
 
             _mockLoggerFactory = new Mock<ILoggerFactory>();
 
-            _decompilationProvider = new DecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
+            _decompilationProvider = new SimpleDecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
 
             _server = new TestServer(new WebHostBuilder()
                 .ConfigureServices(serviceCollection =>
@@ -54,6 +56,10 @@ namespace ILSpy.Host.Tests
                 .UseStartup<Startup>());
 
             _client = _server.CreateClient();
+            if (Debugger.IsAttached)
+            {
+                _client.Timeout = TimeSpan.FromMinutes(10);
+            }
 
             _filePath = new FileInfo(testAssemblyPath).FullName;
         }
@@ -69,8 +75,8 @@ namespace ILSpy.Host.Tests
             var decompiledCode = await PostRequest<DecompileCode>("/decompileassembly", payload1);
 
             Assert.Contains("// TestAssembly, Version=", decompiledCode.Decompiled);
-            Assert.Contains("[assembly: AssemblyProduct(\"TestAssembly\")]", decompiledCode.Decompiled);
-            Assert.Contains("[assembly: AssemblyTitle(\"TestAssembly\")]", decompiledCode.Decompiled);
+            Assert.Contains("// Architecture: AnyCPU (64-bit preferred)", decompiledCode.Decompiled);
+            Assert.Contains("// Runtime: .NET 4.0", decompiledCode.Decompiled);
 
             var data = await PostRequest<ListTypesResponse>("/listtypes", payload1);
 
@@ -89,13 +95,27 @@ namespace ILSpy.Host.Tests
             var data2 = await PostRequest<ListMembersResponse>("/listmembers", payload2);
 
             Assert.NotEmpty(data2.Members);
-            Assert.True(data2.Members.Single(t => t.Name.Equals("get_ProgId()")).MemberSubKind == MemberSubKind.None);
-            Assert.True(data2.Members.Single(t => t.Name.Equals("set_ProgId(System.Int32)")).MemberSubKind == MemberSubKind.None);
 
-            var payload3 = new { AssemblyPath = _filePath, TypeRid = 2, MemberType = 100663296, MemberRid = 2 };
+            var m1 = data2.Members.Single(t => t.Name.Equals(".ctor"));
+            Assert.Equal(MemberSubKind.None, m1.MemberSubKind);
+            Assert.Equal(TokenType.Method, m1.Token.TokenType);
+
+            var m2 = data2.Members.Single(t => t.Name.Equals("_ProgId"));
+            Assert.Equal(MemberSubKind.None, m2.MemberSubKind);
+            Assert.Equal(TokenType.Field, m2.Token.TokenType);
+
+            var m3 = data2.Members.Single(t => t.Name.Equals("ProgId"));
+            Assert.Equal(MemberSubKind.None, m3.MemberSubKind);
+            Assert.Equal(TokenType.Property, m3.Token.TokenType);
+
+            var payload3 = new { AssemblyPath = _filePath, TypeRid = 2, MemberType = 100663296, MemberRid = 3 };
             decompiledCode = await PostRequest<DecompileCode>("/decompilemember", payload3);
 
-            Assert.Contains("public void set_ProgId(int value)", decompiledCode.Decompiled);
+            Assert.Equal(@"public C(int ProgramId)
+{
+	this.ProgId = ProgramId;
+}
+", decompiledCode.Decompiled);
         }
 
         private async Task<T> PostRequest<T>(string endpoint, object payload)
@@ -104,8 +124,37 @@ namespace ILSpy.Host.Tests
             var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await _client.PostAsync(endpoint, httpContent);
             var responseString = await response.Content.ReadAsStringAsync();
-            T result = JsonConvert.DeserializeObject<T>(responseString);
+
+            var traceWriter = new Newtonsoft.Json.Serialization.MemoryTraceWriter();
+            JsonSerializerSettings settings = new JsonSerializerSettings { TraceWriter = traceWriter, TypeNameHandling = TypeNameHandling.Objects };
+            settings.Converters.Add(new TestMetadataTokenConverter());
+            var result = JsonConvert.DeserializeObject<T>(responseString, settings);
+            var s = traceWriter.ToString();
             return result;
+        }
+
+        // For unknown reason the default converter couldn't deserialize MetadataToken.
+        // This works around the issue.
+        private class TestMetadataTokenConverter : JsonConverter
+        {
+            public override bool CanConvert(Type objectType)
+            {
+                return objectType == typeof(MetadataToken);
+            }
+
+            public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+            {
+                var jsonObject = Newtonsoft.Json.Linq.JObject.Load(reader);
+                var properties = jsonObject.Properties().ToList();
+                var tokenType = (TokenType)(uint)properties[1].Value;
+                var rid = (uint)properties[0].Value;
+                return new MetadataToken(tokenType, rid);
+            }
+
+            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

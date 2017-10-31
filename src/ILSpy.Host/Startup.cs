@@ -42,9 +42,6 @@ namespace ILSpy.Host
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Add framework services.
-            services.AddMvc();
-
             services.AddOptions();
 
             //TODO: add options, e.g., formatting options for decompiled code, etc.
@@ -87,8 +84,6 @@ namespace ILSpy.Host
             {
                 logger.LogInformation($"MsilDecompiler server running on port '{_env.Port}'.");
             }
-
-            app.UseMvc();
         }
         
         private static bool LogFilter(string category, LogLevel level, IMsilDecompilerEnvironment environment)

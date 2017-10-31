@@ -3,10 +3,8 @@
 using Microsoft.Extensions.Logging;
 using Mono.Cecil;
 using Moq;
-using ILSpy.Host;
 using ILSpy.Host.Providers;
 using OmniSharp.Host.Services;
-using System;
 using System.IO;
 using System.Linq;
 using Xunit;
@@ -37,7 +35,7 @@ namespace ILSpy.Host.Tests
         public void AddValidAssemblyShouldSucceed()
         {
             // Arrange
-            var provider = new DecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
+            var provider = new SimpleDecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
 
             // Act
             var added = provider.AddAssembly(new FileInfo(testAssemblyPath).FullName);
@@ -50,7 +48,7 @@ namespace ILSpy.Host.Tests
         public void AddInValidAssemblyShouldFail()
         {
             // Arrange
-            var provider = new DecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
+            var provider = new SimpleDecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
 
             // Act
             var added = provider.AddAssembly("../non/existant/path.dll");
@@ -63,7 +61,7 @@ namespace ILSpy.Host.Tests
         public void ListOfTypesFromValidAssembly()
         {
             // Arrange
-            var provider = new DecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
+            var provider = new SimpleDecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
 
             // Act
             string assemblyPath = new FileInfo(testAssemblyPath).FullName;
@@ -82,7 +80,7 @@ namespace ILSpy.Host.Tests
         public void DecompileAssembly()
         {
             // Arrange
-            var provider = new DecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
+            var provider = new SimpleDecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
 
             // Act
             string assemblyPath = new FileInfo(testAssemblyPath).FullName;
@@ -91,8 +89,91 @@ namespace ILSpy.Host.Tests
 
             // Assert
             Assert.Contains("// TestAssembly, Version=", code);
-            Assert.Contains("[assembly: AssemblyProduct(\"TestAssembly\")]", code);
-            Assert.Contains("[assembly: AssemblyTitle(\"TestAssembly\")]", code);
+            Assert.Contains("// Architecture: AnyCPU (64-bit preferred)", code);
+            Assert.Contains("// Runtime: .NET 4.0", code);
+        }
+
+        [Fact]
+        public void ListOfMembersOfAType()
+        {
+            // Arrange
+            var provider = new SimpleDecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
+
+            // Act
+            string assemblyPath = new FileInfo(testAssemblyPath).FullName;
+            var added = provider.AddAssembly(assemblyPath);
+            var types = provider.ListTypes(assemblyPath).ToList();
+
+            // Assert
+            var type = types.Single(t => t.Name.Equals("C"));
+            var members = provider.GetChildren(assemblyPath, type.Token.TokenType, type.Token.RID);
+
+            Assert.NotEmpty(members);
+            var m1 = members.Single(m => m.Name.Equals(".ctor"));
+            Assert.Equal(TokenType.Method, m1.Token.TokenType);
+
+            var m2 = members.Single(m => m.Name.Equals("_ProgId"));
+            Assert.Equal(TokenType.Field, m2.Token.TokenType);
+
+            var m3 = members.Single(m => m.Name.Equals("ProgId"));
+            Assert.Equal(TokenType.Property, m3.Token.TokenType);
+
+            var m4 = members.Single(m => m.Name.Equals("NestedC"));
+            Assert.Equal(TokenType.TypeDef, m4.Token.TokenType);
+            Assert.Equal(MemberSubKind.Class, m4.MemberSubKind);
+        }
+
+        [Fact]
+        public void DecompileOneMember()
+        {
+            // Arrange
+            var provider = new SimpleDecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
+
+            // Act
+            string assemblyPath = new FileInfo(testAssemblyPath).FullName;
+            var added = provider.AddAssembly(assemblyPath);
+            var types = provider.ListTypes(assemblyPath).ToList();
+
+            var type = types.Single(t => t.Name.Equals("C"));
+            var members = provider.GetChildren(assemblyPath, type.Token.TokenType, type.Token.RID).ToArray();
+
+            // Assert
+            Assert.NotEmpty(members);
+            var m1 = members.Single(m => m.Name.Equals(".ctor"));
+            var decompiled = provider.GetMemberCode(assemblyPath, m1.Token);
+            Assert.Equal(@"public C(int ProgramId)
+{
+	this.ProgId = ProgramId;
+}
+", decompiled);
+        }
+
+        [Fact]
+        public void DecompileNestedClass()
+        {
+            // Arrange
+            var provider = new SimpleDecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
+
+            // Act
+            string assemblyPath = new FileInfo(testAssemblyPath).FullName;
+            var added = provider.AddAssembly(assemblyPath);
+            var types = provider.ListTypes(assemblyPath).ToList();
+
+            var type = types.Single(t => t.Name.Equals("C"));
+            var members = provider.GetChildren(assemblyPath, type.Token.TokenType, type.Token.RID).ToArray();
+
+            // Assert
+            Assert.NotEmpty(members);
+            var m1 = members.Single(m => m.Name.Equals("NestedC"));
+            var decompiled = provider.GetMemberCode(assemblyPath, m1.Token);
+            Assert.Equal(
+@"public class NestedC
+{
+	public void M()
+	{
+	}
+}
+", decompiled);
         }
     }
 }

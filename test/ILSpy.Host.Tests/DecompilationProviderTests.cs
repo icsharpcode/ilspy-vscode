@@ -148,7 +148,7 @@ namespace ILSpy.Host.Tests
 ", decompiled);
         }
 
-        [Fact(Skip = "nested type not working?")]
+        [Fact]
         public void DecompileNestedClass()
         {
             // Arrange
@@ -169,7 +169,9 @@ namespace ILSpy.Host.Tests
             Assert.Equal(
 @"public class NestedC
 {
-    public void M() { }
+	public void M()
+	{
+	}
 }
 ", decompiled);
         }

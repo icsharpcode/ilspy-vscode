@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
-using ICSharpCode.Decompiler.Extensions;
+using ICSharpCode.Decompiler;
+using ICSharpCode.Decompiler.CSharp;
 using ICSharpCode.Decompiler.TypeSystem;
 using Microsoft.Extensions.Logging;
 using Mono.Cecil;
@@ -14,9 +14,9 @@ namespace ILSpy.Host.Providers
     public class SimpleDecompilationProvider : IDecompilationProvider
     {
         private ILogger _logger;
-        private Dictionary<ModuleDefinition, Dictionary<MetadataToken, IEntity>> _tokenToProviderMap = new Dictionary<ModuleDefinition, Dictionary<MetadataToken, IEntity>>();
-        private Dictionary<string, ModuleDefinition> _moduleDefinitions = new Dictionary<string, ModuleDefinition>();
-        private Dictionary<ModuleDefinition, SimpleDecompiler> _decompilers = new Dictionary<ModuleDefinition, SimpleDecompiler>();
+        private Dictionary<string, Dictionary<MetadataToken, IEntity>> _tokenToProviderMap = new Dictionary<string, Dictionary<MetadataToken, IEntity>>();
+        private Dictionary<string, CSharpDecompiler> _decompilers = new Dictionary<string, CSharpDecompiler>();
+        private Dictionary<string, ModuleDefinition> _mainModules = new Dictionary<string, ModuleDefinition>();
 
         public SimpleDecompilationProvider(IMsilDecompilerEnvironment decompilationConfiguration, ILoggerFactory loggerFactory)
         {
@@ -27,11 +27,11 @@ namespace ILSpy.Host.Providers
         {
             try
             {
-                var asm = SimpleAssemblyLoader.LoadModule(path);
-                if (asm != null)
+                var mainModule = UniversalAssemblyResolver.LoadMainModule(path);
+                if (mainModule != null)
                 {
-                    _moduleDefinitions[path] = asm;
-                    PopulateTokenToProviderMap(asm);
+                    _mainModules.Add(path, mainModule);
+                    PopulateTokenToProviderMap(path);
                     return true;
                 }
             }
@@ -43,42 +43,42 @@ namespace ILSpy.Host.Providers
             return false;
         }
 
-        private void PopulateTokenToProviderMap(ModuleDefinition module)
+        private void PopulateTokenToProviderMap(string assemblyPath)
         {
-            var dc = SimpleDecompiler.Create(module);
-            _decompilers[module] = dc;
-            var tds = dc.ListContent(new HashSet<TypeKind>() { TypeKind.Class, TypeKind.Interface, TypeKind.Enum, TypeKind.Delegate, TypeKind.Struct });
-            foreach (var type in tds)
+            var decompiler = new CSharpDecompiler(assemblyPath, new DecompilerSettings());
+            _decompilers[assemblyPath] = decompiler;
+            var types = decompiler.TypeSystem.Compilation.MainAssembly.GetAllTypeDefinitions();
+            foreach (var type in types)
             {
-                PopulateTokenToProviderMap(dc, module, type);
+                PopulateTokenToProviderMap(decompiler, assemblyPath, type);
             }
         }
 
-        private void PopulateTokenToProviderMap(SimpleDecompiler dc, ModuleDefinition module, ITypeDefinition typeDefinition)
+        private void PopulateTokenToProviderMap(CSharpDecompiler dc, string assemblyPath, ITypeDefinition typeDefinition)
         {
             if (typeDefinition == null)
             {
                 return;
             }
 
-            AddToProviderMap(dc, module, typeDefinition);
+            AddToProviderMap(dc, assemblyPath, typeDefinition);
 
             foreach (var member in typeDefinition.Members)
             {
-                AddToProviderMap(dc, module, member);
+                AddToProviderMap(dc, assemblyPath, member);
             }
 
             foreach (var nestedType in typeDefinition.NestedTypes)
             {
-                PopulateTokenToProviderMap(dc, module, nestedType);
+                PopulateTokenToProviderMap(dc, assemblyPath, nestedType);
             }
         }
 
-        private void AddToProviderMap(SimpleDecompiler dc, ModuleDefinition module, IEntity entity)
+        private void AddToProviderMap(CSharpDecompiler dc, string assemblyPath, IEntity entity)
         {
-            if (!_tokenToProviderMap.ContainsKey(module))
+            if (!_tokenToProviderMap.ContainsKey(assemblyPath))
             {
-                _tokenToProviderMap.Add(module, new Dictionary<MetadataToken, IEntity>());
+                _tokenToProviderMap.Add(assemblyPath, new Dictionary<MetadataToken, IEntity>());
             }
 
             var token = entity is ITypeDefinition type
@@ -86,15 +86,14 @@ namespace ILSpy.Host.Providers
                 : dc.TypeSystem.GetCecil((IMember)entity)?.MetadataToken;
             if (token.HasValue)
             {
-                _tokenToProviderMap[module][token.Value] = entity;
+                _tokenToProviderMap[assemblyPath][token.Value] = entity;
             }
         }
 
         public IEnumerable<MemberData> GetChildren(string assemblyPath, TokenType tokenType, uint rid)
         {
-            var module = _moduleDefinitions[assemblyPath];
-            var dc = _decompilers[module];
-            var c = _tokenToProviderMap[module][new MetadataToken(tokenType, rid)] as ITypeDefinition;
+            var dc = _decompilers[assemblyPath];
+            var c = _tokenToProviderMap[assemblyPath][new MetadataToken(tokenType, rid)] as ITypeDefinition;
 
             return c == null
                 ? new List<MemberData>()
@@ -123,25 +122,26 @@ namespace ILSpy.Host.Providers
 
         public string GetCode(string assemblyPath, TokenType tokenType, uint rid)
         {
-            var module = _moduleDefinitions[assemblyPath];
             if (tokenType == TokenType.Assembly)
             {
-                return GetAssemblyCode(assemblyPath, module);
+                return GetAssemblyCode(assemblyPath);
             }
             else if (tokenType == TokenType.TypeDef)
             {
-                var c = _tokenToProviderMap[module][new MetadataToken(tokenType, rid)];
-                return GetEntityCode(module, c);
+                var c = _tokenToProviderMap[assemblyPath][new MetadataToken(tokenType, rid)];
+                return GetEntityCode(assemblyPath, c);
             }
 
             return string.Empty;
         }
 
-        private static string GetAssemblyCode(string assemblyPath, ModuleDefinition module)
+        private string GetAssemblyCode(string assemblyPath)
         {
             using (var output = new StringWriter())
             {
                 WriteCommentLine(output, assemblyPath);
+                var decompiler = _decompilers[assemblyPath];
+                var module = _mainModules[assemblyPath];
                 var assembly = module.Assembly;
                 if (assembly != null)
                 {
@@ -195,24 +195,25 @@ namespace ILSpy.Host.Providers
 
         public string GetMemberCode(string assemblyPath, MetadataToken memberToken)
         {
-            var module = _moduleDefinitions[assemblyPath];
-            var entity = _tokenToProviderMap[module][memberToken];
-            return GetEntityCode(module, entity);
+            var entity = _tokenToProviderMap[assemblyPath][memberToken];
+            return GetEntityCode(assemblyPath, entity);
         }
 
-        private string GetEntityCode(ModuleDefinition module, IEntity entity)
+        private string GetEntityCode(string assemblyPath, IEntity entity)
         {
             if (entity != null)
             {
-                var dc = _decompilers[module];
+                var dc = _decompilers[assemblyPath];
                 var sw = new StringWriter();
                 if (entity is ITypeDefinition type)
                 {
-                    dc.Decompile(sw, type.FullName);
+                    var cecilType = dc.TypeSystem.GetCecil(type);
+                    return dc.DecompileTypesAsString(new[] { cecilType });
                 }
                 else if (entity is IMember member)
                 {
-                    dc.Decompile(sw, member);
+                    var m = dc.TypeSystem.GetCecil(member);
+                    dc.DecompileAsString();
                 }
 
                 return sw.ToString();
@@ -223,14 +224,12 @@ namespace ILSpy.Host.Providers
 
         public IEnumerable<MemberData> ListTypes(string assemblyPath)
         {
-            var module = _moduleDefinitions[assemblyPath];
+            var decompiler = _decompilers[assemblyPath];
+            var types = decompiler.TypeSystem.Compilation.MainAssembly.GetAllTypeDefinitions();
 
-            var dc = _decompilers[module];
-            var tds = dc.ListContent(new HashSet<TypeKind>() { TypeKind.Class, TypeKind.Interface, TypeKind.Enum, TypeKind.Delegate, TypeKind.Struct });
-
-            foreach (var t in tds)
+            foreach (var t in types)
             {
-                var cecilType = dc.TypeSystem.GetCecil(t);
+                var cecilType = decompiler.TypeSystem.GetCecil(t);
                 yield return new MemberData
                 {
                     Name = t.Name,

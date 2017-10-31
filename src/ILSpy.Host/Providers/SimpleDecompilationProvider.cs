@@ -182,6 +182,9 @@ namespace ILSpy.Host.Providers
                 {
                     output.WriteLine("// Runtime: " + runtimeName);
                 }
+
+                output.Write(decompiler.DecompileModuleAndAssemblyAttributesToString());
+
                 output.WriteLine();
 
                 return output.ToString();

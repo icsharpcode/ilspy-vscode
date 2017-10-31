@@ -91,6 +91,9 @@ namespace ILSpy.Host.Tests
             Assert.Contains("// TestAssembly, Version=", code);
             Assert.Contains("// Architecture: AnyCPU (64-bit preferred)", code);
             Assert.Contains("// Runtime: .NET 4.0", code);
+            Assert.Contains("[assembly: AssemblyTitle(\"TestAssembly\")]", code);
+            Assert.Contains("[assembly: AssemblyVersion(\"1.0.0.0\")]", code);
+            Assert.Contains("[assembly: Guid(\"98030de1-dc87-4e74-8201-fe8e93e826b5\")]", code);
         }
 
         [Fact]

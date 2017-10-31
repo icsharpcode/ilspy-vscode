@@ -2,8 +2,7 @@
 
 namespace ILSpy.Host
 {
-    public class ListTypesRequest : RequestBase
+    internal class ListNamespacesRequest : RequestBase
     {
-        public string Namespace { get; set; }
     }
 }

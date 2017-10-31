@@ -182,6 +182,9 @@ namespace ILSpy.Host.Providers
                 {
                     output.WriteLine("// Runtime: " + runtimeName);
                 }
+
+                output.Write(decompiler.DecompileModuleAndAssemblyAttributesToString());
+
                 output.WriteLine();
 
                 return output.ToString();
@@ -219,10 +222,11 @@ namespace ILSpy.Host.Providers
             return string.Empty;
         }
 
-        public IEnumerable<MemberData> ListTypes(string assemblyPath)
+        public IEnumerable<MemberData> ListTypes(string assemblyPath, string @namespace)
         {
             var decompiler = _decompilers[assemblyPath];
-            var types = decompiler.TypeSystem.Compilation.MainAssembly.GetAllTypeDefinitions();
+            var types = decompiler.TypeSystem.Compilation.MainAssembly.GetAllTypeDefinitions()
+                .Where(t => t.Namespace.Equals(@namespace, StringComparison.Ordinal));
 
             foreach (var t in types)
             {
@@ -234,6 +238,21 @@ namespace ILSpy.Host.Providers
                     MemberSubKind = cecilType.GetMemberSubKind()
                 };
             }
+        }
+
+        public IEnumerable<string> ListNamespaces(string assemblyPath)
+        {
+            var decompiler = _decompilers[assemblyPath];
+            var types = decompiler.TypeSystem.Compilation.MainAssembly.GetAllTypeDefinitions();
+            var namespaces = types.Select(t =>
+            {
+                var cecilType = decompiler.TypeSystem.GetCecil(t);
+                var ns = t.Namespace;
+                return ns;
+            })
+            .Distinct();
+
+            return namespaces;
         }
     }
 

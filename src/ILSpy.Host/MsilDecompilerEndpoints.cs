@@ -6,6 +6,7 @@ namespace ILSpy.Host
     {
         public const string AddAssembly = "/addassembly";
         public const string DecompileAssembly = "/decompileassembly";
+        public const string ListNamespaces = "/listnamespaces";
         public const string ListTypes = "/listtypes";
         public const string DecompileType = "/decompiletype";
         public const string ListMembers = "/listmembers";

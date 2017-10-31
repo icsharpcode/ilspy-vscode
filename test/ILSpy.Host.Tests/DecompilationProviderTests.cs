@@ -66,7 +66,7 @@ namespace ILSpy.Host.Tests
             // Act
             string assemblyPath = new FileInfo(testAssemblyPath).FullName;
             var added = provider.AddAssembly(assemblyPath);
-            var types = provider.ListTypes(assemblyPath).ToList();
+            var types = provider.ListTypes(assemblyPath, "TestAssembly").ToList();
 
             // Assert
             Assert.NotEmpty(types);
@@ -105,7 +105,7 @@ namespace ILSpy.Host.Tests
             // Act
             string assemblyPath = new FileInfo(testAssemblyPath).FullName;
             var added = provider.AddAssembly(assemblyPath);
-            var types = provider.ListTypes(assemblyPath).ToList();
+            var types = provider.ListTypes(assemblyPath, "TestAssembly").ToList();
 
             // Assert
             var type = types.Single(t => t.Name.Equals("C"));
@@ -135,7 +135,7 @@ namespace ILSpy.Host.Tests
             // Act
             string assemblyPath = new FileInfo(testAssemblyPath).FullName;
             var added = provider.AddAssembly(assemblyPath);
-            var types = provider.ListTypes(assemblyPath).ToList();
+            var types = provider.ListTypes(assemblyPath, "TestAssembly").ToList();
 
             var type = types.Single(t => t.Name.Equals("C"));
             var members = provider.GetChildren(assemblyPath, type.Token.TokenType, type.Token.RID).ToArray();
@@ -160,7 +160,7 @@ namespace ILSpy.Host.Tests
             // Act
             string assemblyPath = new FileInfo(testAssemblyPath).FullName;
             var added = provider.AddAssembly(assemblyPath);
-            var types = provider.ListTypes(assemblyPath).ToList();
+            var types = provider.ListTypes(assemblyPath, "TestAssembly").ToList();
 
             var type = types.Single(t => t.Name.Equals("C"));
             var members = provider.GetChildren(assemblyPath, type.Token.TokenType, type.Token.RID).ToArray();
@@ -196,6 +196,39 @@ namespace ILSpy.Host.Tests
             Assert.Contains("A.B.C", namespaces);
             Assert.Contains("A.B.C.D", namespaces);
             Assert.Contains("TestAssembly", namespaces);
+        }
+
+        [Fact]
+        public void ListTypesUnderNamespace()
+        {
+            // Arrange
+            var provider = new SimpleDecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
+            string assemblyPath = new FileInfo(testAssemblyPath).FullName;
+
+            // Act
+            var added = provider.AddAssembly(assemblyPath);
+            var list1 = provider.ListTypes(assemblyPath, "A");
+            var list2 = provider.ListTypes(assemblyPath, "A.B");
+            var list3 = provider.ListTypes(assemblyPath, "A.B.C");
+            var list4 = provider.ListTypes(assemblyPath, "A.B.C.D");
+
+            // Assert
+            Assert.Contains(list1, t => t.Name.Equals("A1"));
+            Assert.Contains(list1, t => t.Name.Equals("A2"));
+            Assert.Contains(list1, t => t.Name.Equals("A3"));
+
+            Assert.Contains(list2, t => t.Name.Equals("AB1"));
+            Assert.Contains(list2, t => t.Name.Equals("AB2"));
+            Assert.Contains(list2, t => t.Name.Equals("AB3"));
+            Assert.Contains(list2, t => t.Name.Equals("AB4"));
+
+            Assert.Contains(list3, t => t.Name.Equals("ABC1"));
+            Assert.Contains(list3, t => t.Name.Equals("ABC2"));
+            Assert.Contains(list3, t => t.Name.Equals("ABC3"));
+            Assert.Contains(list3, t => t.Name.Equals("ABC4"));
+
+            Assert.Contains(list4, t => t.Name.Equals("ABCD1"));
+            Assert.Contains(list4, t => t.Name.Equals("ABCD2"));
         }
     }
 }

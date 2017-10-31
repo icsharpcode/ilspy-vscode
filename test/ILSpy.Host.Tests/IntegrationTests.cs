@@ -67,18 +67,19 @@ namespace ILSpy.Host.Tests
         [Fact]
         public async Task End2End()
         {
-            var payload1 = new { AssemblyPath = _filePath };
-            var obj = await PostRequest<AddAssemblyResponse>("/addassembly", payload1);
+            var payloadAddAssembly = new { AssemblyPath = _filePath };
+            var obj = await PostRequest<AddAssemblyResponse>("/addassembly", payloadAddAssembly);
 
             Assert.True(obj.Added);
 
-            var decompiledCode = await PostRequest<DecompileCode>("/decompileassembly", payload1);
+            var decompiledCode = await PostRequest<DecompileCode>("/decompileassembly", payloadAddAssembly);
 
             Assert.Contains("// TestAssembly, Version=", decompiledCode.Decompiled);
             Assert.Contains("// Architecture: AnyCPU (64-bit preferred)", decompiledCode.Decompiled);
             Assert.Contains("// Runtime: .NET 4.0", decompiledCode.Decompiled);
 
-            var data = await PostRequest<ListTypesResponse>("/listtypes", payload1);
+            var payloadListTypes = new { AssemblyPath = _filePath, Namespace = "TestAssembly" };
+            var data = await PostRequest<ListTypesResponse>("/listtypes", payloadListTypes);
 
             Assert.NotEmpty(data.Types);
             Assert.True(data.Types.Single(t => t.Name.Equals("C")).MemberSubKind == MemberSubKind.Class);

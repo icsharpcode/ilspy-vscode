@@ -4,5 +4,6 @@ namespace ILSpy.Host
 {
     public class ListTypesRequest : RequestBase
     {
+        public string Namespace { get; set; }
     }
 }

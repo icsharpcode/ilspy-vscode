@@ -20,8 +20,7 @@ namespace ILSpy.Host
         {
             var requestObject = JsonHelper.DeserializeRequestObject(httpContext.Request.Body)
                 .ToObject<ListTypesRequest>();
-            var assemblyPath = requestObject.AssemblyPath;
-            var types = _decompilationProvider.ListTypes(assemblyPath);
+            var types = _decompilationProvider.ListTypes(requestObject.AssemblyPath, requestObject.Namespace);
             var data = new ListTypesResponse { Types = types };
             return data;
         }

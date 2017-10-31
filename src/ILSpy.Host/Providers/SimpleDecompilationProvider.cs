@@ -222,10 +222,11 @@ namespace ILSpy.Host.Providers
             return string.Empty;
         }
 
-        public IEnumerable<MemberData> ListTypes(string assemblyPath)
+        public IEnumerable<MemberData> ListTypes(string assemblyPath, string @namespace)
         {
             var decompiler = _decompilers[assemblyPath];
-            var types = decompiler.TypeSystem.Compilation.MainAssembly.GetAllTypeDefinitions();
+            var types = decompiler.TypeSystem.Compilation.MainAssembly.GetAllTypeDefinitions()
+                .Where(t => t.Namespace.Equals(@namespace, StringComparison.Ordinal));
 
             foreach (var t in types)
             {

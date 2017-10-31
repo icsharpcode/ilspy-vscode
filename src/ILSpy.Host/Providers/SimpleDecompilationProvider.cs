@@ -204,7 +204,6 @@ namespace ILSpy.Host.Providers
             if (entity != null)
             {
                 var dc = _decompilers[assemblyPath];
-                var sw = new StringWriter();
                 if (entity is ITypeDefinition type)
                 {
                     var cecilType = dc.TypeSystem.GetCecil(type);
@@ -212,11 +211,9 @@ namespace ILSpy.Host.Providers
                 }
                 else if (entity is IMember member)
                 {
-                    var m = dc.TypeSystem.GetCecil(member);
-                    dc.DecompileAsString();
+                    var memberDef = dc.TypeSystem.GetCecil(member).Resolve();
+                    return dc.DecompileAsString(memberDef);
                 }
-
-                return sw.ToString();
             }
 
             return string.Empty;

@@ -178,5 +178,24 @@ namespace ILSpy.Host.Tests
 }
 ", decompiled);
         }
+
+        [Fact]
+        public void ListNamespace()
+        {
+            // Arrange
+            var provider = new SimpleDecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
+            string assemblyPath = new FileInfo(testAssemblyPath).FullName;
+
+            // Act
+            var added = provider.AddAssembly(assemblyPath);
+            var namespaces = provider.ListNamespaces(assemblyPath);
+
+            // Assert
+            Assert.Contains("A", namespaces);
+            Assert.Contains("A.B", namespaces);
+            Assert.Contains("A.B.C", namespaces);
+            Assert.Contains("A.B.C.D", namespaces);
+            Assert.Contains("TestAssembly", namespaces);
+        }
     }
 }

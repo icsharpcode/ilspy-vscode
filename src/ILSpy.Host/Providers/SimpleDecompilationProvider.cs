@@ -238,6 +238,21 @@ namespace ILSpy.Host.Providers
                 };
             }
         }
+
+        public IEnumerable<string> ListNamespaces(string assemblyPath)
+        {
+            var decompiler = _decompilers[assemblyPath];
+            var types = decompiler.TypeSystem.Compilation.MainAssembly.GetAllTypeDefinitions();
+            var namespaces = types.Select(t =>
+            {
+                var cecilType = decompiler.TypeSystem.GetCecil(t);
+                var ns = t.Namespace;
+                return ns;
+            })
+            .Distinct();
+
+            return namespaces;
+        }
     }
 
     static class Extensions

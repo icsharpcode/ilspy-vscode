@@ -86,7 +86,8 @@ namespace ILSpy.Host.Tests
             Assert.True(data.Types.Single(t => t.Name.Equals("I")).MemberSubKind == MemberSubKind.Interface);
             Assert.True(data.Types.Single(t => t.Name.Equals("E")).MemberSubKind == MemberSubKind.Enum);
 
-            var payload2 = new { AssemblyPath = _filePath, Rid = 2 };
+            var c = data.Types.Single(t => t.Name.Equals("C"));
+            var payload2 = new { AssemblyPath = _filePath, Rid = c.Token.RID };
             decompiledCode = await PostRequest<DecompileCode>("/decompiletype", payload2);
             Assert.Contains(@"namespace TestAssembly", decompiledCode.Decompiled);
             Assert.Contains(@"public class C", decompiledCode.Decompiled);
@@ -108,7 +109,7 @@ namespace ILSpy.Host.Tests
             Assert.Equal(MemberSubKind.None, m3.MemberSubKind);
             Assert.Equal(TokenType.Property, m3.Token.TokenType);
 
-            var payload3 = new { AssemblyPath = _filePath, TypeRid = 2, MemberType = 100663296, MemberRid = 3 };
+            var payload3 = new { AssemblyPath = _filePath, TypeRid = c.Token.RID, MemberType = 100663296, MemberRid = m1.Token.RID };
             decompiledCode = await PostRequest<DecompileCode>("/decompilemember", payload3);
 
             Assert.Equal(@"public C(int ProgramId)

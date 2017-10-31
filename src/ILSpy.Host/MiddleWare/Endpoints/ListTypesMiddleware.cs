@@ -18,7 +18,6 @@ namespace ILSpy.Host
 
         public override object Handle(HttpContext httpContext)
         {
-
             var requestObject = JsonHelper.DeserializeRequestObject(httpContext.Request.Body)
                 .ToObject<ListTypesRequest>();
             var assemblyPath = requestObject.AssemblyPath;

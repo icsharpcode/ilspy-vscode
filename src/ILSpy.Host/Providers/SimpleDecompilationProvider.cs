@@ -111,9 +111,12 @@ namespace ILSpy.Host.Providers
                 c.Members.Select(m =>
                 {
                     var cecilRef = dc.TypeSystem.GetCecil(m);
+                    var memberName = m is IMethod
+                        ? ((MethodDefinition)cecilRef.Resolve()).GetFormattedText()
+                        : m.Name;
                     return new MemberData
                     {
-                        Name = m.Name,
+                        Name = memberName,
                         Token = cecilRef.MetadataToken,
                         MemberSubKind = MemberSubKind.None
                     };

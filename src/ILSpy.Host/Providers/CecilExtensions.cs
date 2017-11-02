@@ -1,4 +1,5 @@
-﻿using Mono.Cecil;
+﻿using System.Text;
+using Mono.Cecil;
 
 namespace ILSpy.Host.Providers
 {
@@ -26,6 +27,35 @@ namespace ILSpy.Host.Providers
             return MemberSubKind.None;
         }
 
+        public static string GetFormattedText(this MethodDefinition method)
+        {
+            StringBuilder b = new StringBuilder();
+            b.Append(method.Name);
+            b.Append('(');
+            for (int i = 0; i < method.Parameters.Count; i++)
+            {
+                if (i > 0)
+                    b.Append(", ");
+                b.Append(method.Parameters[i].ParameterType.Name);
+            }
+            if (method.CallingConvention == MethodCallingConvention.VarArg)
+            {
+                if (method.HasParameters)
+                    b.Append(", ");
+                b.Append("...");
+            }
+            if (method.IsConstructor)
+            {
+                b.Append(')');
+            }
+            else
+            {
+                b.Append(") : ");
+                b.Append(method.ReturnType.Name);
+            }
+
+            return b.ToString();
+        }
 
         public static string GetPlatformDisplayName(this ModuleDefinition module)
         {

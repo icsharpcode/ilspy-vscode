@@ -259,7 +259,8 @@ namespace ILSpy.Host.Providers
                 var ns = t.Namespace;
                 return ns;
             })
-            .Distinct();
+            .Distinct()
+            .OrderBy(n => n);
 
             return namespaces;
         }

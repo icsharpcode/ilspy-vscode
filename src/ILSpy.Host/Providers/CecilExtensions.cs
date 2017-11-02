@@ -30,7 +30,7 @@ namespace ILSpy.Host.Providers
         public static string GetFormattedText(this MethodDefinition method)
         {
             StringBuilder b = new StringBuilder();
-            b.Append(method.Name);
+            b.Append(method.IsConstructor ? method.DeclaringType.Name : method.Name);
             b.Append('(');
             for (int i = 0; i < method.Parameters.Count; i++)
             {

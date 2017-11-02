@@ -106,22 +106,27 @@ namespace ILSpy.Host.Providers
                             Token = cecilType.MetadataToken,
                             MemberSubKind = cecilType.GetMemberSubKind()
                         };
-                    }
-                    ).Union(
-                c.Members.Select(m =>
+                    })
+                    .Union(c.Fields.Select(GetMemberData))
+                    .Union(c.Properties.Select(GetMemberData))
+                    .Union(c.Events.Select(GetMemberData))
+                    .Union(c.Methods.Select(GetMemberData));
+
+            MemberData GetMemberData(IMember member)
+            {
+                var cecilRef = dc.TypeSystem.GetCecil(member);
+                var memberName = member is IMethod
+                    ? ((MethodDefinition)cecilRef.Resolve()).GetFormattedText()
+                    : member.Name;
+                return new MemberData
                 {
-                    var cecilRef = dc.TypeSystem.GetCecil(m);
-                    var memberName = m is IMethod
-                        ? ((MethodDefinition)cecilRef.Resolve()).GetFormattedText()
-                        : m.Name;
-                    return new MemberData
-                    {
-                        Name = memberName,
-                        Token = cecilRef.MetadataToken,
-                        MemberSubKind = MemberSubKind.None
-                    };
-                }));
+                    Name = memberName,
+                    Token = cecilRef.MetadataToken,
+                    MemberSubKind = MemberSubKind.None
+                };
+            }
         }
+
 
         public string GetCode(string assemblyPath, TokenType tokenType, uint rid)
         {

@@ -112,7 +112,7 @@ namespace ILSpy.Host.Tests
             var members = provider.GetChildren(assemblyPath, type.Token.TokenType, type.Token.RID);
 
             Assert.NotEmpty(members);
-            var m1 = members.Single(m => m.Name.Equals(".ctor"));
+            var m1 = members.Single(m => m.Name.Equals("C(Int32)"));
             Assert.Equal(TokenType.Method, m1.Token.TokenType);
 
             var m2 = members.Single(m => m.Name.Equals("_ProgId"));
@@ -142,7 +142,7 @@ namespace ILSpy.Host.Tests
 
             // Assert
             Assert.NotEmpty(members);
-            var m1 = members.Single(m => m.Name.Equals(".ctor"));
+            var m1 = members.Single(m => m.Name.Equals("C(Int32)"));
             var decompiled = provider.GetMemberCode(assemblyPath, m1.Token);
             Assert.Equal(@"public C(int ProgramId)
 {

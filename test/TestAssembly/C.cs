@@ -27,6 +27,10 @@ namespace TestAssembly
             }
         }
 
+        static C() { }
+
+        public C() { }
+
         /// <summary>
         /// Some class ctor
         /// </summary>

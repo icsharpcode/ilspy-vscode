@@ -98,7 +98,7 @@ namespace ILSpy.Host.Tests
 
             Assert.NotEmpty(data2.Members);
 
-            var m1 = data2.Members.Single(t => t.Name.Equals(".ctor"));
+            var m1 = data2.Members.Single(t => t.Name.Equals("C(Int32)"));
             Assert.Equal(MemberSubKind.None, m1.MemberSubKind);
             Assert.Equal(TokenType.Method, m1.Token.TokenType);
 

@@ -225,17 +225,18 @@ namespace ILSpy.Host.Providers
         public IEnumerable<MemberData> ListTypes(string assemblyPath, string @namespace)
         {
             var decompiler = _decompilers[assemblyPath];
-            var types = decompiler.TypeSystem.Compilation.MainAssembly.GetAllTypeDefinitions()
+            var cecilTypes = decompiler.TypeSystem.Compilation.MainAssembly.GetAllTypeDefinitions()
+                .Select(t => decompiler.TypeSystem.GetCecil(t))
+                .Where(t => !t.IsNested)
                 .Where(t => t.Namespace.Equals(@namespace, StringComparison.Ordinal));
 
-            foreach (var t in types)
+            foreach (var t in cecilTypes)
             {
-                var cecilType = decompiler.TypeSystem.GetCecil(t);
                 yield return new MemberData
                 {
                     Name = t.Name,
-                    Token = cecilType.MetadataToken,
-                    MemberSubKind = cecilType.GetMemberSubKind()
+                    Token = t.MetadataToken,
+                    MemberSubKind = t.GetMemberSubKind()
                 };
             }
         }

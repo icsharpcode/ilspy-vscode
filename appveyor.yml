@@ -6,7 +6,7 @@ branches:
   - master
 image: Visual Studio 2017
 init:
-- cmd: 
+- cmd:
 nuget:
   disable_publish_on_pr: true
 before_build:
@@ -15,5 +15,5 @@ before_build:
 
     nuget restore
 build:
-  project: ILSpy-server.sln
+  project: backend\ILSpy-server.sln
   verbosity: minimal

@@ -9,8 +9,8 @@
     "repository": {
         "type": "git",
         "url": "https://github.com/jeremymeng/msil-decompiler-vscode"
-      },
-      "engines": {
+    },
+    "engines": {
         "vscode": "^1.13.0"
     },
     "categories": [
@@ -32,16 +32,18 @@
                 }
             ]
         },
-        "commands": [{
-            "command": "msildecompiler.decompileAssemblyInWorkspace",
-            "title": "Decompile IL Assembly in Current Workspace",
-            "category": "MSIL Decompiler"
-        },
-        {
-            "command": "msildecompiler.decompileAssemblyPromptForFilePath",
-            "title": "Decompile IL Assembly from a Given Path",
-            "category": "MSIL Decompiler"
-        }]
+        "commands": [
+            {
+                "command": "msildecompiler.decompileAssemblyInWorkspace",
+                "title": "Decompile IL Assembly in Current Workspace",
+                "category": "MSIL Decompiler"
+            },
+            {
+                "command": "msildecompiler.decompileAssemblyPromptForFilePath",
+                "title": "Decompile IL Assembly from a Given Path",
+                "category": "MSIL Decompiler"
+            }
+        ]
     },
     "scripts": {
         "vscode:prepublish": "tsc -p ./",
@@ -69,13 +71,13 @@
     },
     "runtimeDependencies": [
         {
-          "description": "ILSpy Server Host for Windows (.NET 4.6)",
-          "url": "https://ilspyhostdownload.blob.core.windows.net/ilspyhostdownload/ilspyhost-net46-Release-9db791a945ff3b60f92f47177c442a6390ae6a51.zip",
-          "installPath": "./bin/msildecompiler",
-          "platforms": [
-            "win32"
-          ],
-          "installTestPath": "./bin/msildecompiler/ILSpy.Host.exe"
+            "description": "ILSpy Server Host for Windows (.NET 4.6)",
+            "url": "https://ilspyhostdownload.blob.core.windows.net/ilspyhostdownload/ilspyhost-net46-Release-9db791a945ff3b60f92f47177c442a6390ae6a51.zip",
+            "installPath": "./bin/msildecompiler",
+            "platforms": [
+                "win32"
+            ],
+            "installTestPath": "./bin/msildecompiler/ILSpy.Host.exe"
         }
     ]
 }

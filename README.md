@@ -38,7 +38,7 @@ To build the solution,
 git clone <REPO_URL>
 git submodule init
 git submodule update
-msbuild MsilDecompiler.sln
+msbuild /t:Restore,Build ILSpy-server.sln
 ```
 ## License
 

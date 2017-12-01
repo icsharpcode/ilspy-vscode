@@ -18,11 +18,13 @@ addons:
       - g++-4.9
       - libsecret-1-dev
 
-install:
-- npm install
-- npm run compile
-- npm install -g vsce
-- vsce package
+before_script:
+- cd vscode-extension
+
 
 script:
+  - npm install
+  - npm run compile
+  - npm install -g vsce
+  - vsce package
   - npm test --silent

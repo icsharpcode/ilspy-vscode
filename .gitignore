@@ -286,3 +286,10 @@ __pycache__/
 *.btm.cs
 *.odx.cs
 *.xsd.cs
+
+# vscode extension
+out
+node_modules
+bin
+.vscode-test
+*.vsix

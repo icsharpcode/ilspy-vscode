@@ -2,17 +2,17 @@
 // Licensed under the MIT license. See the LICENSE file in the project root for more information.
 
 using System;
+using ILSpy.Host.MiddleWare;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Serilog;
 using OmniSharp;
-using OmniSharp.Stdio.Services;
-using OmniSharp.Stdio.Logging;
 using OmniSharp.Host.Services;
-using ILSpy.Host.MiddleWare;
+using OmniSharp.Stdio.Logging;
+using OmniSharp.Stdio.Services;
+using Serilog;
 
 namespace ILSpy.Host
 {

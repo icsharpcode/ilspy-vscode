@@ -1,13 +1,13 @@
 ﻿// Copyright (c) .NET Foundation and Contributors. All rights reserved.
 // Licensed under the MIT license. See the LICENSE file in the project root for more information.
 
+using System.IO;
+using System.Linq;
+using ILSpy.Host.Providers;
 using Microsoft.Extensions.Logging;
 using Mono.Cecil;
 using Moq;
-using ILSpy.Host.Providers;
 using OmniSharp.Host.Services;
-using System.IO;
-using System.Linq;
 using Xunit;
 using Xunit.Abstractions;
 

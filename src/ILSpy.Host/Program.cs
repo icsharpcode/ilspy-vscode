@@ -1,22 +1,22 @@
 ﻿// Copyright (c) .NET Foundation and Contributors. All rights reserved.
 // Licensed under the MIT license. See the LICENSE file in the project root for more information.
 
+using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using ILSpy.Host.Internal;
+using ILSpy.Host.Providers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using ILSpy.Host.Internal;
-using ILSpy.Host.Providers;
 using OmniSharp;
 using OmniSharp.Host.Services;
 using OmniSharp.Stdio;
 using OmniSharp.Stdio.Services;
 using OmniSharp.Utilities;
-using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
 
 namespace ILSpy.Host
 {

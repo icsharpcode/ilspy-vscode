@@ -66,17 +66,17 @@ namespace ILSpy.Host
 
         private static int Run(string[] args)
         {
-            Console.WriteLine($"MsilDecompiler: {string.Join(" ", args)}");
+            Console.WriteLine($"ILSpy.Host: {string.Join(" ", args)}");
 
             var msilDecompilerApp = new CommandLineApplication(throwOnUnexpectedArg: false);
             msilDecompilerApp.HelpOption("-? | -h | --help");
 
             var assemblyPathOption = msilDecompilerApp.Option("-a | --assembly", "Path to the managed assembly to decompile", CommandOptionType.SingleValue);
-            var portOption = msilDecompilerApp.Option("-p | --port", "MsilDecompiler port (defaults to 2000).", CommandOptionType.SingleValue);
+            var portOption = msilDecompilerApp.Option("-p | --port", "ILSpy.Host port (defaults to 2000).", CommandOptionType.SingleValue);
             var logLevelOption = msilDecompilerApp.Option("-l | --loglevel", "Level of logging (defaults to 'Information').", CommandOptionType.SingleValue);
             var verboseOption = msilDecompilerApp.Option("-v | --verbose", "Explicitly set 'Debug' log level.", CommandOptionType.NoValue);
             var hostPidOption = msilDecompilerApp.Option("-hpid | --hostPID", "Host process ID.", CommandOptionType.SingleValue);
-            var stdioOption = msilDecompilerApp.Option("-stdio | --stdio", "Use STDIO over HTTP as MsilDecompiler communication protocol.", CommandOptionType.NoValue);
+            var stdioOption = msilDecompilerApp.Option("-stdio | --stdio", "Use STDIO over HTTP as ILSpy.Host communication protocol.", CommandOptionType.NoValue);
             var encodingOption = msilDecompilerApp.Option("-e | --encoding", "Input / output encoding for STDIO protocol.", CommandOptionType.SingleValue);
             var serverInterfaceOption = msilDecompilerApp.Option("-i | --interface", "Server interface address (defaults to 'localhost').", CommandOptionType.SingleValue);
 
@@ -110,7 +110,7 @@ namespace ILSpy.Host
 
                 var builder = new WebHostBuilder()
                     .UseConfiguration(config.Build())
-                    .UseEnvironment("MsilDecompiler")
+                    .UseEnvironment("ILSpyHost")
                     .ConfigureServices(serviceCollection =>
                     {
                         serviceCollection.AddSingleton<IMsilDecompilerEnvironment>(env);

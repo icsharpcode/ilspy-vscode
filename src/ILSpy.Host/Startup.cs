@@ -33,7 +33,7 @@ namespace ILSpy.Host
             var builder = new ConfigurationBuilder()
                 .SetBasePath(AppContext.BaseDirectory)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddEnvironmentVariables("MSILDECOMPILER_");
+                .AddEnvironmentVariables("ILSPYHOST_");
 
             Configuration = builder.Build();
         }
@@ -79,11 +79,11 @@ namespace ILSpy.Host
             var logger = loggerFactory.CreateLogger<Startup>();
             if (_env.TransportType == TransportType.Stdio)
             {
-                logger.LogInformation($"MsilDecompiler server running using {nameof(TransportType.Stdio)}.");
+                logger.LogInformation($"ILSpy.Host server running using {nameof(TransportType.Stdio)}.");
             }
             else
             {
-                logger.LogInformation($"MsilDecompiler server running on port '{_env.Port}'.");
+                logger.LogInformation($"ILSpy.Host server running on port '{_env.Port}'.");
             }
         }
         
@@ -94,7 +94,7 @@ namespace ILSpy.Host
                 return false;
             }
 
-            if (!category.StartsWith("MsilDecompiler", StringComparison.OrdinalIgnoreCase))
+            if (!category.StartsWith("ILSpy.Host", StringComparison.OrdinalIgnoreCase))
             {
                 return false;
             }

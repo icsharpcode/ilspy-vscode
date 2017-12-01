@@ -13,7 +13,7 @@ before_build:
 - cmd: >-
     git submodule update --init --recursive
 
-    nuget restore
+    nuget restore backend\ILSpy-server.sln
 build:
   project: backend\ILSpy-server.sln
   verbosity: minimal

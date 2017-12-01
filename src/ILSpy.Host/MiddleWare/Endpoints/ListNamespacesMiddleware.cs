@@ -1,6 +1,6 @@
-﻿// See the LICENSE file in the project root for more information.
+﻿// Copyright (c) .NET Foundation and Contributors. All rights reserved.
+// Licensed under the MIT license. See the LICENSE file in the project root for more information.
 
-using System;
 using ILSpy.Host.Providers;
 using Microsoft.AspNetCore.Http;
 

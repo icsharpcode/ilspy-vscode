@@ -1,5 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// Copyright (c) .NET Foundation and Contributors. All rights reserved.
+// Licensed under the MIT license. See the LICENSE file in the project root for more information.
+
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;

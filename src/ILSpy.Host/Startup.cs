@@ -1,17 +1,18 @@
-﻿// See the LICENSE file in the project root for more information.
+﻿// Copyright (c) .NET Foundation and Contributors. All rights reserved.
+// Licensed under the MIT license. See the LICENSE file in the project root for more information.
 
 using System;
+using ILSpy.Host.MiddleWare;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Serilog;
 using OmniSharp;
-using OmniSharp.Stdio.Services;
-using OmniSharp.Stdio.Logging;
 using OmniSharp.Host.Services;
-using ILSpy.Host.MiddleWare;
+using OmniSharp.Stdio.Logging;
+using OmniSharp.Stdio.Services;
+using Serilog;
 
 namespace ILSpy.Host
 {
@@ -32,7 +33,7 @@ namespace ILSpy.Host
             var builder = new ConfigurationBuilder()
                 .SetBasePath(AppContext.BaseDirectory)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddEnvironmentVariables("MSILDECOMPILER_");
+                .AddEnvironmentVariables("ILSPYHOST_");
 
             Configuration = builder.Build();
         }
@@ -78,11 +79,11 @@ namespace ILSpy.Host
             var logger = loggerFactory.CreateLogger<Startup>();
             if (_env.TransportType == TransportType.Stdio)
             {
-                logger.LogInformation($"MsilDecompiler server running using {nameof(TransportType.Stdio)}.");
+                logger.LogInformation($"ILSpy.Host server running using {nameof(TransportType.Stdio)}.");
             }
             else
             {
-                logger.LogInformation($"MsilDecompiler server running on port '{_env.Port}'.");
+                logger.LogInformation($"ILSpy.Host server running on port '{_env.Port}'.");
             }
         }
         
@@ -93,7 +94,7 @@ namespace ILSpy.Host
                 return false;
             }
 
-            if (!category.StartsWith("MsilDecompiler", StringComparison.OrdinalIgnoreCase))
+            if (!category.StartsWith("ILSpy.Host", StringComparison.OrdinalIgnoreCase))
             {
                 return false;
             }

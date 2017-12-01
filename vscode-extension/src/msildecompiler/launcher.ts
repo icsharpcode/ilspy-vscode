@@ -47,6 +47,7 @@ function launch(cwd: string, args: string[]): Promise<LaunchResult> {
 
         const launchPath = options.path || getLaunchPath(platformInfo);
 
+        // TODO: verify existence of the launch path
         if (platformInfo.isWindows()) {
             return launchWindows(launchPath, cwd, args);
         }
@@ -61,7 +62,7 @@ function launch(cwd: string, args: string[]): Promise<LaunchResult> {
 function getLaunchPath(platformInfo: PlatformInformation): string {
     const binPath = util.getBinPath();
 
-    return path.join(binPath, 'msildecompiler', 'ILSpy.Host.exe');
+    return path.join(binPath, 'ilspy-host', 'ILSpy.Host.exe');
 }
 
 function launchWindows(launchPath: string, cwd: string, args: string[]): LaunchResult {

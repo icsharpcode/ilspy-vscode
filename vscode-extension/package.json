@@ -73,11 +73,11 @@
         {
             "description": "ILSpy Server Host for Windows (.NET 4.6)",
             "url": "https://ilspyhostdownload.blob.core.windows.net/ilspyhostdownload/ilspyhost-net46-Release-9db791a945ff3b60f92f47177c442a6390ae6a51.zip",
-            "installPath": "./bin/msildecompiler",
+            "installPath": "./bin/ilspy-host",
             "platforms": [
                 "win32"
             ],
-            "installTestPath": "./bin/msildecompiler/ILSpy.Host.exe"
+            "installTestPath": "./bin/ilspy-host/ILSpy.Host.exe"
         }
     ]
 }

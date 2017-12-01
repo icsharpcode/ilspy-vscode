@@ -19,7 +19,7 @@ let textEditor: vscode.TextEditor = null;
 
 export function activate(context: vscode.ExtensionContext) {
 
-    const extensionId = 'jeremymeng.msil-decompiler';
+    const extensionId = 'icsharpcode.ilspy-vscode';
     const extension = vscode.extensions.getExtension(extensionId);
     const extensionVersion = extension.packageJSON.version;
     const aiKey = extension.packageJSON.aiKey;
@@ -31,22 +31,22 @@ export function activate(context: vscode.ExtensionContext) {
     let decompileTreeProvider = new DecompiledTreeProvider(server);
     const disposables: vscode.Disposable[] = [];
 
-    console.log('Congratulations, your extension "msil-decompiler" is now active!');
+    console.log('Congratulations, your extension "ilspy-vscode" is now active!');
 
     decompileTreeProvider = new DecompiledTreeProvider(server);
-    disposables.push(vscode.window.registerTreeDataProvider("msilDecompiledMembers", decompileTreeProvider));
+    disposables.push(vscode.window.registerTreeDataProvider("ilspyDecompiledMembers", decompileTreeProvider));
 
     // The command has been defined in the package.json file
     // Now provide the implementation of the command with  registerCommand
     // The commandId parameter must match the command field in package.json
-    disposables.push(vscode.commands.registerCommand('msildecompiler.decompileAssemblyInWorkspace', () => {
+    disposables.push(vscode.commands.registerCommand('ilspy.decompileAssemblyInWorkspace', () => {
         // The code you place here will be executed every time your command is executed
         pickAssembly().then(assembly => {
             decompileFile(assembly);
         });
     }));
 
-    disposables.push(vscode.commands.registerCommand('msildecompiler.decompileAssemblyPromptForFilePath', () => {
+    disposables.push(vscode.commands.registerCommand('ilspy.decompileAssemblyPromptForFilePath', () => {
         promptForAssemblyFilePath().then(filePath => {
             decompileFile(filePath);
         });

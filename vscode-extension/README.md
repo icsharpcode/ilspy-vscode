@@ -1,9 +1,9 @@
-# msil-decompiler (powered by ILSpy)
+# ilspy-vscode (powered by ICSharpCode.Decompiler)
 
-Welcome to the msil-decompiler extension for Visual Studio Code! This prototype provides two commands inside Visual Studio Code:
+Welcome to the ilspy extension for Visual Studio Code! This extension provides two commands inside Visual Studio Code:
 
-* `msildecompiler.decompileAssemblyPromptForFilePath` - Decompile an MSIL assembly from a user-input full path.
-* `msildecompiler.decompileAssemblyInWorkspace` - Decompile a MSIL assembly inside of current Visual Studio Code workspace.
+* `ilspy.decompileAssemblyPromptForFilePath` - Decompile an MSIL assembly from a user-input full path.
+* `ilspy.decompileAssemblyInWorkspace` - Decompile a MSIL assembly inside of current Visual Studio Code workspace.
 
 ## Requirements
 
@@ -11,6 +11,10 @@ Welcome to the msil-decompiler extension for Visual Studio Code! This prototype 
 * Linux/MacOS - requires Mono version >= 4.6.0.
 
 ## Release Notes
+
+### 0.0.3
+
+Move to icsharpcode/ilspy-vscode repository
 
 ### 0.0.2
 
@@ -32,7 +36,7 @@ First install:
 * *Optional:* run `npm run watch`, make code changes
 * Press <kbd>F5</kbd> to debug
 
-To **test** do the following: `npm run test` or <kbd>F5</kbd> in VS Code with the "Launch Tests" debug configuration.
+To **test** do the following: `npm test` or <kbd>F5</kbd> in VS Code with the "Launch Tests" debug configuration.
 
 ## License
 

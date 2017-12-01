@@ -16,15 +16,15 @@ export class Options {
 
     public static Read(): Options {
 
-        const msildecompilerConfig = vscode.workspace.getConfiguration('msildecompiler');
+        const ilspyConfig = vscode.workspace.getConfiguration('ilspy-vscode');
 
-        const path = msildecompilerConfig.get<string>('path');
+        const path = ilspyConfig.get<string>('path');
 
-        const useMono = msildecompilerConfig.get<boolean>('useMono');
+        const useMono = ilspyConfig.get<boolean>('useMono');
 
-        const assemblyLoadTimeout = msildecompilerConfig.get<number>('assemblyLoadTimeout', 60);
+        const assemblyLoadTimeout = ilspyConfig.get<number>('assemblyLoadTimeout', 60);
 
-        const loggingLevel = msildecompilerConfig.get<string>('loggingLevel');
+        const loggingLevel = ilspyConfig.get<string>('loggingLevel');
 
         return new Options(path, useMono, loggingLevel, assemblyLoadTimeout);
     }

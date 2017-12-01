@@ -76,7 +76,7 @@ export class MsilDecompilerServer {
     constructor(reporter: TelemetryReporter) {
         this._reporter = reporter;
 
-        this._channel = vscode.window.createOutputChannel('MsilDecompiler Log');
+        this._channel = vscode.window.createOutputChannel('ilspy-vscode Log');
         this._logger = new Logger(message => this._channel.append(message));
 
         const logger = this._debugMode
@@ -175,7 +175,7 @@ export class MsilDecompilerServer {
 
         this._options = Options.Read();
 
-        this._logger.appendLine(`Starting MsilDecompiler server at ${new Date().toLocaleString()}`);
+        this._logger.appendLine(`Starting ILSpy.Host server at ${new Date().toLocaleString()}`);
         this._logger.increaseIndent();
         this._logger.decreaseIndent();
         this._logger.appendLine();
@@ -185,10 +185,10 @@ export class MsilDecompilerServer {
         const cwd = "";
         return launchMsilDecompiler(cwd, args).then(value => {
             if (value.usingMono) {
-                this._logger.appendLine(`MsilDecompiler server started wth Mono`);
+                this._logger.appendLine(`ILSpy.Host server started wth Mono`);
             }
             else {
-                this._logger.appendLine(`MsilDecompiler server started`);
+                this._logger.appendLine(`ILSpy.Host server started`);
             }
 
             this._logger.increaseIndent();
@@ -339,7 +339,7 @@ export class MsilDecompilerServer {
                     listener.dispose();
                 }
 
-                reject(new Error("MsilDecompiler server load timed out. Use the 'msildecompiler.assemblyLoadTimeout' setting to override the default delay (one minute)."));
+                reject(new Error("ILSpy.Host server load timed out. Use the 'ilspy-vscode.assemblyLoadTimeout' setting to override the default delay (one minute)."));
             }, timeoutDuration);
 
             // handle started-event

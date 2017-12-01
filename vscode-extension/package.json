@@ -1,14 +1,14 @@
 {
-    "name": "msil-decompiler",
-    "displayName": "MSIL Decompiler",
-    "description": "A prototype decompiler extension for MSIL assemblies, powered by ILSpy API",
-    "version": "0.0.2",
-    "publisher": "jeremymeng",
+    "name": "ilspy-vscode",
+    "displayName": "ILSpy extension",
+    "description": "A prototype decompiler extension for MSIL assemblies, powered by ICSharpCode.Decompiler API",
+    "version": "0.0.3",
+    "publisher": "icsharpcode",
     "preview": true,
     "license": "SEE LICENSE",
     "repository": {
         "type": "git",
-        "url": "https://github.com/jeremymeng/msil-decompiler-vscode"
+        "url": "https://github.com/icsharpcode/ilspy-vscode"
     },
     "engines": {
         "vscode": "^1.13.0"
@@ -19,29 +19,29 @@
     ],
     "aiKey": "",
     "activationEvents": [
-        "onCommand:msildecompiler.decompileAssemblyInWorkspace",
-        "onCommand:msildecompiler.decompileAssemblyPromptForFilePath"
+        "onCommand:ilspy.decompileAssemblyInWorkspace",
+        "onCommand:ilspy.decompileAssemblyPromptForFilePath"
     ],
     "main": "./out/src/extension",
     "contributes": {
         "views": {
             "explorer": [
                 {
-                    "id": "msilDecompiledMembers",
+                    "id": "ilspyDecompiledMembers",
                     "name": "Decompiled Members"
                 }
             ]
         },
         "commands": [
             {
-                "command": "msildecompiler.decompileAssemblyInWorkspace",
+                "command": "ilspy.decompileAssemblyInWorkspace",
                 "title": "Decompile IL Assembly in Current Workspace",
-                "category": "MSIL Decompiler"
+                "category": "ILSpy"
             },
             {
-                "command": "msildecompiler.decompileAssemblyPromptForFilePath",
+                "command": "ilspy.decompileAssemblyPromptForFilePath",
                 "title": "Decompile IL Assembly from a Given Path",
-                "category": "MSIL Decompiler"
+                "category": "ILSpy"
             }
         ]
     },
@@ -71,8 +71,8 @@
     },
     "runtimeDependencies": [
         {
-            "description": "ILSpy Server Host for Windows (.NET 4.6)",
-            "url": "https://ilspyhostdownload.blob.core.windows.net/ilspyhostdownload/ilspyhost-net46-Release-9db791a945ff3b60f92f47177c442a6390ae6a51.zip",
+            "description": "(CURRENTLY UNUSED) ILSpy Server Host for Windows (.NET 4.6.1)",
+            "url": "<url to zipped backend bits>",
             "installPath": "./bin/ilspy-host",
             "platforms": [
                 "win32"

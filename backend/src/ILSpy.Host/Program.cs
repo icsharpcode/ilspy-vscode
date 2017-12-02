@@ -49,19 +49,6 @@ namespace ILSpy.Host
                 Console.Error.WriteLine(e.ToString());
                 return 0xbad;
             }
-
-            //var host = new WebHostBuilder()
-            //    .UseKestrel()
-            //    .UseContentRoot(Directory.GetCurrentDirectory())
-            //    .UseIISIntegration()
-            //    .UseStartup<Startup>()
-            //    .ConfigureServices(services => services
-            //        .AddSingleton(new ConsoleArgs(args))
-            //        .AddSingleton<IDecompilationConfiguration, ConsoleSettingsConfiguration>()
-            //        .AddSingleton<IDecompilationProvider, DecompilationProvider>())
-            //    .Build();
-
-            //host.Run();
         }
 
         private static int Run(string[] args)

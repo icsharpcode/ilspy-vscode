@@ -5,6 +5,7 @@
     "version": "0.0.3",
     "publisher": "icsharpcode",
     "preview": true,
+    "private": true,
     "license": "SEE LICENSE",
     "repository": {
         "type": "git",

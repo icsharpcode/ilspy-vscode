@@ -1,0 +1,84 @@
+{
+    "name": "ilspy-vscode",
+    "displayName": "ILSpy extension",
+    "description": "A prototype decompiler extension for MSIL assemblies, powered by ICSharpCode.Decompiler API",
+    "version": "0.0.3",
+    "publisher": "icsharpcode",
+    "preview": true,
+    "private": true,
+    "license": "SEE LICENSE",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/icsharpcode/ilspy-vscode"
+    },
+    "engines": {
+        "vscode": "^1.13.0"
+    },
+    "categories": [
+        "Languages",
+        "Other"
+    ],
+    "aiKey": "",
+    "activationEvents": [
+        "onCommand:ilspy.decompileAssemblyInWorkspace",
+        "onCommand:ilspy.decompileAssemblyPromptForFilePath"
+    ],
+    "main": "./out/src/extension",
+    "contributes": {
+        "views": {
+            "explorer": [
+                {
+                    "id": "ilspyDecompiledMembers",
+                    "name": "Decompiled Members"
+                }
+            ]
+        },
+        "commands": [
+            {
+                "command": "ilspy.decompileAssemblyInWorkspace",
+                "title": "Decompile IL Assembly in Current Workspace",
+                "category": "ILSpy"
+            },
+            {
+                "command": "ilspy.decompileAssemblyPromptForFilePath",
+                "title": "Decompile IL Assembly from a Given Path",
+                "category": "ILSpy"
+            }
+        ]
+    },
+    "scripts": {
+        "vscode:prepublish": "tsc -p ./",
+        "compile": "tsc -p ./ && gulp tslint",
+        "watch": "tsc -watch -p ./",
+        "test": "node ./node_modules/vscode/bin/test",
+        "postinstall": "node ./node_modules/vscode/bin/install"
+    },
+    "dependencies": {
+        "semver": "*",
+        "vscode-extension-telemetry": "0.0.4"
+    },
+    "devDependencies": {
+        "typescript": "^2.0.3",
+        "vscode": "^1.0.0",
+        "chai": "^3.5.0",
+        "mocha": "^2.3.3",
+        "gulp": "^3.9.1",
+        "gulp-mocha": "^2.1.3",
+        "gulp-tslint": "^4.3.0",
+        "tslint": "^3.15.1",
+        "tslint-microsoft-contrib": "^2.0.12",
+        "@types/node": "^6.0.40",
+        "@types/mocha": "^2.2.32"
+    },
+    "runtimeDependencies": [
+        {
+            "description": "(CURRENTLY UNUSED) ILSpy Server Host for Windows (.NET 4.6.1)",
+            "url": "<url to zipped backend bits>",
+            "installPath": "./bin/ilspy-host",
+            "platforms": [
+                "win32"
+            ],
+            "installTestPath": "./bin/ilspy-host/ILSpy.Host.exe"
+        }
+    ]
+}

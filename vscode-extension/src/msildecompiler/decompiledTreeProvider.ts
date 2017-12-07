@@ -69,15 +69,15 @@ export class MemberNode {
 }
 
 export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, TextDocumentContentProvider {
-	private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
-	readonly onDidChangeTreeData: Event<any> = this._onDidChangeTreeData.event;
+    private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
+    readonly onDidChangeTreeData: Event<any> = this._onDidChangeTreeData.event;
 
     constructor(private server: MsilDecompilerServer) {
     }
 
-	public refresh(): void {
-		this._onDidChangeTreeData.fire();
-	}
+    public refresh(): void {
+        this._onDidChangeTreeData.fire();
+    }
 
     public addAssembly(assembly: string): Thenable<boolean> {
         let escaped: string = assembly.replace(/\\/g, "\\\\",);
@@ -93,10 +93,10 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, Tex
             label: element.name,
             collapsibleState: element.mayHaveChildren ? TreeItemCollapsibleState.Collapsed : void 0,
             command: {
-				command: 'showDecompiledCode',
-				arguments: [element],
-				title: 'Decompile'
-			},
+                command: 'showDecompiledCode',
+                arguments: [element],
+                title: 'Decompile'
+            },
             iconPath: this.getIconByTokenType(element)
         };
     }
@@ -159,7 +159,7 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, Tex
         };
     }
 
-	public getChildren(element?: MemberNode): MemberNode[] | Thenable<MemberNode[]> {
+    public getChildren(element?: MemberNode): MemberNode[] | Thenable<MemberNode[]> {
         if (this.server.assemblyPaths.size <= 0) {
              return [];
         }
@@ -181,7 +181,7 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, Tex
         } else {
             return this.getMembers(element);
         }
-	}
+    }
 
     getNamespaces(assembly: string): Thenable<MemberNode[]> {
         let request: ListNamespacesRequest = { "AssemblyPath": assembly };
@@ -230,8 +230,8 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, Tex
         }
     }
 
-	public provideTextDocumentContent(uri: Uri, token: CancellationToken): ProviderResult<string> {
+    public provideTextDocumentContent(uri: Uri, token: CancellationToken): ProviderResult<string> {
         //TODO:
-		return "";
-	}
+        return "";
+    }
 }

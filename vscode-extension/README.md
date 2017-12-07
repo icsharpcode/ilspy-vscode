@@ -1,6 +1,6 @@
 # ilspy-vscode (powered by ICSharpCode.Decompiler)
 
-Welcome to the ilspy extension for Visual Studio Code! This extension provides two commands inside Visual Studio Code:
+Welcome to the ILSpy extension for Visual Studio Code! This extension provides two commands inside Visual Studio Code:
 
 * `ilspy.decompileAssemblyPromptForFilePath` - Decompile an MSIL assembly from a user-input full path.
 * `ilspy.decompileAssemblyInWorkspace` - Decompile a MSIL assembly inside of current Visual Studio Code workspace.

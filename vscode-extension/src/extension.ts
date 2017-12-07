@@ -7,13 +7,9 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import TelemetryReporter from 'vscode-extension-telemetry';
 import * as util from './common';
-import { Logger } from './logger';
-import { PlatformInformation } from './platform';
 import { MsilDecompilerServer } from './msildecompiler/server';
 import { DecompiledTreeProvider, MemberNode } from './msildecompiler/decompiledTreeProvider';
-import { Options } from './msildecompiler/options';
 
 let textEditor: vscode.TextEditor = null;
 
@@ -21,13 +17,10 @@ export function activate(context: vscode.ExtensionContext) {
 
     const extensionId = 'icsharpcode.ilspy-vscode';
     const extension = vscode.extensions.getExtension(extensionId);
-    const extensionVersion = extension.packageJSON.version;
-    const aiKey = extension.packageJSON.aiKey;
-    const reporter = null; //new TelemetryReporter(extensionId, extensionVersion, aiKey);
 
     util.setExtensionPath(extension.extensionPath);
 
-    const server = new MsilDecompilerServer(reporter);
+    const server = new MsilDecompilerServer();
     let decompileTreeProvider = new DecompiledTreeProvider(server);
     const disposables: vscode.Disposable[] = [];
 
@@ -69,7 +62,7 @@ export function activate(context: vscode.ExtensionContext) {
                 showCode(node.decompiled);
             });
         }
-	}));
+    }));
 
     disposables.push(new vscode.Disposable(() => {
         server.stop();
@@ -133,8 +126,6 @@ function findAssemblies(): Thenable<string[]> {
     if (!vscode.workspace.rootPath) {
         return Promise.resolve([]);
     }
-
-    const options = Options.Read();
 
     return vscode.workspace.findFiles(
         /*include*/ '{**/*.dll,**/*.exe,**/*.winrt,**/*.netmodule}',

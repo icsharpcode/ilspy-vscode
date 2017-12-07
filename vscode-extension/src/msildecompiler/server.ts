@@ -11,9 +11,7 @@ import { ReadLine, createInterface } from 'readline';
 import { launchMsilDecompiler } from './launcher';
 import { Options } from './options';
 import { Logger } from '../logger';
-import { DelayTracker } from './delayTracker';
 import { Request, RequestQueueCollection } from './requestQueue';
-import TelemetryReporter from 'vscode-extension-telemetry';
 import * as os from 'os';
 import * as protocol from './protocol';
 import * as vscode from 'vscode';
@@ -41,12 +39,6 @@ module Events {
     export const Started = 'started';
 }
 
-module Constants {
-
-}
-
-const TelemetryReportingDelay = 2 * 60 * 1000; // two minutes
-
 export class MsilDecompilerServer {
 
     private static _nextId = 1;
@@ -55,10 +47,6 @@ export class MsilDecompilerServer {
 
     private _readLine: ReadLine;
     private _disposables: vscode.Disposable[] = [];
-
-    private _reporter: TelemetryReporter;
-    private _delayTrackers: { [requestName: string]: DelayTracker };
-    private _telemetryIntervalId: NodeJS.Timer = undefined;
 
     private _eventBus = new EventEmitter();
     private _state: ServerState = ServerState.Stopped;
@@ -73,9 +61,7 @@ export class MsilDecompilerServer {
 
     private _assemblyPaths: Set<string> = new Set<string>();
 
-    constructor(reporter: TelemetryReporter) {
-        this._reporter = reporter;
-
+    constructor() {
         this._channel = vscode.window.createOutputChannel('ilspy-vscode Log');
         this._logger = new Logger(message => this._channel.append(message));
 
@@ -103,10 +89,6 @@ export class MsilDecompilerServer {
             this._state = value;
             this._fireEvent(Events.StateChanged, this._state);
         }
-    }
-
-    private _reportTelemetry() {
-        //this._reporter.sendTelemetryEvent(eventName, null, measures);
     }
 
     public getChannel(): vscode.OutputChannel {
@@ -203,9 +185,6 @@ export class MsilDecompilerServer {
 
             return this._doConnect();
         }).then(() => {
-            // Start telemetry reporting
-            this._telemetryIntervalId = setInterval(() => this._reportTelemetry(), TelemetryReportingDelay);
-        }).then(() => {
             this._requestQueue.drain();
         }).catch(err => {
             this._fireEvent(Events.ServerError, err);
@@ -220,13 +199,6 @@ export class MsilDecompilerServer {
         }
 
         let cleanupPromise: Promise<void>;
-
-        if (this._telemetryIntervalId !== undefined) {
-            // Stop reporting telemetry
-            clearInterval(this._telemetryIntervalId);
-            this._telemetryIntervalId = undefined;
-            this._reportTelemetry();
-        }
 
         if (!this._serverProcess) {
             // nothing to kill
@@ -283,12 +255,9 @@ export class MsilDecompilerServer {
             return Promise.reject<TResponse>('server has been stopped or not started');
         }
 
-        let startTime: number;
         let request: Request;
 
         let promise = new Promise<TResponse>((resolve, reject) => {
-            startTime = Date.now();
-
             request = {
                 command,
                 data,
@@ -306,10 +275,6 @@ export class MsilDecompilerServer {
         }
 
         return promise.then(response => {
-            let endTime = Date.now();
-            let elapsedTime = endTime - startTime;
-            //TODO: this._recordRequestDelay(command, elapsedTime);
-
             return response;
         });
     }
@@ -395,24 +360,6 @@ export class MsilDecompilerServer {
                 console.warn(`Unknown packet type: ${packet.Type}`);
                 break;
         }
-    }
-
-    private _onDataReceived(line: string) {
-        if (line[0] !== '{') {
-            this._logger.appendLine(line);
-            return;
-        }
-
-        let packet: any;
-        try {
-            packet = JSON.parse(line);
-        }
-        catch (err) {
-            // This isn't JSON
-            return;
-        }
-
-        this._handleResponsePacket(<protocol.WireProtocol.ResponsePacket>packet);
     }
 
     private _handleResponsePacket(packet: protocol.WireProtocol.ResponsePacket) {

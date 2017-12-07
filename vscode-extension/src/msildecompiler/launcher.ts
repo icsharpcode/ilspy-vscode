@@ -94,19 +94,6 @@ function launchWindows(launchPath: string, cwd: string, args: string[]): LaunchR
     };
 }
 
-function launchNix(launchPath: string, cwd: string, args: string[]): LaunchResult {
-    let process = spawn(launchPath, args, {
-        detached: false,
-        cwd: cwd
-    });
-
-    return {
-        process,
-        command: launchPath,
-        usingMono: true
-    };
-}
-
 function launchNixMono(launchPath: string, cwd: string, args: string[]): Promise<LaunchResult> {
     return canLaunchMono()
         .then(() => {

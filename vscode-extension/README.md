@@ -22,23 +22,14 @@ It allows expanding and selecting various nodes, whose decompiled C# code is sho
 * Windows - no other pre-requisites
 * Linux/MacOS - requires Mono version >= 4.6.0.
 
-## Release Notes
+## What's New
 
-### 0.1.0
+First release of ILSpy .NET Decompiler extension for Visual Studio Code!
 
-Add more details about the two commands in README
+See our [change log](CHANGELOG.md) for all of the updates.
 
-### 0.0.3
-
-Move to icsharpcode/ilspy-vscode repository
-
-### 0.0.2
-
-Enable *Nix support using Mono.
-
-### 0.0.1
-
-Initial release
+### Found a Bug?
+Please file any issues at https://github.com/icsharpcode/ilspy-vscode/issues
 
 ## Development
 

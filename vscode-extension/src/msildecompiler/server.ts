@@ -62,7 +62,7 @@ export class MsilDecompilerServer {
     private _assemblyPaths: Set<string> = new Set<string>();
 
     constructor() {
-        this._channel = vscode.window.createOutputChannel('ilspy-vscode Log');
+        this._channel = vscode.window.createOutputChannel('ilspy-vscode');
         this._logger = new Logger(message => this._channel.append(message));
 
         const logger = this._debugMode

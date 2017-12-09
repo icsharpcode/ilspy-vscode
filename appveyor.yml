@@ -1,4 +1,4 @@
-version: 0.0.1.{branch}-{build}
+version: 0.1.0.{branch}-{build}
 environment:
   nodejs_version: "6"
 pull_requests:

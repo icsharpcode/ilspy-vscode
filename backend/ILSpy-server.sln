@@ -26,6 +26,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestAssembly", "test\TestAssembly\TestAssembly.csproj", "{98030DE1-DC87-4E74-8201-FE8E93E826B5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ILSpy.Host.Tests", "test\ILSpy.Host.Tests\ILSpy.Host.Tests.csproj", "{E563593F-7948-446D-9F73-69C18B6DCBA9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{98030DE1-DC87-4E74-8201-FE8E93E826B5} = {98030DE1-DC87-4E74-8201-FE8E93E826B5}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

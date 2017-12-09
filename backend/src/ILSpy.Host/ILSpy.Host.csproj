@@ -2,18 +2,15 @@
 
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
-    <PreserveCompilationContext>true</PreserveCompilationContext>
     <AssemblyName>ILSpy.Host</AssemblyName>
     <OutputType>Exe</OutputType>
-    <PackageId>MsilDecompiler.Host</PackageId>
+    <PackageId>ILSpy.Host</PackageId>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <Company>ic#code</Company>
+    <Title>ILSpy .NET Decompiler Backend</Title>
+    <Product>ILSpy .NET Decompiler</Product>
+    <Copyright>Copyright 2017 ICSharpCode, Microsoft Corporation</Copyright>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Update="Views;Areas\**\Views">
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </None>
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\omnisharp-roslyn\src\OmniSharp.Stdio\OmniSharp.Stdio.csproj" />
@@ -40,10 +37,5 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
-
-  <!--<ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>-->
 
 </Project>

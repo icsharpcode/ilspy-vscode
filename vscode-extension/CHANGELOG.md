@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to the "ilspy-vscode" extension will be documented in this file.
 
+## 0.2.0
+
+* Publish to the marketplace (fix icon and more)
+* Update to latest ICS.Decompiler NuGet (Beta 4)
+
 ## 0.1.0
 
 Add more details about the two commands in README

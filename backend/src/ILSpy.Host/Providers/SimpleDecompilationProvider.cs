@@ -48,7 +48,7 @@ namespace ILSpy.Host.Providers
 
         private void PopulateTokenToProviderMap(string assemblyPath)
         {
-            var decompiler = new CSharpDecompiler(assemblyPath, new DecompilerSettings());
+            var decompiler = new CSharpDecompiler(assemblyPath, new DecompilerSettings() { ThrowOnAssemblyResolveErrors = false });
             _decompilers[assemblyPath] = decompiler;
             var types = decompiler.TypeSystem.Compilation.MainAssembly.GetAllTypeDefinitions();
             foreach (var type in types)

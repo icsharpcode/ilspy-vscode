@@ -6,6 +6,7 @@
  'use strict';
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
+import * as fs from 'fs';
 import * as vscode from 'vscode';
 import * as util from './common';
 import { MsilDecompilerServer } from './msildecompiler/server';
@@ -41,7 +42,18 @@ export function activate(context: vscode.ExtensionContext) {
 
     disposables.push(vscode.commands.registerCommand('ilspy.decompileAssemblyPromptForFilePath', () => {
         promptForAssemblyFilePath().then(filePath => {
-            decompileFile(filePath);
+            let escaped: string = filePath.replace(/\\/g, "\\\\",);
+            // Remove surronding double quotes in path copied from Windows Explorer
+            if (escaped[0] === '"' && escaped[escaped.length - 1] === '"') {
+                escaped = escaped.slice(1, -1);
+            }
+
+            try {
+                fs.accessSync(escaped, fs.constants.R_OK);
+                decompileFile(escaped);
+            } catch (err) {
+                vscode.window.showErrorMessage('cannot read the file ' + filePath);
+            }
         });
     }));
 

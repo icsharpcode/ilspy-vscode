@@ -80,9 +80,8 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, Tex
     }
 
     public addAssembly(assembly: string): Thenable<boolean> {
-        let escaped: string = assembly.replace(/\\/g, "\\\\",);
-        let request: AddAssemblyRequest = { "AssemblyPath": escaped };
-        this.server.assemblyPaths.add(escaped);
+        let request: AddAssemblyRequest = { "AssemblyPath": assembly };
+        this.server.assemblyPaths.add(assembly);
         return serverUtils.addAssembly(this.server, request).then(response => {
             return response.Added;
         });

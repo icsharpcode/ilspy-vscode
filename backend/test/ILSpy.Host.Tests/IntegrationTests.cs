@@ -117,7 +117,7 @@ namespace ILSpy.Host.Tests
 
             Assert.Equal(@"public C(int ProgramId)
 {
-	this.ProgId = ProgramId;
+	ProgId = ProgramId;
 }
 ", decompiledCode.Decompiled);
         }

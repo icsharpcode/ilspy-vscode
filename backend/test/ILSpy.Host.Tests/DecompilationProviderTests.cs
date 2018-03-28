@@ -147,7 +147,7 @@ namespace ILSpy.Host.Tests
             var decompiled = provider.GetMemberCode(assemblyPath, m1.Token);
             Assert.Equal(@"public C(int ProgramId)
 {
-	this.ProgId = ProgramId;
+	ProgId = ProgramId;
 }
 ", decompiled);
         }

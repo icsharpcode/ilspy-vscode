@@ -41,20 +41,11 @@ export function activate(context: vscode.ExtensionContext) {
     }));
 
     disposables.push(vscode.commands.registerCommand('ilspy.decompileAssemblyPromptForFilePath', () => {
-        promptForAssemblyFilePath().then(filePath => {
-            let escaped: string = filePath.replace(/\\/g, "\\\\",);
-            // Remove surronding double quotes in path copied from Windows Explorer
-            if (escaped[0] === '"' && escaped[escaped.length - 1] === '"') {
-                escaped = escaped.slice(1, -1);
-            }
+        promptForAssemblyFilePath().then(attemptToDecompileFilePath);
+    }));
 
-            try {
-                fs.accessSync(escaped, fs.constants.R_OK);
-                decompileFile(escaped);
-            } catch (err) {
-                vscode.window.showErrorMessage('cannot read the file ' + filePath);
-            }
-        });
+    disposables.push(vscode.commands.registerCommand('ilspy.decompileAssemblyViaDialog', () => {
+        promptForAssemblyFilePathViaDialog().then(attemptToDecompileFilePath);
     }));
 
     let lastSelectedNode: MemberNode = null;
@@ -81,6 +72,20 @@ export function activate(context: vscode.ExtensionContext) {
     }));
 
     context.subscriptions.push(...disposables);
+
+    function attemptToDecompileFilePath(filePath: string) {
+        let escaped: string = filePath.replace(/\\/g, "\\\\",);
+        if (escaped[0] === '"' && escaped[escaped.length - 1] === '"') {
+            escaped = escaped.slice(1, -1);
+        }
+
+        try {
+            fs.accessSync(escaped, fs.constants.R_OK);
+            decompileFile(escaped);
+        } catch (err) {
+            vscode.window.showErrorMessage('cannot read the file ' + filePath);
+        }
+    }
 
     function decompileFile(assembly: string) {
         if(!server.isRunning()) {
@@ -144,6 +149,29 @@ function findAssemblies(): Thenable<string[]> {
         /*exclude*/ '{**/node_modules/**,**/.git/**,**/bower_components/**}')
     .then(resources => {
         return resources.map(uri => uri.fsPath);
+    });
+}
+
+function promptForAssemblyFilePathViaDialog(): Thenable<string> {
+    return vscode.window.showOpenDialog(
+        /* options*/ {
+            openLabel: 'Select assembly',
+            canSelectFiles: true,
+            canSelectFolders: false,
+            canSelectMany: false,
+        }
+    )
+    .then(uris => {
+        if (uris === undefined) {
+            return undefined;
+        }
+
+        let strings = uris.map(uri => uri.fsPath);
+        if (strings.length > 0) {
+            return strings[0];
+        } else {
+            return undefined;
+        }
     });
 }
 

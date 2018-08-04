@@ -3,9 +3,11 @@
 
 using System.IO;
 using System.Linq;
+using System.Reflection.Metadata;
+using System.Reflection.Metadata.Ecma335;
+using ICSharpCode.Decompiler.TypeSystem;
 using ILSpy.Host.Providers;
 using Microsoft.Extensions.Logging;
-using Mono.Cecil;
 using Moq;
 using OmniSharp.Host.Services;
 using Xunit;
@@ -71,10 +73,10 @@ namespace ILSpy.Host.Tests
 
             // Assert
             Assert.NotEmpty(types);
-            Assert.True(types.Single(t => t.Name.Equals("C")).MemberSubKind == MemberSubKind.Class);
-            Assert.True(types.Single(t => t.Name.Equals("S")).MemberSubKind == MemberSubKind.Structure);
-            Assert.True(types.Single(t => t.Name.Equals("I")).MemberSubKind == MemberSubKind.Interface);
-            Assert.True(types.Single(t => t.Name.Equals("E")).MemberSubKind == MemberSubKind.Enum);
+            Assert.True(types.Single(t => t.Name.Equals("C")).MemberSubKind == TypeKind.Class);
+            Assert.True(types.Single(t => t.Name.Equals("S")).MemberSubKind == TypeKind.Struct);
+            Assert.True(types.Single(t => t.Name.Equals("I")).MemberSubKind == TypeKind.Interface);
+            Assert.True(types.Single(t => t.Name.Equals("E")).MemberSubKind == TypeKind.Enum);
         }
 
         [Fact]
@@ -86,12 +88,12 @@ namespace ILSpy.Host.Tests
             // Act
             string assemblyPath = new FileInfo(testAssemblyPath).FullName;
             var added = provider.AddAssembly(assemblyPath);
-            var code = provider.GetCode(assemblyPath, TokenType.Assembly, 0);
+            var code = provider.GetCode(assemblyPath, EntityHandle.AssemblyDefinition);
 
             // Assert
             Assert.Contains("// TestAssembly, Version=", code);
             Assert.Contains("// Architecture: AnyCPU (64-bit preferred)", code);
-            Assert.Contains("// Runtime: .NET 4.0", code);
+            Assert.Contains("// Runtime: v4.0.30319", code);
             Assert.Contains("[assembly: AssemblyTitle(\"TestAssembly\")]", code);
             Assert.Contains("[assembly: AssemblyVersion(\"1.0.0.0\")]", code);
             Assert.Contains("[assembly: Guid(\"98030de1-dc87-4e74-8201-fe8e93e826b5\")]", code);
@@ -110,21 +112,21 @@ namespace ILSpy.Host.Tests
 
             // Assert
             var type = types.Single(t => t.Name.Equals("C"));
-            var members = provider.GetChildren(assemblyPath, type.Token.TokenType, type.Token.RID);
+            var members = provider.GetMembers(assemblyPath, MetadataTokens.TypeDefinitionHandle(type.Token));
 
             Assert.NotEmpty(members);
-            var m1 = members.Single(m => m.Name.Equals("C(Int32)"));
-            Assert.Equal(TokenType.Method, m1.Token.TokenType);
+            var m1 = members.Single(m => m.Name.Equals("C(int)"));
+            Assert.Equal(HandleKind.MethodDefinition, MetadataTokens.EntityHandle(m1.Token).Kind);
 
             var m2 = members.Single(m => m.Name.Equals("_ProgId"));
-            Assert.Equal(TokenType.Field, m2.Token.TokenType);
+            Assert.Equal(HandleKind.FieldDefinition, MetadataTokens.EntityHandle(m2.Token).Kind);
 
             var m3 = members.Single(m => m.Name.Equals("ProgId"));
-            Assert.Equal(TokenType.Property, m3.Token.TokenType);
+            Assert.Equal(HandleKind.PropertyDefinition, MetadataTokens.EntityHandle(m3.Token).Kind);
 
             var m4 = members.Single(m => m.Name.Equals("NestedC"));
-            Assert.Equal(TokenType.TypeDef, m4.Token.TokenType);
-            Assert.Equal(MemberSubKind.Class, m4.MemberSubKind);
+            Assert.Equal(HandleKind.TypeDefinition, MetadataTokens.EntityHandle(m4.Token).Kind);
+            Assert.Equal(TypeKind.Class, m4.MemberSubKind);
         }
 
         [Fact]
@@ -139,12 +141,12 @@ namespace ILSpy.Host.Tests
             var types = provider.ListTypes(assemblyPath, "TestAssembly").ToList();
 
             var type = types.Single(t => t.Name.Equals("C"));
-            var members = provider.GetChildren(assemblyPath, type.Token.TokenType, type.Token.RID).ToArray();
+            var members = provider.GetMembers(assemblyPath, MetadataTokens.TypeDefinitionHandle(type.Token)).ToArray();
 
             // Assert
             Assert.NotEmpty(members);
-            var m1 = members.Single(m => m.Name.Equals("C(Int32)"));
-            var decompiled = provider.GetMemberCode(assemblyPath, m1.Token);
+            var m1 = members.Single(m => m.Name.Equals("C(int)"));
+            var decompiled = provider.GetCode(assemblyPath, MetadataTokens.EntityHandle(m1.Token));
             Assert.Equal(@"public C(int ProgramId)
 {
 	ProgId = ProgramId;
@@ -164,12 +166,12 @@ namespace ILSpy.Host.Tests
             var types = provider.ListTypes(assemblyPath, "TestAssembly").ToList();
 
             var type = types.Single(t => t.Name.Equals("C"));
-            var members = provider.GetChildren(assemblyPath, type.Token.TokenType, type.Token.RID).ToArray();
+            var members = provider.GetMembers(assemblyPath, MetadataTokens.TypeDefinitionHandle(type.Token)).ToArray();
 
             // Assert
             Assert.NotEmpty(members);
             var m1 = members.Single(m => m.Name.Equals("NestedC"));
-            var decompiled = provider.GetMemberCode(assemblyPath, m1.Token);
+            var decompiled = provider.GetCode(assemblyPath, MetadataTokens.EntityHandle(m1.Token));
             Assert.Equal(
 @"public class NestedC
 {

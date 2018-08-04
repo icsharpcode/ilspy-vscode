@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ICSharpCode.Decompiler" Version="3.2.0.3856" />
+    <PackageReference Include="ICSharpCode.Decompiler" Version="4.0.0.4285-beta1" />
     <PackageReference Include="Microsoft.AspNetCore.Server.IISIntegration" Version="1.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />

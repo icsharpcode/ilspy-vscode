@@ -5,8 +5,7 @@ namespace ILSpy.Host
 {
     public class DecompileMemberRequest : RequestBase
     {
-        public uint TypeRid { get; set; }
-        public uint MemberType { get; set; }
-        public uint MemberRid { get; set; }
+        public int Type { get; set; }
+        public int Member { get; set; }
     }
 }

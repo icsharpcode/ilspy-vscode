@@ -3,7 +3,7 @@
 
 using ILSpy.Host.Providers;
 using Microsoft.AspNetCore.Http;
-using Mono.Cecil;
+using System.Reflection.Metadata;
 
 namespace ILSpy.Host
 {
@@ -20,7 +20,7 @@ namespace ILSpy.Host
         {
             var requestObject = JsonHelper.DeserializeRequestObject(httpContext.Request.Body)
                 .ToObject<DecompileAssemblyRequest>();
-            var code = new DecompileCode { Decompiled = _decompilationProvider.GetCode(requestObject.AssemblyPath, TokenType.Assembly, 0) };
+            var code = new DecompileCode { Decompiled = _decompilationProvider.GetCode(requestObject.AssemblyPath, EntityHandle.AssemblyDefinition) };
             return code;
         }
     }

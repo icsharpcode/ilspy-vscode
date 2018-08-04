@@ -3,45 +3,45 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-// from https://raw.githubusercontent.com/jbevain/cecil/505b07d6974d8405a63124139733c6fdc0e67bc7/Mono.Cecil.Metadata/TokenType.cs
+// from https://raw.githubusercontent.com/dotnet/corefx/28cb4c8917c25033bb136055c3c2462907a281fe/src/System.Reflection.Metadata/src/System/Reflection/Metadata/HandleKind.cs
 export enum TokenType
 {
-    Module = 0x00000000,
-    TypeRef = 0x01000000,
-    TypeDef = 0x02000000,
-    Field = 0x04000000,
-    Method = 0x06000000,
-    Param = 0x08000000,
-    InterfaceImpl = 0x09000000,
-    MemberRef = 0x0a000000,
-    CustomAttribute = 0x0c000000,
-    Permission = 0x0e000000,
-    Signature = 0x11000000,
-    Event = 0x14000000,
-    Property = 0x17000000,
-    ModuleRef = 0x1a000000,
-    TypeSpec = 0x1b000000,
-    Assembly = 0x20000000,
-    AssemblyRef = 0x23000000,
-    File = 0x26000000,
-    ExportedType = 0x27000000,
-    ManifestResource = 0x28000000,
-    GenericParam = 0x2a000000,
-    MethodSpec = 0x2b000000,
-    GenericParamConstraint = 0x2c000000,
-
-    Document = 0x30000000,
-    MethodDebugInformation = 0x31000000,
-    LocalScope = 0x32000000,
-    LocalVariable = 0x33000000,
-    LocalConstant = 0x34000000,
-    ImportScope = 0x35000000,
-    StateMachineMethod = 0x36000000,
-    CustomDebugInformation = 0x37000000,
-
-    String = 0x70000000,
-
-        // Added for namespace nodes
-    Namespace = 0x71000000
+    ModuleDefinition = 0,
+    TypeReference = 1,
+    TypeDefinition = 2,
+    FieldDefinition = 4,
+    MethodDefinition = 6,
+    Parameter = 8,
+    InterfaceImplementation = 9,
+    MemberReference = 10,
+    Constant = 11,
+    CustomAttribute = 12,
+    DeclarativeSecurityAttribute = 14,
+    StandaloneSignature = 17,
+    EventDefinition = 20,
+    PropertyDefinition = 23,
+    MethodImplementation = 25,
+    ModuleReference = 26,
+    TypeSpecification = 27,
+    AssemblyDefinition = 0x20,
+    AssemblyFile = 38,
+    AssemblyReference = 35,
+    ExportedType = 39,
+    GenericParameter = 42,
+    MethodSpecification = 43,
+    GenericParameterConstraint = 44,
+    ManifestResource = 40,
+    Document = 48,
+    MethodDebugInformation = 49,
+    LocalScope = 50,
+    LocalVariable = 51,
+    LocalConstant = 52,
+    ImportScope = 53,
+    CustomDebugInformation = 55,
+    NamespaceDefinition = 124,
+    UserString = 112,
+    String = 120,
+    Blob = 113,
+    Guid = 114
 }
 

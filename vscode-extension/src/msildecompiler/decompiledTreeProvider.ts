@@ -197,7 +197,7 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, Tex
     }
 
     getMembers(element: MemberNode): Thenable<MemberNode[]> {
-        let request: ListMembersRequest = {"AssemblyPath": element.assembly, "Handle": (element.type << 24) | element.rid };
+        let request: ListMembersRequest = {"AssemblyPath": element.assembly, "Handle": this.makeHandle(element) };
         if (element.mayHaveChildren) {
             return serverUtils.getMembers(this.server, request).then(result => {
                 return result.Members.map(m => new MemberNode(element.assembly, m.Name, this.getRid(m), this.getHandleKind(m), m.MemberSubKind, element.rid));

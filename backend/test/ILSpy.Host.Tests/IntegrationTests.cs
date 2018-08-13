@@ -6,14 +6,16 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Reflection.Metadata;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
+using ICSharpCode.Decompiler.TypeSystem;
 using ILSpy.Host.Providers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Mono.Cecil;
 using Moq;
 using Newtonsoft.Json;
 using OmniSharp.Host.Services;
@@ -78,19 +80,19 @@ namespace ILSpy.Host.Tests
 
             Assert.Contains("// TestAssembly, Version=", decompiledCode.Decompiled);
             Assert.Contains("// Architecture: AnyCPU (64-bit preferred)", decompiledCode.Decompiled);
-            Assert.Contains("// Runtime: .NET 4.0", decompiledCode.Decompiled);
+            Assert.Contains("// Runtime: v4.0.30319", decompiledCode.Decompiled);
 
             var payloadListTypes = new { AssemblyPath = _filePath, Namespace = "TestAssembly" };
             var data = await PostRequest<ListTypesResponse>("/listtypes", payloadListTypes);
 
             Assert.NotEmpty(data.Types);
-            Assert.True(data.Types.Single(t => t.Name.Equals("C")).MemberSubKind == MemberSubKind.Class);
-            Assert.True(data.Types.Single(t => t.Name.Equals("S")).MemberSubKind == MemberSubKind.Structure);
-            Assert.True(data.Types.Single(t => t.Name.Equals("I")).MemberSubKind == MemberSubKind.Interface);
-            Assert.True(data.Types.Single(t => t.Name.Equals("E")).MemberSubKind == MemberSubKind.Enum);
+            Assert.True(data.Types.Single(t => t.Name.Equals("C")).MemberSubKind == TypeKind.Class);
+            Assert.True(data.Types.Single(t => t.Name.Equals("S")).MemberSubKind == TypeKind.Struct);
+            Assert.True(data.Types.Single(t => t.Name.Equals("I")).MemberSubKind == TypeKind.Interface);
+            Assert.True(data.Types.Single(t => t.Name.Equals("E")).MemberSubKind == TypeKind.Enum);
 
             var c = data.Types.Single(t => t.Name.Equals("C"));
-            var payload2 = new { AssemblyPath = _filePath, Rid = c.Token.RID };
+            var payload2 = new { AssemblyPath = _filePath, Handle = c.Token };
             decompiledCode = await PostRequest<DecompileCode>("/decompiletype", payload2);
             Assert.Contains(@"namespace TestAssembly", decompiledCode.Decompiled);
             Assert.Contains(@"public class C", decompiledCode.Decompiled);
@@ -100,19 +102,19 @@ namespace ILSpy.Host.Tests
 
             Assert.NotEmpty(data2.Members);
 
-            var m1 = data2.Members.Single(t => t.Name.Equals("C(Int32)"));
-            Assert.Equal(MemberSubKind.None, m1.MemberSubKind);
-            Assert.Equal(TokenType.Method, m1.Token.TokenType);
+            var m1 = data2.Members.Single(t => t.Name.Equals("C(int)"));
+            Assert.Equal(TypeKind.None, m1.MemberSubKind);
+            Assert.Equal(HandleKind.MethodDefinition, MetadataTokens.EntityHandle(m1.Token).Kind);
 
             var m2 = data2.Members.Single(t => t.Name.Equals("_ProgId"));
-            Assert.Equal(MemberSubKind.None, m2.MemberSubKind);
-            Assert.Equal(TokenType.Field, m2.Token.TokenType);
+            Assert.Equal(TypeKind.None, m2.MemberSubKind);
+            Assert.Equal(HandleKind.FieldDefinition, MetadataTokens.EntityHandle(m2.Token).Kind);
 
             var m3 = data2.Members.Single(t => t.Name.Equals("ProgId"));
-            Assert.Equal(MemberSubKind.None, m3.MemberSubKind);
-            Assert.Equal(TokenType.Property, m3.Token.TokenType);
+            Assert.Equal(TypeKind.None, m3.MemberSubKind);
+            Assert.Equal(HandleKind.PropertyDefinition, MetadataTokens.EntityHandle(m3.Token).Kind);
 
-            var payload3 = new { AssemblyPath = _filePath, TypeRid = c.Token.RID, MemberType = 100663296, MemberRid = m1.Token.RID };
+            var payload3 = new { AssemblyPath = _filePath, Type = c.Token, Member = m1.Token };
             decompiledCode = await PostRequest<DecompileCode>("/decompilemember", payload3);
 
             Assert.Equal(@"public C(int ProgramId)
@@ -131,34 +133,9 @@ namespace ILSpy.Host.Tests
 
             var traceWriter = new Newtonsoft.Json.Serialization.MemoryTraceWriter();
             JsonSerializerSettings settings = new JsonSerializerSettings { TraceWriter = traceWriter, TypeNameHandling = TypeNameHandling.Objects };
-            settings.Converters.Add(new TestMetadataTokenConverter());
             var result = JsonConvert.DeserializeObject<T>(responseString, settings);
             var s = traceWriter.ToString();
             return result;
-        }
-
-        // For unknown reason the default converter couldn't deserialize MetadataToken.
-        // This works around the issue.
-        private class TestMetadataTokenConverter : JsonConverter
-        {
-            public override bool CanConvert(Type objectType)
-            {
-                return objectType == typeof(MetadataToken);
-            }
-
-            public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-            {
-                var jsonObject = Newtonsoft.Json.Linq.JObject.Load(reader);
-                var properties = jsonObject.Properties().ToList();
-                var tokenType = (TokenType)(uint)properties[1].Value;
-                var rid = (uint)properties[0].Value;
-                return new MetadataToken(tokenType, rid);
-            }
-
-            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-            {
-                throw new NotImplementedException();
-            }
         }
     }
 }

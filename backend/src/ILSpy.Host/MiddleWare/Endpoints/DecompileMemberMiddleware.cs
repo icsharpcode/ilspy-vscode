@@ -3,7 +3,7 @@
 
 using ILSpy.Host.Providers;
 using Microsoft.AspNetCore.Http;
-using Mono.Cecil;
+using System.Reflection.Metadata.Ecma335;
 
 namespace ILSpy.Host
 {
@@ -21,18 +21,19 @@ namespace ILSpy.Host
             DecompileMemberRequest requestData = JsonHelper.DeserializeRequestObject(httpContext.Request.Body)
                 .ToObject<DecompileMemberRequest>();
 
-            var members = _decompilationProvider.GetChildren(requestData.AssemblyPath, TokenType.TypeDef, requestData.TypeRid);
+            var members = _decompilationProvider.GetMembers(requestData.AssemblyPath, MetadataTokens.TypeDefinitionHandle(requestData.Type));
+            var requestedMember = MetadataTokens.EntityHandle(requestData.Member);
             foreach (var member in members)
             {
-                if (member.Token.RID == requestData.MemberRid
-                    && member.Token.TokenType == (TokenType)requestData.MemberType)
+                var memberToken = MetadataTokens.EntityHandle(member.Token);
+                if (memberToken == requestedMember)
                 {
-                    var code = new DecompileCode { Decompiled = _decompilationProvider.GetMemberCode(requestData.AssemblyPath, member.Token) };
+                    var code = new DecompileCode { Decompiled = _decompilationProvider.GetCode(requestData.AssemblyPath, memberToken) };
                     return code;
                 }
             }
 
-            var message = $"Error: could not find member matching (type: {requestData.TypeRid}, member: {((TokenType)requestData.MemberType).ToString()}:{requestData.MemberRid}).";
+            var message = $"Error: could not find member matching (type: {requestData.Type:8x}, member: {requestData.Member:8x}).";
             return message;
         }
     }

@@ -3,12 +3,29 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-// This should be the same as defined in ILSpy.Host back end
+// This should be the same as ICSharpCode.Decompiler.TypeSystem.TypeKind in ICSharpCode.Decompiler.dll
 export enum MemberSubKind
 {
-    None = 0x0000,
-    Class = 0x0001,
-    Enum = 0x0002,
-    Interface = 0x0003,
-    Structure = 0x0004,
+    Other,
+    Class,
+    Interface,
+    Struct,
+    Delegate,
+    Enum,
+    Void,
+    Unknown,
+    Null,
+    None,
+    Dynamic,
+    UnboundTypeArgument,
+    TypeParameter,
+    Array,
+    Pointer,
+    ByReference,
+    Anonymous,
+    Intersection,
+    ArgList,
+    Tuple,
+    ModOpt,
+    ModReq
 }

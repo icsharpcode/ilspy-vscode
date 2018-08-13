@@ -75,14 +75,9 @@ export interface ListTypesRequest extends Request {
     Namespace: string;
 }
 
-export interface MetadataToken {
-    RID: number;
-    TokenType: number;
-}
-
 export interface MemberData {
     Name: string;
-    Token: MetadataToken;
+    Token: number;
     MemberSubKind: MemberSubKind;
 }
 
@@ -91,11 +86,11 @@ export interface ListTypesResponse {
 }
 
 export interface DecompileTypeRequest extends Request {
-    Rid: number;
+    Handle: number;
 }
 
 export interface ListMembersRequest extends Request {
-    Rid: number;
+    Handle: number;
 }
 
 export interface ListMembersResponse {
@@ -103,7 +98,6 @@ export interface ListMembersResponse {
 }
 
 export interface DecompileMemberRequest extends Request {
-    TypeRid: number;
-    MemberType: number;
-    MemberRid: number;
+    Type: number;
+    Member: number;
 }

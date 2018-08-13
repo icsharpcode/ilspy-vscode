@@ -9,7 +9,7 @@ import { TokenType } from './tokenType';
 import { MemberSubKind } from './memberSubKind';
 import * as serverUtils from './utils';
 import * as path from 'path';
-import { AddAssemblyRequest, ListNamespacesRequest, ListTypesRequest, ListMembersRequest, DecompileAssemblyRequest, DecompileTypeRequest, DecompileMemberRequest } from './protocol';
+import { AddAssemblyRequest, ListNamespacesRequest, ListTypesRequest, ListMembersRequest, DecompileAssemblyRequest, DecompileTypeRequest, DecompileMemberRequest, MemberData } from './protocol';
 
 export class MemberNode {
     private _decompiled: string = null;
@@ -20,7 +20,7 @@ export class MemberNode {
         private _rid: number,
         private _tokenType: TokenType,
         private _typeDefSubKind: MemberSubKind,
-        private _parentRid : number) {
+        private _parentToken : number) {
     }
 
     public get name(): string {
@@ -44,13 +44,13 @@ export class MemberNode {
     }
 
     public get mayHaveChildren() : boolean {
-        return this.type === TokenType.TypeDef
-         || this.type === TokenType.Assembly
-         || this.type === TokenType.Namespace;
+        return this.type === TokenType.TypeDefinition
+         || this.type === TokenType.AssemblyDefinition
+         || this.type === TokenType.NamespaceDefinition;
     }
 
     public get parent(): number {
-        return this._parentRid;
+        return this._parentToken;
     }
 
     public get assembly(): string {
@@ -104,22 +104,22 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, Tex
         let name: string = null;
 
         switch (node.type) {
-            case TokenType.Assembly:
+            case TokenType.AssemblyDefinition:
                 name = "Document";
                 break;
-            case TokenType.Namespace:
+            case TokenType.NamespaceDefinition:
                 name = "Namespace";
                 break;
-            case TokenType.Event:
+            case TokenType.EventDefinition:
                 name = "Event";
                 break;
-            case TokenType.Field:
+            case TokenType.FieldDefinition:
                 name = "Field";
                 break;
-            case TokenType.Method:
+            case TokenType.MethodDefinition:
                 name = "Method";
                 break;
-            case TokenType.TypeDef:
+            case TokenType.TypeDefinition:
                 switch (node.memberSubKind)
                 {
                     case MemberSubKind.Enum:
@@ -128,7 +128,7 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, Tex
                     case MemberSubKind.Interface:
                         name = "Interface";
                         break;
-                    case MemberSubKind.Structure:
+                    case MemberSubKind.Struct:
                         name = "Structure";
                         break;
                     default:
@@ -139,7 +139,7 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, Tex
             case TokenType.LocalConstant:
                 name = "Constant";
                 break;
-            case TokenType.Property:
+            case TokenType.PropertyDefinition:
                 name = "Property";
                 break;
             default:
@@ -167,7 +167,7 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, Tex
         if (!element) {
             let result = [];
             for (let e of this.server.assemblyPaths) {
-                result.push(new MemberNode(e, e, -2, TokenType.Assembly, MemberSubKind.None, -3));
+                result.push(new MemberNode(e, e, -2, TokenType.AssemblyDefinition, MemberSubKind.None, -3));
             }
 
             return result;
@@ -185,22 +185,22 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, Tex
     getNamespaces(assembly: string): Thenable<MemberNode[]> {
         let request: ListNamespacesRequest = { "AssemblyPath": assembly };
         return serverUtils.listNamespaces(this.server, request).then(result => {
-            return result.Namespaces.map(n => new MemberNode(assembly, n, -1, TokenType.Namespace, MemberSubKind.None, -2));
+            return result.Namespaces.map(n => new MemberNode(assembly, n, -1, TokenType.NamespaceDefinition, MemberSubKind.None, -2));
         });
     }
 
     getTypes(assembly: string, namespace: string): Thenable<MemberNode[]> {
         let request: ListTypesRequest = { "AssemblyPath": assembly, "Namespace": namespace };
         return serverUtils.getTypes(this.server, request).then(result => {
-            return result.Types.map(t => new MemberNode(assembly, t.Name, t.Token.RID, t.Token.TokenType, t.MemberSubKind, -1));
+            return result.Types.map(t => new MemberNode(assembly, t.Name, this.getRid(t), this.getHandleKind(t), t.MemberSubKind, -1));
         });
     }
 
     getMembers(element: MemberNode): Thenable<MemberNode[]> {
-        let request: ListMembersRequest = {"AssemblyPath": element.assembly, "Rid": element.rid };
+        let request: ListMembersRequest = {"AssemblyPath": element.assembly, "Handle": (element.type << 24) | element.rid };
         if (element.mayHaveChildren) {
             return serverUtils.getMembers(this.server, request).then(result => {
-                return result.Members.map(m => new MemberNode(element.assembly, m.Name, m.Token.RID, m.Token.TokenType, m.MemberSubKind, element.rid));
+                return result.Members.map(m => new MemberNode(element.assembly, m.Name, this.getRid(m), this.getHandleKind(m), m.MemberSubKind, element.rid));
             });
         }
         else {
@@ -220,11 +220,11 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, Tex
         }
 
         if (element.mayHaveChildren) {
-            let request: DecompileTypeRequest = {"AssemblyPath": element.assembly, "Rid": element.rid};
+            let request: DecompileTypeRequest = {"AssemblyPath": element.assembly, "Handle": this.makeHandle(element)};
             return serverUtils.decompileType(this.server, request).then(result => result.Decompiled);
         }
         else {
-            let request: DecompileMemberRequest = {"AssemblyPath": element.assembly, "TypeRid": element.parent, "MemberType": element.type, "MemberRid": element.rid};
+            let request: DecompileMemberRequest = {"AssemblyPath": element.assembly, "Type": element.parent, "Member": this.makeHandle(element)};
             return serverUtils.decompileMember(this.server, request).then(result => result.Decompiled);
         }
     }
@@ -232,5 +232,22 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, Tex
     public provideTextDocumentContent(uri: Uri, token: CancellationToken): ProviderResult<string> {
         //TODO:
         return "";
+    }
+
+    // metadata tokens/handles are 32-bit unsigned integers in the format:
+    // the first byte is the handle kind/token type, the other three bytes are used for the row-id.
+    makeHandle(element: MemberNode): number {
+        return (element.type << 24) | element.rid;
+    }
+
+    // extract the row-id by removing the first byte
+    getRid(member: MemberData): number {
+        return member.Token & 0x00FFFFFF;
+    }
+
+    // extract the token/handle kind by shifting the first byte to the position of the first byte
+    // apply bit-and 0xFF to the result to ensure that the other bytes are zero.
+    getHandleKind(member: MemberData): number {
+        return (member.Token >> 24) & 0xFF;
     }
 }

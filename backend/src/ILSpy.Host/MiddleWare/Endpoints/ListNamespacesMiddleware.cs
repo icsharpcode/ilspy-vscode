@@ -20,8 +20,8 @@ namespace ILSpy.Host.MiddleWare.Endpoints
             var requestObject = JsonHelper.DeserializeRequestObject(httpContext.Request.Body)
                 .ToObject<ListNamespacesRequest>();
             var assemblyPath = requestObject.AssemblyPath;
-            var types = _decompilationProvider.ListNamespaces(assemblyPath);
-            var data = new ListNamespacesResponse { Namespaces = types };
+            var namespaces = _decompilationProvider.ListNamespaces(assemblyPath);
+            var data = new ListNamespacesResponse { Namespaces = namespaces };
             return data;
         }
     }

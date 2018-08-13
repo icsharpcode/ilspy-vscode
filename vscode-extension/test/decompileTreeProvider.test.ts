@@ -11,20 +11,20 @@ import { MemberSubKind } from '../src/msildecompiler/memberSubKind';
 
 suite("Member Node Tests", () => {
     test("Assembly node returns true for isType", () => {
-        const node = new MemberNode("assembly", "name", 0, TokenType.Assembly, MemberSubKind.None, -1);
+        const node = new MemberNode("assembly", "name", 0, TokenType.AssemblyDefinition, MemberSubKind.None, -1);
 
         expect(node.mayHaveChildren).to.be.a('boolean').that.equal(true);
     });
 
     test("Type node returns true for isType", () => {
-        const node = new MemberNode("assembly", "name", 0, TokenType.TypeDef, MemberSubKind.Class, 0);
+        const node = new MemberNode("assembly", "name", 0, TokenType.TypeDefinition, MemberSubKind.Class, 0);
 
         expect(node.mayHaveChildren).to.be.a('boolean').that.equal(true);
     });
 
 
     test("Other nodes return false for isType", () => {
-        const node = new MemberNode("assembly", "name", 0, TokenType.MemberRef, MemberSubKind.None, 0);
+        const node = new MemberNode("assembly", "name", 0, TokenType.MemberReference, MemberSubKind.None, 0);
 
         expect(node.mayHaveChildren).to.be.a('boolean').that.equal(false);
     });
@@ -38,7 +38,7 @@ interface IconPath {
 suite("Tree Data Provider tests", () => {
     test("Assembly node should be collapsible", () => {
         const provider = new DecompiledTreeProvider(null);
-        const treeItem = provider.getTreeItem(new MemberNode("assembly", "name", 0, TokenType.Assembly, MemberSubKind.None, -1));
+        const treeItem = provider.getTreeItem(new MemberNode("assembly", "name", 0, TokenType.AssemblyDefinition, MemberSubKind.None, -1));
 
         expect(treeItem.collapsibleState).to.not.equal(TreeItemCollapsibleState.None);
         expect(treeItem.collapsibleState).to.not.equal(undefined);
@@ -46,7 +46,7 @@ suite("Tree Data Provider tests", () => {
 
     test("Type node should be collapsible", () => {
         const provider = new DecompiledTreeProvider(null);
-        const treeItem = provider.getTreeItem(new MemberNode("assembly", "name", 0, TokenType.TypeDef, MemberSubKind.Class, 0));
+        const treeItem = provider.getTreeItem(new MemberNode("assembly", "name", 0, TokenType.TypeDefinition, MemberSubKind.Class, 0));
 
         expect(treeItem.collapsibleState).to.not.equal(TreeItemCollapsibleState.None);
         expect(treeItem.collapsibleState).to.not.equal(undefined);
@@ -54,14 +54,14 @@ suite("Tree Data Provider tests", () => {
 
     test("Other node should not be collapsible", () => {
         const provider = new DecompiledTreeProvider(null);
-        const treeItem = provider.getTreeItem(new MemberNode("assembly", "name", 0, TokenType.MemberRef, MemberSubKind.None, 0));
+        const treeItem = provider.getTreeItem(new MemberNode("assembly", "name", 0, TokenType.MemberReference, MemberSubKind.None, 0));
 
         expect(treeItem.collapsibleState).to.equal(undefined);
     });
 
     test("Class node should have Class Icon", () => {
         const provider = new DecompiledTreeProvider(null);
-        const treeItem = provider.getTreeItem(new MemberNode("assembly", "name", 0, TokenType.TypeDef, MemberSubKind.Class, 0));
+        const treeItem = provider.getTreeItem(new MemberNode("assembly", "name", 0, TokenType.TypeDefinition, MemberSubKind.Class, 0));
         const iconPath = treeItem.iconPath;
 
         expect(iconPath).to.be.a("Object");
@@ -75,7 +75,7 @@ suite("Tree Data Provider tests", () => {
 
     test("Interface node should have Interface Icon", () => {
         const provider = new DecompiledTreeProvider(null);
-        const treeItem = provider.getTreeItem(new MemberNode("assembly", "name", 0, TokenType.TypeDef, MemberSubKind.Interface, 0));
+        const treeItem = provider.getTreeItem(new MemberNode("assembly", "name", 0, TokenType.TypeDefinition, MemberSubKind.Interface, 0));
         const iconPath = treeItem.iconPath;
 
         expect(iconPath).to.be.a("Object");
@@ -89,7 +89,7 @@ suite("Tree Data Provider tests", () => {
 
     test("Structure node should have Structure Icon", () => {
         const provider = new DecompiledTreeProvider(null);
-        const treeItem = provider.getTreeItem(new MemberNode("assembly", "name", 0, TokenType.TypeDef, MemberSubKind.Structure, 0));
+        const treeItem = provider.getTreeItem(new MemberNode("assembly", "name", 0, TokenType.TypeDefinition, MemberSubKind.Struct, 0));
         const iconPath = treeItem.iconPath;
 
         expect(iconPath).to.be.a("Object");
@@ -103,7 +103,7 @@ suite("Tree Data Provider tests", () => {
 
     test("Enum node should have Enum Icon", () => {
         const provider = new DecompiledTreeProvider(null);
-        const treeItem = provider.getTreeItem(new MemberNode("assembly", "name", 0, TokenType.TypeDef, MemberSubKind.Enum, 0));
+        const treeItem = provider.getTreeItem(new MemberNode("assembly", "name", 0, TokenType.TypeDefinition, MemberSubKind.Enum, 0));
         const iconPath = treeItem.iconPath;
 
         expect(iconPath).to.be.a("Object");

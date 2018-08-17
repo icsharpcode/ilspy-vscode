@@ -2,7 +2,6 @@
 
 Welcome to the ILSpy extension for Visual Studio Code! This extension provides two commands inside Visual Studio Code:
 
-* `ilspy.decompileAssemblyPromptForFilePath` - Decompile an MSIL assembly from a user-input full path.
 * `ilspy.decompileAssemblyInWorkspace` - Decompile a MSIL assembly inside of current Visual Studio Code workspace.
 * `ilspy.decompileAssemblyViaDialog` - Decompoile an MSIL assembly from file picker dialog.
 
@@ -12,10 +11,8 @@ The `Decompile IL Assembly in Current Workspace` will put all potential .NET ass
 (files with extension `.dll`, `.exe`, `.winrt`, or `.netmodule`) in your
 workspace in a list for selection.
 
-For the `Decompile IL Assembly from a Given Path` command, when prompted, type the full path to a .NET assembly,
-For example, `c:/temp/a.dll` or `/home/user/b.dll`.
-
-The `Decompile IL Assembly (pick file)` command allows choosing an assembly using the file picker dialog.
+The `Decompile IL Assembly (pick file)` command allows choosing an assembly using the file picker dialog. The dialog
+should also allow one to type in the full path, for example, `c:/temp/a.dll` or `/home/user/b.dll`.
 
 If the file is a valid .NET assembly, a tree view named `DECOMPILED MEMBERS` is added into the Explorer view.
 It allows expanding and selecting various nodes, whose decompiled C# code is shown in the editor.

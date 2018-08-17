@@ -43,11 +43,6 @@
                 "category": "ILSpy"
             },
             {
-                "command": "ilspy.decompileAssemblyPromptForFilePath",
-                "title": "Decompile IL Assembly from a Given Path",
-                "category": "ILSpy"
-            },
-            {
                 "command": "ilspy.decompileAssemblyViaDialog",
                 "title": "Decompile IL Assembly (pick file)",
                 "category": "ILSpy"

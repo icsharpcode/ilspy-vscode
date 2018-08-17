@@ -233,5 +233,43 @@ namespace ILSpy.Host.Tests
             Assert.Contains(list4, t => t.Name.Equals("ABCD1"));
             Assert.Contains(list4, t => t.Name.Equals("ABCD2"));
         }
+
+        [Fact]
+        public void ListGenericTypesWithSameNameButDifferentNumbersOfTypeArgument()
+        {
+            // Arrange
+            var provider = new SimpleDecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
+            string assemblyPath = new FileInfo(testAssemblyPath).FullName;
+
+            // Act
+            var added = provider.AddAssembly(assemblyPath);
+            var list1 = provider.ListTypes(assemblyPath, "Generics");
+
+            // Assert
+            Assert.Contains(list1, t => t.Name.Equals("C<T>"));
+            Assert.Contains(list1, t => t.Name.Equals("C<T1,T2>"));
+            Assert.Contains(list1, t => t.Name.Equals("I<T>"));
+            Assert.Contains(list1, t => t.Name.Equals("I<T1,T2>"));
+            Assert.Contains(list1, t => t.Name.Equals("I<T1,T2,T3>"));
+        }
+
+
+        [Fact]
+        public void ListGenericMethodOverloadsWithDifferentNumbersOfTypeArgument()
+        {
+            // Arrange
+            var provider = new SimpleDecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
+            string assemblyPath = new FileInfo(testAssemblyPath).FullName;
+
+            // Act
+            var added = provider.AddAssembly(assemblyPath);
+            var list1 = provider.ListTypes(assemblyPath, "Generics");
+            var type = list1.Single(t => t.Name.Equals("A"));
+            var members = provider.GetMembers(assemblyPath, MetadataTokens.TypeDefinitionHandle(type.Token));
+
+            // Assert
+            Assert.Contains(members, m => m.Name.Equals("M<T>() : void"));
+            Assert.Contains(members, m => m.Name.Equals("M<T1, T2>() : void"));
+        }
     }
 }

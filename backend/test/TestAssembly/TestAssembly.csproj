@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="C.cs" />
     <Compile Include="E.cs" />
+    <Compile Include="Generics.cs" />
     <Compile Include="I.cs" />
     <Compile Include="Namespaces.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

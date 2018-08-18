@@ -40,10 +40,6 @@ export function activate(context: vscode.ExtensionContext) {
         });
     }));
 
-    disposables.push(vscode.commands.registerCommand('ilspy.decompileAssemblyPromptForFilePath', () => {
-        promptForAssemblyFilePath().then(attemptToDecompileFilePath);
-    }));
-
     disposables.push(vscode.commands.registerCommand('ilspy.decompileAssemblyViaDialog', () => {
         promptForAssemblyFilePathViaDialog().then(attemptToDecompileFilePath);
     }));
@@ -173,14 +169,4 @@ function promptForAssemblyFilePathViaDialog(): Thenable<string> {
             return undefined;
         }
     });
-}
-
-function promptForAssemblyFilePath(): Thenable<string> {
-    return vscode.window.showInputBox(
-        /*options*/ {
-            prompt: 'Fill in the full path to the managed assembly',
-            ignoreFocusOut: true,
-            placeHolder: 'full/path/to/the/assembly'
-        }
-    );
 }

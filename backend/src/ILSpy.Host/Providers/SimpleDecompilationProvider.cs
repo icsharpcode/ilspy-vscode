@@ -193,7 +193,7 @@ namespace ILSpy.Host.Providers
             {
                 yield return new MemberData
                 {
-                    Name = t.Name,
+                    Name = t.TypeToString(includeNamespace: false),
                     Token = MetadataTokens.GetToken(t.MetadataToken),
                     MemberSubKind = t.Kind
                 };

@@ -131,7 +131,8 @@ namespace ILSpy.Host.Providers
             switch (handle.Kind)
             {
                 case HandleKind.AssemblyDefinition:
-                    return "TODO: assembly IL";
+                    GetAssemblyILCode(disassembler, assemblyPath, module, textOutput);
+                    return textOutput.ToString();
                 case HandleKind.TypeDefinition:
                     disassembler.DisassembleType(module.PEFile, (TypeDefinitionHandle)handle);
                     return textOutput.ToString();
@@ -153,7 +154,7 @@ namespace ILSpy.Host.Providers
             return string.Empty;
         }
 
-        private static ReflectionDisassembler CreateDisassembler(string assemblyPath, MetadataModule module, PlainTextOutput textOutput)
+        private static ReflectionDisassembler CreateDisassembler(string assemblyPath, MetadataModule module, ITextOutput textOutput)
         {
             var dis = new ReflectionDisassembler(textOutput, CancellationToken.None)
             {
@@ -169,6 +170,25 @@ namespace ILSpy.Host.Providers
             dis.DebugInfo = null;
 
             return dis;
+        }
+
+        private static void GetAssemblyILCode(ReflectionDisassembler disassembler, string assemblyPath, MetadataModule module, ITextOutput output)
+        {
+            output.WriteLine("// " + assemblyPath);
+            output.WriteLine();
+            var peFile = module.PEFile;
+            var metadata = peFile.Metadata;
+
+            disassembler.WriteAssemblyReferences(metadata);
+            if (metadata.IsAssembly)
+            {
+                disassembler.WriteAssemblyHeader(peFile);
+            }
+            output.WriteLine();
+            disassembler.WriteModuleHeader(peFile);
+            output.WriteLine();
+            output.WriteLine();
+            disassembler.WriteModuleContents(peFile);
         }
 
         private string GetAssemblyCode(string assemblyPath, CSharpDecompiler decompiler)

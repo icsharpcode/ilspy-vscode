@@ -55,7 +55,7 @@ namespace ILSpy.Host.Providers
                 ? new List<MemberData>()
                 : c.NestedTypes.Select(typeDefinition => new MemberData
                     {
-                        Name = typeDefinition.Name,
+                        Name = typeDefinition.TypeToString(includeNamespace: false),
                         Token = MetadataTokens.GetToken(typeDefinition.MetadataToken),
                         MemberSubKind = typeDefinition.Kind
                     })

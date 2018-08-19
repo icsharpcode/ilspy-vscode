@@ -235,7 +235,7 @@ namespace ILSpy.Host.Tests
         }
 
         [Fact]
-        public void ListGenericTypesWithSameNameButDifferentNumbersOfTypeArgument()
+        public void ListGenericTypesWithSameNameButDifferentNumbersOfTypeArguments()
         {
             // Arrange
             var provider = new SimpleDecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
@@ -253,9 +253,8 @@ namespace ILSpy.Host.Tests
             Assert.Contains(list1, t => t.Name.Equals("I<T1,T2,T3>"));
         }
 
-
         [Fact]
-        public void ListGenericMethodOverloadsWithDifferentNumbersOfTypeArgument()
+        public void ListGenericMethodOverloadsWithDifferentNumbersOfTypeArguments()
         {
             // Arrange
             var provider = new SimpleDecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
@@ -270,6 +269,24 @@ namespace ILSpy.Host.Tests
             // Assert
             Assert.Contains(members, m => m.Name.Equals("M<T>() : void"));
             Assert.Contains(members, m => m.Name.Equals("M<T1, T2>() : void"));
+        }
+
+        [Fact]
+        public void ListNestedGenericsWithDifferentNumbersOfTypeArguments()
+        {
+            // Arrange
+            var provider = new SimpleDecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
+            string assemblyPath = new FileInfo(testAssemblyPath).FullName;
+
+            // Act
+            var added = provider.AddAssembly(assemblyPath);
+            var list1 = provider.ListTypes(assemblyPath, "Generics");
+            var type = list1.Single(t => t.Name.Equals("A"));
+            var members = provider.GetMembers(assemblyPath, MetadataTokens.TypeDefinitionHandle(type.Token));
+
+            // Assert
+            Assert.Contains(members, m => m.Name.Equals("NestedC<T>"));
+            Assert.Contains(members, m => m.Name.Equals("NestedC<T1,T2>"));
         }
     }
 }

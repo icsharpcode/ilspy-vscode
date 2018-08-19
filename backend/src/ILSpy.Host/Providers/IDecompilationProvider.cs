@@ -11,7 +11,7 @@ namespace ILSpy.Host.Providers
         bool AddAssembly(string path);
         IEnumerable<string> ListNamespaces(string assemblyPath);
         IEnumerable<MemberData> ListTypes(string assemblyPath, string @namespace);
-        string GetCode(string assemblyPath, EntityHandle handle);
+        string GetCSharpCode(string assemblyPath, EntityHandle handle);
         IEnumerable<MemberData> GetMembers(string assemblyPath, TypeDefinitionHandle handle);
     }
 }

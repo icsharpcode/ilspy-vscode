@@ -28,7 +28,7 @@ namespace ILSpy.Host
                 var memberToken = MetadataTokens.EntityHandle(member.Token);
                 if (memberToken == requestedMember)
                 {
-                    var code = new DecompileCode { Decompiled = _decompilationProvider.GetCode(requestData.AssemblyPath, memberToken) };
+                    var code = new DecompileCode { Decompiled = _decompilationProvider.GetCSharpCode(requestData.AssemblyPath, memberToken) };
                     return code;
                 }
             }

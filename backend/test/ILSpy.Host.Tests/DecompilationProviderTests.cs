@@ -88,7 +88,7 @@ namespace ILSpy.Host.Tests
             // Act
             string assemblyPath = new FileInfo(testAssemblyPath).FullName;
             var added = provider.AddAssembly(assemblyPath);
-            var code = provider.GetCode(assemblyPath, EntityHandle.AssemblyDefinition);
+            var code = provider.GetCSharpCode(assemblyPath, EntityHandle.AssemblyDefinition);
 
             // Assert
             Assert.Contains("// TestAssembly, Version=", code);
@@ -146,7 +146,7 @@ namespace ILSpy.Host.Tests
             // Assert
             Assert.NotEmpty(members);
             var m1 = members.Single(m => m.Name.Equals("C(int)"));
-            var decompiled = provider.GetCode(assemblyPath, MetadataTokens.EntityHandle(m1.Token));
+            var decompiled = provider.GetCSharpCode(assemblyPath, MetadataTokens.EntityHandle(m1.Token));
             Assert.Equal(@"public C(int ProgramId)
 {
 	ProgId = ProgramId;
@@ -171,7 +171,7 @@ namespace ILSpy.Host.Tests
             // Assert
             Assert.NotEmpty(members);
             var m1 = members.Single(m => m.Name.Equals("NestedC"));
-            var decompiled = provider.GetCode(assemblyPath, MetadataTokens.EntityHandle(m1.Token));
+            var decompiled = provider.GetCSharpCode(assemblyPath, MetadataTokens.EntityHandle(m1.Token));
             Assert.Equal(
 @"public class NestedC
 {
@@ -287,6 +287,64 @@ namespace ILSpy.Host.Tests
             // Assert
             Assert.Contains(members, m => m.Name.Equals("NestedC<T>"));
             Assert.Contains(members, m => m.Name.Equals("NestedC<T1,T2>"));
+        }
+
+        [Fact]
+        public void GetILCodeForType()
+        {
+            // Arrange
+            var provider = new SimpleDecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
+            string assemblyPath = new FileInfo(testAssemblyPath).FullName;
+
+            // Act
+            var added = provider.AddAssembly(assemblyPath);
+            var list1 = provider.ListTypes(assemblyPath, "TestAssembly");
+            var type = list1.Single(t => t.Name.Equals("C"));
+            var il = provider.GetILCode(assemblyPath, MetadataTokens.TypeDefinitionHandle(type.Token));
+
+            // Assert
+            Assert.StartsWith(".class public auto ansi TestAssembly.C", il);
+        }
+
+        [Fact]
+        public void GetILCodeForMember()
+        {
+            // Arrange
+            var provider = new SimpleDecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
+            string assemblyPath = new FileInfo(testAssemblyPath).FullName;
+
+            // Act
+            var added = provider.AddAssembly(assemblyPath);
+            var list1 = provider.ListTypes(assemblyPath, "TestAssembly");
+            var type = list1.Single(t => t.Name.Equals("C"));
+            var members = provider.GetMembers(assemblyPath, MetadataTokens.TypeDefinitionHandle(type.Token)).ToArray();
+
+            // Assert
+            Assert.NotEmpty(members);
+            var m1 = members.Single(m => m.Name.Equals("C(int)"));
+            var il = provider.GetILCode(assemblyPath, MetadataTokens.EntityHandle(m1.Token));
+
+            // Assert
+            Assert.Equal(@".method /* 06000017 */ public hidebysig specialname rtspecialname 
+	instance void .ctor (
+		int32 ProgramId
+	) cil managed 
+{
+	// Method begins at RVA 0x2088
+	// Code size 17 (0x11)
+	.maxstack 8
+
+	IL_0000: ldarg.0
+	IL_0001: call instance void [mscorlib]System.Object::.ctor() /* 0A000011 */
+	IL_0006: nop
+	IL_0007: nop
+	IL_0008: ldarg.0
+	IL_0009: ldarg.1
+	IL_000a: call instance void TestAssembly.C::set_ProgId(int32) /* 06000014 */
+	IL_000f: nop
+	IL_0010: ret
+} // end of method C::.ctor
+", il);
         }
     }
 }

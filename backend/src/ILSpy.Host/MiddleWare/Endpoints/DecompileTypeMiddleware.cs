@@ -22,7 +22,7 @@ namespace ILSpy.Host
                 .ToObject<DecompileTypeRequest>();
             var code = new DecompileCode
             {
-                Decompiled = _decompilationProvider.GetCode(requestObject.AssemblyPath, MetadataTokens.EntityHandle(requestObject.Handle))
+                Decompiled = _decompilationProvider.GetCSharpCode(requestObject.AssemblyPath, MetadataTokens.EntityHandle(requestObject.Handle))
             };
 
             return code;

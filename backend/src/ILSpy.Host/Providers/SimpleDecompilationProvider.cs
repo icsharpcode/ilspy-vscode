@@ -8,8 +8,10 @@ using System.Linq;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
+using System.Threading;
 using ICSharpCode.Decompiler;
 using ICSharpCode.Decompiler.CSharp;
+using ICSharpCode.Decompiler.Disassembler;
 using ICSharpCode.Decompiler.Metadata;
 using ICSharpCode.Decompiler.TypeSystem;
 using Microsoft.Extensions.Logging;
@@ -78,8 +80,7 @@ namespace ILSpy.Host.Providers
             }
         }
 
-
-        public string GetCode(string assemblyPath, EntityHandle handle)
+        public string GetCSharpCode(string assemblyPath, EntityHandle handle)
         {
             if (handle.IsNil)
                 return string.Empty;
@@ -104,6 +105,59 @@ namespace ILSpy.Host.Providers
             }
 
             return string.Empty;
+        }
+
+        public string GetILCode(string assemblyPath, EntityHandle handle)
+        {
+            if (handle.IsNil)
+                return string.Empty;
+
+            var dc = _decompilers[assemblyPath];
+            var module = dc.TypeSystem.MainModule;
+            var textOutput = new PlainTextOutput();
+            var disassembler = CreateDisassembler(assemblyPath, module, textOutput);
+
+            switch (handle.Kind)
+            {
+                case HandleKind.AssemblyDefinition:
+                    return "TODO: assembly IL";
+                case HandleKind.TypeDefinition:
+                    disassembler.DisassembleType(module.PEFile, (TypeDefinitionHandle)handle);
+                    return textOutput.ToString();
+                case HandleKind.FieldDefinition:
+                    var dis = CreateDisassembler(assemblyPath, module, textOutput);
+                    disassembler.DisassembleField(module.PEFile, (FieldDefinitionHandle)handle);
+                    return textOutput.ToString();
+                case HandleKind.MethodDefinition:
+                    disassembler.DisassembleMethod(module.PEFile, (MethodDefinitionHandle)handle);
+                    return textOutput.ToString();
+                case HandleKind.PropertyDefinition:
+                    disassembler.DisassembleProperty(module.PEFile, (PropertyDefinitionHandle)handle);
+                    return textOutput.ToString();
+                case HandleKind.EventDefinition:
+                    disassembler.DisassembleEvent(module.PEFile, (EventDefinitionHandle)handle);
+                    return textOutput.ToString();
+            }
+
+            return string.Empty;
+        }
+
+        private static ReflectionDisassembler CreateDisassembler(string assemblyPath, MetadataModule module, PlainTextOutput textOutput)
+        {
+            var dis = new ReflectionDisassembler(textOutput, CancellationToken.None)
+            {
+                DetectControlStructure = true,
+                ShowSequencePoints = false,
+                ShowMetadataTokens = true,
+                ExpandMemberDefinitions = true,
+            };
+            var resolver = new UniversalAssemblyResolver(assemblyPath,
+                throwOnError: true,
+                targetFramework: module.PEFile.Reader.DetectTargetFrameworkId());
+            dis.AssemblyResolver = resolver;
+            dis.DebugInfo = null;
+
+            return dis;
         }
 
         private string GetAssemblyCode(string assemblyPath, CSharpDecompiler decompiler)

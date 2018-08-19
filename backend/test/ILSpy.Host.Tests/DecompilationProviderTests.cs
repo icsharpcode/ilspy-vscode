@@ -88,7 +88,7 @@ namespace ILSpy.Host.Tests
             // Act
             string assemblyPath = new FileInfo(testAssemblyPath).FullName;
             var added = provider.AddAssembly(assemblyPath);
-            var code = provider.GetCSharpCode(assemblyPath, EntityHandle.AssemblyDefinition);
+            var code = provider.GetCode(assemblyPath, EntityHandle.AssemblyDefinition)[LanguageNames.CSharp];
 
             // Assert
             Assert.Contains("// TestAssembly, Version=", code);
@@ -146,7 +146,7 @@ namespace ILSpy.Host.Tests
             // Assert
             Assert.NotEmpty(members);
             var m1 = members.Single(m => m.Name.Equals("C(int)"));
-            var decompiled = provider.GetCSharpCode(assemblyPath, MetadataTokens.EntityHandle(m1.Token));
+            var decompiled = provider.GetCode(assemblyPath, MetadataTokens.EntityHandle(m1.Token))[LanguageNames.CSharp];
             Assert.Equal(@"public C(int ProgramId)
 {
 	ProgId = ProgramId;
@@ -171,7 +171,7 @@ namespace ILSpy.Host.Tests
             // Assert
             Assert.NotEmpty(members);
             var m1 = members.Single(m => m.Name.Equals("NestedC"));
-            var decompiled = provider.GetCSharpCode(assemblyPath, MetadataTokens.EntityHandle(m1.Token));
+            var decompiled = provider.GetCode(assemblyPath, MetadataTokens.EntityHandle(m1.Token))[LanguageNames.CSharp];
             Assert.Equal(
 @"public class NestedC
 {
@@ -300,7 +300,7 @@ namespace ILSpy.Host.Tests
             var added = provider.AddAssembly(assemblyPath);
             var list1 = provider.ListTypes(assemblyPath, "TestAssembly");
             var type = list1.Single(t => t.Name.Equals("C"));
-            var il = provider.GetILCode(assemblyPath, MetadataTokens.TypeDefinitionHandle(type.Token));
+            var il = provider.GetCode(assemblyPath, MetadataTokens.TypeDefinitionHandle(type.Token))[LanguageNames.IL];
 
             // Assert
             Assert.StartsWith(".class public auto ansi TestAssembly.C", il);
@@ -322,7 +322,7 @@ namespace ILSpy.Host.Tests
             // Assert
             Assert.NotEmpty(members);
             var m1 = members.Single(m => m.Name.Equals("C(int)"));
-            var il = provider.GetILCode(assemblyPath, MetadataTokens.EntityHandle(m1.Token));
+            var il = provider.GetCode(assemblyPath, MetadataTokens.EntityHandle(m1.Token))[LanguageNames.IL];
 
             // Assert
             Assert.Equal(@".method /* 06000017 */ public hidebysig specialname rtspecialname 

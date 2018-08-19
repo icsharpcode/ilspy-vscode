@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
-using System.Reflection.PortableExecutable;
 using System.Threading;
 using ICSharpCode.Decompiler;
 using ICSharpCode.Decompiler.CSharp;
@@ -80,7 +79,19 @@ namespace ILSpy.Host.Providers
             }
         }
 
-        public string GetCSharpCode(string assemblyPath, EntityHandle handle)
+        public IDictionary<string, string> GetCode(string assemblyPath, EntityHandle handle)
+        {
+            var csharpCode = GetCSharpCode(assemblyPath, handle);
+            var ilCode = GetILCode(assemblyPath, handle);
+
+            return new Dictionary<string, string>()
+            {
+                { LanguageNames.CSharp, csharpCode},
+                { LanguageNames.IL, ilCode },
+            };
+        }
+
+        private string GetCSharpCode(string assemblyPath, EntityHandle handle)
         {
             if (handle.IsNil)
                 return string.Empty;
@@ -107,7 +118,7 @@ namespace ILSpy.Host.Providers
             return string.Empty;
         }
 
-        public string GetILCode(string assemblyPath, EntityHandle handle)
+        private string GetILCode(string assemblyPath, EntityHandle handle)
         {
             if (handle.IsNil)
                 return string.Empty;

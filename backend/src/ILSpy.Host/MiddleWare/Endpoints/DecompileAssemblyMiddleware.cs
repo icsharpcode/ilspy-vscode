@@ -20,7 +20,7 @@ namespace ILSpy.Host
         {
             var requestObject = JsonHelper.DeserializeRequestObject(httpContext.Request.Body)
                 .ToObject<DecompileAssemblyRequest>();
-            var code = new DecompileCode { Decompiled = _decompilationProvider.GetCSharpCode(requestObject.AssemblyPath, EntityHandle.AssemblyDefinition) };
+            var code = new DecompileCode { Decompiled = _decompilationProvider.GetCode(requestObject.AssemblyPath, EntityHandle.AssemblyDefinition) };
             return code;
         }
     }

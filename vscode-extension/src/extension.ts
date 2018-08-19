@@ -10,9 +10,12 @@ import * as fs from 'fs';
 import * as vscode from 'vscode';
 import * as util from './common';
 import { MsilDecompilerServer } from './msildecompiler/server';
-import { DecompiledTreeProvider, MemberNode } from './msildecompiler/decompiledTreeProvider';
+import { DecompiledTreeProvider, MemberNode, LangaugeNames } from './msildecompiler/decompiledTreeProvider';
+import { DecompiledCode } from './msildecompiler/protocol';
 
-let textEditor: vscode.TextEditor = null;
+let csharpEditor: vscode.TextEditor = null;
+let ilEditor: vscode.TextEditor = null;
+
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -106,27 +109,37 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate() {
 }
 
-function showCode(code: string) {
-    if (!textEditor) {
+function showCode(code: DecompiledCode) {
+    if (!csharpEditor) {
         vscode.workspace.openTextDocument(
             {
-                "content": code,
+                "content": code[LangaugeNames.CSharp],
                 "language": "csharp"
-            }
+            },
         ).then(document => {
-            vscode.window.showTextDocument(document).then(editor => textEditor = editor);
+            vscode.window.showTextDocument(document, vscode.ViewColumn.One).then(editor => csharpEditor = editor);
+            vscode.workspace.openTextDocument(
+                {
+                    "content": code[LangaugeNames.IL],
+                    "language": "text"
+                }
+            ).then(d2 => {
+                vscode.window.showTextDocument(d2, vscode.ViewColumn.Two, true,).then(ed2 => ilEditor = ed2);
+            });
         });
     }
     else {
-        const firstLine = textEditor.document.lineAt(0);
-        const lastLine = textEditor.document.lineAt(textEditor.document.lineCount - 1);
-        const range = new vscode.Range(0,
-            firstLine.range.start.character,
-            textEditor.document.lineCount - 1,
-            lastLine.range.end.character);
-        textEditor.edit(editBuilder => editBuilder.replace(range, code));
-        vscode.commands.executeCommand("cursorMove", {"to": "viewPortTop"});
+        replaceCode(csharpEditor, code[LangaugeNames.CSharp]);
+        replaceCode(ilEditor, code[LangaugeNames.IL]);
     }
+}
+
+function replaceCode(editor: vscode.TextEditor, code: string) {
+    const firstLine = editor.document.lineAt(0);
+    const lastLine = editor.document.lineAt(editor.document.lineCount - 1);
+    const range = new vscode.Range(0, firstLine.range.start.character, editor.document.lineCount - 1, lastLine.range.end.character);
+    editor.edit(editBuilder => editBuilder.replace(range, code));
+    vscode.commands.executeCommand("cursorMove", { "to": "viewPortTop" });
 }
 
 function pickAssembly(): Thenable<string> {

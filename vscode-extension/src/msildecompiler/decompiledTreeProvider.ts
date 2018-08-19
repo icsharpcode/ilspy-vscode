@@ -11,6 +11,11 @@ import * as serverUtils from './utils';
 import * as path from 'path';
 import { AddAssemblyRequest, ListNamespacesRequest, ListTypesRequest, ListMembersRequest, DecompileAssemblyRequest, DecompileTypeRequest, DecompileMemberRequest, MemberData } from './protocol';
 
+export class LangaugeNames {
+    public static readonly CSharp = "CSharp";
+    public static readonly IL = "IL";
+}
+
 export class MemberNode {
     private _decompiled: string = null;
 
@@ -211,7 +216,7 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, Tex
     public getCode(element?: MemberNode): Thenable<string> {
         if (element.rid === -2) {
             let request: DecompileAssemblyRequest = { "AssemblyPath": element.assembly };
-            return serverUtils.decompileAssembly(this.server, request).then(result => result.Decompiled);
+            return serverUtils.decompileAssembly(this.server, request).then(result => result.Decompiled[LangaugeNames.CSharp]);
         }
 
         if (element.rid === -1) {
@@ -221,11 +226,11 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, Tex
 
         if (element.mayHaveChildren) {
             let request: DecompileTypeRequest = {"AssemblyPath": element.assembly, "Handle": this.makeHandle(element)};
-            return serverUtils.decompileType(this.server, request).then(result => result.Decompiled);
+            return serverUtils.decompileType(this.server, request).then(result => result.Decompiled[LangaugeNames.CSharp]);
         }
         else {
             let request: DecompileMemberRequest = {"AssemblyPath": element.assembly, "Type": element.parent, "Member": this.makeHandle(element)};
-            return serverUtils.decompileMember(this.server, request).then(result => result.Decompiled);
+            return serverUtils.decompileMember(this.server, request).then(result => result.Decompiled[LangaugeNames.CSharp]);
         }
     }
 

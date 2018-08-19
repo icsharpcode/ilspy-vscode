@@ -60,8 +60,12 @@ export interface AddAssemblyResponse {
 export interface DecompileAssemblyRequest extends Request {
 }
 
+export interface DecompiledCode {
+    [index:string]: string;
+}
+
 export interface DecompileResponse {
-    Decompiled: string;
+    Decompiled: DecompiledCode;
 }
 
 export interface ListNamespacesRequest extends Request {

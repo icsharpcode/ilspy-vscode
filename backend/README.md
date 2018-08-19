@@ -19,15 +19,19 @@ Options:
   -i | --interface   Server interface address (defaults to 'localhost').
 ```
 
+Run the backend with the following command then you can issue requests in the STDIO
+
+    `ILSpy.Host.exe -stdio -e UTF-8`
+
 Supported commands are of the following format
 
 ```javascript
-{"Seq":1,"Command":"/addassembly",Arguments:{"AssemblyPath":"E:\\temp\\TestAssembly.dll"}}
-{"Seq":2,"Command":"/decompileassembly",Arguments:{"AssemblyPath":"E:\\temp\\TestAssembly.dll"}}
-{"Seq":3,"Command":"/listtypes",Arguments:{"AssemblyPath":"E:\\temp\\TestAssembly.dll","Namespace":"TestAssembly"}}
-{"Seq":4,"Command":"/decompiletype",Arguments:{"AssemblyPath":"E:\\temp\\TestAssembly.dll","Rid":2}}
-{"Seq":5,"Command":"/listmembers",Arguments:{"AssemblyPath":"E:\\temp\\TestAssembly.dll","Rid":2}}
-{"Seq":6,"Command":"/decompilemember",Arguments:{"AssemblyPath":"E:\\temp\\TestAssembly.dll","TypeRid":2,"MemberType":100663296,"MemberRid":3}}
+{"Seq":1,"Command":"/addassembly",Arguments:{"AssemblyPath":"J:\\temp\\TestAssembly.dll"}}
+{"Seq":2,"Command":"/decompileassembly",Arguments:{"AssemblyPath":"J:\\temp\\TestAssembly.dll"}}
+{"Seq":3,"Command":"/listtypes",Arguments:{"AssemblyPath":"J:\\temp\\TestAssembly.dll","Namespace":"TestAssembly"}}
+{"Seq":4,"Command":"/decompiletype",Arguments:{"AssemblyPath":"J:\\temp\\TestAssembly.dll","Handle":33554453}}
+{"Seq":5,"Command":"/listmembers",Arguments:{"AssemblyPath":"J:\\temp\\TestAssembly.dll","Handle":33554453}}
+{"Seq":6,"Command":"/decompilemember",Arguments:{"AssemblyPath":"J:\\temp\\TestAssembly.dll","Type":33554453,"Member":100663319}}
 ```
 
 ## Develop

@@ -118,18 +118,23 @@ function showCode(code: DecompiledCode) {
             },
         ).then(document => {
             vscode.window.showTextDocument(document, vscode.ViewColumn.One).then(editor => csharpEditor = editor);
-            vscode.workspace.openTextDocument(
-                {
-                    "content": code[LangaugeNames.IL],
-                    "language": "text"
-                }
-            ).then(d2 => {
-                vscode.window.showTextDocument(d2, vscode.ViewColumn.Two, true,).then(ed2 => ilEditor = ed2);
-            });
         });
     }
     else {
         replaceCode(csharpEditor, code[LangaugeNames.CSharp]);
+    }
+
+    if (!ilEditor) {
+        vscode.workspace.openTextDocument(
+            {
+                "content": code[LangaugeNames.IL],
+                "language": "text"
+            }
+        ).then(d2 => {
+            vscode.window.showTextDocument(d2, vscode.ViewColumn.Two, true,).then(ed2 => ilEditor = ed2);
+        });
+    }
+    else {
         replaceCode(ilEditor, code[LangaugeNames.IL]);
     }
 }

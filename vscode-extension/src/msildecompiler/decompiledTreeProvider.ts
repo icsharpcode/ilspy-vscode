@@ -101,6 +101,7 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, Tex
                 arguments: [element],
                 title: 'Decompile'
             },
+            contextValue: element.type == TokenType.AssemblyDefinition ? 'assemblyNode' : void 0,
             iconPath: this.getIconByTokenType(element)
         };
     }

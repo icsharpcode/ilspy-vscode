@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to the "ilspy-vscode" extension will be documented in this file.
 
+## 0.7.0
+
+* Add IL view
+
 ## 0.6.0
 
 * Allows choosing assemblies using the file picker dialog

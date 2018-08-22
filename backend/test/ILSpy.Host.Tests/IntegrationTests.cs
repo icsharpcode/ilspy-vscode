@@ -77,10 +77,10 @@ namespace ILSpy.Host.Tests
             Assert.True(obj.Added);
 
             var decompiledCode = await PostRequest<DecompileCode>("/decompileassembly", payloadAddAssembly);
-
-            Assert.Contains("// TestAssembly, Version=", decompiledCode.Decompiled);
-            Assert.Contains("// Architecture: AnyCPU (64-bit preferred)", decompiledCode.Decompiled);
-            Assert.Contains("// Runtime: v4.0.30319", decompiledCode.Decompiled);
+            string csharpCode = decompiledCode.Decompiled[LanguageNames.CSharp];
+            Assert.Contains("// TestAssembly, Version=", csharpCode);
+            Assert.Contains("// Architecture: AnyCPU (64-bit preferred)", csharpCode);
+            Assert.Contains("// Runtime: v4.0.30319", csharpCode);
 
             var payloadListTypes = new { AssemblyPath = _filePath, Namespace = "TestAssembly" };
             var data = await PostRequest<ListTypesResponse>("/listtypes", payloadListTypes);
@@ -94,9 +94,10 @@ namespace ILSpy.Host.Tests
             var c = data.Types.Single(t => t.Name.Equals("C"));
             var payload2 = new { AssemblyPath = _filePath, Handle = c.Token };
             decompiledCode = await PostRequest<DecompileCode>("/decompiletype", payload2);
-            Assert.Contains(@"namespace TestAssembly", decompiledCode.Decompiled);
-            Assert.Contains(@"public class C", decompiledCode.Decompiled);
-            Assert.Contains(@"public C(int ProgramId)", decompiledCode.Decompiled);
+            string csharpCode = csharpCode;
+            Assert.Contains(@"namespace TestAssembly", csharpCode);
+            Assert.Contains(@"public class C", csharpCode);
+            Assert.Contains(@"public C(int ProgramId)", csharpCode);
 
             var data2 = await PostRequest<ListMembersResponse>("/listmembers", payload2);
 
@@ -121,7 +122,28 @@ namespace ILSpy.Host.Tests
 {
 	ProgId = ProgramId;
 }
-", decompiledCode.Decompiled);
+", csharpCode);
+
+            Assert.Equal(@".method /* 06000017 */ public hidebysig specialname rtspecialname 
+	instance void .ctor (
+		int32 ProgramId
+	) cil managed 
+{
+	// Method begins at RVA 0x2088
+	// Code size 17 (0x11)
+	.maxstack 8
+
+	IL_0000: ldarg.0
+	IL_0001: call instance void [mscorlib]System.Object::.ctor() /* 0A000011 */
+	IL_0006: nop
+	IL_0007: nop
+	IL_0008: ldarg.0
+	IL_0009: ldarg.1
+	IL_000a: call instance void TestAssembly.C::set_ProgId(int32) /* 06000014 */
+	IL_000f: nop
+	IL_0010: ret
+} // end of method C::.ctor
+", decompiledCode.Decompiled[LanguageNames.IL]);
         }
 
         private async Task<T> PostRequest<T>(string endpoint, object payload)

@@ -9,10 +9,15 @@ import { TokenType } from './tokenType';
 import { MemberSubKind } from './memberSubKind';
 import * as serverUtils from './utils';
 import * as path from 'path';
-import { AddAssemblyRequest, ListNamespacesRequest, ListTypesRequest, ListMembersRequest, DecompileAssemblyRequest, DecompileTypeRequest, DecompileMemberRequest, MemberData } from './protocol';
+import { AddAssemblyRequest, ListNamespacesRequest, ListTypesRequest, ListMembersRequest, DecompileAssemblyRequest, DecompileTypeRequest, DecompileMemberRequest, MemberData, DecompiledCode } from './protocol';
+
+export class LangaugeNames {
+    public static readonly CSharp = "CSharp";
+    public static readonly IL = "IL";
+}
 
 export class MemberNode {
-    private _decompiled: string = null;
+    private _decompiled: DecompiledCode = null;
 
     constructor(
         private _assembly: string,
@@ -35,11 +40,11 @@ export class MemberNode {
         return this._tokenType;
     }
 
-    public get decompiled(): string {
+    public get decompiled(): DecompiledCode {
         return this._decompiled;
     }
 
-    public set decompiled(val: string) {
+    public set decompiled(val: DecompiledCode) {
         this._decompiled = val;
     }
 
@@ -208,7 +213,7 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, Tex
         }
     }
 
-    public getCode(element?: MemberNode): Thenable<string> {
+    public getCode(element?: MemberNode): Thenable<DecompiledCode> {
         if (element.rid === -2) {
             let request: DecompileAssemblyRequest = { "AssemblyPath": element.assembly };
             return serverUtils.decompileAssembly(this.server, request).then(result => result.Decompiled);
@@ -216,7 +221,11 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, Tex
 
         if (element.rid === -1) {
             let name = element.name.length == 0 ? "<global>" : element.name;
-            return Promise.resolve("namespace " + name + " { }");
+            let namespaceCode: DecompiledCode = { };
+            namespaceCode[LangaugeNames.CSharp] = "namespace " + name + " { }";
+            namespaceCode[LangaugeNames.IL] = "namespace " + name + "";
+
+            return Promise.resolve(namespaceCode);
         }
 
         if (element.mayHaveChildren) {

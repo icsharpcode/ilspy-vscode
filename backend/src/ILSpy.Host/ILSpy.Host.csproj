@@ -10,8 +10,9 @@
     <Title>ILSpy .NET Decompiler Backend</Title>
     <Product>ILSpy .NET Decompiler</Product>
     <Copyright>Copyright 2017 ICSharpCode, Microsoft Corporation</Copyright>
+    <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
+    <BaseNuGetRuntimeIdentifier>win7-x64</BaseNuGetRuntimeIdentifier>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\..\omnisharp-roslyn\src\OmniSharp.Stdio\OmniSharp.Stdio.csproj" />
   </ItemGroup>

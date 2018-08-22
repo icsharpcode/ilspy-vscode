@@ -15,5 +15,9 @@
         public void M<T>() { }
 
         public void M<T1, T2>() { }
+
+        public class NestedC<T> { }
+
+        public class NestedC<T1, T2> { }
     }
 }

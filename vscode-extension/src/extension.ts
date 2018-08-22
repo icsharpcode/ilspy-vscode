@@ -10,9 +10,12 @@ import * as fs from 'fs';
 import * as vscode from 'vscode';
 import * as util from './common';
 import { MsilDecompilerServer } from './msildecompiler/server';
-import { DecompiledTreeProvider, MemberNode } from './msildecompiler/decompiledTreeProvider';
+import { DecompiledTreeProvider, MemberNode, LangaugeNames } from './msildecompiler/decompiledTreeProvider';
+import { DecompiledCode } from './msildecompiler/protocol';
 
-let textEditor: vscode.TextEditor = null;
+let csharpEditor: vscode.TextEditor = null;
+let ilEditor: vscode.TextEditor = null;
+
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -106,27 +109,35 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate() {
 }
 
-function showCode(code: string) {
-    if (!textEditor) {
+function showCode(code: DecompiledCode) {
+    showCodeInEditor(csharpEditor, code[LangaugeNames.CSharp], "csharp", vscode.ViewColumn.One);
+    showCodeInEditor(ilEditor, code[LangaugeNames.IL], "text", vscode.ViewColumn.Two);
+}
+
+function showCodeInEditor(editor: vscode.TextEditor, code: string, language: string, viewColumn: vscode.ViewColumn) {
+    if (!editor) {
         vscode.workspace.openTextDocument(
             {
                 "content": code,
-                "language": "csharp"
-            }
+                "language": language
+            },
         ).then(document => {
-            vscode.window.showTextDocument(document).then(editor => textEditor = editor);
+            vscode.window.showTextDocument(document, viewColumn).then(ed => editor = ed);
+        }, errorReason => {
+           console.log("[Error] ilspy-vscode encountered en error while trying to show code" + errorReason);
         });
     }
     else {
-        const firstLine = textEditor.document.lineAt(0);
-        const lastLine = textEditor.document.lineAt(textEditor.document.lineCount - 1);
-        const range = new vscode.Range(0,
-            firstLine.range.start.character,
-            textEditor.document.lineCount - 1,
-            lastLine.range.end.character);
-        textEditor.edit(editBuilder => editBuilder.replace(range, code));
-        vscode.commands.executeCommand("cursorMove", {"to": "viewPortTop"});
+        replaceCode(editor, code);
     }
+}
+
+function replaceCode(editor: vscode.TextEditor, code: string) {
+    const firstLine = editor.document.lineAt(0);
+    const lastLine = editor.document.lineAt(editor.document.lineCount - 1);
+    const range = new vscode.Range(0, firstLine.range.start.character, editor.document.lineCount - 1, lastLine.range.end.character);
+    editor.edit(editBuilder => editBuilder.replace(range, code));
+    vscode.commands.executeCommand("cursorMove", { "to": "viewPortTop" });
 }
 
 function pickAssembly(): Thenable<string> {

@@ -7,9 +7,10 @@ using System.IO;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
-using System.Reflection.PortableExecutable;
+using System.Threading;
 using ICSharpCode.Decompiler;
 using ICSharpCode.Decompiler.CSharp;
+using ICSharpCode.Decompiler.Disassembler;
 using ICSharpCode.Decompiler.Metadata;
 using ICSharpCode.Decompiler.TypeSystem;
 using Microsoft.Extensions.Logging;
@@ -55,7 +56,7 @@ namespace ILSpy.Host.Providers
                 ? new List<MemberData>()
                 : c.NestedTypes.Select(typeDefinition => new MemberData
                     {
-                        Name = typeDefinition.Name,
+                        Name = typeDefinition.TypeToString(includeNamespace: false),
                         Token = MetadataTokens.GetToken(typeDefinition.MetadataToken),
                         MemberSubKind = typeDefinition.Kind
                     })
@@ -78,8 +79,19 @@ namespace ILSpy.Host.Providers
             }
         }
 
+        public IDictionary<string, string> GetCode(string assemblyPath, EntityHandle handle)
+        {
+            var csharpCode = GetCSharpCode(assemblyPath, handle);
+            var ilCode = GetILCode(assemblyPath, handle);
 
-        public string GetCode(string assemblyPath, EntityHandle handle)
+            return new Dictionary<string, string>()
+            {
+                { LanguageNames.CSharp, csharpCode},
+                { LanguageNames.IL, ilCode },
+            };
+        }
+
+        private string GetCSharpCode(string assemblyPath, EntityHandle handle)
         {
             if (handle.IsNil)
                 return string.Empty;
@@ -104,6 +116,79 @@ namespace ILSpy.Host.Providers
             }
 
             return string.Empty;
+        }
+
+        private string GetILCode(string assemblyPath, EntityHandle handle)
+        {
+            if (handle.IsNil)
+                return string.Empty;
+
+            var dc = _decompilers[assemblyPath];
+            var module = dc.TypeSystem.MainModule;
+            var textOutput = new PlainTextOutput();
+            var disassembler = CreateDisassembler(assemblyPath, module, textOutput);
+
+            switch (handle.Kind)
+            {
+                case HandleKind.AssemblyDefinition:
+                    GetAssemblyILCode(disassembler, assemblyPath, module, textOutput);
+                    return textOutput.ToString();
+                case HandleKind.TypeDefinition:
+                    disassembler.DisassembleType(module.PEFile, (TypeDefinitionHandle)handle);
+                    return textOutput.ToString();
+                case HandleKind.FieldDefinition:
+                    var dis = CreateDisassembler(assemblyPath, module, textOutput);
+                    disassembler.DisassembleField(module.PEFile, (FieldDefinitionHandle)handle);
+                    return textOutput.ToString();
+                case HandleKind.MethodDefinition:
+                    disassembler.DisassembleMethod(module.PEFile, (MethodDefinitionHandle)handle);
+                    return textOutput.ToString();
+                case HandleKind.PropertyDefinition:
+                    disassembler.DisassembleProperty(module.PEFile, (PropertyDefinitionHandle)handle);
+                    return textOutput.ToString();
+                case HandleKind.EventDefinition:
+                    disassembler.DisassembleEvent(module.PEFile, (EventDefinitionHandle)handle);
+                    return textOutput.ToString();
+            }
+
+            return string.Empty;
+        }
+
+        private static ReflectionDisassembler CreateDisassembler(string assemblyPath, MetadataModule module, ITextOutput textOutput)
+        {
+            var dis = new ReflectionDisassembler(textOutput, CancellationToken.None)
+            {
+                DetectControlStructure = true,
+                ShowSequencePoints = false,
+                ShowMetadataTokens = true,
+                ExpandMemberDefinitions = true,
+            };
+            var resolver = new UniversalAssemblyResolver(assemblyPath,
+                throwOnError: true,
+                targetFramework: module.PEFile.Reader.DetectTargetFrameworkId());
+            dis.AssemblyResolver = resolver;
+            dis.DebugInfo = null;
+
+            return dis;
+        }
+
+        private static void GetAssemblyILCode(ReflectionDisassembler disassembler, string assemblyPath, MetadataModule module, ITextOutput output)
+        {
+            output.WriteLine("// " + assemblyPath);
+            output.WriteLine();
+            var peFile = module.PEFile;
+            var metadata = peFile.Metadata;
+
+            disassembler.WriteAssemblyReferences(metadata);
+            if (metadata.IsAssembly)
+            {
+                disassembler.WriteAssemblyHeader(peFile);
+            }
+            output.WriteLine();
+            disassembler.WriteModuleHeader(peFile);
+            output.WriteLine();
+            output.WriteLine();
+            disassembler.WriteModuleContents(peFile);
         }
 
         private string GetAssemblyCode(string assemblyPath, CSharpDecompiler decompiler)

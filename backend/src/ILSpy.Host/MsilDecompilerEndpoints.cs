@@ -6,6 +6,7 @@ namespace ILSpy.Host
     public static class MsilDecompilerEndpoints
     {
         public const string AddAssembly = "/addassembly";
+        public const string RemoveAssembly = "/removeassembly";
         public const string DecompileAssembly = "/decompileassembly";
         public const string ListNamespaces = "/listnamespaces";
         public const string ListTypes = "/listtypes";

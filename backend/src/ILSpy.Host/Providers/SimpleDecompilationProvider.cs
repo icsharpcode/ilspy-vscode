@@ -44,6 +44,19 @@ namespace ILSpy.Host.Providers
             return false;
         }
 
+        public bool RemoveAssembly(string path)
+        {
+            if (_decompilers.ContainsKey(path))
+            {
+                var decompiler = _decompilers[path];
+                _decompilers.Remove(path);
+                decompiler = null;
+                return true;
+            }
+
+            return false;
+        }
+
         public IEnumerable<MemberData> GetMembers(string assemblyPath, TypeDefinitionHandle handle)
         {
             if (handle.IsNil)

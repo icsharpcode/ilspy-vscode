@@ -4,6 +4,7 @@ All notable changes to the "ilspy-vscode" extension will be documented in this f
 ## 0.7.0
 
 * Add IL view
+* Add a context menu for assembly nodes to unload them.
 
 ## 0.6.0
 

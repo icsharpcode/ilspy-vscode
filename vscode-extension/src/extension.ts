@@ -68,6 +68,11 @@ export function activate(context: vscode.ExtensionContext) {
 
     disposables.push(vscode.commands.registerCommand("ilspy.unloadAssembly", (node: MemberNode) => {
         console.log("Unloading assembly " + node.name);
+        decompileTreeProvider.removeAssembly(node.name).then(removed => {
+            if (removed) {
+                decompileTreeProvider.refresh();
+            }
+        });
     }));
 
     disposables.push(new vscode.Disposable(() => {

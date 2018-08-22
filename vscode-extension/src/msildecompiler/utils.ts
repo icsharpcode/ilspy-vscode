@@ -14,6 +14,10 @@ export function addAssembly(server: MsilDecompilerServer, request: protocol.AddA
     return server.makeRequest<protocol.AddAssemblyResponse>(protocol.Requests.AddAssembly, request);
 }
 
+export function removeAssembly(server: MsilDecompilerServer, request: protocol.RemoveAssemblyRequest) {
+    return server.makeRequest<protocol.RemoveAssemblyResponse>(protocol.Requests.RemoveAssembly, request);
+}
+
 export function decompileAssembly(server: MsilDecompilerServer, request: protocol.DecompileAssemblyRequest) {
     return server.makeRequest<protocol.DecompileResponse>(protocol.Requests.DecompileAssembly, request);
 }

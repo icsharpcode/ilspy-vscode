@@ -9,7 +9,7 @@ import { TokenType } from './tokenType';
 import { MemberSubKind } from './memberSubKind';
 import * as serverUtils from './utils';
 import * as path from 'path';
-import { AddAssemblyRequest, ListNamespacesRequest, ListTypesRequest, ListMembersRequest, DecompileAssemblyRequest, DecompileTypeRequest, DecompileMemberRequest, MemberData, DecompiledCode } from './protocol';
+import { AddAssemblyRequest, RemoveAssemblyRequest, ListNamespacesRequest, ListTypesRequest, ListMembersRequest, DecompileAssemblyRequest, DecompileTypeRequest, DecompileMemberRequest, MemberData, DecompiledCode } from './protocol';
 
 export class LangaugeNames {
     public static readonly CSharp = "CSharp";
@@ -86,9 +86,21 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, Tex
 
     public addAssembly(assembly: string): Thenable<boolean> {
         let request: AddAssemblyRequest = { "AssemblyPath": assembly };
-        this.server.assemblyPaths.add(assembly);
         return serverUtils.addAssembly(this.server, request).then(response => {
+            if (response.Added) {
+                this.server.assemblyPaths.add(assembly);
+            }
             return response.Added;
+        });
+    }
+
+    public removeAssembly(assembly: string): Thenable<boolean> {
+        let request: RemoveAssemblyRequest = { "AssemblyPath": assembly };
+        return serverUtils.removeAssembly(this.server, request).then(response => {
+            if (response.Removed) {
+                this.server.assemblyPaths.delete(assembly);
+            }
+            return response.Removed;
         });
     }
 
@@ -101,6 +113,7 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, Tex
                 arguments: [element],
                 title: 'Decompile'
             },
+            contextValue: element.type == TokenType.AssemblyDefinition ? 'assemblyNode' : void 0,
             iconPath: this.getIconByTokenType(element)
         };
     }

@@ -14,8 +14,10 @@ workspace in a list for selection.
 The `Decompile IL Assembly (pick file)` command allows choosing an assembly using the file picker dialog. The dialog
 should also allow one to type in the full path, for example, `c:/temp/a.dll` or `/home/user/b.dll`.
 
-If the file is a valid .NET assembly, a tree view named `DECOMPILED MEMBERS` is added into the Explorer view.
+If the file is a valid .NET assembly, a tree view named `ILSPY DECOMPILED MEMBERS` is added into the Explorer view.
 It allows expanding and selecting various nodes, whose decompiled C# code is shown in the editor.
+
+Loaded assemblies can be closed by right-click on the assemly nodes to show the context menu then select `Unload Assembly` menu item.
 
 ## Requirements
 

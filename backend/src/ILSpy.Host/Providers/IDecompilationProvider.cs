@@ -9,6 +9,7 @@ namespace ILSpy.Host.Providers
     public interface IDecompilationProvider
     {
         bool AddAssembly(string path);
+        bool RemoveAssembly(string path);
         IEnumerable<string> ListNamespaces(string assemblyPath);
         IEnumerable<MemberData> ListTypes(string assemblyPath, string @namespace);
         IDictionary<string, string> GetCode(string assemblyPath, EntityHandle handle);

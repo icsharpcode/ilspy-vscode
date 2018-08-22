@@ -45,8 +45,22 @@
                 "command": "ilspy.decompileAssemblyViaDialog",
                 "title": "Decompile IL Assembly (pick file)",
                 "category": "ILSpy"
+            },
+            {
+                "command": "ilspy.unloadAssembly",
+                "title": "Unload an Assembly",
+                "category": "ILSpy"
             }
-        ]
+        ],
+        "menus": {
+            "view/item/context": [
+               {
+                    "command": "ilspy.unloadAssembly",
+                    "when": "view == ilspyDecompiledMembers && viewItem == assemblyNode",
+                    "group": "1_GeneralCommands@1"
+                }
+            ]
+        }
     },
     "scripts": {
         "vscode:prepublish": "tsc -p ./",

@@ -94,7 +94,7 @@ namespace ILSpy.Host.Tests
             var c = data.Types.Single(t => t.Name.Equals("C"));
             var payload2 = new { AssemblyPath = _filePath, Handle = c.Token };
             decompiledCode = await PostRequest<DecompileCode>("/decompiletype", payload2);
-            string csharpCode = csharpCode;
+            csharpCode = decompiledCode.Decompiled[LanguageNames.CSharp];
             Assert.Contains(@"namespace TestAssembly", csharpCode);
             Assert.Contains(@"public class C", csharpCode);
             Assert.Contains(@"public C(int ProgramId)", csharpCode);
@@ -122,7 +122,7 @@ namespace ILSpy.Host.Tests
 {
 	ProgId = ProgramId;
 }
-", csharpCode);
+", decompiledCode.Decompiled[LanguageNames.CSharp]);
 
             Assert.Equal(@".method /* 06000017 */ public hidebysig specialname rtspecialname 
 	instance void .ctor (

@@ -11,6 +11,7 @@ import { MemberSubKind } from './memberSubKind';
 
 export module Requests {
     export const AddAssembly = '/addassembly';
+    export const RemoveAssembly = '/removeassembly';
     export const DecompileAssembly = '/decompileassembly';
     export const ListNamespaces = '/listnamespaces';
     export const ListTypes = '/listtypes';
@@ -55,6 +56,13 @@ export interface AddAssemblyRequest extends Request {
 
 export interface AddAssemblyResponse {
     Added: boolean;
+}
+
+export interface RemoveAssemblyRequest extends Request {
+}
+
+export interface RemoveAssemblyResponse {
+    Removed: boolean;
 }
 
 export interface DecompileAssemblyRequest extends Request {

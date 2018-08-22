@@ -47,6 +47,31 @@ namespace ILSpy.Host.Tests
             Assert.True(added, "Adding a valid managed assembly should return true");
         }
 
+        [Fact]
+        public void AddRemoveReAddShouldSucceed()
+        {
+            // Arrange
+            var provider = new SimpleDecompilationProvider(_mockEnv.Object, _mockLoggerFactory.Object);
+
+            // Act
+            var added = provider.AddAssembly(new FileInfo(testAssemblyPath).FullName);
+
+            // Assert
+            Assert.True(added, "Adding a valid managed assembly should return true");
+
+            // Act
+            var removed = provider.RemoveAssembly(new FileInfo(testAssemblyPath).FullName);
+
+            // Assert
+            Assert.True(added, "Removing a loaded assembly should return true");
+
+            // Act
+            added = provider.AddAssembly(new FileInfo(testAssemblyPath).FullName);
+
+            // Assert
+            Assert.True(added, "Re-adding a removed managed assembly should return true");
+        }
+
         [Fact(Skip = "Cannot mock ILoggerFactory.CreateLogger() because it is an extension method")]
         public void AddInValidAssemblyShouldFail()
         {

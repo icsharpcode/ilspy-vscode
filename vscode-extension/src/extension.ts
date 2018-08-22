@@ -110,32 +110,25 @@ export function deactivate() {
 }
 
 function showCode(code: DecompiledCode) {
-    if (!csharpEditor) {
+    showCodeInEditor(csharpEditor, code[LangaugeNames.CSharp], "csharp", vscode.ViewColumn.One);
+    showCodeInEditor(ilEditor, code[LangaugeNames.IL], "text", vscode.ViewColumn.Two);
+}
+
+function showCodeInEditor(editor: vscode.TextEditor, code: string, language: string, viewColumn: vscode.ViewColumn) {
+    if (!editor) {
         vscode.workspace.openTextDocument(
             {
-                "content": code[LangaugeNames.CSharp],
-                "language": "csharp"
+                "content": code,
+                "language": language
             },
         ).then(document => {
-            vscode.window.showTextDocument(document, vscode.ViewColumn.One).then(editor => csharpEditor = editor);
+            vscode.window.showTextDocument(document, viewColumn).then(ed => editor = ed);
+        }, errorReason => {
+           console.log("[Error] ilspy-vscode encountered en error while trying to show code" + errorReason);
         });
     }
     else {
-        replaceCode(csharpEditor, code[LangaugeNames.CSharp]);
-    }
-
-    if (!ilEditor) {
-        vscode.workspace.openTextDocument(
-            {
-                "content": code[LangaugeNames.IL],
-                "language": "text"
-            }
-        ).then(d2 => {
-            vscode.window.showTextDocument(d2, vscode.ViewColumn.Two, true,).then(ed2 => ilEditor = ed2);
-        });
-    }
-    else {
-        replaceCode(ilEditor, code[LangaugeNames.IL]);
+        replaceCode(editor, code);
     }
 }
 

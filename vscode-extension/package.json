@@ -48,7 +48,7 @@
             },
             {
                 "command": "ilspy.unloadAssembly",
-                "title": "Unload an Assembly",
+                "title": "Unload Assembly",
                 "category": "ILSpy"
             }
         ],

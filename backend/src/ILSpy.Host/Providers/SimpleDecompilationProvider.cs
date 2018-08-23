@@ -50,7 +50,7 @@ namespace ILSpy.Host.Providers
             {
                 var decompiler = _decompilers[path];
                 _decompilers.Remove(path);
-                decompiler = null;
+                decompiler.TypeSystem.MainModule.PEFile.Dispose();
                 return true;
             }
 

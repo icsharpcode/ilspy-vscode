@@ -199,9 +199,6 @@ namespace ILSpy.Host.Providers
             }
             output.WriteLine();
             disassembler.WriteModuleHeader(peFile);
-            output.WriteLine();
-            output.WriteLine();
-            disassembler.WriteModuleContents(peFile);
         }
 
         private string GetAssemblyCode(string assemblyPath, CSharpDecompiler decompiler)

@@ -119,11 +119,12 @@ export function deactivate() {
 }
 
 function showCode(code: DecompiledCode) {
-    showCodeInEditor(csharpEditor, code[LangaugeNames.CSharp], "csharp", vscode.ViewColumn.One);
-    showCodeInEditor(ilEditor, code[LangaugeNames.IL], "text", vscode.ViewColumn.Two);
+    showCodeInEditor(code[LangaugeNames.CSharp], "csharp", vscode.ViewColumn.One);
+    showCodeInEditor(code[LangaugeNames.IL], "text", vscode.ViewColumn.Two);
 }
 
-function showCodeInEditor(editor: vscode.TextEditor, code: string, language: string, viewColumn: vscode.ViewColumn) {
+function showCodeInEditor(code: string, language: string, viewColumn: vscode.ViewColumn) {
+    let editor = language === "csharp" ? csharpEditor : ilEditor;
     if (!editor) {
         vscode.workspace.openTextDocument(
             {
@@ -131,7 +132,14 @@ function showCodeInEditor(editor: vscode.TextEditor, code: string, language: str
                 "language": language
             },
         ).then(document => {
-            vscode.window.showTextDocument(document, viewColumn).then(ed => editor = ed);
+            vscode.window.showTextDocument(document, viewColumn).then(ed => {
+                if (language === "csharp") {
+                    csharpEditor = ed;
+                }
+                else {
+                    ilEditor = ed;
+                }
+            });
         }, errorReason => {
            console.log("[Error] ilspy-vscode encountered en error while trying to show code" + errorReason);
         });

@@ -128,7 +128,7 @@ function showCode(code: DecompiledCode) {
 
 function showCodeInEditor(code: string, language: string, viewColumn: vscode.ViewColumn) {
     let editor = language === "csharp" ? csharpEditor : ilEditor;
-    if (!editor) {
+    if (true) { //if (!editor) {
         vscode.workspace.openTextDocument(
             {
                 "content": code,
@@ -144,7 +144,7 @@ function showCodeInEditor(code: string, language: string, viewColumn: vscode.Vie
                 }
             });
         }, errorReason => {
-           console.log("[Error] ilspy-vscode encountered en error while trying to show code" + errorReason);
+           console.log("[Error] ilspy-vscode encountered en error while trying to show code: " + errorReason);
         });
     }
     else {

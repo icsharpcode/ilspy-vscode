@@ -186,6 +186,9 @@ function promptForAssemblyFilePathViaDialog(): Thenable<string> {
             canSelectFiles: true,
             canSelectFolders: false,
             canSelectMany: false,
+            filters: {
+                '.NET Assemblies' : ['dll', 'exe', 'winrt', 'netmodule']
+            }
         }
     )
     .then(uris => {

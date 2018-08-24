@@ -16,7 +16,6 @@ import { DecompiledCode } from './msildecompiler/protocol';
 let csharpEditor: vscode.TextEditor = null;
 let ilEditor: vscode.TextEditor = null;
 
-
 export function activate(context: vscode.ExtensionContext) {
 
     const extensionId = 'icsharpcode.ilspy-vscode';
@@ -67,6 +66,10 @@ export function activate(context: vscode.ExtensionContext) {
     }));
 
     disposables.push(vscode.commands.registerCommand("ilspy.unloadAssembly", (node: MemberNode) => {
+        if (!node) {
+            vscode.window.showInformationMessage('Please use context menu: right-click on the assembly node then select "Unload Assembly"');
+            return;
+        }
         console.log("Unloading assembly " + node.name);
         decompileTreeProvider.removeAssembly(node.name).then(removed => {
             if (removed) {

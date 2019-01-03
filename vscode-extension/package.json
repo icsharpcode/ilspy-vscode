@@ -18,7 +18,7 @@
         "vscode": "^1.18.0"
     },
     "categories": [
-        "Languages",
+        "Programming Languages",
         "Other"
     ],
     "activationEvents": [
@@ -54,7 +54,7 @@
         ],
         "menus": {
             "view/item/context": [
-               {
+                {
                     "command": "ilspy.unloadAssembly",
                     "when": "view == ilspyDecompiledMembers && viewItem == assemblyNode",
                     "group": "1_GeneralCommands@1"

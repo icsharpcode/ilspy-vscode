@@ -276,12 +276,16 @@ namespace ILSpy.Host.Providers
             var currentNamespace = decompiler.TypeSystem.MainModule.RootNamespace;
             string[] parts = @namespace.Split('.');
 
-            foreach (var part in parts)
+            if (!(parts.Length == 1 && string.IsNullOrEmpty(parts[0])))
             {
-                var nested = currentNamespace.GetChildNamespace(part);
-                if (nested == null)
-                    yield break;
-                currentNamespace = nested;
+                // not the global namespace
+                foreach (var part in parts)
+                {
+                    var nested = currentNamespace.GetChildNamespace(part);
+                    if (nested == null)
+                        yield break;
+                    currentNamespace = nested;
+                }
             }
 
             foreach (var t in currentNamespace.Types)

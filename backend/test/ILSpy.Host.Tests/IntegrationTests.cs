@@ -124,7 +124,7 @@ namespace ILSpy.Host.Tests
 }
 ", decompiledCode.Decompiled[LanguageNames.CSharp]);
 
-            Assert.Equal(@".method /* 06000017 */ public hidebysig specialname rtspecialname 
+            Assert.Equal(@".method /* 06000018 */ public hidebysig specialname rtspecialname 
 	instance void .ctor (
 		int32 ProgramId
 	) cil managed 
@@ -139,7 +139,7 @@ namespace ILSpy.Host.Tests
 	IL_0007: nop
 	IL_0008: ldarg.0
 	IL_0009: ldarg.1
-	IL_000a: call instance void TestAssembly.C::set_ProgId(int32) /* 06000014 */
+	IL_000a: call instance void TestAssembly.C::set_ProgId(int32) /* 06000015 */
 	IL_000f: nop
 	IL_0010: ret
 } // end of method C::.ctor

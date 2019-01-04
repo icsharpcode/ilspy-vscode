@@ -2,7 +2,7 @@
     "name": "ilspy-vscode",
     "displayName": "ILSpy .NET Decompiler",
     "description": "Decompile MSIL assemblies - support for full framework, .NET Core and .NET Standard",
-    "version": "0.7.1",
+    "version": "0.7.2",
     "icon": "resources/ILSpy-vscode-marketplace-icon.png",
     "publisher": "icsharpcode",
     "preview": true,

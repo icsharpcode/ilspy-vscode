@@ -13,9 +13,6 @@ import { MsilDecompilerServer } from './msildecompiler/server';
 import { DecompiledTreeProvider, MemberNode, LangaugeNames } from './msildecompiler/decompiledTreeProvider';
 import { DecompiledCode } from './msildecompiler/protocol';
 
-let csharpEditor: vscode.TextEditor = null;
-let ilEditor: vscode.TextEditor = null;
-
 export function activate(context: vscode.ExtensionContext) {
 
     const extensionId = 'icsharpcode.ilspy-vscode';
@@ -127,37 +124,16 @@ function showCode(code: DecompiledCode) {
 }
 
 function showCodeInEditor(code: string, language: string, viewColumn: vscode.ViewColumn) {
-    let editor = language === "csharp" ? csharpEditor : ilEditor;
-    if (true) { //if (!editor) {
-        vscode.workspace.openTextDocument(
-            {
-                "content": code,
-                "language": language
-            },
-        ).then(document => {
-            vscode.window.showTextDocument(document, viewColumn).then(ed => {
-                if (language === "csharp") {
-                    csharpEditor = ed;
-                }
-                else {
-                    ilEditor = ed;
-                }
-            });
-        }, errorReason => {
-           console.log("[Error] ilspy-vscode encountered en error while trying to show code: " + errorReason);
-        });
-    }
-    else {
-        replaceCode(editor, code);
-    }
-}
-
-function replaceCode(editor: vscode.TextEditor, code: string) {
-    const firstLine = editor.document.lineAt(0);
-    const lastLine = editor.document.lineAt(editor.document.lineCount - 1);
-    const range = new vscode.Range(0, firstLine.range.start.character, editor.document.lineCount - 1, lastLine.range.end.character);
-    editor.edit(editBuilder => editBuilder.replace(range, code));
-    vscode.commands.executeCommand("cursorMove", { "to": "viewPortTop" });
+    vscode.workspace.openTextDocument(
+        {
+            "content": code,
+            "language": language
+        },
+    ).then(document => {
+        vscode.window.showTextDocument(document, viewColumn);
+    }, errorReason => {
+        console.log("[Error] ilspy-vscode encountered en error while trying to show code: " + errorReason);
+    });
 }
 
 function pickAssembly(): Thenable<string> {

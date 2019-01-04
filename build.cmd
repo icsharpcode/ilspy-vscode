@@ -6,6 +6,7 @@ git submodule init
 git submodule update
 
 pushd backend
+dotnet restore
 dotnet msbuild
 popd
 

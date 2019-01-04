@@ -25,3 +25,4 @@ call npm test
 
 call npm i vsce -g
 call vsce package -o ilspy-vscode-%build_version%.vsix
+popd

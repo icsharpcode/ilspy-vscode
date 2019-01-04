@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { TreeItemCollapsibleState } from 'vscode';
-import { expect, should } from 'chai';
+import { expect } from 'chai';
 import { MemberNode, DecompiledTreeProvider } from '../src/msildecompiler/decompiledTreeProvider';
 import { TokenType } from '../src/msildecompiler/tokenType';
 import { MemberSubKind } from '../src/msildecompiler/memberSubKind';

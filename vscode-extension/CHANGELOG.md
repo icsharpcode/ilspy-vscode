@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to the "ilspy-vscode" extension will be documented in this file.
 
+## 0.7.5
+
+* Update to v4.0 of `ICSharpCode.Decompiler`
+
 ## 0.7.0
 
 * Add IL view

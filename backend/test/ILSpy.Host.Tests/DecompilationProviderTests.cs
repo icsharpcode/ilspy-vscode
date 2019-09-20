@@ -365,22 +365,22 @@ namespace ILSpy.Host.Tests
             var il = provider.GetCode(assemblyPath, MetadataTokens.EntityHandle(m1.Token))[LanguageNames.IL];
 
             // Assert
-            Assert.Equal(@".method /* 06000018 */ public hidebysig specialname rtspecialname 
+            Assert.Equal(@".method /* 0600001A */ public hidebysig specialname rtspecialname 
 	instance void .ctor (
 		int32 ProgramId
 	) cil managed 
 {
-	// Method begins at RVA 0x2088
+	// Method begins at RVA 0x2094
 	// Code size 17 (0x11)
 	.maxstack 8
 
 	IL_0000: ldarg.0
-	IL_0001: call instance void [mscorlib]System.Object::.ctor() /* 0A000011 */
+	IL_0001: call instance void [mscorlib]System.Object::.ctor() /* 0A000012 */
 	IL_0006: nop
 	IL_0007: nop
 	IL_0008: ldarg.0
 	IL_0009: ldarg.1
-	IL_000a: call instance void TestAssembly.C::set_ProgId(int32) /* 06000015 */
+	IL_000a: call instance void TestAssembly.C::set_ProgId(int32) /* 06000017 */
 	IL_000f: nop
 	IL_0010: ret
 } // end of method C::.ctor

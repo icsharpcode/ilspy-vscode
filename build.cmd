@@ -16,7 +16,7 @@ popd
 
 pushd backend\src\ILSpy.Host
 rmdir ..\..\..\vscode-extension\bin\ilspy-host /s /q
-dotnet publish -f net461 -c release -r win7-x64 -o  ..\..\..\vscode-extension\bin\ilspy-host
+dotnet publish -f net472 -c release -r win7-x64 -o  ..\..\..\vscode-extension\bin\ilspy-host
 popd
 
 pushd vscode-extension

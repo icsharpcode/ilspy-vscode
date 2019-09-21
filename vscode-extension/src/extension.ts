@@ -124,15 +124,24 @@ function showCode(code: DecompiledCode) {
 }
 
 function showCodeInEditor(code: string, language: string, viewColumn: vscode.ViewColumn) {
-    vscode.workspace.openTextDocument(
-        {
-            "content": code,
-            "language": language
-        },
-    ).then(document => {
-        vscode.window.showTextDocument(document, viewColumn);
+    const untitledFileName = language === "csharp" ? "untitled:ilspy-decompilation.cs" : "untitled:ilspy-decompilation.il";
+    const uri = vscode.Uri.parse(untitledFileName);
+    vscode.workspace.openTextDocument(uri).then(document => {
+        vscode.window.showTextDocument(document, viewColumn, true).then(e => {
+            replaceCode(e, code);
+        });
     }, errorReason => {
-        console.log("[Error] ilspy-vscode encountered en error while trying to show code: " + errorReason);
+        console.log("[Error] ilspy-vscode encountered an error while trying to show code: " + errorReason);
+    });
+}
+
+function replaceCode(editor: vscode.TextEditor, code: string) {
+    const firstLine = editor.document.lineAt(0);
+    const lastLine = editor.document.lineAt(editor.document.lineCount - 1);
+    const range = new vscode.Range(0, firstLine.range.start.character, editor.document.lineCount - 1, lastLine.range.end.character);
+    editor.edit(editBuilder =>  {
+        editBuilder.delete(range);
+        editBuilder.insert(new vscode.Position(0,0), code);
     });
 }
 

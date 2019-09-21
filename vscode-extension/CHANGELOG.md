@@ -1,9 +1,13 @@
 # Change Log
 All notable changes to the "ilspy-vscode" extension will be documented in this file.
 
+## 0.7.7
+
+* Reuse same doc window to show decompiled code
+
 ## 0.7.6
 
-* UPdate backend to target `net472`
+* Update backend to target `net472`
 
 ## 0.7.5
 

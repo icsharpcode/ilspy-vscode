@@ -143,7 +143,7 @@ export function hasMono(range?: string): Promise<boolean> {
         });
 
         let stdout = '';
-        childprocess.stdout.on('data', (data: NodeBuffer) => {
+        childprocess.stdout.on('data', (data) => {
             stdout += data.toString();
         });
 

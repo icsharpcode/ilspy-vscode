@@ -4,6 +4,7 @@ All notable changes to the "ilspy-vscode" extension will be documented in this f
 ## 0.7.9
 
 * Update npm pacakges
+* Update to ILSpy 5.0.1
 
 ## 0.7.8
 

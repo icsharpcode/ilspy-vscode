@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to the "ilspy-vscode" extension will be documented in this file.
 
+## 0.7.10
+
+* Update to ILSpy 5.0.2
+
 ## 0.7.9
 
 * Update npm pacakges

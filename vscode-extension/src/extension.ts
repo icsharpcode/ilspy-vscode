@@ -7,11 +7,15 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as fs from 'fs';
+import * as path from 'path';
+import * as tempDir from 'temp-dir';
 import * as vscode from 'vscode';
 import * as util from './common';
 import { MsilDecompilerServer } from './msildecompiler/server';
 import { DecompiledTreeProvider, MemberNode, LangaugeNames } from './msildecompiler/decompiledTreeProvider';
 import { DecompiledCode } from './msildecompiler/protocol';
+
+const tempFileName = new Date().getTime().toString();
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -124,14 +128,16 @@ function showCode(code: DecompiledCode) {
 }
 
 function showCodeInEditor(code: string, language: string, viewColumn: vscode.ViewColumn) {
-    const untitledFileName = language === "csharp" ? "untitled:ilspy-decompilation.cs" : "untitled:ilspy-decompilation.il";
+    const untitledFileName = `untitled:${path.join(tempDir, tempFileName)}.${language === "csharp" ? "cs" : "il"}`;
     const uri = vscode.Uri.parse(untitledFileName);
     vscode.workspace.openTextDocument(uri).then(document => {
         vscode.window.showTextDocument(document, viewColumn, true).then(e => {
             replaceCode(e, code);
+        }, reason => {
+            console.log("[Error] ilspy-vscode encountered an error while trying to show code: " + reason);
         });
     }, errorReason => {
-        console.log("[Error] ilspy-vscode encountered an error while trying to show code: " + errorReason);
+        console.log("[Error] ilspy-vscode encountered an error while trying to open text document: " + errorReason);
     });
 }
 

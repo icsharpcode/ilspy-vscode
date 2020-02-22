@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to the "ilspy-vscode" extension will be documented in this file.
 
+## 0.7.11
+
+* Use temp directory and random file names for decompiled documents.
+
 ## 0.7.10
 
 * Update to ILSpy 5.0.2

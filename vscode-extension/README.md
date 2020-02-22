@@ -28,7 +28,7 @@ Loaded assemblies can be closed by right-click on the assemly nodes to show the 
 
 First release of ILSpy .NET Decompiler extension for Visual Studio Code!
 
-See our [change log](CHANGELOG.md) for all of the updates.
+See our [change log](https://github.com/icsharpcode/ilspy-vscode/blob/master/vscode-extension/CHANGELOG.md) for all of the updates.
 
 ### Found a Bug?
 Please file any issues at https://github.com/icsharpcode/ilspy-vscode/issues
@@ -49,4 +49,4 @@ To **test** do the following: `npm test` or <kbd>F5</kbd> in VS Code with the "L
 
 ## License
 
-[MIT license](LICENSE.TXT).
+[MIT license](https://github.com/icsharpcode/ilspy-vscode/blob/master/vscode-extension/LICENSE.TXT).

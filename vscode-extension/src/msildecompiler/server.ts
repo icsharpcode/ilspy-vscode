@@ -187,6 +187,7 @@ export class MsilDecompilerServer {
         }).then(() => {
             this._requestQueue.drain();
         }).catch(err => {
+            this._logger.appendLine(`Error starting ILSpy.Host server: ${err}`);
             this._fireEvent(Events.ServerError, err);
             return this.stop();
         });

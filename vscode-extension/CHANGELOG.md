@@ -4,6 +4,7 @@ All notable changes to the "ilspy-vscode" extension will be documented in this f
 ## 0.7.11
 
 * Use temp directory and files to show decompiled documents.
+* Update dev dependencies to address npm audit warnings
 
 ## 0.7.10
 

@@ -3,7 +3,7 @@ All notable changes to the "ilspy-vscode" extension will be documented in this f
 
 ## 0.7.11
 
-* Use temp directory and random file names for decompiled documents.
+* Use temp directory and files to show decompiled documents.
 
 ## 0.7.10
 

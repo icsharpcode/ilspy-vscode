@@ -128,27 +128,17 @@ function showCode(code: DecompiledCode) {
 }
 
 function showCodeInEditor(code: string, language: string, viewColumn: vscode.ViewColumn) {
-    const untitledFileName = `untitled:${path.join(tempDir, tempFileName)}.${language === "csharp" ? "cs" : "il"}`;
-    const uri = vscode.Uri.parse(untitledFileName);
-    vscode.workspace.openTextDocument(uri).then(document => {
-        vscode.window.showTextDocument(document, viewColumn, true).then(e => {
-            replaceCode(e, code);
-        }, reason => {
-            console.log("[Error] ilspy-vscode encountered an error while trying to show code: " + reason);
+    const untitledFileName = `${path.join(tempDir, tempFileName)}.${language === "csharp" ? "cs" : "il"}`;
+    const writeStream = fs.createWriteStream(untitledFileName, { flags: "w" });
+    writeStream.write(code);
+    writeStream.on("finish", () => {
+        vscode.workspace.openTextDocument(untitledFileName).then(document => {
+            vscode.window.showTextDocument(document, viewColumn, true);
+        }, errorReason => {
+            console.log("[Error] ilspy-vscode encountered an error while trying to open text document: " + errorReason);
         });
-    }, errorReason => {
-        console.log("[Error] ilspy-vscode encountered an error while trying to open text document: " + errorReason);
     });
-}
-
-function replaceCode(editor: vscode.TextEditor, code: string) {
-    const firstLine = editor.document.lineAt(0);
-    const lastLine = editor.document.lineAt(editor.document.lineCount - 1);
-    const range = new vscode.Range(0, firstLine.range.start.character, editor.document.lineCount - 1, lastLine.range.end.character);
-    editor.edit(editBuilder =>  {
-        editBuilder.delete(range);
-        editBuilder.insert(new vscode.Position(0,0), code);
-    });
+    writeStream.end();
 }
 
 function pickAssembly(): Thenable<string> {

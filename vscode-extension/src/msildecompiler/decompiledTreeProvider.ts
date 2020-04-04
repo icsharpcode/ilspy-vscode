@@ -84,24 +84,22 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, Tex
         this._onDidChangeTreeData.fire();
     }
 
-    public addAssembly(assembly: string): Thenable<boolean> {
+    public async addAssembly(assembly: string): Promise<boolean> {
         let request: AddAssemblyRequest = { "AssemblyPath": assembly };
-        return serverUtils.addAssembly(this.server, request).then(response => {
-            if (response.Added) {
-                this.server.assemblyPaths.add(assembly);
-            }
-            return response.Added;
-        });
+        const response = await serverUtils.addAssembly(this.server, request);
+        if (response.Added) {
+            this.server.assemblyPaths.add(assembly);
+        }
+        return response.Added;
     }
 
-    public removeAssembly(assembly: string): Thenable<boolean> {
+    public async removeAssembly(assembly: string): Promise<boolean> {
         let request: RemoveAssemblyRequest = { "AssemblyPath": assembly };
-        return serverUtils.removeAssembly(this.server, request).then(response => {
-            if (response.Removed) {
-                this.server.assemblyPaths.delete(assembly);
-            }
-            return response.Removed;
-        });
+        const response = await serverUtils.removeAssembly(this.server, request);
+        if (response.Removed) {
+            this.server.assemblyPaths.delete(assembly);
+        }
+        return response.Removed;
     }
 
     public getTreeItem(element: MemberNode): TreeItem {
@@ -200,36 +198,33 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, Tex
         }
     }
 
-    getNamespaces(assembly: string): Thenable<MemberNode[]> {
+    async getNamespaces(assembly: string): Promise<MemberNode[]> {
         let request: ListNamespacesRequest = { "AssemblyPath": assembly };
-        return serverUtils.listNamespaces(this.server, request).then(result => {
-            return result.Namespaces.map(n => new MemberNode(assembly, n, -1, TokenType.NamespaceDefinition, MemberSubKind.None, -2));
-        });
+        const result = await serverUtils.listNamespaces(this.server, request);
+        return result.Namespaces.map(n => new MemberNode(assembly, n, -1, TokenType.NamespaceDefinition, MemberSubKind.None, -2));
     }
 
-    getTypes(assembly: string, namespace: string): Thenable<MemberNode[]> {
+    async getTypes(assembly: string, namespace: string): Promise<MemberNode[]> {
         let request: ListTypesRequest = { "AssemblyPath": assembly, "Namespace": namespace };
-        return serverUtils.getTypes(this.server, request).then(result => {
-            return result.Types.map(t => new MemberNode(assembly, t.Name, this.getRid(t), this.getHandleKind(t), t.MemberSubKind, -1));
-        });
+        const result = await serverUtils.getTypes(this.server, request);
+        return result.Types.map(t => new MemberNode(assembly, t.Name, this.getRid(t), this.getHandleKind(t), t.MemberSubKind, -1));
     }
 
-    getMembers(element: MemberNode): Thenable<MemberNode[]> {
+    async getMembers(element: MemberNode): Promise<MemberNode[]> {
         let request: ListMembersRequest = {"AssemblyPath": element.assembly, "Handle": this.makeHandle(element) };
         if (element.mayHaveChildren) {
-            return serverUtils.getMembers(this.server, request).then(result => {
-                return result.Members.map(m => new MemberNode(element.assembly, m.Name, this.getRid(m), this.getHandleKind(m), m.MemberSubKind, element.rid));
-            });
-        }
-        else {
+            const result = await serverUtils.getMembers(this.server, request);
+            return result.Members.map(m => new MemberNode(element.assembly, m.Name, this.getRid(m), this.getHandleKind(m), m.MemberSubKind, element.rid));
+        } else {
             return MemberNode[0];
         }
     }
 
-    public getCode(element?: MemberNode): Thenable<DecompiledCode> {
+    public async getCode(element?: MemberNode): Promise<DecompiledCode> {
         if (element.rid === -2) {
             let request: DecompileAssemblyRequest = { "AssemblyPath": element.assembly };
-            return serverUtils.decompileAssembly(this.server, request).then(result => result.Decompiled);
+            const result = await serverUtils.decompileAssembly(this.server, request);
+            return result.Decompiled;
         }
 
         if (element.rid === -1) {
@@ -243,11 +238,13 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode>, Tex
 
         if (element.mayHaveChildren) {
             let request: DecompileTypeRequest = {"AssemblyPath": element.assembly, "Handle": this.makeHandle(element)};
-            return serverUtils.decompileType(this.server, request).then(result => result.Decompiled);
+            const result = await serverUtils.decompileType(this.server, request);
+            return result.Decompiled;
         }
         else {
             let request: DecompileMemberRequest = {"AssemblyPath": element.assembly, "Type": element.parent, "Member": this.makeHandle(element)};
-            return serverUtils.decompileMember(this.server, request).then(result => result.Decompiled);
+            const result = await serverUtils.decompileMember(this.server, request);
+            return result.Decompiled;
         }
     }
 

@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
- 'use strict';
+'use strict';
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as fs from 'fs';
@@ -36,20 +36,20 @@ export function activate(context: vscode.ExtensionContext) {
     // The command has been defined in the package.json file
     // Now provide the implementation of the command with  registerCommand
     // The commandId parameter must match the command field in package.json
-    disposables.push(vscode.commands.registerCommand('ilspy.decompileAssemblyInWorkspace', () => {
+    disposables.push(vscode.commands.registerCommand('ilspy.decompileAssemblyInWorkspace', async () => {
         // The code you place here will be executed every time your command is executed
-        pickAssembly().then(assembly => {
-            decompileFile(assembly);
-        });
+        const assembly = await pickAssembly();
+        await decompileFile(assembly);
     }));
 
-    disposables.push(vscode.commands.registerCommand('ilspy.decompileAssemblyViaDialog', () => {
-        promptForAssemblyFilePathViaDialog().then(attemptToDecompileFilePath);
+    disposables.push(vscode.commands.registerCommand('ilspy.decompileAssemblyViaDialog', async () => {
+        const file = await promptForAssemblyFilePathViaDialog();
+        attemptToDecompileFilePath(file);
     }));
 
     let lastSelectedNode: MemberNode = null;
 
-    disposables.push(vscode.commands.registerCommand('showDecompiledCode', (node: MemberNode) => {
+    disposables.push(vscode.commands.registerCommand('showDecompiledCode', async (node: MemberNode) => {
         if (lastSelectedNode === node) {
             return;
         }
@@ -59,24 +59,22 @@ export function activate(context: vscode.ExtensionContext) {
             showCode(node.decompiled);
         }
         else {
-            decompileTreeProvider.getCode(node).then(code => {
-                node.decompiled = code;
-                showCode(node.decompiled);
-            });
+            const code = await decompileTreeProvider.getCode(node);
+            node.decompiled = code;
+            showCode(node.decompiled);
         }
     }));
 
-    disposables.push(vscode.commands.registerCommand("ilspy.unloadAssembly", (node: MemberNode) => {
+    disposables.push(vscode.commands.registerCommand("ilspy.unloadAssembly", async (node: MemberNode) => {
         if (!node) {
             vscode.window.showInformationMessage('Please use context menu: right-click on the assembly node then select "Unload Assembly"');
             return;
         }
         console.log("Unloading assembly " + node.name);
-        decompileTreeProvider.removeAssembly(node.name).then(removed => {
-            if (removed) {
-                decompileTreeProvider.refresh();
-            }
-        });
+        const removed = await decompileTreeProvider.removeAssembly(node.name);
+        if (removed) {
+            decompileTreeProvider.refresh();
+        }
     }));
 
     disposables.push(new vscode.Disposable(() => {
@@ -86,7 +84,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(...disposables);
 
     function attemptToDecompileFilePath(filePath: string) {
-        let escaped: string = filePath.replace(/\\/g, "\\\\",);
+        let escaped: string = filePath.replace(/\\/g, "\\\\");
         if (escaped[0] === '"' && escaped[escaped.length - 1] === '"') {
             escaped = escaped.slice(1, -1);
         }
@@ -99,21 +97,13 @@ export function activate(context: vscode.ExtensionContext) {
         }
     }
 
-    function decompileFile(assembly: string) {
-        if(!server.isRunning()) {
-            server.restart().then(() => {
-                decompileTreeProvider.addAssembly(assembly).then(added => {
-                    if(added) {
-                        decompileTreeProvider.refresh();
-                }});
-            });
+    async function decompileFile(assembly: string) {
+        if (!server.isRunning()) {
+            await server.restart();
         }
-        else {
-            decompileTreeProvider.addAssembly(assembly).then(res => {
-                if(res) {
-                    decompileTreeProvider.refresh();
-                }
-            });
+        const added = await decompileTreeProvider.addAssembly(assembly);
+        if (added) {
+            decompileTreeProvider.refresh();
         }
     }
 }
@@ -131,57 +121,54 @@ function showCodeInEditor(code: string, language: string, viewColumn: vscode.Vie
     const untitledFileName = `${path.join(tempDir, tempFileName)}.${language === "csharp" ? "cs" : "il"}`;
     const writeStream = fs.createWriteStream(untitledFileName, { flags: "w" });
     writeStream.write(code);
-    writeStream.on("finish", () => {
-        vscode.workspace.openTextDocument(untitledFileName).then(document => {
-            vscode.window.showTextDocument(document, viewColumn, true);
-        }, errorReason => {
+    writeStream.on("finish", async () => {
+        try {
+            const document = await vscode.workspace.openTextDocument(untitledFileName);
+            await vscode.window.showTextDocument(document, viewColumn, true);
+        } catch (errorReason) {
             console.log("[Error] ilspy-vscode encountered an error while trying to open text document: " + errorReason);
-        });
+        }
     });
     writeStream.end();
 }
 
-function pickAssembly(): Thenable<string> {
-    return findAssemblies().then(assemblies => {
-        return vscode.window.showQuickPick(assemblies);
-    });
+async function pickAssembly(): Promise<string> {
+    const assemblies = await findAssemblies();
+    return await vscode.window.showQuickPick(assemblies);
 }
 
-function findAssemblies(): Thenable<string[]> {
+async function findAssemblies(): Promise<string[]> {
     if (!vscode.workspace.rootPath) {
         return Promise.resolve([]);
     }
 
-    return vscode.workspace.findFiles(
+    const resources = await vscode.workspace.findFiles(
         /*include*/ '{**/*.dll,**/*.exe,**/*.winrt,**/*.netmodule}',
-        /*exclude*/ '{**/node_modules/**,**/.git/**,**/bower_components/**}')
-    .then(resources => {
-        return resources.map(uri => uri.fsPath);
-    });
+        /*exclude*/ '{**/node_modules/**,**/.git/**,**/bower_components/**}');
+    return resources.map(uri => uri.fsPath);
 }
 
-function promptForAssemblyFilePathViaDialog(): Thenable<string> {
-    return vscode.window.showOpenDialog(
+async function promptForAssemblyFilePathViaDialog(): Promise<string> {
+    const uris = await vscode.window.showOpenDialog(
         /* options*/ {
             openLabel: 'Select assembly',
             canSelectFiles: true,
             canSelectFolders: false,
             canSelectMany: false,
             filters: {
-                '.NET Assemblies' : ['dll', 'exe', 'winrt', 'netmodule']
+                '.NET Assemblies': ['dll', 'exe', 'winrt', 'netmodule']
             }
         }
-    )
-    .then(uris => {
-        if (uris === undefined) {
-            return undefined;
-        }
+    );
+    
+    if (uris === undefined) {
+        return undefined;
+    }
 
-        let strings = uris.map(uri => uri.fsPath);
-        if (strings.length > 0) {
-            return strings[0];
-        } else {
-            return undefined;
-        }
-    });
+    let strings = uris.map(uri => uri.fsPath);
+    if (strings.length > 0) {
+        return strings[0];
+    } else {
+        return undefined;
+    }
 }

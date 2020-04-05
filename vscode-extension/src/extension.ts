@@ -113,8 +113,8 @@ export function deactivate() {
 }
 
 function showCode(code: DecompiledCode) {
-    showCodeInEditor(code[LangaugeNames.CSharp], "csharp", vscode.ViewColumn.One);
     showCodeInEditor(code[LangaugeNames.IL], "text", vscode.ViewColumn.Two);
+    showCodeInEditor(code[LangaugeNames.CSharp], "csharp", vscode.ViewColumn.One);
 }
 
 function showCodeInEditor(code: string, language: string, viewColumn: vscode.ViewColumn) {
@@ -125,8 +125,9 @@ function showCodeInEditor(code: string, language: string, viewColumn: vscode.Vie
         try {
             const document = await vscode.workspace.openTextDocument(untitledFileName);
             await vscode.window.showTextDocument(document, viewColumn, true);
+            await vscode.commands.executeCommand("revealLine", { lineNumber: 1, at: "top" });
         } catch (errorReason) {
-            console.log("[Error] ilspy-vscode encountered an error while trying to open text document: " + errorReason);
+            vscode.window.showErrorMessage("[Error] ilspy-vscode encountered an error while trying to open text document: " + errorReason);
         }
     });
     writeStream.end();

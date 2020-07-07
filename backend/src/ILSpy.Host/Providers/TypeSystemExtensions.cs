@@ -32,7 +32,7 @@ namespace ILSpy.Host.Providers
         {
             TypeSystemAstBuilder builder = new TypeSystemAstBuilder();
             builder.AlwaysUseShortTypeNames = !includeNamespace;
-            builder.AlwaysUseBuiltinTypeNames = useBuiltinTypeNames;
+            builder.UseKeywordsForBuiltinTypes = useBuiltinTypeNames;
 
             const ParameterModifier refInOutModifier = ParameterModifier.Ref | ParameterModifier.Out | ParameterModifier.In;
 

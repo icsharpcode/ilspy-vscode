@@ -2,8 +2,8 @@
 
 Welcome to the ILSpy extension for Visual Studio Code! This extension provides two commands inside Visual Studio Code:
 
-* `ilspy.decompileAssemblyInWorkspace` - Decompile a MSIL assembly inside of current Visual Studio Code workspace.
-* `ilspy.decompileAssemblyViaDialog` - Decompoile an MSIL assembly from file picker dialog.
+* `ilspy.decompileAssemblyInWorkspace` - Decompile an MSIL assembly inside the current Visual Studio Code workspace.
+* `ilspy.decompileAssemblyViaDialog` - Decompile an MSIL assembly from file picker dialog.
 
 Open the Visual Studio Code Command Palette (<kbd>Ctrl+Shift+P</kbd>) then type `ilspy` to show the two commands.
 

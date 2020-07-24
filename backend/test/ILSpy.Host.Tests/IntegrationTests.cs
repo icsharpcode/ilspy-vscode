@@ -134,7 +134,6 @@ namespace ILSpy.Host.Tests
             var traceWriter = new Newtonsoft.Json.Serialization.MemoryTraceWriter();
             JsonSerializerSettings settings = new JsonSerializerSettings { TraceWriter = traceWriter, TypeNameHandling = TypeNameHandling.Objects };
             var result = JsonConvert.DeserializeObject<T>(responseString, settings);
-            var s = traceWriter.ToString();
             return result;
         }
     }

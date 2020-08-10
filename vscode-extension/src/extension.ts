@@ -38,8 +38,8 @@ export function activate(context: vscode.ExtensionContext) {
     // The commandId parameter must match the command field in package.json
     disposables.push(vscode.commands.registerCommand('ilspy.decompileAssemblyInWorkspace', async () => {
         // The code you place here will be executed every time your command is executed
-        const assembly = await pickAssembly();
-        await decompileFile(assembly);
+        const assembly = await pickAssembly() as AssemblyQuickPickItem;
+        await decompileFile(assembly.assemblyPath);
     }));
 
     disposables.push(vscode.commands.registerCommand('ilspy.decompileAssemblyViaDialog', async () => {
@@ -133,9 +133,12 @@ function showCodeInEditor(code: string, language: string, viewColumn: vscode.Vie
     writeStream.end();
 }
 
-async function pickAssembly(): Promise<string> {
+async function pickAssembly(): Promise<vscode.QuickPickItem> {
     const assemblies = await findAssemblies();
-    return await vscode.window.showQuickPick(assemblies);
+    const assemblyPathInfo: AssemblyPathInfo[] = parseAssemblyPath(assemblies);
+    const quickPickItems = assemblyPathInfo.map(
+      info => createAssemblyQuickPickItem(info));
+    return await vscode.window.showQuickPick<vscode.QuickPickItem>(quickPickItems);
 }
 
 async function findAssemblies(): Promise<string[]> {
@@ -161,7 +164,7 @@ async function promptForAssemblyFilePathViaDialog(): Promise<string> {
             }
         }
     );
-    
+
     if (uris === undefined) {
         return undefined;
     }
@@ -172,4 +175,52 @@ async function promptForAssemblyFilePathViaDialog(): Promise<string> {
     } else {
         return undefined;
     }
+}
+
+function parseAssemblyPath(assemblies: string[]): AssemblyPathInfo[] {
+    const workspaceFolders = vscode.workspace.workspaceFolders;
+    return assemblies.map(assemblyPath => {
+        const p = path.parse(assemblyPath);
+        const assemblyWorkspace = workspaceFolders
+          .find(w => p.dir.includes(w.uri.fsPath));
+        return {
+          fileName: p.base,
+          fileExtension: p.ext,
+          fullPath: assemblyPath,
+          relativePath: p.dir.replace(assemblyWorkspace.uri.fsPath, ''),
+          workspaceFolder: assemblyWorkspace.name
+        };
+    });
+}
+
+function createAssemblyQuickPickItem(assemblyPathInfo: AssemblyPathInfo): vscode.QuickPickItem{
+    const selectIcon = (extension: string) => {;
+      switch (extension) {
+        case '.dll':
+          return 'library';
+        case '.exe':
+          return 'file-binary';
+        default:
+          return 'file';
+      }
+    }
+    const res: AssemblyQuickPickItem = {
+        label: `$(${selectIcon(assemblyPathInfo.fileExtension)}) ${assemblyPathInfo.fileName}`,
+        description: assemblyPathInfo.fullPath,
+        detail: path.join(assemblyPathInfo.workspaceFolder, assemblyPathInfo.relativePath),
+        assemblyPath: assemblyPathInfo.fullPath
+    };
+    return res;
+}
+
+interface AssemblyPathInfo {
+    fullPath: string;
+    relativePath: string;
+    fileName: string;
+    fileExtension: string;
+    workspaceFolder?: string;
+}
+
+interface AssemblyQuickPickItem extends vscode.QuickPickItem{
+    assemblyPath: string;
 }

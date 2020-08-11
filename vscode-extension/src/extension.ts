@@ -38,7 +38,7 @@ export function activate(context: vscode.ExtensionContext) {
     // The commandId parameter must match the command field in package.json
     disposables.push(vscode.commands.registerCommand('ilspy.decompileAssemblyInWorkspace', async () => {
         // The code you place here will be executed every time your command is executed
-        const assembly = await pickAssembly() as AssemblyQuickPickItem;
+        const assembly = await pickAssembly();
         await decompileFile(assembly.assemblyPath);
     }));
 
@@ -133,12 +133,12 @@ function showCodeInEditor(code: string, language: string, viewColumn: vscode.Vie
     writeStream.end();
 }
 
-async function pickAssembly(): Promise<vscode.QuickPickItem> {
+async function pickAssembly(): Promise<AssemblyQuickPickItem> {
     const assemblies = await findAssemblies();
     const assemblyPathInfo: AssemblyPathInfo[] = parseAssemblyPath(assemblies);
     const quickPickItems = assemblyPathInfo.map(
       info => createAssemblyQuickPickItem(info));
-    return await vscode.window.showQuickPick<vscode.QuickPickItem>(quickPickItems);
+    return await vscode.window.showQuickPick<AssemblyQuickPickItem>(quickPickItems);
 }
 
 async function findAssemblies(): Promise<string[]> {
@@ -193,17 +193,19 @@ function parseAssemblyPath(assemblies: string[]): AssemblyPathInfo[] {
     });
 }
 
-function createAssemblyQuickPickItem(assemblyPathInfo: AssemblyPathInfo): vscode.QuickPickItem{
-    const selectIcon = (extension: string) => {;
+function createAssemblyQuickPickItem(assemblyPathInfo: AssemblyPathInfo): AssemblyQuickPickItem {
+    const selectIcon = (extension: string) => {
       switch (extension) {
         case '.dll':
+        case '.winrt':
+        case '.netmodule':
           return 'library';
         case '.exe':
           return 'file-binary';
         default:
           return 'file';
       }
-    }
+    };
     const res: AssemblyQuickPickItem = {
         label: `$(${selectIcon(assemblyPathInfo.fileExtension)}) ${assemblyPathInfo.fileName}`,
         description: assemblyPathInfo.fullPath,
@@ -221,6 +223,6 @@ interface AssemblyPathInfo {
     workspaceFolder?: string;
 }
 
-interface AssemblyQuickPickItem extends vscode.QuickPickItem{
+interface AssemblyQuickPickItem extends vscode.QuickPickItem {
     assemblyPath: string;
 }

@@ -5,9 +5,9 @@
 
 import { TreeItemCollapsibleState } from 'vscode';
 import { expect } from 'chai';
-import { MemberNode, DecompiledTreeProvider } from '../src/msildecompiler/decompiledTreeProvider';
-import { TokenType } from '../src/msildecompiler/tokenType';
-import { MemberSubKind } from '../src/msildecompiler/memberSubKind';
+import { MemberNode, DecompiledTreeProvider } from '../../src/msildecompiler/decompiledTreeProvider';
+import { TokenType } from '../../src/msildecompiler/tokenType';
+import { MemberSubKind } from '../../src/msildecompiler/memberSubKind';
 
 suite("Member Node Tests", () => {
     test("Assembly node returns true for isType", () => {

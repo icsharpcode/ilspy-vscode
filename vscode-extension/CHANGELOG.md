@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to the "ilspy-vscode" extension will be documented in this file.
 
+## 0.10
+
+* Update to v7.0 of `ICSharpCode.Decompiler`
+
 ## 0.9
 
 * Update to v6.1 of `ICSharpCode.Decompiler`

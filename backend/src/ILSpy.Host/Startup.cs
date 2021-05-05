@@ -27,7 +27,7 @@ namespace ILSpy.Host
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .Enrich.FromLogContext()
-                .WriteTo.ColoredConsole()
+                .WriteTo.Console()
                 .CreateLogger();
 
             var builder = new ConfigurationBuilder()
@@ -86,7 +86,7 @@ namespace ILSpy.Host
                 logger.LogInformation($"ILSpy.Host server running on port '{_env.Port}'.");
             }
         }
-        
+
         private static bool LogFilter(string category, LogLevel level, IMsilDecompilerEnvironment environment)
         {
             if (environment.LogLevel > level)

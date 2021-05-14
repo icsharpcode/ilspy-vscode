@@ -1,0 +1,4 @@
+{
+  "$schema": "./build.schema.json",
+  "BackendSolution": "backend/ILSpy-server.sln"
+}

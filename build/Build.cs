@@ -100,6 +100,6 @@ class Build : NukeBuild
         .DependsOn(backend, compile_extension)
         .Executes(() =>
         {
-            StartProcess("vsce", "package -o ilspy-vscode-0.0.0.vsix", VSCodeExtensionDir);
+            StartProcess("vsce", "package -o ilspy-vscode.vsix", VSCodeExtensionDir);
         });
 }

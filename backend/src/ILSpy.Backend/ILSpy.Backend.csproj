@@ -8,6 +8,7 @@
     <Product>ILSpy .NET Decompiler</Product>
     <Copyright>Copyright 2021 ICSharpCode</Copyright>
     <Nullable>enable</Nullable>
+    <Version>0.10.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

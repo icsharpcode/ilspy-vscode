@@ -4,7 +4,6 @@
  *-----------------------------------------------------------------------------------------------*/
 
 import * as vscode from "vscode";
-import * as path from "path";
 
 import {
   LanguageClient,
@@ -24,13 +23,14 @@ let client: LanguageClient;
 export function activate(context: vscode.ExtensionContext) {
   const disposables: vscode.Disposable[] = [];
 
-  let backendExecutable = ILSpyBackend.getExecutable(context);
-  let serverOptions: ServerOptions = {
-    run: { command: backendExecutable },
-    debug: { command: backendExecutable },
+  const dotnetCli = "dotnet";
+  const backendExecutable = ILSpyBackend.getExecutable(context);
+  const serverOptions: ServerOptions = {
+    run: { command: dotnetCli, args: [backendExecutable] },
+    debug: { command: dotnetCli, args: [backendExecutable] },
   };
 
-  let clientOptions: LanguageClientOptions = {};
+  const clientOptions: LanguageClientOptions = {};
 
   client = new LanguageClient(
     "ilspy-backend",

@@ -27,6 +27,9 @@ class Build : NukeBuild
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
 
+    [Parameter("Release version to build")]
+    readonly string Version;
+
     [Solution] readonly Solution BackendSolution;
     [GitRepository] readonly GitRepository GitRepository;
 
@@ -97,10 +100,13 @@ class Build : NukeBuild
             Npm("test", VSCodeExtensionDir);
         });
 
-    Target vsix => _ => _
+    Target Vsix => _ => _
         .DependsOn(Backend, CompileExtension)
         .Executes(() =>
         {
-            StartProcess("vsce", "package -o ilspy-vscode.vsix", VSCodeExtensionDir);
+            NpmInstall(s => s
+                .SetPackages("vsce")
+                .SetGlobal(true));
+            StartProcess("vsce", $"package -o ilspy-vscode-{Version ?? "local"}.vsix", VSCodeExtensionDir);
         });
 }

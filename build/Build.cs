@@ -16,12 +16,13 @@ using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.Tools.Npm.NpmTasks;
 using static Nuke.Common.Tooling.ProcessTasks;
+using System.Collections.Generic;
 
 [CheckBuildProjectConfigurations]
 [ShutdownDotNetAfterServerBuild]
 class Build : NukeBuild
 {
-    public static int Main() => Execute<Build>(x => x.compile_backend);
+    public static int Main() => Execute<Build>(x => x.CompileBackend);
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
@@ -33,21 +34,21 @@ class Build : NukeBuild
     AbsolutePath VSCodeExtensionBinDir => VSCodeExtensionDir / "bin";
     AbsolutePath BackendDirectory => RootDirectory / "backend";
 
-    Target clean => _ => _
-        .Before(restore_backend)
+    Target Clean => _ => _
+        .Before(RestoreBackend)
         .Executes(() =>
         {
         });
 
-    Target restore_backend => _ => _
+    Target RestoreBackend => _ => _
         .Executes(() =>
         {
             DotNetRestore(s => s
                 .SetProjectFile(BackendSolution));
         });
 
-    Target compile_backend => _ => _
-        .DependsOn(restore_backend)
+    Target CompileBackend => _ => _
+        .DependsOn(RestoreBackend)
         .Executes(() =>
         {
             DotNetBuild(s => s
@@ -56,30 +57,30 @@ class Build : NukeBuild
                 .EnableNoRestore());
         });
 
-    Target publish_backend => _ => _
+    Target PublishBackend => _ => _
         .Executes(() =>
         {
             EnsureCleanDirectory(VSCodeExtensionBinDir);
             DotNetPublish(s => s
                 .SetProject(BackendDirectory / "src" / "ILSpy.Backend")
                 .SetConfiguration(Configuration.Release)
-                .SetRuntime("win-x64")
                 .DisableSelfContained()
+                .SetProperty("UseAppHost", "false")
                 .SetOutput(VSCodeExtensionBinDir / "ilspy-backend"));
         });
 
-    Target test_backend => _ => _
-        .DependsOn(compile_backend)
+    Target TestBackend => _ => _
+        .DependsOn(CompileBackend)
         .Executes(() =>
         {
             //DotNetTest(s => s
             //    .SetProjectFile("ILSpy.Backend.Tests"));
         });
 
-    Target backend => _ => _
-        .DependsOn(publish_backend);
+    Target Backend => _ => _
+        .DependsOn(PublishBackend);
 
-    Target compile_extension => _ => _
+    Target CompileExtension => _ => _
         .Executes(() =>
         {
             NpmInstall(s => s
@@ -89,15 +90,15 @@ class Build : NukeBuild
                 .SetCommand("compile"));
         });
 
-    Target test_extension => _ => _
-        .DependsOn(compile_extension)
+    Target TestExtension => _ => _
+        .DependsOn(CompileExtension)
         .Executes(() =>
         {
             Npm("test", VSCodeExtensionDir);
         });
 
     Target vsix => _ => _
-        .DependsOn(backend, compile_extension)
+        .DependsOn(Backend, CompileExtension)
         .Executes(() =>
         {
             StartProcess("vsce", "package -o ilspy-vscode.vsix", VSCodeExtensionDir);

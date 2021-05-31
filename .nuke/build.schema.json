@@ -68,14 +68,14 @@
           "items": {
             "type": "string",
             "enum": [
-              "backend",
-              "clean",
-              "compile_backend",
-              "compile_extension",
-              "publish_backend",
-              "restore_backend",
-              "test_backend",
-              "test_extension",
+              "Backend",
+              "Clean",
+              "CompileBackend",
+              "CompileExtension",
+              "PublishBackend",
+              "RestoreBackend",
+              "TestBackend",
+              "TestExtension",
               "vsix"
             ]
           }
@@ -86,14 +86,14 @@
           "items": {
             "type": "string",
             "enum": [
-              "backend",
-              "clean",
-              "compile_backend",
-              "compile_extension",
-              "publish_backend",
-              "restore_backend",
-              "test_backend",
-              "test_extension",
+              "Backend",
+              "Clean",
+              "CompileBackend",
+              "CompileExtension",
+              "PublishBackend",
+              "RestoreBackend",
+              "TestBackend",
+              "TestExtension",
               "vsix"
             ]
           }

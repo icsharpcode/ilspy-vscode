@@ -6,7 +6,7 @@
     <Company>ic#code</Company>
     <Title>ILSpy .NET Decompiler LSP Backend</Title>
     <Product>ILSpy .NET Decompiler</Product>
-    <Copyright>Copyright 2021 ICSharpCode</Copyright>
+    <Copyright>Copyright 2017-2021 ICSharpCode, Microsoft Corporation</Copyright>
     <Nullable>enable</Nullable>
     <Version>0.10.0</Version>
   </PropertyGroup>

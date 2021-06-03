@@ -17,31 +17,35 @@ import { registerDecompileAssemblyInWorkspace } from "./commands/decompileAssemb
 import { registerDecompileAssemblyViaDialog } from "./commands/decompileAssemblyViaDialog";
 import { registerShowDecompiledCode } from "./commands/showDecompiledCode";
 import { registerUnloadAssembly } from "./commands/unloadAssembly";
+import { acquireDotnetRuntime } from "./dotnet-acquire/acquire";
 
 let client: LanguageClient;
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
   const disposables: vscode.Disposable[] = [];
 
-  const dotnetCli = "dotnet";
-  const backendExecutable = ILSpyBackend.getExecutable(context);
-  const serverOptions: ServerOptions = {
-    run: { command: dotnetCli, args: [backendExecutable] },
-    debug: { command: dotnetCli, args: [backendExecutable] },
-  };
+  const dotnetCli = await acquireDotnetRuntime(context);
+  if (dotnetCli) {
+    const backendExecutable = ILSpyBackend.getExecutable(context);
+    const serverOptions: ServerOptions = {
+      run: { command: dotnetCli, args: [backendExecutable], options: {} },
+      debug: { command: dotnetCli, args: [backendExecutable] },
+    };
 
-  const clientOptions: LanguageClientOptions = {};
+    const clientOptions: LanguageClientOptions = {};
 
-  client = new LanguageClient(
-    "ilspy-backend",
-    "ILSpy Backend",
-    serverOptions,
-    clientOptions
-  );
-  client.trace = Trace.Verbose;
+    client = new LanguageClient(
+      "ilspy-backend",
+      "ILSpy Backend",
+      serverOptions,
+      clientOptions
+    );
+    client.trace = Trace.Verbose;
+
+    client.start();
+  }
 
   const ilspyBackend = new ILSpyBackend(client);
-
   const decompileTreeProvider = new DecompiledTreeProvider(ilspyBackend);
   disposables.push(
     vscode.window.registerTreeDataProvider(
@@ -54,8 +58,6 @@ export function activate(context: vscode.ExtensionContext) {
   disposables.push(registerDecompileAssemblyViaDialog(decompileTreeProvider));
   disposables.push(registerShowDecompiledCode(decompileTreeProvider));
   disposables.push(registerUnloadAssembly(decompileTreeProvider));
-
-  client.start();
 
   context.subscriptions.push(...disposables);
 }

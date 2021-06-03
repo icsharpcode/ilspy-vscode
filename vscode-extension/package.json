@@ -21,8 +21,7 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:ilspy.decompileAssemblyInWorkspace",
-		"onCommand:ilspy.decompileAssemblyViaDialog"
+		"*"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -87,5 +86,8 @@
 		"mocha": "^8.2.1",
 		"typescript": "^4.1.3",
 		"vscode-test": "^1.5.0"
-	}
+	},
+	"extensionDependencies": [
+		"ms-dotnettools.vscode-dotnet-runtime"
+	]
 }

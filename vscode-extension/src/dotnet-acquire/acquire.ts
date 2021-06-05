@@ -15,7 +15,6 @@ export async function acquireDotnetRuntime(context: vscode.ExtensionContext) {
 
   let dotnetPath: string | undefined;
   try {
-    await vscode.commands.executeCommand("dotnet.showAcquisitionLog");
     const acquireResult =
       await vscode.commands.executeCommand<IDotnetAcquireResult>(
         "dotnet.acquire",

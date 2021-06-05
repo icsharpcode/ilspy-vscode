@@ -13,10 +13,12 @@ import {
   TextDocumentContentProvider,
   CancellationToken,
   ProviderResult,
+  window,
 } from "vscode";
 import { TokenType } from "./TokenType";
 import { MemberSubKind } from "./MemberSubKind";
 import * as path from "path";
+import * as os from "os";
 import { DecompiledCode, LanguageName } from "../protocol/DecompileResponse";
 import MemberData from "../protocol/MemberData";
 import IILSpyBackend from "./IILSpyBackend";
@@ -97,8 +99,14 @@ export class DecompiledTreeProvider
     });
     if (response?.added) {
       this.backend.assemblyPaths.add(assembly);
+      return true;
+    } else {
+      window.showWarningMessage(
+        `File '${assembly}' could not be loaded as assembly.`
+      );
     }
-    return response?.added ?? false;
+
+    return false;
   }
 
   public async removeAssembly(assembly: string): Promise<boolean> {

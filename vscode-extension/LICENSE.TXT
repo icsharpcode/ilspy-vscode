@@ -1,6 +1,7 @@
 The MIT License (MIT)
 
 Copyright (c) Microsoft Corporation
+Copyright (c) ICSharpCode
 
 All rights reserved.
 

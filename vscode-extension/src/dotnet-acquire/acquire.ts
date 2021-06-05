@@ -6,6 +6,7 @@
 import * as vscode from "vscode";
 import * as os from "os";
 import { IDotnetAcquireResult } from "./types";
+import ILSpyBackend from "../decompiler/ILSpyBackend";
 
 const netRuntimeVersion = "5.0";
 
@@ -29,11 +30,10 @@ export async function acquireDotnetRuntime(context: vscode.ExtensionContext) {
     vscode.window.showWarningMessage(formatAcquireError());
   }
 
-  // TODO Execute this on Linux systems only
-  //   await vscode.commands.executeCommand("dotnet.ensureDotnetDependencies", {
-  //     command: dotnetPath,
-  //     arguments: [ILSpyBackend.getExecutable(context)],
-  //   });
+  await vscode.commands.executeCommand("dotnet.ensureDotnetDependencies", {
+    command: dotnetPath,
+    arguments: [ILSpyBackend.getExecutable(context)],
+  });
 
   return dotnetPath;
 }

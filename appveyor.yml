@@ -16,7 +16,7 @@ nuget:
 before_build:
 - cmd:
 build_script:
-- cmd: build.cmd %appveyor_build_version%
+- cmd: build.cmd vsix --version %appveyor_build_version%
 artifacts:
   - path: 'vscode-extension\*.vsix'
 test: off

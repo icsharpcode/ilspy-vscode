@@ -1,91 +1,93 @@
 {
-    "name": "ilspy-vscode",
-    "displayName": "ILSpy .NET Decompiler",
-    "description": "Decompile MSIL assemblies - support for full framework, .NET Core and .NET Standard",
-    "version": "0.10.0",
-    "icon": "resources/ILSpy-vscode-marketplace-icon.png",
-    "publisher": "icsharpcode",
-    "preview": true,
-    "private": true,
-    "license": "SEE LICENSE",
-    "homepage": "https://github.com/icsharpcode/ilspy-vscode/tree/master/vscode-extension",
-    "bugs": "https://github.com/icsharpcode/ilspy-vscode/issues",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/icsharpcode/ilspy-vscode"
-    },
-    "engines": {
-        "vscode": "^1.18.0"
-    },
-    "categories": [
-        "Programming Languages",
-        "Other"
-    ],
-    "activationEvents": [
-        "onCommand:ilspy.decompileAssemblyInWorkspace",
-        "onCommand:ilspy.decompileAssemblyViaDialog"
-    ],
-    "main": "./out/src/extension",
-    "contributes": {
-        "views": {
-            "explorer": [
-                {
-                    "id": "ilspyDecompiledMembers",
-                    "name": "ILSpy Decompiled Members"
-                }
-            ]
-        },
-        "commands": [
-            {
-                "command": "ilspy.decompileAssemblyInWorkspace",
-                "title": "Decompile IL Assembly in Current Workspace",
-                "category": "ILSpy"
-            },
-            {
-                "command": "ilspy.decompileAssemblyViaDialog",
-                "title": "Decompile IL Assembly (pick file)",
-                "category": "ILSpy"
-            },
-            {
-                "command": "ilspy.unloadAssembly",
-                "title": "Unload Assembly",
-                "category": "ILSpy"
-            }
-        ],
-        "menus": {
-            "view/item/context": [
-                {
-                    "command": "ilspy.unloadAssembly",
-                    "when": "view == ilspyDecompiledMembers && viewItem == assemblyNode",
-                    "group": "1_GeneralCommands@1"
-                }
-            ]
-        }
-    },
-    "scripts": {
-        "vscode:prepublish": "tsc -p ./",
-        "compile": "tsc -p ./ && gulp tslint",
-        "watch": "tsc -watch -p ./",
-        "test": "node ./node_modules/vscode/bin/test",
-        "postinstall": "node ./node_modules/vscode/bin/install"
-    },
-    "dependencies": {
-        "semver": "*",
-        "temp-dir": "^2.0.0",
-        "vscode-extension-telemetry": "0.1.1"
-    },
-    "devDependencies": {
-        "@types/mocha": "5.2.5",
-        "@types/node": "^12.12.34",
-        "chai": "4.2.0",
-        "gulp": "^4.0.2",
-        "gulp-mocha": "^7.0.2",
-        "gulp-tslint": "8.1.3",
-        "mocha": "^6.2.3",
-        "tslint": "5.12.1",
-        "tslint-microsoft-contrib": "6.0.0",
-        "tslint-no-unused-expression-chai": "0.1.4",
-        "typescript": "^3.8.3",
-        "vscode": "^1.1.36"
-    }
+	"name": "ilspy-vscode",
+	"displayName": "ilspy-vscode",
+	"description": "Decompile MSIL assemblies - support for full framework, .NET Core and .NET Standard",
+	"version": "0.10.0",
+	"icon": "resources/ILSpy-vscode-marketplace-icon.png",
+	"publisher": "icsharpcode",
+	"preview": true,
+	"private": true,
+	"license": "SEE LICENSE",
+	"homepage": "https://github.com/icsharpcode/ilspy-vscode/tree/master/vscode-extension",
+	"bugs": "https://github.com/icsharpcode/ilspy-vscode/issues",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/icsharpcode/ilspy-vscode"
+	},
+	"engines": {
+		"vscode": "^1.56.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"*"
+	],
+	"main": "./out/extension.js",
+	"contributes": {
+		"views": {
+			"explorer": [
+				{
+					"id": "ilspyDecompiledMembers",
+					"name": "ILSpy Decompiled Members"
+				}
+			]
+		},
+		"commands": [
+			{
+				"command": "ilspy.decompileAssemblyInWorkspace",
+				"title": "Decompile IL Assembly in Current Workspace",
+				"category": "ILSpy"
+			},
+			{
+				"command": "ilspy.decompileAssemblyViaDialog",
+				"title": "Decompile IL Assembly (pick file)",
+				"category": "ILSpy"
+			},
+			{
+				"command": "ilspy.unloadAssembly",
+				"title": "Unload Assembly",
+				"category": "ILSpy"
+			}
+		],
+		"menus": {
+			"view/item/context": [
+				{
+					"command": "ilspy.unloadAssembly",
+					"when": "view == ilspyDecompiledMembers && viewItem == assemblyNode",
+					"group": "1_GeneralCommands@1"
+				}
+			]
+		}
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -p ./",
+		"watch": "tsc -watch -p ./",
+		"pretest": "npm run compile && npm run lint",
+		"lint": "eslint src --ext ts",
+		"test": "node ./out/test/runTest.js"
+	},
+	"dependencies": {
+		"chai": "^4.3.4",
+		"temp-dir": "^2.0.0",
+		"vscode-languageclient": "^7.0.0"
+	},
+	"devDependencies": {
+		"@types/chai": "^4.2.18",
+		"@types/glob": "^7.1.3",
+		"@types/mocha": "^8.0.4",
+		"@types/node": "^12.11.7",
+		"@types/vscode": "^1.56.0",
+		"@typescript-eslint/eslint-plugin": "^4.14.1",
+		"@typescript-eslint/parser": "^4.14.1",
+		"eslint": "^7.19.0",
+		"glob": "^7.1.6",
+		"mocha": "^8.2.1",
+		"typescript": "^4.1.3",
+		"vscode-test": "^1.5.0"
+	},
+	"extensionDependencies": [
+		"ms-dotnettools.vscode-dotnet-runtime"
+	]
 }

@@ -76,6 +76,7 @@
               "RestoreBackend",
               "TestBackend",
               "TestExtension",
+              "Versionize",
               "Vsix"
             ]
           }
@@ -94,6 +95,7 @@
               "RestoreBackend",
               "TestBackend",
               "TestExtension",
+              "Versionize",
               "Vsix"
             ]
           }
@@ -107,10 +109,6 @@
             "Quiet",
             "Verbose"
           ]
-        },
-        "Version": {
-          "type": "string",
-          "description": "Release version to build"
         }
       }
     }

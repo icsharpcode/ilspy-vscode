@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using Nuke.Common;
 using Nuke.Common.CI;
 using Nuke.Common.Execution;
@@ -16,7 +17,6 @@ using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.Tools.Npm.NpmTasks;
 using static Nuke.Common.Tooling.ProcessTasks;
-using System.Collections.Generic;
 
 [CheckBuildProjectConfigurations]
 [ShutdownDotNetAfterServerBuild]
@@ -27,15 +27,19 @@ class Build : NukeBuild
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
 
-    [Parameter("Release version to build")]
-    readonly string Version;
-
     [Solution] readonly Solution BackendSolution;
     [GitRepository] readonly GitRepository GitRepository;
 
     AbsolutePath VSCodeExtensionDir => RootDirectory / "vscode-extension";
     AbsolutePath VSCodeExtensionBinDir => VSCodeExtensionDir / "bin";
     AbsolutePath BackendDirectory => RootDirectory / "backend";
+
+    Target Versionize => _ => _
+        .Executes(() =>
+        {
+            ProjectVersionWriter.WriteToVsProject(BackendDirectory / "src" / "ILSpy.Backend" / "ILSpy.Backend.csproj");
+            ProjectVersionWriter.WriteToPackageJson(VSCodeExtensionDir / "package.json");
+        });
 
     Target Clean => _ => _
         .Before(RestoreBackend)
@@ -101,12 +105,12 @@ class Build : NukeBuild
         });
 
     Target Vsix => _ => _
-        .DependsOn(Backend, CompileExtension)
+        .DependsOn(Versionize, Backend, CompileExtension)
         .Executes(() =>
         {
             NpmInstall(s => s
                 .SetPackages("vsce")
                 .SetGlobal(true));
-            StartProcess("vsce", $"package -o ilspy-vscode-{Version ?? "local"}.vsix", VSCodeExtensionDir);
+            StartProcess("vsce", $"package -o ilspy-vscode-{ProjectVersion.Version.ToString(3) }.vsix", VSCodeExtensionDir);
         });
 }

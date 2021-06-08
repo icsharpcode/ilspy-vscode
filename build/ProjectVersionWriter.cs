@@ -7,6 +7,8 @@ using static ProjectVersion;
 
 public static class ProjectVersionWriter
 {
+    public static UTF8Encoding UTF8WithoutBOM => new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
+
     public static void WriteToVsProject(params string[] files)
     {
         WriteVersionToFiles("<Version>$$$</Version>", Version.ToString(), files);
@@ -27,7 +29,7 @@ public static class ProjectVersionWriter
             string newText = Regex.Replace(origText,
                 template.Replace("$$$", "(.*)"),
                 template.Replace("$$$", version));
-            File.WriteAllText(file, newText, Encoding.UTF8);
+            File.WriteAllText(file, newText, UTF8WithoutBOM);
         }
     }
 }

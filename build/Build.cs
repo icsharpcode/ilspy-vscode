@@ -33,6 +33,7 @@ class Build : NukeBuild
     AbsolutePath VSCodeExtensionDir => RootDirectory / "vscode-extension";
     AbsolutePath VSCodeExtensionBinDir => VSCodeExtensionDir / "bin";
     AbsolutePath BackendDirectory => RootDirectory / "backend";
+    AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
 
     Target Versionize => _ => _
         .Executes(() =>
@@ -111,6 +112,9 @@ class Build : NukeBuild
             NpmInstall(s => s
                 .SetPackages("vsce")
                 .SetGlobal(true));
-            StartProcess("vsce", $"package -o ilspy-vscode-{ProjectVersion.Version.ToString(3) }.vsix", VSCodeExtensionDir);
+            EnsureExistingDirectory(ArtifactsDirectory);
+            var vsixFileName = $"ilspy-vscode-{ProjectVersion.Version.ToString(3) }.vsix";
+            using var vsceProcess = StartProcess("vsce", $"package -o {ArtifactsDirectory / vsixFileName}", VSCodeExtensionDir);
+            vsceProcess.AssertZeroExitCode();
         });
 }

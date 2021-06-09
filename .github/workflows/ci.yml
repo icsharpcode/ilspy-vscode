@@ -26,6 +26,10 @@ jobs:
       - name: Check .NET Core version
         run: dotnet --version
 
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+    
       - name: Build
         run: ./build.sh vsix
 

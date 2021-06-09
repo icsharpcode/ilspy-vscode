@@ -32,7 +32,17 @@ jobs:
     
       - name: Build
         run: ./build.sh vsix
-
+        
+      - name : machine ls $GITHUB_EVENT_PATH
+        run : "ls -la $GITHUB_EVENT_PATH"
+      - name : machine ls $GITHUB_WORKSPACE
+        run : "ls -la $GITHUB_WORKSPACE"
+      - name : machine ls $HOME
+        working-directory : "."
+        run : "ls -la $HOME"
+      - name : vscode
+        run : "ls -la ./vscode-extension"
+        
       - name: Archive artifacts
         if: github.ref == 'refs/heads/master'
         uses: actions/upload-artifact@v2

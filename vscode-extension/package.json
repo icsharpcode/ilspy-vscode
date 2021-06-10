@@ -57,6 +57,20 @@
 					"when": "view == ilspyDecompiledMembers && viewItem == assemblyNode",
 					"group": "1_GeneralCommands@1"
 				}
+			],
+			"commandPalette": [
+				{
+					"command": "ilspy.decompileAssemblyInWorkspace",
+					"when": "ilspy.backendAvailable"
+				},
+				{
+					"command": "ilspy.decompileAssemblyViaDialog",
+					"when": "ilspy.backendAvailable"
+				},
+				{
+					"command": "ilspy.unloadAssembly",
+					"when": "ilspy.backendAvailable"
+				}
 			]
 		}
 	},

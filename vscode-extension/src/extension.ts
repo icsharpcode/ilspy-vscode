@@ -24,6 +24,8 @@ let client: LanguageClient;
 export async function activate(context: vscode.ExtensionContext) {
   const disposables: vscode.Disposable[] = [];
 
+  setBackendAvailable(false);
+
   const dotnetCli = await acquireDotnetRuntime(context);
   if (dotnetCli) {
     const backendExecutable = ILSpyBackend.getExecutable(context);
@@ -43,6 +45,8 @@ export async function activate(context: vscode.ExtensionContext) {
     client.trace = Trace.Verbose;
 
     client.start();
+
+    setBackendAvailable(true);
   }
 
   const ilspyBackend = new ILSpyBackend(client);
@@ -67,4 +71,12 @@ export function deactivate(): Thenable<void> | undefined {
     return undefined;
   }
   return client.stop();
+}
+
+function setBackendAvailable(available: boolean) {
+  vscode.commands.executeCommand(
+    "setContext",
+    "ilspy.backendAvailable",
+    available
+  );
 }

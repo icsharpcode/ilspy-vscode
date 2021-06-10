@@ -21,18 +21,18 @@ export async function acquireDotnetRuntime(context: vscode.ExtensionContext) {
         { version: netRuntimeVersion, requestingExtensionId }
       );
     dotnetPath = acquireResult?.dotnetPath;
+
+    if (dotnetPath) {
+      await vscode.commands.executeCommand("dotnet.ensureDotnetDependencies", {
+        command: dotnetPath,
+        arguments: [ILSpyBackend.getExecutable(context)],
+      });
+    } else {
+      vscode.window.showWarningMessage(formatAcquireError());
+    }
   } catch (error) {
     vscode.window.showWarningMessage(formatAcquireError(error.toString()));
   }
-
-  if (!dotnetPath) {
-    vscode.window.showWarningMessage(formatAcquireError());
-  }
-
-  await vscode.commands.executeCommand("dotnet.ensureDotnetDependencies", {
-    command: dotnetPath,
-    arguments: [ILSpyBackend.getExecutable(context)],
-  });
 
   return dotnetPath;
 }

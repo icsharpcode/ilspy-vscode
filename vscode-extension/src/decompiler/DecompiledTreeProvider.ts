@@ -148,7 +148,7 @@ export class DecompiledTreeProvider
 
     switch (node.type) {
       case TokenType.AssemblyDefinition:
-        name = "Document";
+        name = "Assembly";
         break;
       case TokenType.NamespaceDefinition:
         name = "Namespace";

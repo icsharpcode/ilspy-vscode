@@ -4,18 +4,26 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as vscode from "vscode";
-import { DecompiledTreeProvider } from "../decompiler/DecompiledTreeProvider";
-import { attemptToDecompileFilePath } from "./utils";
+import {
+  DecompiledTreeProvider,
+  MemberNode,
+} from "../decompiler/DecompiledTreeProvider";
+import { addAssemblyFromFilePath } from "./utils";
 
 export function registerDecompileAssemblyViaDialog(
-  decompiledTreeProvider: DecompiledTreeProvider
+  decompiledTreeProvider: DecompiledTreeProvider,
+  decompiledTreeView: vscode.TreeView<MemberNode>
 ) {
   return vscode.commands.registerCommand(
     "ilspy.decompileAssemblyViaDialog",
     async () => {
       const file = await promptForAssemblyFilePathViaDialog();
       if (file) {
-        attemptToDecompileFilePath(file, decompiledTreeProvider);
+        addAssemblyFromFilePath(
+          file,
+          decompiledTreeProvider,
+          decompiledTreeView
+        );
       }
     }
   );

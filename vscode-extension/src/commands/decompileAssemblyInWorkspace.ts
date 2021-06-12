@@ -5,11 +5,15 @@
 
 import * as vscode from "vscode";
 import * as path from "path";
-import { DecompiledTreeProvider } from "../decompiler/DecompiledTreeProvider";
-import { decompileFile } from "./utils";
+import {
+  DecompiledTreeProvider,
+  MemberNode,
+} from "../decompiler/DecompiledTreeProvider";
+import { addAssemblyToTree } from "./utils";
 
 export function registerDecompileAssemblyInWorkspace(
-  decompiledTreeProvider: DecompiledTreeProvider
+  decompiledTreeProvider: DecompiledTreeProvider,
+  decompiledTreeView: vscode.TreeView<MemberNode>
 ) {
   return vscode.commands.registerCommand(
     "ilspy.decompileAssemblyInWorkspace",
@@ -17,7 +21,11 @@ export function registerDecompileAssemblyInWorkspace(
       // The code you place here will be executed every time your command is executed
       const assembly = await pickAssembly();
       if (assembly) {
-        await decompileFile(assembly.assemblyPath, decompiledTreeProvider);
+        await addAssemblyToTree(
+          assembly.assemblyPath,
+          decompiledTreeProvider,
+          decompiledTreeView
+        );
       }
     }
   );

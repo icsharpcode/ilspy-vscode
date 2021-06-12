@@ -13,7 +13,10 @@ import {
   Trace,
 } from "vscode-languageclient/node";
 import ILSpyBackend from "./decompiler/ILSpyBackend";
-import { DecompiledTreeProvider } from "./decompiler/DecompiledTreeProvider";
+import {
+  DecompiledTreeProvider,
+  MemberNode,
+} from "./decompiler/DecompiledTreeProvider";
 import { registerDecompileAssemblyInWorkspace } from "./commands/decompileAssemblyInWorkspace";
 import { registerDecompileAssemblyViaDialog } from "./commands/decompileAssemblyViaDialog";
 import { registerShowDecompiledCode } from "./commands/showDecompiledCode";
@@ -58,15 +61,21 @@ export async function activate(context: vscode.ExtensionContext) {
 
   const ilspyBackend = new ILSpyBackend(client);
   const decompileTreeProvider = new DecompiledTreeProvider(ilspyBackend);
+  const decompileTreeView: vscode.TreeView<MemberNode> =
+    vscode.window.createTreeView("ilspyDecompiledMembers", {
+      treeDataProvider: decompileTreeProvider,
+    });
+  disposables.push(decompileTreeView);
+
   disposables.push(
-    vscode.window.registerTreeDataProvider(
-      "ilspyDecompiledMembers",
-      decompileTreeProvider
+    registerDecompileAssemblyInWorkspace(
+      decompileTreeProvider,
+      decompileTreeView
     )
   );
-
-  disposables.push(registerDecompileAssemblyInWorkspace(decompileTreeProvider));
-  disposables.push(registerDecompileAssemblyViaDialog(decompileTreeProvider));
+  disposables.push(
+    registerDecompileAssemblyViaDialog(decompileTreeProvider, decompileTreeView)
+  );
   disposables.push(registerShowDecompiledCode(decompileTreeProvider));
   disposables.push(registerUnloadAssembly(decompileTreeProvider));
 

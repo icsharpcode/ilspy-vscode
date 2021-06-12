@@ -5,11 +5,15 @@
 
 import * as vscode from "vscode";
 import * as fs from "fs";
-import { DecompiledTreeProvider } from "../decompiler/DecompiledTreeProvider";
+import {
+  DecompiledTreeProvider,
+  MemberNode,
+} from "../decompiler/DecompiledTreeProvider";
 
-export function attemptToDecompileFilePath(
+export function addAssemblyFromFilePath(
   filePath: string,
-  decompiledTreeProvider: DecompiledTreeProvider
+  decompiledTreeProvider: DecompiledTreeProvider,
+  decompiledTreeView: vscode.TreeView<MemberNode>
 ) {
   let escaped: string = filePath.replace(/\\/g, "\\\\");
   if (escaped[0] === '"' && escaped[escaped.length - 1] === '"') {
@@ -18,15 +22,24 @@ export function attemptToDecompileFilePath(
 
   try {
     fs.accessSync(escaped, fs.constants.R_OK);
-    decompileFile(escaped, decompiledTreeProvider);
+    addAssemblyToTree(escaped, decompiledTreeProvider, decompiledTreeView);
   } catch (err) {
     vscode.window.showErrorMessage("Cannot read the file " + filePath);
   }
 }
 
-export async function decompileFile(
+export async function addAssemblyToTree(
   assembly: string,
-  decompiledTreeProvider: DecompiledTreeProvider
+  decompiledTreeProvider: DecompiledTreeProvider,
+  decompiledTreeView: vscode.TreeView<MemberNode>
 ) {
-  await decompiledTreeProvider.addAssembly(assembly);
+  const added = await decompiledTreeProvider.addAssembly(assembly);
+  if (added) {
+    const newNode = decompiledTreeProvider.findNode(
+      (node) => node.assembly === assembly
+    );
+    if (newNode) {
+      decompiledTreeView.reveal(newNode, { focus: true, select: true });
+    }
+  }
 }

@@ -214,6 +214,10 @@ export class DecompiledTreeProvider
     };
   }
 
+  public findNode(predicate: (node: MemberNode) => boolean) {
+    return (this.getChildren() as MemberNode[]).find(predicate);
+  }
+
   public getChildren(
     element?: MemberNode
   ): MemberNode[] | Thenable<MemberNode[]> {
@@ -245,6 +249,11 @@ export class DecompiledTreeProvider
     } else {
       return this.getMembers(element);
     }
+  }
+
+  public getParent?(element: MemberNode): ProviderResult<MemberNode> {
+    // Note: This allows relealing of assembly nodes in TreeView, which are placed in root. It won't work for other nodes.
+    return undefined;
   }
 
   async getNamespaces(assembly: string): Promise<MemberNode[]> {

@@ -7,6 +7,7 @@ import {
   AddAssemblyParams,
   AddAssemblyResponse,
 } from "../protocol/addAssembly";
+import AssemblyData from "../protocol/AssemblyData";
 import { DecompileAssemblyParams } from "../protocol/decompileAssembly";
 import { DecompileMemberParams } from "../protocol/decompileMember";
 import DecompileResponse from "../protocol/DecompileResponse";
@@ -26,7 +27,7 @@ import {
 } from "../protocol/removeAssembly";
 
 export default interface IILSpyBackend {
-  readonly assemblyPaths: Set<string>;
+  readonly assemblies: Map<string, AssemblyData>;
 
   sendAddAssembly(
     params: AddAssemblyParams

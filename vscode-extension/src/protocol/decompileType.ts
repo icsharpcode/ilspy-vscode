@@ -14,7 +14,7 @@ import AssemblyRequestParams from "./AssemblyRequestParams";
 import DecompileResponse from "./DecompileResponse";
 
 export interface DecompileTypeParams extends AssemblyRequestParams {
-  Handle: number;
+  handle: number;
 }
 
 export namespace DecompileTypeRequest {

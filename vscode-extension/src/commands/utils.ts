@@ -28,8 +28,5 @@ export async function decompileFile(
   assembly: string,
   decompiledTreeProvider: DecompiledTreeProvider
 ) {
-  const added = await decompiledTreeProvider.addAssembly(assembly);
-  if (added) {
-    decompiledTreeProvider.refresh();
-  }
+  await decompiledTreeProvider.addAssembly(assembly);
 }

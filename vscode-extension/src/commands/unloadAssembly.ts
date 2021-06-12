@@ -22,10 +22,7 @@ export function registerUnloadAssembly(
         return;
       }
       console.log("Unloading assembly " + node.name);
-      const removed = await decompiledTreeProvider.removeAssembly(node.name);
-      if (removed) {
-        decompiledTreeProvider.refresh();
-      }
+      await decompiledTreeProvider.removeAssembly(node.assembly);
     }
   );
 }

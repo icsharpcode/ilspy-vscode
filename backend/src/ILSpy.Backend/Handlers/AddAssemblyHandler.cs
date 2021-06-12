@@ -21,8 +21,10 @@ namespace ILSpy.Backend.Handlers
 
         public Task<AddAssemblyResponse> Handle(AddAssemblyRequest request, CancellationToken cancellationToken)
         {
-            var result = request.AssemblyPath != null && decompilerBackend.AddAssembly(request.AssemblyPath);
-            return Task.FromResult(new AddAssemblyResponse(Added: result));
+            var result = request.AssemblyPath != null ? decompilerBackend.AddAssembly(request.AssemblyPath) : null;
+            return Task.FromResult(new AddAssemblyResponse(
+                Added: result != null,
+                AssemblyData: result));
         }
     }
 }

@@ -10,12 +10,14 @@ import {
   RequestHandler,
   RequestType,
 } from "vscode-languageclient";
+import AssemblyData from "./AssemblyData";
 import AssemblyRequestParams from "./AssemblyRequestParams";
 
 export interface AddAssemblyParams extends AssemblyRequestParams {}
 
 export interface AddAssemblyResponse {
   added: boolean;
+  assemblyData?: AssemblyData;
 }
 
 export namespace AddAssemblyRequest {

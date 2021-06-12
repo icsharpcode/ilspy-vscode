@@ -28,7 +28,7 @@ namespace ILSpy.Backend.Decompiler
             logger = loggerFactory.CreateLogger<DecompilerBackend>();
         }
 
-        public bool AddAssembly(string? path)
+        public AssemblyData? AddAssembly(string? path)
         {
             if (path != null)
             {
@@ -36,7 +36,7 @@ namespace ILSpy.Backend.Decompiler
                 {
                     var decompiler = new CSharpDecompiler(path, new DecompilerSettings() { ThrowOnAssemblyResolveErrors = false });
                     decompilers[path] = decompiler;
-                    return true;
+                    return CreateAssemblyData(decompiler, path);
                 }
                 catch (Exception ex)
                 {
@@ -44,7 +44,31 @@ namespace ILSpy.Backend.Decompiler
                 }
             }
 
-            return false;
+            return null;
+        }
+
+        public AssemblyData? CreateAssemblyData(CSharpDecompiler decompiler, string assemblyFile)
+        {
+            var module = decompiler.TypeSystem.MainModule.PEFile;
+            var metadata = module.Metadata;
+            if (metadata != null)
+            {
+                AssemblyData assemblyData = new(Path.GetFileNameWithoutExtension(assemblyFile), assemblyFile);
+                if (metadata.IsAssembly)
+                {
+                    var assemblyDefinition = metadata.GetAssemblyDefinition();
+                    assemblyData.Version = assemblyDefinition.Version.ToString();
+                    var targetFrameworkId = module.DetectTargetFrameworkId();
+                    if (!string.IsNullOrEmpty(targetFrameworkId))
+                    {
+                        assemblyData.TargetFramework = targetFrameworkId.Replace("Version=", " ");
+                    }
+                }
+
+                return assemblyData;
+            }
+
+            return null;
         }
 
         public bool RemoveAssembly(string? path)

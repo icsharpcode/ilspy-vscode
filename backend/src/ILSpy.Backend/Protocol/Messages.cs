@@ -14,7 +14,7 @@ namespace ILSpy.Backend.Protocol
     public record AddAssemblyRequest(string? AssemblyPath)
         : IRequest<AddAssemblyResponse>;
 
-    public record AddAssemblyResponse(bool Added);
+    public record AddAssemblyResponse(bool Added, AssemblyData? AssemblyData);
 
     #endregion
 

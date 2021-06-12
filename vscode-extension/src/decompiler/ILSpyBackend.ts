@@ -45,9 +45,10 @@ import {
   RemoveAssemblyResponse,
 } from "../protocol/removeAssembly";
 import IILSpyBackend from "./IILSpyBackend";
+import AssemblyData from "../protocol/AssemblyData";
 
 export default class ILSpyBackend implements IILSpyBackend {
-  public readonly assemblyPaths: Set<string> = new Set<string>();
+  public readonly assemblies = new Map<string, AssemblyData>();
 
   constructor(private languageClient: LanguageClient) {}
 

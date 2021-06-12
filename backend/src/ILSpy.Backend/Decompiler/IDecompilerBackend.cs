@@ -9,7 +9,7 @@ namespace ILSpy.Backend.Decompiler
 {
     public interface IDecompilerBackend
     {
-        bool AddAssembly(string? path);
+        AssemblyData? AddAssembly(string? path);
         bool RemoveAssembly(string? path);
         IEnumerable<string> ListNamespaces(string? assemblyPath);
         IEnumerable<MemberData> ListTypes(string? assemblyPath, string? @namespace);

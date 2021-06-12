@@ -22,6 +22,7 @@ import * as os from "os";
 import { DecompiledCode, LanguageName } from "../protocol/DecompileResponse";
 import MemberData from "../protocol/MemberData";
 import IILSpyBackend from "./IILSpyBackend";
+import AssemblyData from "../protocol/AssemblyData";
 
 export class MemberNode {
   private _decompiled?: DecompiledCode;
@@ -97,8 +98,9 @@ export class DecompiledTreeProvider
     const response = await this.backend.sendAddAssembly({
       assemblyPath: assembly,
     });
-    if (response?.added) {
-      this.backend.assemblyPaths.add(assembly);
+    if (response?.added && response?.assemblyData) {
+      this.backend.assemblies.set(assembly, response.assemblyData);
+      this.refresh();
       return true;
     } else {
       window.showWarningMessage(
@@ -114,7 +116,8 @@ export class DecompiledTreeProvider
       assemblyPath: assembly,
     });
     if (response?.removed) {
-      this.backend.assemblyPaths.delete(assembly);
+      this.backend.assemblies.delete(assembly);
+      this.refresh();
     }
     return response?.removed ?? false;
   }
@@ -122,6 +125,10 @@ export class DecompiledTreeProvider
   public getTreeItem(element: MemberNode): TreeItem {
     return {
       label: element.name,
+      tooltip:
+        element.type === TokenType.AssemblyDefinition
+          ? element.assembly
+          : element.name,
       collapsibleState: element.mayHaveChildren
         ? TreeItemCollapsibleState.Collapsed
         : void 0,
@@ -210,18 +217,18 @@ export class DecompiledTreeProvider
   public getChildren(
     element?: MemberNode
   ): MemberNode[] | Thenable<MemberNode[]> {
-    if (this.backend.assemblyPaths.size <= 0) {
+    if (this.backend.assemblies.size <= 0) {
       return [];
     }
 
     // Nothing yet so add assembly nodes
     if (!element) {
-      let result = [];
-      for (let e of this.backend.assemblyPaths) {
+      let result = [] as MemberNode[];
+      for (let assemblyData of this.backend.assemblies.values()) {
         result.push(
           new MemberNode(
-            e,
-            e,
+            assemblyData.filePath,
+            getAssemblyNodeText(assemblyData),
             -2,
             TokenType.AssemblyDefinition,
             MemberSubKind.None,
@@ -270,8 +277,8 @@ export class DecompiledTreeProvider
           new MemberNode(
             assembly,
             t.name,
-            this.getRid(t),
-            this.getHandleKind(t),
+            getRid(t),
+            getHandleKind(t),
             t.subKind,
             -1
           )
@@ -283,7 +290,7 @@ export class DecompiledTreeProvider
     if (element.mayHaveChildren) {
       const result = await this.backend.sendListMembers({
         assemblyPath: element.assembly,
-        handle: this.makeHandle(element),
+        handle: makeHandle(element),
       });
       return (
         result?.members.map(
@@ -291,8 +298,8 @@ export class DecompiledTreeProvider
             new MemberNode(
               element.assembly,
               m.name,
-              this.getRid(m),
-              this.getHandleKind(m),
+              getRid(m),
+              getHandleKind(m),
               m.subKind,
               element.rid
             )
@@ -325,14 +332,14 @@ export class DecompiledTreeProvider
     if (element.mayHaveChildren) {
       const result = await this.backend.sendDecompileType({
         assemblyPath: element.assembly,
-        Handle: this.makeHandle(element),
+        handle: makeHandle(element),
       });
       return result?.decompiledCode;
     } else {
       const result = await this.backend.sendDecompileMember({
         assemblyPath: element?.assembly,
         type: element?.parent,
-        member: this.makeHandle(element),
+        member: makeHandle(element),
       });
       return result?.decompiledCode;
     }
@@ -345,21 +352,29 @@ export class DecompiledTreeProvider
     //TODO:
     return "";
   }
+}
 
-  // metadata tokens/handles are 32-bit unsigned integers in the format:
-  // the first byte is the handle kind/token type, the other three bytes are used for the row-id.
-  makeHandle(element: MemberNode): number {
-    return (element.type << 24) | element.rid;
-  }
+function getAssemblyNodeText(assemblyData: AssemblyData) {
+  const text = assemblyData.name;
+  const additionalData = [assemblyData.version, assemblyData.targetFramework]
+    .filter((d) => d)
+    .join(", ");
+  return `${text}${additionalData ? ` (${additionalData})` : ""}`;
+}
 
-  // extract the row-id by removing the first byte
-  getRid(member: MemberData): number {
-    return member.token & 0x00ffffff;
-  }
+// metadata tokens/handles are 32-bit unsigned integers in the format:
+// the first byte is the handle kind/token type, the other three bytes are used for the row-id.
+function makeHandle(element: MemberNode): number {
+  return (element.type << 24) | element.rid;
+}
 
-  // extract the token/handle kind by shifting the first byte to the position of the first byte
-  // apply bit-and 0xFF to the result to ensure that the other bytes are zero.
-  getHandleKind(member: MemberData): number {
-    return (member.token >> 24) & 0xff;
-  }
+// extract the row-id by removing the first byte
+function getRid(member: MemberData): number {
+  return member.token & 0x00ffffff;
+}
+
+// extract the token/handle kind by shifting the first byte to the position of the first byte
+// apply bit-and 0xFF to the result to ensure that the other bytes are zero.
+function getHandleKind(member: MemberData): number {
+  return (member.token >> 24) & 0xff;
 }

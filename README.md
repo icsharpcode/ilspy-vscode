@@ -18,7 +18,7 @@ Compile and package all parts:
 ./build vsix
 ```
 
-An installable `.vsix` file should be generated in `vscode-extension` folder, if everything is fine.
+An installable `.vsix` file should be generated in `artifacts` folder, if everything is fine.
 
 Compile only backend server from console:
 
@@ -31,8 +31,8 @@ Or open `backend/ILSpy-server.sln` in Visual Studio 2019 (>= 16.9) or another .N
 Compile VSCode extension itself:
 
 ```
-./build CompileExtension
-./build TestExtension
+./build compile-extension
+./build test-extension
 ```
 
 To develop and debug the VSCode extension, install [Visual Studio Code](https://code.visualstudio.com/),

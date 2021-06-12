@@ -9,6 +9,7 @@ import {
   LanguageClient,
   LanguageClientOptions,
   ServerOptions,
+  State,
   Trace,
 } from "vscode-languageclient/node";
 import ILSpyBackend from "./decompiler/ILSpyBackend";
@@ -44,9 +45,15 @@ export async function activate(context: vscode.ExtensionContext) {
     );
     client.trace = Trace.Verbose;
 
-    client.start();
+    client.onDidChangeState((e) => {
+      if (e.newState === State.Running) {
+        setBackendAvailable(true);
+      } else {
+        setBackendAvailable(false);
+      }
+    });
 
-    setBackendAvailable(true);
+    client.start();
   }
 
   const ilspyBackend = new ILSpyBackend(client);

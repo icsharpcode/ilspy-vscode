@@ -2,8 +2,8 @@
 
 Welcome to the ILSpy extension for Visual Studio Code! This extension provides two commands inside Visual Studio Code:
 
-* `ilspy.decompileAssemblyInWorkspace` - Decompile an MSIL assembly inside the current Visual Studio Code workspace.
-* `ilspy.decompileAssemblyViaDialog` - Decompile an MSIL assembly from file picker dialog.
+- `ilspy.decompileAssemblyInWorkspace` - Decompile an MSIL assembly inside the current Visual Studio Code workspace.
+- `ilspy.decompileAssemblyViaDialog` - Decompile an MSIL assembly from file picker dialog.
 
 Open the Visual Studio Code Command Palette (<kbd>Ctrl+Shift+P</kbd>) then type `ilspy` to show the two commands.
 
@@ -21,29 +21,31 @@ Loaded assemblies can be closed by right-click on the assemly nodes to show the 
 
 ## Requirements
 
-* Windows - no other pre-requisites
-* Linux/MacOS - requires Mono version >= 4.6.0.
+- Visual Studio Code >= 1.56
+- .NET 5.0 (installed automatically on first start)
 
 ## What's New
-
-First release of ILSpy .NET Decompiler extension for Visual Studio Code!
 
 See our [change log](https://github.com/icsharpcode/ilspy-vscode/blob/master/vscode-extension/CHANGELOG.md) for all of the updates.
 
 ### Found a Bug?
+
 Please file any issues at https://github.com/icsharpcode/ilspy-vscode/issues
 
 ## Development
 
 First install:
-* Node.js (newer than 4.3.1)
-* Npm (newer than 2.14.12)
 
-* Run `npm i`
-* Run `npm run compile`
-* Open in Visual Studio Code (`code .`)
-* *Optional:* run `npm run watch`, make code changes
-* Press <kbd>F5</kbd> to debug
+- Node.js (newer than 4.3.1)
+- Npm (newer than 2.14.12)
+
+- Compile and prepare ILSpy.Backend: `../build backend` (or `../build.sh backend`)
+
+- Run `npm i`
+- Run `npm run compile`
+- Open in Visual Studio Code (`code .`)
+- _Optional:_ run `npm run watch`, make code changes
+- Press <kbd>F5</kbd> to debug
 
 To **test** do the following: `npm test` or <kbd>F5</kbd> in VS Code with the "Launch Tests" debug configuration.
 

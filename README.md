@@ -2,6 +2,14 @@
 
 You can install the extension in Visual Studio Code via the [marketplace](https://marketplace.visualstudio.com/items?itemName=icsharpcode.ilspy-vscode)
 
+## Getting started
+
+Please see the [Getting started](https://github.com/icsharpcode/ilspy-vscode/wiki/Getting-started) overview.
+
+## Troubleshooting
+
+If you have issues during installation of .NET Runtime, please see [here](https://github.com/icsharpcode/ilspy-vscode/wiki/Troubleshooting#download-of-net-runtime-fails-with-slow-internet-connection).
+
 ## Develop
 
 The extension consists of two parts: The VSCode extension itself (written in TypeScript) and a "backend" server process (written in C#), which provides a bridge to ILSpy functionality.

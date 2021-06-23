@@ -22,15 +22,19 @@ import { registerDecompileAssemblyViaDialog } from "./commands/decompileAssembly
 import { registerShowDecompiledCode } from "./commands/showDecompiledCode";
 import { registerUnloadAssembly } from "./commands/unloadAssembly";
 import { acquireDotnetRuntime } from "./dotnet-acquire/acquire";
+import OutputWindowLogger from "./OutputWindowLogger";
+import { stat } from "fs";
 
 let client: LanguageClient;
 
 export async function activate(context: vscode.ExtensionContext) {
   const disposables: vscode.Disposable[] = [];
 
+  const logger = new OutputWindowLogger();
+
   setBackendAvailable(false);
 
-  const dotnetCli = await acquireDotnetRuntime(context);
+  const dotnetCli = await acquireDotnetRuntime(context, logger);
   if (dotnetCli) {
     const backendExecutable = ILSpyBackend.getExecutable(context);
     const serverOptions: ServerOptions = {
@@ -49,13 +53,23 @@ export async function activate(context: vscode.ExtensionContext) {
     client.trace = Trace.Verbose;
 
     client.onDidChangeState((e) => {
-      if (e.newState === State.Running) {
-        setBackendAvailable(true);
-      } else {
-        setBackendAvailable(false);
+      switch (e.newState) {
+        case State.Running:
+          logger.writeLine("ILSpy Backend is running");
+          setBackendAvailable(true);
+          break;
+        case State.Starting:
+          logger.writeLine("ILSpy Backend is starting...");
+          setBackendAvailable(false);
+          break;
+        case State.Stopped:
+          logger.writeLine("ILSpy Backend has stopped");
+          setBackendAvailable(false);
+          break;
       }
     });
 
+    logger.writeLine(`Launch ILSpy Backend: ${backendExecutable}`);
     client.start();
   }
 

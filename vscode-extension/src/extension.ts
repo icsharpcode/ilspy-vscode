@@ -3,8 +3,6 @@
  *  Licensed under the MIT License. See LICENSE.TXT in the project root for license information.
  *-----------------------------------------------------------------------------------------------*/
 
-import * as vscode from "vscode";
-
 import {
   LanguageClient,
   LanguageClientOptions,
@@ -23,12 +21,18 @@ import { registerShowDecompiledCode } from "./commands/showDecompiledCode";
 import { registerUnloadAssembly } from "./commands/unloadAssembly";
 import { acquireDotnetRuntime } from "./dotnet-acquire/acquire";
 import OutputWindowLogger from "./OutputWindowLogger";
-import { stat } from "fs";
+import {
+  commands,
+  Disposable,
+  ExtensionContext,
+  TreeView,
+  window,
+} from "vscode";
 
 let client: LanguageClient;
 
-export async function activate(context: vscode.ExtensionContext) {
-  const disposables: vscode.Disposable[] = [];
+export async function activate(context: ExtensionContext) {
+  const disposables: Disposable[] = [];
 
   const logger = new OutputWindowLogger();
 
@@ -69,16 +73,20 @@ export async function activate(context: vscode.ExtensionContext) {
       }
     });
 
-    logger.writeLine(`Launch ILSpy Backend: ${backendExecutable}`);
+    logger.writeLine(`ILSpy Backend: ${backendExecutable}`);
+    logger.writeLine(`Starting LSP client...`);
     client.start();
+    logger.writeLine(`Started LSP client`);
   }
 
   const ilspyBackend = new ILSpyBackend(client);
   const decompileTreeProvider = new DecompiledTreeProvider(ilspyBackend);
-  const decompileTreeView: vscode.TreeView<MemberNode> =
-    vscode.window.createTreeView("ilspyDecompiledMembers", {
+  const decompileTreeView: TreeView<MemberNode> = window.createTreeView(
+    "ilspyDecompiledMembers",
+    {
       treeDataProvider: decompileTreeProvider,
-    });
+    }
+  );
   disposables.push(decompileTreeView);
 
   disposables.push(
@@ -104,9 +112,5 @@ export function deactivate(): Thenable<void> | undefined {
 }
 
 function setBackendAvailable(available: boolean) {
-  vscode.commands.executeCommand(
-    "setContext",
-    "ilspy.backendAvailable",
-    available
-  );
+  commands.executeCommand("setContext", "ilspy.backendAvailable", available);
 }

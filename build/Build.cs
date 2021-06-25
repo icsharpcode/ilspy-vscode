@@ -66,6 +66,7 @@ class Build : NukeBuild
         });
 
     Target PublishBackend => _ => _
+        .DependsOn(Versionize)
         .Executes(() =>
         {
             EnsureCleanDirectory(VSCodeExtensionBinDir);
@@ -89,6 +90,7 @@ class Build : NukeBuild
         .DependsOn(PublishBackend);
 
     Target CompileExtension => _ => _
+        .DependsOn(Versionize)
         .Executes(() =>
         {
             NpmInstall(s => s
@@ -106,7 +108,7 @@ class Build : NukeBuild
         });
 
     Target Vsix => _ => _
-        .DependsOn(Versionize, Backend, CompileExtension)
+        .DependsOn(Backend, CompileExtension)
         .Executes(() =>
         {
             NpmInstall(s => s

@@ -29,14 +29,16 @@
 			"explorer": [
 				{
 					"id": "ilspyDecompiledMembers",
-					"name": "ILSpy Decompiled Members"
+					"name": "ILSpy Decompiled Members",
+					"when": "ilspy.backendAvailable"
 				}
 			]
 		},
 		"viewsWelcome": [
 			{
 				"view": "ilspyDecompiledMembers",
-				"contents": "No assemblies selected yet\n[Add assembly from workspace](command:ilspy.decompileAssemblyInWorkspace)\n[Pick assembly from file system](command:ilspy.decompileAssemblyViaDialog)\n\nGet [more help](https://github.com/icsharpcode/ilspy-vscode/wiki/Getting-started#usage)"
+				"contents": "No assemblies selected yet\n[Add assembly from workspace](command:ilspy.decompileAssemblyInWorkspace)\n[Pick assembly from file system](command:ilspy.decompileAssemblyViaDialog)\n\nGet [more help](https://github.com/icsharpcode/ilspy-vscode/wiki/Getting-started#usage)",
+				"when": "ilspy.backendAvailable"
 			}
 		],
 		"commands": [

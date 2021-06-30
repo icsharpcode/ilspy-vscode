@@ -43,6 +43,7 @@ export async function acquireDotnetRuntime(
     }
     logger.writeLine("Check for additional dependencies finished");
   } catch (error) {
+    logger.writeLine(`[ERROR] Acquiring .NET runtime: ${error.toString()}`);
     vscode.window.showWarningMessage(formatAcquireError(error.toString()));
   }
 

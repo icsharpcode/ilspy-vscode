@@ -2,6 +2,10 @@
 
 All notable changes to the "ilspy-vscode" extension will be documented in this file.
 
+## 0.11.2
+
+- Fixed issues activating the extension on Linux systems, also leading to malfunction of some other extensions
+
 ## 0.11
 
 - Re-architecture of internal ILSpy interface (_ILSpy.Backend_) based on .NET 5.0, therefore no Mono dependency on Linux/MacOS any more

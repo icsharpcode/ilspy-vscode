@@ -36,7 +36,7 @@ export async function acquireDotnetRuntime(
     if (dotnetPath) {
       await vscode.commands.executeCommand("dotnet.ensureDotnetDependencies", {
         command: dotnetPath,
-        arguments: [ILSpyBackend.getExecutable(context)],
+        arguments: ["--info"],
       });
     } else {
       vscode.window.showWarningMessage(formatAcquireError());

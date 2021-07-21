@@ -34,7 +34,8 @@ namespace ILSpy.Backend.Decompiler
             {
                 try
                 {
-                    var decompiler = new CSharpDecompiler(path, new DecompilerSettings() { ThrowOnAssemblyResolveErrors = false });
+                    var assemblyResolver = AssemblyReferences.CreateAssemblyResolver(path);
+                    var decompiler = new CSharpDecompiler(path, assemblyResolver, new DecompilerSettings() { ThrowOnAssemblyResolveErrors = false });
                     decompilers[path] = decompiler;
                     return CreateAssemblyData(decompiler, path);
                 }

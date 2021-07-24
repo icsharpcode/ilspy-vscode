@@ -5,6 +5,7 @@ VisualStudioVersion = 16.0.31112.23
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C431902B-34F0-4C4C-8A3C-5513BE55A3D4}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		..\appveyor.yml = ..\appveyor.yml
 		..\.github\workflows\ci.yml = ..\.github\workflows\ci.yml
 		LICENSE.TXT = LICENSE.TXT
@@ -16,7 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{52028C35-563
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{A40CFEFF-8CA9-4EAE-BA24-A2339CE505A9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestAssembly", "test\TestAssembly\TestAssembly.csproj", "{98030DE1-DC87-4E74-8201-FE8E93E826B5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestAssembly", "test\TestAssembly\TestAssembly.csproj", "{98030DE1-DC87-4E74-8201-FE8E93E826B5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ILSpy.Backend", "src\ILSpy.Backend\ILSpy.Backend.csproj", "{A97B9A08-1EC0-4D6E-B9B6-9A9C643552E7}"
 EndProject

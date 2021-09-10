@@ -4,10 +4,8 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as vscode from "vscode";
-import {
-  DecompiledTreeProvider,
-  MemberNode,
-} from "../decompiler/DecompiledTreeProvider";
+import { DecompiledTreeProvider } from "../decompiler/DecompiledTreeProvider";
+import { MemberNode } from "../decompiler/MemberNode";
 
 export function registerUnloadAssembly(
   decompiledTreeProvider: DecompiledTreeProvider

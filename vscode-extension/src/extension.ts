@@ -11,13 +11,9 @@ import {
   Trace,
 } from "vscode-languageclient/node";
 import ILSpyBackend from "./decompiler/ILSpyBackend";
-import {
-  DecompiledTreeProvider,
-  MemberNode,
-} from "./decompiler/DecompiledTreeProvider";
+import { DecompiledTreeProvider } from "./decompiler/DecompiledTreeProvider";
 import { registerDecompileAssemblyInWorkspace } from "./commands/decompileAssemblyInWorkspace";
 import { registerDecompileAssemblyViaDialog } from "./commands/decompileAssemblyViaDialog";
-import { registerShowDecompiledCode } from "./commands/showDecompiledCode";
 import { registerUnloadAssembly } from "./commands/unloadAssembly";
 import { acquireDotnetRuntime } from "./dotnet-acquire/acquire";
 import OutputWindowLogger from "./OutputWindowLogger";
@@ -27,7 +23,13 @@ import {
   ExtensionContext,
   TreeView,
   window,
+  workspace,
 } from "vscode";
+import { DecompilerTextDocumentContentProvider } from "./decompiler/DecompilerTextDocumentContentProvider";
+import { MemberNode } from "./decompiler/MemberNode";
+import { registerShowCode } from "./commands/showCode";
+import { registerSelectOutputLanguage } from "./commands/selectOutputLanguage";
+import { ILSPY_URI_SCHEME } from "./decompiler/memberNodeUri";
 
 let client: LanguageClient;
 
@@ -98,7 +100,21 @@ export async function activate(context: ExtensionContext) {
   disposables.push(
     registerDecompileAssemblyViaDialog(decompileTreeProvider, decompileTreeView)
   );
-  disposables.push(registerShowDecompiledCode(decompileTreeProvider));
+  disposables.push(registerShowCode(decompileTreeProvider));
+
+  const decompilerTextDocumentContentProvider =
+    new DecompilerTextDocumentContentProvider(ilspyBackend);
+
+  disposables.push(
+    workspace.registerTextDocumentContentProvider(
+      ILSPY_URI_SCHEME,
+      decompilerTextDocumentContentProvider
+    )
+  );
+
+  disposables.push(
+    registerSelectOutputLanguage(decompilerTextDocumentContentProvider)
+  );
   disposables.push(registerUnloadAssembly(decompileTreeProvider));
 
   context.subscriptions.push(...disposables);

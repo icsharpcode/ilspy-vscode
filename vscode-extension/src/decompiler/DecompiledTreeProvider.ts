@@ -9,82 +9,25 @@ import {
   TreeItem,
   Event,
   TreeItemCollapsibleState,
-  Uri,
-  TextDocumentContentProvider,
-  CancellationToken,
   ProviderResult,
   window,
 } from "vscode";
 import { TokenType } from "./TokenType";
 import { MemberSubKind } from "./MemberSubKind";
 import * as path from "path";
-import * as os from "os";
 import { DecompiledCode, LanguageName } from "../protocol/DecompileResponse";
 import MemberData from "../protocol/MemberData";
 import IILSpyBackend from "./IILSpyBackend";
 import AssemblyData from "../protocol/AssemblyData";
-
-export class MemberNode {
-  private _decompiled?: DecompiledCode;
-
-  constructor(
-    private _assembly: string,
-    private _name: string,
-    private _rid: number,
-    private _tokenType: TokenType,
-    private _typeDefSubKind: MemberSubKind,
-    private _parentToken: number
-  ) {}
-
-  public get name(): string {
-    return this._name;
-  }
-
-  public get rid(): number {
-    return this._rid;
-  }
-
-  public get type(): TokenType {
-    return this._tokenType;
-  }
-
-  public get decompiled(): DecompiledCode | undefined {
-    return this._decompiled;
-  }
-
-  public set decompiled(val: DecompiledCode | undefined) {
-    this._decompiled = val;
-  }
-
-  public get mayHaveChildren(): boolean {
-    return (
-      this.type === TokenType.TypeDefinition ||
-      this.type === TokenType.AssemblyDefinition ||
-      this.type === TokenType.NamespaceDefinition
-    );
-  }
-
-  public get parent(): number {
-    return this._parentToken;
-  }
-
-  public get assembly(): string {
-    return this._assembly;
-  }
-
-  public get memberSubKind(): MemberSubKind {
-    return this._typeDefSubKind;
-  }
-}
+import { MemberNode } from "./MemberNode";
+import { makeHandle } from "./utils";
 
 interface ThenableTreeIconPath {
   light: string;
   dark: string;
 }
 
-export class DecompiledTreeProvider
-  implements TreeDataProvider<MemberNode>, TextDocumentContentProvider
-{
+export class DecompiledTreeProvider implements TreeDataProvider<MemberNode> {
   private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
   readonly onDidChangeTreeData: Event<any> = this._onDidChangeTreeData.event;
 
@@ -133,7 +76,7 @@ export class DecompiledTreeProvider
         ? TreeItemCollapsibleState.Collapsed
         : void 0,
       command: {
-        command: "showDecompiledCode",
+        command: "showCode",
         arguments: [element],
         title: "Decompile",
       },
@@ -353,14 +296,6 @@ export class DecompiledTreeProvider
       return result?.decompiledCode;
     }
   }
-
-  public provideTextDocumentContent(
-    uri: Uri,
-    token: CancellationToken
-  ): ProviderResult<string> {
-    //TODO:
-    return "";
-  }
 }
 
 function getAssemblyNodeText(assemblyData: AssemblyData) {
@@ -369,12 +304,6 @@ function getAssemblyNodeText(assemblyData: AssemblyData) {
     .filter((d) => d)
     .join(", ");
   return `${text}${additionalData ? ` (${additionalData})` : ""}`;
-}
-
-// metadata tokens/handles are 32-bit unsigned integers in the format:
-// the first byte is the handle kind/token type, the other three bytes are used for the row-id.
-function makeHandle(element: MemberNode): number {
-  return (element.type << 24) | element.rid;
 }
 
 // extract the row-id by removing the first byte

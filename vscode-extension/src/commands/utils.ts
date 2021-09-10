@@ -5,10 +5,8 @@
 
 import * as vscode from "vscode";
 import * as fs from "fs";
-import {
-  DecompiledTreeProvider,
-  MemberNode,
-} from "../decompiler/DecompiledTreeProvider";
+import { DecompiledTreeProvider } from "../decompiler/DecompiledTreeProvider";
+import { MemberNode } from "../decompiler/MemberNode";
 
 export function addAssemblyFromFilePath(
   filePath: string,

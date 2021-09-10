@@ -5,11 +5,9 @@
 
 import * as vscode from "vscode";
 import * as path from "path";
-import {
-  DecompiledTreeProvider,
-  MemberNode,
-} from "../decompiler/DecompiledTreeProvider";
+import { DecompiledTreeProvider } from "../decompiler/DecompiledTreeProvider";
 import { addAssemblyToTree } from "./utils";
+import { MemberNode } from "../decompiler/MemberNode";
 
 export function registerDecompileAssemblyInWorkspace(
   decompiledTreeProvider: DecompiledTreeProvider,

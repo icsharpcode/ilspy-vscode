@@ -4,14 +4,12 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { expect } from "chai";
-import {
-  MemberNode,
-  DecompiledTreeProvider,
-} from "../../decompiler/DecompiledTreeProvider";
+import { DecompiledTreeProvider } from "../../decompiler/DecompiledTreeProvider";
 import { TreeItemCollapsibleState } from "vscode";
 import MockILSpyBackend from "./MockILSpyBackend";
 import { MemberSubKind } from "../../decompiler/MemberSubKind";
 import { TokenType } from "../../decompiler/TokenType";
+import { MemberNode } from "../../decompiler/MemberNode";
 
 suite("Member Node Tests", () => {
   test("Assembly node returns true for isType", () => {

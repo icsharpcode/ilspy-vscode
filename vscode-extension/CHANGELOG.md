@@ -2,6 +2,12 @@
 
 All notable changes to the "ilspy-vscode" extension will be documented in this file.
 
+## 0.12
+
+- Only one document is opened now on decompilation (C# or IL). Users can switch the output language in editor toolbar and also preset a default output language in VS Code configuration. Documents are read-only now.
+- Previously opened documents with decompiled code are no longer re-opened on restart of VS Code
+- Improved decompilation results by resolving dependencies of decompiled assembly (as ILSpy does)
+
 ## 0.11.2
 
 - Fixed issues activating the extension on Linux systems, also leading to malfunction of some other extensions

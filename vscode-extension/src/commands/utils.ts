@@ -13,14 +13,17 @@ export function addAssemblyFromFilePath(
   decompiledTreeProvider: DecompiledTreeProvider,
   decompiledTreeView: vscode.TreeView<MemberNode>
 ) {
-  let escaped: string = filePath.replace(/\\/g, "\\\\");
-  if (escaped[0] === '"' && escaped[escaped.length - 1] === '"') {
-    escaped = escaped.slice(1, -1);
+  let assemblyFile = filePath;
+  if (
+    assemblyFile[0] === '"' &&
+    assemblyFile[assemblyFile.length - 1] === '"'
+  ) {
+    assemblyFile = assemblyFile.slice(1, -1);
   }
 
   try {
-    fs.accessSync(escaped, fs.constants.R_OK);
-    addAssemblyToTree(escaped, decompiledTreeProvider, decompiledTreeView);
+    fs.accessSync(assemblyFile, fs.constants.R_OK);
+    addAssemblyToTree(assemblyFile, decompiledTreeProvider, decompiledTreeView);
   } catch (err) {
     vscode.window.showErrorMessage("Cannot read the file " + filePath);
   }

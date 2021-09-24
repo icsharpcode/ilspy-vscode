@@ -2,6 +2,10 @@
 
 All notable changes to the "ilspy-vscode" extension will be documented in this file.
 
+## 0.12.1
+
+- Fix issue with "Pick assembly from file system" command, where only namespaces were decompiled.
+
 ## 0.12
 
 - Only one document is opened now on decompilation (C# or IL). Users can switch the output language in editor toolbar and also preset a default output language in VS Code configuration. Documents are read-only now.

@@ -64,12 +64,12 @@
 		"commands": [
 			{
 				"command": "ilspy.decompileAssemblyInWorkspace",
-				"title": "Decompile IL Assembly in Current Workspace",
+				"title": "Add assembly from workspace",
 				"category": "ILSpy"
 			},
 			{
 				"command": "ilspy.decompileAssemblyViaDialog",
-				"title": "Decompile IL Assembly (pick file)",
+				"title": "Pick assembly from file system",
 				"category": "ILSpy"
 			},
 			{
@@ -84,6 +84,16 @@
 			}
 		],
 		"menus": {
+			"view/title": [
+				{
+					"command": "ilspy.decompileAssemblyInWorkspace",
+					"when": "view == ilspyDecompiledMembers"
+				},
+				{
+					"command": "ilspy.decompileAssemblyViaDialog",
+					"when": "view == ilspyDecompiledMembers"
+				}
+			],
 			"view/item/context": [
 				{
 					"command": "ilspy.unloadAssembly",

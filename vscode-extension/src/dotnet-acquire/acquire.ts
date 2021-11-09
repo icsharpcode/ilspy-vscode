@@ -9,7 +9,7 @@ import { IDotnetAcquireResult } from "./types";
 import ILSpyBackend from "../decompiler/ILSpyBackend";
 import OutputWindowLogger from "../OutputWindowLogger";
 
-const netRuntimeVersion = "5.0";
+const netRuntimeVersion = "6.0";
 
 export async function acquireDotnetRuntime(
   context: vscode.ExtensionContext,

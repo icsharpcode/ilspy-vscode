@@ -2,6 +2,11 @@
 
 All notable changes to the "ilspy-vscode" extension will be documented in this file.
 
+## 0.13
+
+- Upgrade to .NET 6.0 runtime
+- "ILSpy Decompiled Members" view now has a menu to quickly add assemblies without command palette
+
 ## 0.12.1
 
 - Fix issue with "Pick assembly from file system" command, where only namespaces were decompiled.

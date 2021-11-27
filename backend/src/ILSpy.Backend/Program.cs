@@ -47,7 +47,7 @@ namespace ILSpy.Backend
                     .WithHandler<RemoveAssemblyHandler>()
                  );
 
-            await server.WaitForExit;
+            await server.WasShutDown;
         }
 
         static void ConfigureServices(IServiceCollection services)

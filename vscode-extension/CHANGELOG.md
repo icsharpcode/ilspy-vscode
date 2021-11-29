@@ -2,6 +2,11 @@
 
 All notable changes to the "ilspy-vscode" extension will be documented in this file.
 
+## 0.13.1
+
+- Fix zombie backend processes still running after VS Code was closed on Linux and macOS
+- Make output language selection less confusing
+
 ## 0.13
 
 - Upgrade to .NET 6.0 runtime

@@ -100,7 +100,6 @@ export async function activate(context: ExtensionContext) {
   disposables.push(
     registerDecompileAssemblyViaDialog(decompileTreeProvider, decompileTreeView)
   );
-  disposables.push(registerShowCode(decompileTreeProvider));
 
   const decompilerTextDocumentContentProvider =
     new DecompilerTextDocumentContentProvider(ilspyBackend);
@@ -111,6 +110,8 @@ export async function activate(context: ExtensionContext) {
       decompilerTextDocumentContentProvider
     )
   );
+
+  disposables.push(registerShowCode(decompilerTextDocumentContentProvider));
 
   disposables.push(
     registerSelectOutputLanguage(decompilerTextDocumentContentProvider)

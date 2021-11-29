@@ -75,7 +75,10 @@ export class DecompilerTextDocumentContentProvider
     this.onDidChangeEmitter.fire(uri);
   }
 
-  getDocumentOutputLanguage(uri: vscode.Uri): LanguageName {
+  getDocumentOutputLanguage(uri: vscode.Uri | undefined): LanguageName {
+    if (uri === undefined) {
+      return getDefaultOutputLanguage();
+    }
     return this.documentLanguages[uri.toString()] ?? getDefaultOutputLanguage();
   }
 }

@@ -4,16 +4,16 @@
  *-----------------------------------------------------------------------------------------------*/
 
 import * as vscode from "vscode";
-import { DecompiledTreeProvider } from "../decompiler/DecompiledTreeProvider";
 import { memberNodeToUri } from "../decompiler/memberNodeUri";
 import { MemberNode } from "../decompiler/MemberNode";
 import { languageInfos } from "../decompiler/languageInfos";
 import { getDefaultOutputLanguage } from "../decompiler/settings";
+import { DecompilerTextDocumentContentProvider } from "../decompiler/DecompilerTextDocumentContentProvider";
 
 let lastSelectedNode: MemberNode | undefined = undefined;
 
 export function registerShowCode(
-  decompiledTreeProvider: DecompiledTreeProvider
+  contentProvider: DecompilerTextDocumentContentProvider
 ) {
   return vscode.commands.registerCommand(
     "showCode",
@@ -24,10 +24,15 @@ export function registerShowCode(
 
       lastSelectedNode = node;
 
-      let doc = await vscode.workspace.openTextDocument(memberNodeToUri(node));
+      const uri = memberNodeToUri(node);
+      const language = getDefaultOutputLanguage();
+
+      contentProvider.setDocumentOutputLanguage(uri, language);
+
+      let doc = await vscode.workspace.openTextDocument(uri);
       vscode.languages.setTextDocumentLanguage(
         doc,
-        languageInfos[getDefaultOutputLanguage()].vsLanguageMode
+        languageInfos[language].vsLanguageMode
       );
       await vscode.window.showTextDocument(doc, { preview: true });
     }

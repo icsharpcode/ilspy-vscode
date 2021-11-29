@@ -120,6 +120,10 @@
 				{
 					"command": "ilspy.unloadAssembly",
 					"when": "ilspy.backendAvailable"
+				},
+				{
+					"command": "ilspy.selectOutputLanguage",
+					"when": "resourceScheme == ilspy"
 				}
 			]
 		}

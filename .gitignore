@@ -256,6 +256,9 @@ typings/
 **/*.Server/ModelManifest.xml
 _Pvt_Extensions
 
+# Visual Studio Code
+.ionide/
+
 # Paket dependency manager
 .paket/paket.exe
 paket-files/

@@ -1,0 +1,51 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            // Use IntelliSense to find out which attributes exist for C# debugging
+            // Use hover for the description of the existing attributes
+            // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
+            "name": "Run Backend",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            // If you have changed target frameworks, make sure to update the program path.
+            "program": "${workspaceFolder}/backend/src/ILSpy.Backend/bin/Debug/net6.0/ILSpy.Backend.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/backend/src/ILSpy.Backend",
+            // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
+            "name": "Attach Backend",
+            "type": "coreclr",
+            "request": "attach"
+        },
+        {
+            "name": "Run Extension",
+            "type": "extensionHost",
+            "request": "launch",
+            "args": [
+                "--extensionDevelopmentPath=${workspaceFolder}/vscode-extension"
+            ],
+            "outFiles": [
+                "${workspaceFolder}/vscode-extension/out/**/*.js"
+            ],
+            "preLaunchTask": "${defaultBuildTask}"
+        },
+        {
+            "name": "Extension Tests",
+            "type": "extensionHost",
+            "request": "launch",
+            "args": [
+                "--extensionDevelopmentPath=${workspaceFolder}/vscode-extension",
+                "--extensionTestsPath=${workspaceFolder}/vscode-extension/out/test/suite/index"
+            ],
+            "outFiles": [
+                "${workspaceFolder}/vscode-extension/out/test/**/*.js"
+            ],
+            "preLaunchTask": "${defaultBuildTask}"
+        }
+    ]
+}

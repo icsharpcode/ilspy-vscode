@@ -6,13 +6,13 @@
     <Company>ic#code</Company>
     <Title>ILSpy .NET Decompiler LSP Backend</Title>
     <Product>ILSpy .NET Decompiler</Product>
-    <Copyright>Copyright 2017-2021 ICSharpCode, Microsoft Corporation</Copyright>
+    <Copyright>Copyright 2017-2022 ICSharpCode, Microsoft Corporation</Copyright>
     <Nullable>enable</Nullable>
     <Version>0.13.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ICSharpCode.Decompiler" Version="7.2.0.6702-preview2" />
+    <PackageReference Include="ICSharpCode.Decompiler" Version="7.2.0.6844" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
     <PackageReference Include="Mono.Cecil" Version="0.11.4" />
     <PackageReference Include="OmniSharp.Extensions.LanguageServer" Version="0.19.5" />

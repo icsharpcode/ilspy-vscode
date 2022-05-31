@@ -12,6 +12,9 @@
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
+# macOS-specific
+**/.DS_Store
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/

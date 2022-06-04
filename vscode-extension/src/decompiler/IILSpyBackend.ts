@@ -25,6 +25,7 @@ import {
   RemoveAssemblyParams,
   RemoveAssemblyResponse,
 } from "../protocol/removeAssembly";
+import { SearchParams, SearchResponse } from "../protocol/search";
 
 export default interface IILSpyBackend {
   readonly assemblies: Map<string, AssemblyData>;
@@ -58,4 +59,6 @@ export default interface IILSpyBackend {
   ): Promise<ListNamespacesResponse | null>;
 
   sendListTypes(params: ListTypesParams): Promise<ListTypesResponse | null>;
+
+  sendSearch(params: SearchParams): Promise<SearchResponse | null>;
 }

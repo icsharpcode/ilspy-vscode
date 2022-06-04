@@ -81,6 +81,12 @@
 				"command": "ilspy.selectOutputLanguage",
 				"title": "Output language",
 				"category": "ILSpy"
+			},
+			{
+				"command": "ilspy.search",
+				"title": "Search in Decompiled Assemblies",
+				"category": "ILSpy",
+				"icon": "$(search-view-icon)"
 			}
 		],
 		"menus": {
@@ -92,6 +98,11 @@
 				{
 					"command": "ilspy.decompileAssemblyViaDialog",
 					"when": "view == ilspyDecompiledMembers"
+				},
+				{
+					"command": "ilspy.search",
+					"when": "view == ilspyDecompiledMembers",
+					"group": "navigation"
 				}
 			],
 			"view/item/context": [
@@ -124,6 +135,10 @@
 				{
 					"command": "ilspy.selectOutputLanguage",
 					"when": "resourceScheme == ilspy"
+				},
+				{
+					"command": "ilspy.search",
+					"when": "ilspy.backendAvailable"
 				}
 			]
 		}

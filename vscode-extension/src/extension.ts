@@ -30,6 +30,7 @@ import { MemberNode } from "./decompiler/MemberNode";
 import { registerShowCode } from "./commands/showCode";
 import { registerSelectOutputLanguage } from "./commands/selectOutputLanguage";
 import { ILSPY_URI_SCHEME } from "./decompiler/memberNodeUri";
+import { registerSearch } from "./commands/search";
 
 let client: LanguageClient;
 
@@ -100,6 +101,8 @@ export async function activate(context: ExtensionContext) {
   disposables.push(
     registerDecompileAssemblyViaDialog(decompileTreeProvider, decompileTreeView)
   );
+
+  disposables.push(registerSearch(ilspyBackend));
 
   const decompilerTextDocumentContentProvider =
     new DecompilerTextDocumentContentProvider(ilspyBackend);

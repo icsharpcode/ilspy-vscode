@@ -46,6 +46,11 @@ import {
 } from "../protocol/removeAssembly";
 import IILSpyBackend from "./IILSpyBackend";
 import AssemblyData from "../protocol/AssemblyData";
+import {
+  SearchParams,
+  SearchRequest,
+  SearchResponse,
+} from "../protocol/search";
 
 export default class ILSpyBackend implements IILSpyBackend {
   public readonly assemblies = new Map<string, AssemblyData>();
@@ -107,5 +112,9 @@ export default class ILSpyBackend implements IILSpyBackend {
     params: ListTypesParams
   ): Promise<ListTypesResponse | null> {
     return this.languageClient.sendRequest(ListTypesRequest.type, params);
+  }
+
+  public sendSearch(params: SearchParams): Promise<SearchResponse | null> {
+    return this.languageClient.sendRequest(SearchRequest.type, params);
   }
 }

@@ -25,6 +25,7 @@ import {
   RemoveAssemblyParams,
   RemoveAssemblyResponse,
 } from "../../protocol/removeAssembly";
+import { SearchParams, SearchResponse } from "../../protocol/search";
 
 export default class MockILSpyBackend implements IILSpyBackend {
   public readonly assemblies = new Map<string, AssemblyData>();
@@ -74,6 +75,10 @@ export default class MockILSpyBackend implements IILSpyBackend {
   public sendListTypes(
     params: ListTypesParams
   ): Promise<ListTypesResponse | null> {
+    return Promise.resolve(null);
+  }
+
+  public sendSearch(params: SearchParams): Promise<SearchResponse | null> {
     return Promise.resolve(null);
   }
 }

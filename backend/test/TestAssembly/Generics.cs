@@ -1,23 +1,23 @@
 ﻿namespace Generics
 {
-    public class C<T> { }
+    public class ClassGeneric<T> { }
 
-    public class C<T1, T2> { }
+    public class ClassGeneric<T1, T2> { }
 
-    public interface I<T> { }
+    public interface IGeneric<T> { }
 
-    public interface I<T1, T2> { }
+    public interface IGeneric<T1, T2> { }
 
-    public interface I<T1, T2, T3> { }
+    public interface IGeneric<T1, T2, T3> { }
 
-    public class A
+    public class AClass
     {
         public void M<T>() { }
 
         public void M<T1, T2>() { }
 
-        public class NestedC<T> { }
+        public class NestedClass<T> { }
 
-        public class NestedC<T1, T2> { }
+        public class NestedClass<T1, T2> { }
     }
 }

@@ -5,7 +5,7 @@
     /// <summary>
     /// Some struct
     /// </summary>
-    public struct S
+    public struct SomeStruct
     {
         /// <summary>
         ///  some public struct property with getter and setter.

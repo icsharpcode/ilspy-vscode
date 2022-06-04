@@ -4,10 +4,12 @@
  *-----------------------------------------------------------------------------------------------*/
 
 import Node from "./Node";
+import { SymbolModifiers } from "./SymbolModifiers";
 
 export default interface NodeData {
   node?: Node;
   name: string;
   description: string;
   mayHaveChildren: boolean;
+  modifiers: SymbolModifiers;
 }

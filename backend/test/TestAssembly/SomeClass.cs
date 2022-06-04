@@ -5,7 +5,7 @@ namespace TestAssembly
     /// <summary>
     /// Some class
     /// </summary>
-    public class C
+    public class SomeClass
     {
         /// <summary>
         /// some private class field
@@ -15,27 +15,24 @@ namespace TestAssembly
         /// <summary>
         /// Some public class propertywith getter and setter
         /// </summary>
-        public int ProgId
-        {
-            get
-            {
+        public int ProgId {
+            get {
                 return _ProgId;
             }
-            set
-            {
+            set {
                 _ProgId = value;
             }
         }
 
-        static C() { }
+        static SomeClass() { }
 
-        public C() { }
+        public SomeClass() { }
 
         /// <summary>
         /// Some class ctor
         /// </summary>
         /// <param name="ProgramId"></param>
-        public C(int ProgramId)
+        public SomeClass(int ProgramId)
         {
             ProgId = ProgramId;
         }

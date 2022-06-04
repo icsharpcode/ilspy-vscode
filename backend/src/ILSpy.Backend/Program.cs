@@ -1,6 +1,7 @@
 ﻿// Copyright(c) 2021 ICSharpCode
 // Licensed under the MIT license. See the LICENSE file in the project root for more information.
 
+using ICSharpCode.ILSpyX;
 using ILSpy.Backend.Decompiler;
 using ILSpy.Backend.Handlers;
 using Microsoft.Extensions.DependencyInjection;
@@ -45,6 +46,7 @@ namespace ILSpy.Backend
                     .WithHandler<ListNamespacesHandler>()
                     .WithHandler<ListTypesHandler>()
                     .WithHandler<RemoveAssemblyHandler>()
+                    .WithHandler<SearchHandler>()
                  );
 
             await server.WasShutDown;
@@ -52,6 +54,9 @@ namespace ILSpy.Backend
 
         static void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<ISettingsProvider, SettingsProvider>();
+            services.AddSingleton<AssemblyListManager>();
+            services.AddSingleton<SearchBackend>();
             services.AddSingleton<IDecompilerBackend, DecompilerBackend>();
         }
     }

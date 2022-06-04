@@ -3,7 +3,7 @@
     /// <summary>
     /// Some enum
     /// </summary>
-    public enum E
+    public enum SomeEnum
     {
         /// <summary>
         /// E1 - first enum field

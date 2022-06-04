@@ -1,6 +1,6 @@
 ﻿namespace TestAssembly
 {
-    public interface I
+    public interface ISomeInterface
     {
         int i { get; set; }
     }

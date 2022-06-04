@@ -13,14 +13,21 @@ namespace ILSpy.Backend.Handlers
     public class RemoveAssemblyHandler : IJsonRpcRequestHandler<RemoveAssemblyRequest, RemoveAssemblyResponse>
     {
         private readonly IDecompilerBackend decompilerBackend;
+        private readonly SearchBackend searchBackend;
 
-        public RemoveAssemblyHandler(IDecompilerBackend decompilerBackend)
+        public RemoveAssemblyHandler(IDecompilerBackend decompilerBackend, SearchBackend searchBackend)
         {
             this.decompilerBackend = decompilerBackend;
+            this.searchBackend = searchBackend;
         }
 
         public Task<RemoveAssemblyResponse> Handle(RemoveAssemblyRequest request, CancellationToken cancellationToken)
         {
+            if (request.AssemblyPath != null)
+            {
+                searchBackend.RemoveAssembly(request.AssemblyPath);
+            }
+
             var result = request.AssemblyPath != null && decompilerBackend.RemoveAssembly(request.AssemblyPath);
             return Task.FromResult(new RemoveAssemblyResponse(Removed: result));
         }

@@ -89,4 +89,14 @@ namespace ILSpy.Backend.Protocol
     public record ListTypesResponse(IEnumerable<MemberData>? Types);
 
     #endregion
+
+    #region search
+
+    [Serial, Method("ilspy/search", Direction.ClientToServer)]
+    public record SearchRequest(string Term)
+        : IRequest<SearchResponse>;
+
+    public record SearchResponse(IEnumerable<NodeData>? Results);
+
+    #endregion
 }

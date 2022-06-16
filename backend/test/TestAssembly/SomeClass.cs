@@ -32,7 +32,7 @@ namespace TestAssembly
         /// Some class ctor
         /// </summary>
         /// <param name="ProgramId"></param>
-        public SomeClass(int ProgramId)
+        internal SomeClass(int ProgramId)
         {
             ProgId = ProgramId;
         }
@@ -40,6 +40,13 @@ namespace TestAssembly
         public class NestedC
         {
             public void M() { }
+        }
+
+        public virtual void VirtualMethod() { }
+
+        public override string ToString()
+        {
+            return base.ToString();
         }
     }
 }

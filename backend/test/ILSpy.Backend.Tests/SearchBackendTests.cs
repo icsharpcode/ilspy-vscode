@@ -17,7 +17,7 @@ public class SearchBackendTests
     }
 
     [Fact]
-    public async Task SearchForClassName()
+    public async Task ClassName()
     {
         var searchBackend = CreateSearchBackend();
         var nodeData = await searchBackend.Search("SomeClass", new CancellationToken());
@@ -27,34 +27,34 @@ public class SearchBackendTests
                     Assert.Equal("TestAssembly", node.Description);
                     Assert.Equal(NodeType.Class, node.Node?.Type);
                     Assert.True(node.MayHaveChildren);
-                    Assert.Equal(SymbolModifiers.None, node.SymbolModifiers);
+                    Assert.Equal(SymbolModifiers.Public, node.SymbolModifiers);
                 },
                 node => {
                     Assert.Equal("SomeClass.SomeClass()", node.Name);
                     Assert.Equal("TestAssembly.SomeClass", node.Description);
                     Assert.Equal(NodeType.Method, node.Node?.Type);
                     Assert.False(node.MayHaveChildren);
-                    Assert.Equal(SymbolModifiers.None, node.SymbolModifiers);
+                    Assert.Equal(SymbolModifiers.Static | SymbolModifiers.Private, node.SymbolModifiers);
                 },
                 node => {
                     Assert.Equal("SomeClass.SomeClass()", node.Name);
                     Assert.Equal("TestAssembly.SomeClass", node.Description);
                     Assert.Equal(NodeType.Method, node.Node?.Type);
                     Assert.False(node.MayHaveChildren);
-                    Assert.Equal(SymbolModifiers.None, node.SymbolModifiers);
+                    Assert.Equal(SymbolModifiers.Public, node.SymbolModifiers);
                 },
                 node => {
                     Assert.Equal("SomeClass.SomeClass(int)", node.Name);
                     Assert.Equal("TestAssembly.SomeClass", node.Description);
                     Assert.Equal(NodeType.Method, node.Node?.Type);
                     Assert.False(node.MayHaveChildren);
-                    Assert.Equal(SymbolModifiers.None, node.SymbolModifiers);
+                    Assert.Equal(SymbolModifiers.Internal, node.SymbolModifiers);
                 }
             );
     }
 
     [Fact]
-    public async Task SearchForInterfaceNameLowerCase()
+    public async Task InterfaceNameLowerCase()
     {
         var searchBackend = CreateSearchBackend();
         var nodeData = await searchBackend.Search("isomeinterface", new CancellationToken());
@@ -64,13 +64,13 @@ public class SearchBackendTests
                     Assert.Equal("TestAssembly", node.Description);
                     Assert.Equal(NodeType.Interface, node.Node?.Type);
                     Assert.True(node.MayHaveChildren);
-                    Assert.Equal(SymbolModifiers.None, node.SymbolModifiers);
+                    Assert.Equal(SymbolModifiers.Abstract | SymbolModifiers.Public, node.SymbolModifiers);
                 }
             );
     }
 
     [Fact]
-    public async Task SearchForEnumConstants()
+    public async Task EnumConstants()
     {
         var searchBackend = CreateSearchBackend();
         var nodeData = await searchBackend.Search("E1", new CancellationToken());
@@ -80,7 +80,39 @@ public class SearchBackendTests
                     Assert.Equal("TestAssembly.SomeEnum", node.Description);
                     Assert.Equal(NodeType.Field, node.Node?.Type);
                     Assert.False(node.MayHaveChildren);
-                    Assert.Equal(SymbolModifiers.None, node.SymbolModifiers);
+                    Assert.Equal(SymbolModifiers.Static | SymbolModifiers.Public, node.SymbolModifiers);
+                }
+            );
+    }
+
+    [Fact]
+    public async Task VirtualClassMethod()
+    {
+        var searchBackend = CreateSearchBackend();
+        var nodeData = await searchBackend.Search("VirtualMethod", new CancellationToken());
+        Assert.Collection(nodeData,
+                node => {
+                    Assert.Equal("SomeClass.VirtualMethod() : void", node.Name);
+                    Assert.Equal("TestAssembly.SomeClass", node.Description);
+                    Assert.Equal(NodeType.Method, node.Node?.Type);
+                    Assert.False(node.MayHaveChildren);
+                    Assert.Equal(SymbolModifiers.Virtual | SymbolModifiers.Public, node.SymbolModifiers);
+                }
+            );
+    }
+
+    [Fact]
+    public async Task OverrideClassMethod()
+    {
+        var searchBackend = CreateSearchBackend();
+        var nodeData = await searchBackend.Search("ToString", new CancellationToken());
+        Assert.Collection(nodeData,
+                node => {
+                    Assert.Equal("SomeClass.ToString() : string", node.Name);
+                    Assert.Equal("TestAssembly.SomeClass", node.Description);
+                    Assert.Equal(NodeType.Method, node.Node?.Type);
+                    Assert.False(node.MayHaveChildren);
+                    Assert.Equal(SymbolModifiers.Override | SymbolModifiers.Public, node.SymbolModifiers);
                 }
             );
     }

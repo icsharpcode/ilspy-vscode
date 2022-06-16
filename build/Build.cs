@@ -82,8 +82,8 @@ class Build : NukeBuild
         .DependsOn(CompileBackend)
         .Executes(() =>
         {
-            //DotNetTest(s => s
-            //    .SetProjectFile("ILSpy.Backend.Tests"));
+            DotNetTest(s => s
+                .SetProjectFile(BackendDirectory / "test" / "ILSpy.Backend.Tests" / "ILSpy.Backend.Tests.csproj"));
         });
 
     Target Backend => _ => _

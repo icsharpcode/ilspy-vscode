@@ -35,6 +35,9 @@ jobs:
       - name: Build
         run: ./build.sh vsix
 
+      - name: Test
+        run: ./build.sh test-backend
+
       - name: Archive artifacts
         if: github.ref == 'refs/heads/master'
         uses: actions/upload-artifact@v2

@@ -4,6 +4,7 @@
  *-----------------------------------------------------------------------------------------------*/
 
 import * as vscode from "vscode";
+import { getProductIconByNodeType } from "../decompiler/icons";
 import IILSpyBackend from "../decompiler/IILSpyBackend";
 
 export function registerSearch(ilspyBackend: IILSpyBackend) {
@@ -24,7 +25,7 @@ export function registerSearch(ilspyBackend: IILSpyBackend) {
       response?.results.map(
         (res) =>
           ({
-            label: res.name,
+            label: `$(${getProductIconByNodeType(res.node?.type)}) ${res.name}`,
             description: res.description,
           } as vscode.QuickPickItem)
       ),

@@ -103,10 +103,10 @@ namespace ILSpy.Backend.Decompiler
                         Name: typeDefinition.TypeToString(includeNamespace: false),
                         Token: MetadataTokens.GetToken(typeDefinition.MetadataToken),
                         SubKind: typeDefinition.Kind))
-                    .Union(c.Fields.Select(GetMemberData))
-                    .Union(c.Properties.Select(GetMemberData))
-                    .Union(c.Events.Select(GetMemberData))
-                    .Union(c.Methods.Select(GetMemberData));
+                    .Union(c.Fields.Select(GetMemberData).OrderBy(m => m.Name))
+                    .Union(c.Properties.Select(GetMemberData).OrderBy(m => m.Name))
+                    .Union(c.Events.Select(GetMemberData).OrderBy(m => m.Name))
+                    .Union(c.Methods.Select(GetMemberData).OrderBy(m => m.Name));
 
             static MemberData GetMemberData(IMember member)
             {
@@ -323,7 +323,7 @@ namespace ILSpy.Backend.Decompiler
                 }
             }
 
-            foreach (var t in currentNamespace.Types)
+            foreach (var t in currentNamespace.Types.OrderBy(t => t.FullName))
             {
                 yield return new MemberData(
                     Name: t.TypeToString(includeNamespace: false),

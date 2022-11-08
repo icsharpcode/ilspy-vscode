@@ -45,12 +45,28 @@
 				}
 			}
 		],
+		"viewsContainers": {
+			"panel": [
+				{
+					"id": "ilspySearchResultsContainer",
+					"title": "ILSpy: Search Results",
+					"icon": ""
+				}
+			]
+		},
 		"views": {
 			"explorer": [
 				{
 					"id": "ilspyDecompiledMembers",
 					"name": "ILSpy Decompiled Members",
 					"when": "ilspy.backendAvailable"
+				}
+			],
+			"ilspySearchResultsContainer": [
+				{
+					"id": "ilspySearchResultsContainer",
+					"name": "ILSpy: Search Results",
+					"when": "ilspy.searchResultsToShow"
 				}
 			]
 		},

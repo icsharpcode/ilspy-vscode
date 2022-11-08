@@ -21,6 +21,7 @@ import {
   ListNamespacesResponse,
 } from "../protocol/listNamespaces";
 import { ListTypesParams, ListTypesResponse } from "../protocol/listTypes";
+import NodeData from "../protocol/NodeData";
 import {
   RemoveAssemblyParams,
   RemoveAssemblyResponse,

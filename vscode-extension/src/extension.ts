@@ -29,8 +29,11 @@ import { DecompilerTextDocumentContentProvider } from "./decompiler/DecompilerTe
 import { MemberNode } from "./decompiler/MemberNode";
 import { registerShowCode } from "./commands/showCode";
 import { registerSelectOutputLanguage } from "./commands/selectOutputLanguage";
-import { ILSPY_URI_SCHEME } from "./decompiler/memberNodeUri";
+import { ILSPY_URI_SCHEME_LEGACY } from "./decompiler/nodeUri";
 import { registerSearch } from "./commands/search";
+import { SearchResultTreeProvider } from "./decompiler/search/SearchResultTreeProvider";
+import NodeData from "./protocol/NodeData";
+import { registerDecompileNode } from "./commands/decompileNode";
 
 let client: LanguageClient;
 
@@ -102,19 +105,30 @@ export async function activate(context: ExtensionContext) {
     registerDecompileAssemblyViaDialog(decompileTreeProvider, decompileTreeView)
   );
 
-  disposables.push(registerSearch(ilspyBackend));
-
   const decompilerTextDocumentContentProvider =
     new DecompilerTextDocumentContentProvider(ilspyBackend);
 
+  const searchTreeProvider = new SearchResultTreeProvider(ilspyBackend);
+  const searchResultTreeView: TreeView<NodeData> = window.createTreeView(
+    "ilspySearchResultsContainer",
+    {
+      treeDataProvider: searchTreeProvider,
+    }
+  );
+  disposables.push(searchResultTreeView);
+  disposables.push(registerSearch(searchTreeProvider));
+
   disposables.push(
     workspace.registerTextDocumentContentProvider(
-      ILSPY_URI_SCHEME,
+      ILSPY_URI_SCHEME_LEGACY,
       decompilerTextDocumentContentProvider
     )
   );
 
   disposables.push(registerShowCode(decompilerTextDocumentContentProvider));
+  disposables.push(
+    registerDecompileNode(decompilerTextDocumentContentProvider)
+  );
 
   disposables.push(
     registerSelectOutputLanguage(decompilerTextDocumentContentProvider)

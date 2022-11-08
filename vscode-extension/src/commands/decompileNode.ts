@@ -1,30 +1,30 @@
 /*------------------------------------------------------------------------------------------------
- *  Copyright (c) 2021 ICSharpCode
+ *  Copyright (c) 2022 ICSharpCode
  *  Licensed under the MIT License. See LICENSE.TXT in the project root for license information.
  *-----------------------------------------------------------------------------------------------*/
 
 import * as vscode from "vscode";
-import { memberNodeToUri } from "../decompiler/nodeUri";
-import { MemberNode } from "../decompiler/MemberNode";
+import { nodeToUri } from "../decompiler/nodeUri";
 import { languageInfos } from "../decompiler/languageInfos";
 import { getDefaultOutputLanguage } from "../decompiler/settings";
 import { DecompilerTextDocumentContentProvider } from "../decompiler/DecompilerTextDocumentContentProvider";
+import NodeData from "../protocol/NodeData";
 
-let lastSelectedNode: MemberNode | undefined = undefined;
+let lastSelectedNode: NodeData | undefined = undefined;
 
-export function registerShowCode(
+export function registerDecompileNode(
   contentProvider: DecompilerTextDocumentContentProvider
 ) {
   return vscode.commands.registerCommand(
-    "showCode",
-    async (node: MemberNode) => {
+    "decompileNode",
+    async (node: NodeData) => {
       if (lastSelectedNode === node) {
         return;
       }
 
       lastSelectedNode = node;
 
-      const uri = memberNodeToUri(node);
+      const uri = nodeToUri(node);
       const language = getDefaultOutputLanguage();
 
       contentProvider.setDocumentOutputLanguage(uri, language);

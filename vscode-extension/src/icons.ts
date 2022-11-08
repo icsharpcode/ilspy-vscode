@@ -1,9 +1,14 @@
-import { MemberNode } from "./MemberNode";
-import { MemberSubKind } from "./MemberSubKind";
-import { TokenType } from "./TokenType";
+/*------------------------------------------------------------------------------------------------
+ *  Copyright (c) 2022 ICSharpCode
+ *  Licensed under the MIT License. See LICENSE.TXT in the project root for license information.
+ *-----------------------------------------------------------------------------------------------*/
+
+import { MemberNode } from "./decompiler/MemberNode";
+import { MemberSubKind } from "./decompiler/MemberSubKind";
+import { TokenType } from "./decompiler/TokenType";
 import * as path from "path";
-import Node from "../protocol/Node";
-import { NodeType } from "../protocol/NodeType";
+import Node from "./protocol/Node";
+import { NodeType } from "./protocol/NodeType";
 
 export function getIconImageByTokenType(
   node: MemberNode
@@ -55,22 +60,8 @@ export function getIconImageByTokenType(
 
   const normalName = name + "_16x.svg";
   const inverseName = name + "_inverse_16x.svg";
-  const lightIconPath = path.join(
-    __dirname,
-    "..",
-    "..",
-    // "..",
-    "resources",
-    normalName
-  );
-  const darkIconPath = path.join(
-    __dirname,
-    "..",
-    "..",
-    // "..",
-    "resources",
-    inverseName
-  );
+  const lightIconPath = path.join(__dirname, "..", "resources", normalName);
+  const darkIconPath = path.join(__dirname, "..", "resources", inverseName);
 
   return {
     light: lightIconPath,
@@ -78,63 +69,54 @@ export function getIconImageByTokenType(
   };
 }
 
-export function getIconImageByNodeType(node: Node): ThenableTreeIconPath {
+export function getIconImageByNodeType(node?: Node): ThenableTreeIconPath {
   let name: string | undefined;
 
-  switch (node.type) {
-    case NodeType.Assembly:
-      name = "Assembly";
-      break;
-    case NodeType.Namespace:
-      name = "Namespace";
-      break;
-    case NodeType.Event:
-      name = "Event";
-      break;
-    case NodeType.Field:
-      name = "Field";
-      break;
-    case NodeType.Method:
-      name = "Method";
-      break;
-    case NodeType.Enum:
-      name = "EnumItem";
-      break;
-    case NodeType.Interface:
-      name = "Interface";
-      break;
-    case NodeType.Struct:
-      name = "Structure";
-      break;
-    case NodeType.Const:
-      name = "Constant";
-      break;
-    case NodeType.Property:
-      name = "Property";
-      break;
-    default:
-      name = "Misc";
-      break;
+  if (node) {
+    switch (node.type) {
+      case NodeType.Assembly:
+        name = "Assembly";
+        break;
+      case NodeType.Namespace:
+        name = "Namespace";
+        break;
+      case NodeType.Event:
+        name = "Event";
+        break;
+      case NodeType.Field:
+        name = "Field";
+        break;
+      case NodeType.Method:
+        name = "Method";
+        break;
+      case NodeType.Class:
+        name = "Class";
+        break;
+      case NodeType.Enum:
+        name = "EnumItem";
+        break;
+      case NodeType.Interface:
+        name = "Interface";
+        break;
+      case NodeType.Struct:
+        name = "Structure";
+        break;
+      case NodeType.Const:
+        name = "Constant";
+        break;
+      case NodeType.Property:
+        name = "Property";
+        break;
+      default:
+        name = "Misc";
+        break;
+    }
   }
 
   const normalName = name + "_16x.svg";
   const inverseName = name + "_inverse_16x.svg";
-  const lightIconPath = path.join(
-    __dirname,
-    "..",
-    "..",
-    // "..",
-    "resources",
-    normalName
-  );
-  const darkIconPath = path.join(
-    __dirname,
-    "..",
-    "..",
-    // "..",
-    "resources",
-    inverseName
-  );
+  const lightIconPath = path.join(__dirname, "..", "resources", normalName);
+  const darkIconPath = path.join(__dirname, "..", "resources", inverseName);
 
   return {
     light: lightIconPath,
@@ -172,4 +154,3 @@ export function getProductIconByNodeType(
       return "question";
   }
 }
-

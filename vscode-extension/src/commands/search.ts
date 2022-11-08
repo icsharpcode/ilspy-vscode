@@ -4,32 +4,23 @@
  *-----------------------------------------------------------------------------------------------*/
 
 import * as vscode from "vscode";
-import { getProductIconByNodeType } from "../decompiler/icons";
-import IILSpyBackend from "../decompiler/IILSpyBackend";
+import { SearchResultTreeProvider } from "../decompiler/search/SearchResultTreeProvider";
 
-export function registerSearch(ilspyBackend: IILSpyBackend) {
+export function registerSearch(
+  searchResultTreeProvider: SearchResultTreeProvider
+) {
   return vscode.commands.registerCommand("ilspy.search", async () => {
     const searchTerm = await vscode.window.showInputBox({
       prompt: "Please enter the search term",
     });
 
-    const response = await ilspyBackend.sendSearch({
-      term: searchTerm,
-    });
-
-    if (!response) {
-      return;
+    if (searchTerm) {
+      vscode.commands.executeCommand(
+        "setContext",
+        "ilspy.searchResultsToShow",
+        true
+      );
+      searchResultTreeProvider.performSearch(searchTerm);
     }
-
-    const selectedNode = await vscode.window.showQuickPick(
-      response?.results.map(
-        (res) =>
-          ({
-            label: `$(${getProductIconByNodeType(res.node?.type)}) ${res.name}`,
-            description: res.description,
-          } as vscode.QuickPickItem)
-      ),
-      { canPickMany: false, matchOnDetail: false, matchOnDescription: false }
-    );
   });
 }

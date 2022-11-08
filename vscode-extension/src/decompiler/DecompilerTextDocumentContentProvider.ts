@@ -8,8 +8,15 @@ import { DecompiledCode, LanguageName } from "../protocol/DecompileResponse";
 import { getDefaultOutputLanguage } from "./settings";
 import IILSpyBackend from "./IILSpyBackend";
 import { MemberNode } from "./MemberNode";
-import { ILSPY_URI_SCHEME, uriToMemberNode } from "./memberNodeUri";
-import { makeHandle } from "./utils";
+import {
+  ILSPY_URI_SCHEME,
+  ILSPY_URI_SCHEME_LEGACY,
+  NodeFromUri,
+  uriToMemberNode,
+  uriToNode,
+} from "./nodeUri";
+import { isTypeNode, makeHandle } from "./utils";
+import { NodeType } from "../protocol/NodeType";
 
 export class DecompilerTextDocumentContentProvider
   implements vscode.TextDocumentContentProvider
@@ -25,17 +32,28 @@ export class DecompilerTextDocumentContentProvider
     uri: vscode.Uri,
     token: vscode.CancellationToken
   ): Promise<string> {
-    const memberNode = uriToMemberNode(uri);
-    if (!memberNode) {
-      return "// Invalid URI";
+    if (uri.scheme === ILSPY_URI_SCHEME_LEGACY) {
+      const memberNode = uriToMemberNode(uri);
+      if (!memberNode) {
+        return "// Invalid URI";
+      }
+      const code = await this.getCodeFromMemberNode(memberNode);
+      return (
+        code?.[this.getDocumentOutputLanguage(uri)] ?? "// No code available"
+      );
+    } else {
+      const node = uriToNode(uri);
+      if (!node) {
+        return "// Invalid URI";
+      }
+      const code = await this.getCodeFromNode(node);
+      return (
+        code?.[this.getDocumentOutputLanguage(uri)] ?? "// No code available"
+      );
     }
-    const code = await this.getCode(memberNode);
-    return (
-      code?.[this.getDocumentOutputLanguage(uri)] ?? "// No code available"
-    );
   }
 
-  private async getCode(
+  private async getCodeFromMemberNode(
     element: MemberNode
   ): Promise<DecompiledCode | undefined> {
     if (element.rid === -2) {
@@ -70,6 +88,41 @@ export class DecompilerTextDocumentContentProvider
     }
   }
 
+  private async getCodeFromNode(
+    element: NodeFromUri
+  ): Promise<DecompiledCode | undefined> {
+    if (element.type === NodeType.Assembly) {
+      const result = await this.backend.sendDecompileAssembly({
+        assemblyPath: element.assemblyPath,
+      });
+      return result?.decompiledCode;
+    }
+
+    if (element.type === NodeType.Namespace) {
+      let name = element.name.length === 0 ? "<global>" : element.name;
+      let namespaceCode: DecompiledCode = {};
+      namespaceCode[LanguageName.CSharp] = "namespace " + name + " { }";
+      namespaceCode[LanguageName.IL] = "namespace " + name + "";
+
+      return Promise.resolve(namespaceCode);
+    }
+
+    if (isTypeNode(element.type)) {
+      const result = await this.backend.sendDecompileType({
+        assemblyPath: element.assemblyPath,
+        handle: element.symbolToken,
+      });
+      return result?.decompiledCode;
+    } else {
+      const result = await this.backend.sendDecompileMember({
+        assemblyPath: element.assemblyPath,
+        type: element.parentSymbolToken,
+        member: element.symbolToken,
+      });
+      return result?.decompiledCode;
+    }
+  }
+
   setDocumentOutputLanguage(uri: vscode.Uri, language: LanguageName) {
     this.documentLanguages[uri.toString()] = language;
     this.onDidChangeEmitter.fire(uri);
@@ -81,6 +134,15 @@ export class DecompilerTextDocumentContentProvider
     }
     return this.documentLanguages[uri.toString()] ?? getDefaultOutputLanguage();
   }
+}
+
+export function registerLegacyDecompilerTextDocumentContentProvider(
+  ilspyBackend: IILSpyBackend
+) {
+  return vscode.workspace.registerTextDocumentContentProvider(
+    ILSPY_URI_SCHEME_LEGACY,
+    new DecompilerTextDocumentContentProvider(ilspyBackend)
+  );
 }
 
 export function registerDecompilerTextDocumentContentProvider(

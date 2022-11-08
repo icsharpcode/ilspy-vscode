@@ -3,4 +3,4 @@
 
 namespace ILSpy.Backend.Model;
 
-public record Node(NodeType Type, int SymbolToken, int ParentSymbolToken);
+public record Node(string AssemblyPath, NodeType Type, int SymbolToken, int ParentSymbolToken);

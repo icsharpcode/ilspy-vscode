@@ -100,6 +100,7 @@ public class SearchBackend
     {
         return new NodeData(
             Node: new Node(
+                AssemblyPath: result.Assembly,
                 Type: GetNodeType(result),
                 SymbolToken: 0,
                 ParentSymbolToken: 0),

@@ -6,6 +6,7 @@
 import { NodeType } from "./NodeType";
 
 export default interface Node {
+  assemblyPath: string;
   type: NodeType;
   symbolToken: number;
   parentSymbolToken: number;

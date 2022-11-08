@@ -20,7 +20,7 @@ import IILSpyBackend from "./IILSpyBackend";
 import AssemblyData from "../protocol/AssemblyData";
 import { MemberNode } from "./MemberNode";
 import { makeHandle } from "./utils";
-import { getIconImageByTokenType } from "./icons";
+import { getIconImageByTokenType } from "../icons";
 
 export class DecompiledTreeProvider implements TreeDataProvider<MemberNode> {
   private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();

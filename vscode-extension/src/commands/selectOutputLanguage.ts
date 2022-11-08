@@ -6,7 +6,7 @@
 import * as vscode from "vscode";
 import { DecompilerTextDocumentContentProvider } from "../decompiler/DecompilerTextDocumentContentProvider";
 import { languageInfos } from "../decompiler/languageInfos";
-import { ILSPY_URI_SCHEME } from "../decompiler/memberNodeUri";
+import { ILSPY_URI_SCHEME_LEGACY } from "../decompiler/nodeUri";
 import {
   getDefaultOutputLanguage,
   setDefaultOutputLanguage,
@@ -25,7 +25,7 @@ export function registerSelectOutputLanguage(
     "ilspy.selectOutputLanguage",
     async () => {
       let document = vscode.window.activeTextEditor?.document;
-      if (document?.uri.scheme !== ILSPY_URI_SCHEME) {
+      if (document?.uri.scheme !== ILSPY_URI_SCHEME_LEGACY) {
         return;
       }
 
@@ -33,7 +33,9 @@ export function registerSelectOutputLanguage(
         Object.entries(languageInfos)
           .map((languageInfoEntry) => {
             const [languageName, languageInfo] = languageInfoEntry;
-            const isActive = contentProvider.getDocumentOutputLanguage(document?.uri) === languageName;
+            const isActive =
+              contentProvider.getDocumentOutputLanguage(document?.uri) ===
+              languageName;
             return {
               label: languageInfo.displayName,
               description: isActive ? "active" : undefined,

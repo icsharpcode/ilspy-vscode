@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------------------------------
- *  Copyright (c) 2021 ICSharpCode
+ *  Copyright (c) 2022 ICSharpCode
  *  Licensed under the MIT License. See LICENSE.TXT in the project root for license information.
  *-----------------------------------------------------------------------------------------------*/
 
@@ -14,7 +14,7 @@ import AssemblyRequestParams from "./AssemblyRequestParams";
 import NodeData from "./NodeData";
 
 export interface SearchParams {
-  term?: string;
+  term: string;
 }
 
 export interface SearchResponse {

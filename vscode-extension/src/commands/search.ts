@@ -21,6 +21,7 @@ export function registerSearch(
         true
       );
       searchResultTreeProvider.performSearch(searchTerm);
+      vscode.commands.executeCommand("ilspySearchResultsContainer.focus");
     }
   });
 }

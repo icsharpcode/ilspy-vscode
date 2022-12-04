@@ -10,6 +10,7 @@ import {
   Event,
   TreeItemCollapsibleState,
   ProviderResult,
+  ThemeIcon,
 } from "vscode";
 import IILSpyBackend from "../IILSpyBackend";
 import NodeData from "../../protocol/NodeData";
@@ -47,6 +48,7 @@ export class SearchResultTreeProvider implements TreeDataProvider<SearchTreeNode
       return {
         label: `Search results for "${performedSearch.term}"`,
         collapsibleState: TreeItemCollapsibleState.Expanded,
+        iconPath: new ThemeIcon("search-view-icon"),
       };
     } else {
       const nodeData = element as NodeData;

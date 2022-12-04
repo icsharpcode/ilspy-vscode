@@ -18,7 +18,6 @@ using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.Tools.Npm.NpmTasks;
 using static Nuke.Common.Tooling.ProcessTasks;
 
-[CheckBuildProjectConfigurations]
 [ShutdownDotNetAfterServerBuild]
 class Build : NukeBuild
 {
@@ -115,7 +114,7 @@ class Build : NukeBuild
                 .SetPackages("vsce")
                 .SetGlobal(true));
             EnsureExistingDirectory(ArtifactsDirectory);
-            var vsixFileName = $"ilspy-vscode-{ProjectVersion.Version.ToString(3) }.vsix";
+            var vsixFileName = $"ilspy-vscode-{ProjectVersion.Version.ToString(3)}.vsix";
             using var vsceProcess = StartProcess("vsce", $"package -o {ArtifactsDirectory / vsixFileName}", VSCodeExtensionDir);
             vsceProcess.AssertZeroExitCode();
         });

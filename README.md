@@ -17,7 +17,7 @@ The extension consists of two parts: The VSCode extension itself (written in Typ
 If first time
 
 ```
-npm i vsce -g
+npm i @vscode/vsce -g
 ```
 
 Compile and package all parts:

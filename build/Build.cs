@@ -112,7 +112,7 @@ class Build : NukeBuild
         .Executes(() =>
         {
             NpmInstall(s => s
-                .SetPackages("vsce")
+                .SetPackages("@vscode/vsce")
                 .SetGlobal(true));
             EnsureExistingDirectory(ArtifactsDirectory);
             var vsixFileName = $"ilspy-vscode-{ProjectVersion.Version.ToString(3) }.vsix";

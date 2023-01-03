@@ -97,7 +97,7 @@ class Build : NukeBuild
                 .SetProcessWorkingDirectory(VSCodeExtensionDir));
             NpmRun(s => s
                 .SetProcessWorkingDirectory(VSCodeExtensionDir)
-                .SetCommand("compile"));
+                .SetCommand("package"));
         });
 
     Target TestExtension => _ => _

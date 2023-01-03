@@ -137,16 +137,12 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode> {
     const lightIconPath = path.join(
       __dirname,
       "..",
-      "..",
-      // "..",
       "resources",
       normalName
     );
     const darkIconPath = path.join(
       __dirname,
       "..",
-      "..",
-      // "..",
       "resources",
       inverseName
     );

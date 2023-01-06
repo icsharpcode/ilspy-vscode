@@ -63,7 +63,7 @@ async function findAssemblies(): Promise<string[]> {
   }
 
   const resources = await vscode.workspace.findFiles(
-    /*include*/ "{**/*.dll,**/*.exe,**/*.winrt,**/*.netmodule}",
+    /*include*/ "{**/*.dll,**/*.exe,**/*.winmd,**/*.netmodule}",
     /*exclude*/ "{**/node_modules/**,**/.git/**,**/bower_components/**}"
   );
   return resources.map((uri) => uri.fsPath);
@@ -75,7 +75,7 @@ function createAssemblyQuickPickItem(
   const selectIcon = (extension: string) => {
     switch (extension) {
       case ".dll":
-      case ".winrt":
+      case ".winmd":
       case ".netmodule":
         return "library";
       case ".exe":

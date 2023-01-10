@@ -53,12 +53,12 @@ export class SearchResultTreeProvider implements TreeDataProvider<SearchTreeNode
     } else {
       const nodeData = element as NodeData;
       return {
-        label: nodeData.name,
+        label: nodeData.displayName,
         tooltip: nodeData.description,
         collapsibleState: TreeItemCollapsibleState.None,
         command: {
           command: "decompileNode",
-          arguments: [nodeData.node],
+          arguments: [nodeData],
           title: "Decompile",
         },
         iconPath: getIconImageByNodeType(nodeData.node),

@@ -40,15 +40,15 @@ export function uriToMemberNode(uri: vscode.Uri): MemberNode | undefined {
   );
 }
 
-export function nodeToUri(node: NodeData): vscode.Uri {
+export function nodeDataToUri(nodeData: NodeData): vscode.Uri {
   return vscode.Uri.file(
-    path.join(node.node?.assemblyPath ?? "", node.name)
+    path.join(nodeData.node?.assemblyPath ?? "", nodeData.symbolName)
   ).with({
     scheme: ILSPY_URI_SCHEME,
     query: [
-      node.node?.symbolToken,
-      node.node?.type,
-      node.node?.parentSymbolToken,
+      nodeData.node?.symbolToken,
+      nodeData.node?.type,
+      nodeData.node?.parentSymbolToken,
     ].join(":"),
   });
 }
@@ -63,7 +63,7 @@ export function uriToNode(uri: vscode.Uri): NodeFromUri | undefined {
   const [symbolToken, type, parentSymbolToken] = uri.query.split(":");
   return {
     assemblyPath: assembly,
-    type: NodeType[type as keyof typeof NodeType],
+    type: parseInt(type) as NodeType,
     symbolToken: parseInt(symbolToken),
     parentSymbolToken: parseInt(parentSymbolToken),
     name,

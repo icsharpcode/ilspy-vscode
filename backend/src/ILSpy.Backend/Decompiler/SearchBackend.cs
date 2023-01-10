@@ -14,6 +14,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -98,15 +99,19 @@ public class SearchBackend
 
     NodeData ConvertResultToNode(SearchResult result)
     {
+        var memberSearchResult = result as MemberSearchResult;
         return new NodeData(
             Node: new Node(
                 AssemblyPath: result.Assembly,
                 Type: GetNodeType(result),
-                SymbolToken: 0,
-                ParentSymbolToken: 0),
-            Name: result.Name,
+                SymbolToken: memberSearchResult != null ? MetadataTokens.GetToken(memberSearchResult.Member.MetadataToken) : 0,
+                ParentSymbolToken:
+                    memberSearchResult?.Member.DeclaringTypeDefinition?.MetadataToken != null ?
+                    MetadataTokens.GetToken(memberSearchResult.Member.DeclaringTypeDefinition.MetadataToken) : 0),
+            SymbolName: memberSearchResult?.Member?.Name ?? result.Name,
+            DisplayName: result.Name,
             Description: result.Location,
-            MayHaveChildren: (result as MemberSearchResult)?.Member is ITypeDefinition,
+            MayHaveChildren: memberSearchResult?.Member is ITypeDefinition,
             SymbolModifiers: GetSymbolModifiers(result));
     }
 

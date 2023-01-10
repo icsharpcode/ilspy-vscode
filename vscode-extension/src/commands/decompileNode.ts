@@ -4,7 +4,7 @@
  *-----------------------------------------------------------------------------------------------*/
 
 import * as vscode from "vscode";
-import { nodeToUri } from "../decompiler/nodeUri";
+import { nodeDataToUri } from "../decompiler/nodeUri";
 import { languageInfos } from "../decompiler/languageInfos";
 import { getDefaultOutputLanguage } from "../decompiler/settings";
 import { DecompilerTextDocumentContentProvider } from "../decompiler/DecompilerTextDocumentContentProvider";
@@ -24,7 +24,7 @@ export function registerDecompileNode(
 
       lastSelectedNode = node;
 
-      const uri = nodeToUri(node);
+      const uri = nodeDataToUri(node);
       const language = getDefaultOutputLanguage();
 
       contentProvider.setDocumentOutputLanguage(uri, language);

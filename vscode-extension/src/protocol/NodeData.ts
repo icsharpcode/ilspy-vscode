@@ -8,7 +8,8 @@ import { SymbolModifiers } from "./SymbolModifiers";
 
 export default interface NodeData {
   node?: Node;
-  name: string;
+  displayName: string;
+  symbolName: string;
   description: string;
   mayHaveChildren: boolean;
   modifiers: SymbolModifiers;

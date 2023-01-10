@@ -5,7 +5,8 @@ namespace ILSpy.Backend.Model;
 
 public record NodeData(
     Node? Node,
-    string Name,
+    string DisplayName,
+    string SymbolName,
     string Description,
     bool MayHaveChildren,
     SymbolModifiers SymbolModifiers);

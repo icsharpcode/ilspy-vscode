@@ -29,7 +29,10 @@ import { DecompilerTextDocumentContentProvider } from "./decompiler/DecompilerTe
 import { MemberNode } from "./decompiler/MemberNode";
 import { registerShowCode } from "./commands/showCode";
 import { registerSelectOutputLanguage } from "./commands/selectOutputLanguage";
-import { ILSPY_URI_SCHEME_LEGACY } from "./decompiler/nodeUri";
+import {
+  ILSPY_URI_SCHEME,
+  ILSPY_URI_SCHEME_LEGACY,
+} from "./decompiler/nodeUri";
 import { registerSearch } from "./commands/search";
 import { SearchResultTreeProvider } from "./decompiler/search/SearchResultTreeProvider";
 import NodeData from "./protocol/NodeData";
@@ -121,6 +124,12 @@ export async function activate(context: ExtensionContext) {
   disposables.push(
     workspace.registerTextDocumentContentProvider(
       ILSPY_URI_SCHEME_LEGACY,
+      decompilerTextDocumentContentProvider
+    )
+  );
+  disposables.push(
+    workspace.registerTextDocumentContentProvider(
+      ILSPY_URI_SCHEME,
       decompilerTextDocumentContentProvider
     )
   );

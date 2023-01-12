@@ -265,21 +265,24 @@ namespace ILSpy.Backend.Decompiler
                 output.WriteLine();
             }
             var corHeader = module.Reader.PEHeaders.CorHeader;
-            var entrypointHandle = MetadataTokenHelpers.EntityHandleOrNil(corHeader.EntryPointTokenOrRelativeVirtualAddress);
-            if (!entrypointHandle.IsNil && entrypointHandle.Kind == HandleKind.MethodDefinition)
+            if (corHeader != null)
             {
-                var entrypoint = mainModule.ResolveMethod(entrypointHandle, new ICSharpCode.Decompiler.TypeSystem.GenericContext());
-                if (entrypoint != null)
+                var entrypointHandle = MetadataTokenHelpers.EntityHandleOrNil(corHeader.EntryPointTokenOrRelativeVirtualAddress);
+                if (!entrypointHandle.IsNil && entrypointHandle.Kind == HandleKind.MethodDefinition)
                 {
-                    output.Write("// Entry point: ");
-                    output.Write(entrypoint.DeclaringType.FullName + "." + entrypoint.Name);
-                    output.WriteLine();
+                    var entrypoint = mainModule.ResolveMethod(entrypointHandle, new ICSharpCode.Decompiler.TypeSystem.GenericContext());
+                    if (entrypoint != null)
+                    {
+                        output.Write("// Entry point: ");
+                        output.Write(entrypoint.DeclaringType.FullName + "." + entrypoint.Name);
+                        output.WriteLine();
+                    }
                 }
-            }
-            output.WriteLine("// Architecture: " + module.GetPlatformDisplayName());
-            if ((corHeader.Flags & System.Reflection.PortableExecutable.CorFlags.ILOnly) == 0)
-            {
-                output.WriteLine("// This assembly contains unmanaged code.");
+                output.WriteLine("// Architecture: " + module.GetPlatformDisplayName());
+                if ((corHeader.Flags & System.Reflection.PortableExecutable.CorFlags.ILOnly) == 0)
+                {
+                    output.WriteLine("// This assembly contains unmanaged code.");
+                }
             }
             string runtimeName = module.GetRuntimeDisplayName();
             if (runtimeName != null)

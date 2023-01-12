@@ -30,7 +30,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: "14"
+          node-version: "18"
 
       - name: Build
         run: ./build.sh vsix

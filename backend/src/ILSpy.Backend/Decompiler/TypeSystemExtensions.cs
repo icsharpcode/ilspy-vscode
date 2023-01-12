@@ -205,16 +205,22 @@ namespace ILSpy.Backend.Decompiler
         public static string GetPlatformDisplayName(this PEFile module)
         {
             var architecture = module.Reader.PEHeaders.CoffHeader.Machine;
-            var flags = module.Reader.PEHeaders.CorHeader.Flags;
             switch (architecture)
             {
                 case Machine.I386:
+                    var flags = module.Reader.PEHeaders.CorHeader?.Flags;
                     if ((flags & CorFlags.Prefers32Bit) != 0)
+                    {
                         return "AnyCPU (32-bit preferred)";
+                    }
                     else if ((flags & CorFlags.Requires32Bit) != 0)
+                    {
                         return "x86";
+                    }
                     else
+                    {
                         return "AnyCPU (64-bit preferred)";
+                    }
                 case Machine.Amd64:
                     return "x64";
                 case Machine.IA64:

@@ -78,6 +78,11 @@
 				"category": "ILSpy"
 			},
 			{
+				"command": "ilspy.reloadAssembly",
+				"title": "Reload Assembly",
+				"category": "ILSpy"
+			},
+			{
 				"command": "ilspy.selectOutputLanguage",
 				"title": "Output language",
 				"category": "ILSpy"
@@ -97,6 +102,11 @@
 			"view/item/context": [
 				{
 					"command": "ilspy.unloadAssembly",
+					"when": "view == ilspyDecompiledMembers && viewItem == assemblyNode",
+					"group": "1_GeneralCommands@1"
+				},
+				{
+					"command": "ilspy.reloadAssembly",
 					"when": "view == ilspyDecompiledMembers && viewItem == assemblyNode",
 					"group": "1_GeneralCommands@1"
 				}
@@ -119,6 +129,10 @@
 				},
 				{
 					"command": "ilspy.unloadAssembly",
+					"when": "ilspy.backendAvailable"
+				},
+				{
+					"command": "ilspy.reloadAssembly",
 					"when": "ilspy.backendAvailable"
 				},
 				{

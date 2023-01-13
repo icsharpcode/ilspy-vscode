@@ -14,6 +14,7 @@ import ILSpyBackend from "./decompiler/ILSpyBackend";
 import { DecompiledTreeProvider } from "./decompiler/DecompiledTreeProvider";
 import { registerDecompileAssemblyInWorkspace } from "./commands/decompileAssemblyInWorkspace";
 import { registerDecompileAssemblyViaDialog } from "./commands/decompileAssemblyViaDialog";
+import { registerReloadAssembly } from "./commands/reloadAssembly";
 import { registerUnloadAssembly } from "./commands/unloadAssembly";
 import { acquireDotnetRuntime } from "./dotnet-acquire/acquire";
 import OutputWindowLogger from "./OutputWindowLogger";
@@ -116,6 +117,7 @@ export async function activate(context: ExtensionContext) {
   disposables.push(
     registerSelectOutputLanguage(decompilerTextDocumentContentProvider)
   );
+  disposables.push(registerReloadAssembly(decompileTreeProvider));
   disposables.push(registerUnloadAssembly(decompileTreeProvider));
 
   context.subscriptions.push(...disposables);

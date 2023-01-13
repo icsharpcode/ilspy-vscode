@@ -65,6 +65,25 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode> {
     return response?.removed ?? false;
   }
 
+  public async reloadAssembly(assembly: string): Promise<boolean> {
+    const response = await this.backend.sendRemoveAssembly({
+      assemblyPath: assembly,
+    });
+    if (response?.removed) {
+      this.backend.assemblies.delete(assembly);
+
+      const response = await this.backend.sendAddAssembly({
+        assemblyPath: assembly,
+      });
+      if (response?.added && response?.assemblyData) {
+        this.backend.assemblies.set(assembly, response.assemblyData);
+        this.refresh();
+        return true;
+      }
+    }
+    return false;
+  }
+
   public getTreeItem(element: MemberNode): TreeItem {
     return {
       label: element.name,
@@ -191,7 +210,7 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode> {
   }
 
   public getParent?(element: MemberNode): ProviderResult<MemberNode> {
-    // Note: This allows relealing of assembly nodes in TreeView, which are placed in root. It won't work for other nodes.
+    // Note: This allows releasing of assembly nodes in TreeView, which are placed in root. It won't work for other nodes.
     return undefined;
   }
 

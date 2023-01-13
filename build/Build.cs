@@ -1,6 +1,3 @@
-using System;
-using System.Linq;
-using System.Collections.Generic;
 using Nuke.Common;
 using Nuke.Common.CI;
 using Nuke.Common.Execution;
@@ -10,10 +7,7 @@ using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.Npm;
-using Nuke.Common.Utilities.Collections;
-using static Nuke.Common.EnvironmentInfo;
 using static Nuke.Common.IO.FileSystemTasks;
-using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.Tools.Npm.NpmTasks;
 using static Nuke.Common.Tooling.ProcessTasks;
@@ -115,7 +109,7 @@ class Build : NukeBuild
                 .SetPackages("@vscode/vsce")
                 .SetGlobal(true));
             EnsureExistingDirectory(ArtifactsDirectory);
-            var vsixFileName = $"ilspy-vscode-{ProjectVersion.Version.ToString(3) }.vsix";
+            var vsixFileName = $"ilspy-vscode-{ProjectVersion.Version.ToString(3)}.vsix";
             using var vsceProcess = StartProcess("vsce", $"package -o {ArtifactsDirectory / vsixFileName}", VSCodeExtensionDir);
             vsceProcess.AssertZeroExitCode();
         });

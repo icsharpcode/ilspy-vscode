@@ -11,3 +11,8 @@ updates:
     directory: "/vscode-extension/"
     schedule:
       interval: "weekly"
+
+  - package-ecosystem: "nuget"
+    directory: "/backend/"
+    schedule:
+      interval: "weekly"

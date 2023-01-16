@@ -21,8 +21,8 @@ Loaded assemblies can be closed by right-click on the assemly nodes to show the 
 
 ## Requirements
 
-- Visual Studio Code >= 1.56
-- .NET 5.0 (installed automatically on first start)
+- Visual Studio Code >= 1.74
+- .NET 6.0 (installed automatically on first start)
 
 ## What's New
 

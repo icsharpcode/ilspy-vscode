@@ -13,6 +13,6 @@ updates:
       interval: "weekly"
 
   - package-ecosystem: "nuget"
-    directory: "/backend/"
+    directory: "/backend/src/ILSpy.Backend/"
     schedule:
       interval: "weekly"

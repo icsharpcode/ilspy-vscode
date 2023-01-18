@@ -6,7 +6,6 @@
 import * as vscode from "vscode";
 import * as os from "os";
 import { IDotnetAcquireResult } from "./types";
-import ILSpyBackend from "../decompiler/ILSpyBackend";
 import OutputWindowLogger from "../OutputWindowLogger";
 
 const netRuntimeVersion = "6.0";
@@ -42,7 +41,7 @@ export async function acquireDotnetRuntime(
       vscode.window.showWarningMessage(formatAcquireError());
     }
     logger.writeLine("Check for additional dependencies finished");
-  } catch (error) {
+  } catch (error: any) {
     logger.writeLine(`[ERROR] Acquiring .NET runtime: ${error.toString()}`);
     vscode.window.showWarningMessage(formatAcquireError(error.toString()));
   }

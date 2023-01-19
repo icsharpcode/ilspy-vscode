@@ -35,9 +35,13 @@ async function pickAssembly(): Promise<AssemblyQuickPickItem | undefined> {
   const quickPickItems = assemblyPathInfo.map((info) =>
     createAssemblyQuickPickItem(info)
   );
-  return await vscode.window.showQuickPick<AssemblyQuickPickItem>(
-    quickPickItems
-  );
+  if (quickPickItems.length === 0) {
+    vscode.window.showInformationMessage("No assembly found inside the workspace");
+  } else {
+    return await vscode.window.showQuickPick<AssemblyQuickPickItem>(
+      quickPickItems
+    );
+  }
 }
 
 function parseAssemblyPath(assemblies: string[]): AssemblyPathInfo[] {
@@ -58,15 +62,23 @@ function parseAssemblyPath(assemblies: string[]): AssemblyPathInfo[] {
 }
 
 async function findAssemblies(): Promise<string[]> {
-  if (!vscode.workspace.rootPath) {
+  if (!vscode.workspace.workspaceFolders) {
     return Promise.resolve([]);
   }
 
   const resources = await vscode.workspace.findFiles(
-    /*include*/ "{**/*.dll,**/*.exe,**/*.winrt,**/*.netmodule}",
+    /*include*/ "{**/*.dll,**/*.exe,**/*.winmd,**/*.netmodule}",
     /*exclude*/ "{**/node_modules/**,**/.git/**,**/bower_components/**}"
   );
-  return resources.map((uri) => uri.fsPath);
+  return resources.map((uri) => uri.fsPath).sort((s1, s2) => {
+    if (s1 > s2) {
+      return 1;
+    } else if (s1 < s2) {
+      return -1;
+    } else {
+      return 0;
+    }
+  });
 }
 
 function createAssemblyQuickPickItem(
@@ -75,7 +87,7 @@ function createAssemblyQuickPickItem(
   const selectIcon = (extension: string) => {
     switch (extension) {
       case ".dll":
-      case ".winrt":
+      case ".winmd":
       case ".netmodule":
         return "library";
       case ".exe":

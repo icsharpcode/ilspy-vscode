@@ -8,7 +8,7 @@ Welcome to the ILSpy extension for Visual Studio Code! This extension provides t
 Open the Visual Studio Code Command Palette (<kbd>Ctrl+Shift+P</kbd>) then type `ilspy` to show the two commands.
 
 The `Decompile IL Assembly in Current Workspace` will put all potential .NET assemblies
-(files with extension `.dll`, `.exe`, `.winrt`, or `.netmodule`) in your
+(files with extension `.dll`, `.exe`, `.winmd`, or `.netmodule`) in your
 workspace in a list for selection.
 
 The `Decompile IL Assembly (pick file)` command allows choosing an assembly using the file picker dialog. The dialog
@@ -21,8 +21,8 @@ Loaded assemblies can be closed by right-click on the assemly nodes to show the 
 
 ## Requirements
 
-- Visual Studio Code >= 1.56
-- .NET 5.0 (installed automatically on first start)
+- Visual Studio Code >= 1.74
+- .NET 6.0 (installed automatically on first start)
 
 ## What's New
 

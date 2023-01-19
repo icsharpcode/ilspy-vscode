@@ -1,6 +1,3 @@
-using System;
-using System.Linq;
-using System.Collections.Generic;
 using Nuke.Common;
 using Nuke.Common.CI;
 using Nuke.Common.Execution;
@@ -10,10 +7,7 @@ using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.Npm;
-using Nuke.Common.Utilities.Collections;
-using static Nuke.Common.EnvironmentInfo;
 using static Nuke.Common.IO.FileSystemTasks;
-using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.Tools.Npm.NpmTasks;
 using static Nuke.Common.Tooling.ProcessTasks;
@@ -96,7 +90,7 @@ class Build : NukeBuild
                 .SetProcessWorkingDirectory(VSCodeExtensionDir));
             NpmRun(s => s
                 .SetProcessWorkingDirectory(VSCodeExtensionDir)
-                .SetCommand("compile"));
+                .SetCommand("package"));
         });
 
     Target TestExtension => _ => _
@@ -111,7 +105,7 @@ class Build : NukeBuild
         .Executes(() =>
         {
             NpmInstall(s => s
-                .SetPackages("vsce")
+                .SetPackages("@vscode/vsce")
                 .SetGlobal(true));
             EnsureExistingDirectory(ArtifactsDirectory);
             var vsixFileName = $"ilspy-vscode-{ProjectVersion.Version.ToString(3)}.vsix";

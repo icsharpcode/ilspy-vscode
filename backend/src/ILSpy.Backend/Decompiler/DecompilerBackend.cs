@@ -96,17 +96,17 @@ public class DecompilerBackend : IDecompilerBackend
         var typeSystem = decompilers[assemblyPath].TypeSystem;
         var c = typeSystem.MainModule.GetDefinition(handle);
 
-        return c == null
-            ? new List<MemberData>()
-            : c.NestedTypes
-                .Select(typeDefinition => new MemberData(
-                    Name: typeDefinition.TypeToString(includeNamespace: false),
-                    Token: MetadataTokens.GetToken(typeDefinition.MetadataToken),
-                    SubKind: typeDefinition.Kind))
-                .Union(c.Fields.Select(GetMemberData))
-                .Union(c.Properties.Select(GetMemberData))
-                .Union(c.Events.Select(GetMemberData))
-                .Union(c.Methods.Select(GetMemberData));
+            return c == null
+                ? new List<MemberData>()
+                : c.NestedTypes
+                    .Select(typeDefinition => new MemberData(
+                        Name: typeDefinition.TypeToString(includeNamespace: false),
+                        Token: MetadataTokens.GetToken(typeDefinition.MetadataToken),
+                        SubKind: typeDefinition.Kind))
+                    .Union(c.Fields.Select(GetMemberData).OrderBy(m => m.Name))
+                    .Union(c.Properties.Select(GetMemberData).OrderBy(m => m.Name))
+                    .Union(c.Events.Select(GetMemberData).OrderBy(m => m.Name))
+                    .Union(c.Methods.Select(GetMemberData).OrderBy(m => m.Name));
 
         static MemberData GetMemberData(IMember member)
         {
@@ -256,37 +256,40 @@ public class DecompilerBackend : IDecompilerBackend
             WriteCommentLine(output, module.Name);
         }
 
-        var mainModule = decompiler.TypeSystem.MainModule;
-        var globalType = mainModule.TypeDefinitions.FirstOrDefault();
-        if (globalType != null)
-        {
-            output.Write("// Global type: ");
-            output.Write(globalType.FullName);
-            output.WriteLine();
-        }
-        var corHeader = module.Reader.PEHeaders.CorHeader;
-        var entrypointHandle = MetadataTokenHelpers.EntityHandleOrNil(corHeader.EntryPointTokenOrRelativeVirtualAddress);
-        if (!entrypointHandle.IsNil && entrypointHandle.Kind == HandleKind.MethodDefinition)
-        {
-            var entrypoint = mainModule.ResolveMethod(entrypointHandle, new ICSharpCode.Decompiler.TypeSystem.GenericContext());
-            if (entrypoint != null)
+            var mainModule = decompiler.TypeSystem.MainModule;
+            var globalType = mainModule.TypeDefinitions.FirstOrDefault();
+            if (globalType != null)
             {
-                output.Write("// Entry point: ");
-                output.Write(entrypoint.DeclaringType.FullName + "." + entrypoint.Name);
+                output.Write("// Global type: ");
+                output.Write(globalType.FullName);
                 output.WriteLine();
             }
-        }
-        output.WriteLine("// Architecture: " + module.GetPlatformDisplayName());
-        if ((corHeader.Flags & System.Reflection.PortableExecutable.CorFlags.ILOnly) == 0)
-        {
-            output.WriteLine("// This assembly contains unmanaged code.");
-        }
-        string runtimeName = module.GetRuntimeDisplayName();
-        if (runtimeName != null)
-        {
-            output.WriteLine("// Runtime: " + runtimeName);
-        }
-        output.WriteLine();
+            var corHeader = module.Reader.PEHeaders.CorHeader;
+            if (corHeader != null)
+            {
+                var entrypointHandle = MetadataTokenHelpers.EntityHandleOrNil(corHeader.EntryPointTokenOrRelativeVirtualAddress);
+                if (!entrypointHandle.IsNil && entrypointHandle.Kind == HandleKind.MethodDefinition)
+                {
+                    var entrypoint = mainModule.ResolveMethod(entrypointHandle, new ICSharpCode.Decompiler.TypeSystem.GenericContext());
+                    if (entrypoint != null)
+                    {
+                        output.Write("// Entry point: ");
+                        output.Write(entrypoint.DeclaringType.FullName + "." + entrypoint.Name);
+                        output.WriteLine();
+                    }
+                }
+                output.WriteLine("// Architecture: " + module.GetPlatformDisplayName());
+                if ((corHeader.Flags & System.Reflection.PortableExecutable.CorFlags.ILOnly) == 0)
+                {
+                    output.WriteLine("// This assembly contains unmanaged code.");
+                }
+            }
+            string runtimeName = module.GetRuntimeDisplayName();
+            if (runtimeName != null)
+            {
+                output.WriteLine("// Runtime: " + runtimeName);
+            }
+            output.WriteLine();
 
         output.Write(decompiler.DecompileModuleAndAssemblyAttributesToString());
 
@@ -323,14 +326,14 @@ public class DecompilerBackend : IDecompilerBackend
             }
         }
 
-        foreach (var t in currentNamespace.Types)
-        {
-            yield return new MemberData(
-                Name: t.TypeToString(includeNamespace: false),
-                Token: MetadataTokens.GetToken(t.MetadataToken),
-                SubKind: t.Kind);
+            foreach (var t in currentNamespace.Types.OrderBy(t => t.FullName))
+            {
+                yield return new MemberData(
+                    Name: t.TypeToString(includeNamespace: false),
+                    Token: MetadataTokens.GetToken(t.MetadataToken),
+                    SubKind: t.Kind);
+            }
         }
-    }
 
     public IEnumerable<string> ListNamespaces(string? assemblyPath)
     {

@@ -15,41 +15,36 @@ export function registerDecompileAssemblyViaDialog(
   return vscode.commands.registerCommand(
     "ilspy.decompileAssemblyViaDialog",
     async () => {
-      const file = await promptForAssemblyFilePathViaDialog();
-      if (file) {
+      const files = await promptForAssemblyFilesPathViaDialog();
+      files.forEach((file) => {
         addAssemblyFromFilePath(
           file,
           decompiledTreeProvider,
           decompiledTreeView
         );
-      }
+      });
     }
   );
 }
 
-async function promptForAssemblyFilePathViaDialog(): Promise<
-  string | undefined
+async function promptForAssemblyFilesPathViaDialog(): Promise<
+  string[]
 > {
   const uris = await vscode.window.showOpenDialog(
     /* options*/ {
-      openLabel: "Select assembly",
+      openLabel: "Select assemblies",
       canSelectFiles: true,
       canSelectFolders: false,
-      canSelectMany: false,
+      canSelectMany: true,
       filters: {
-        ".NET Assemblies": ["dll", "exe", "winrt", "netmodule"],
+        ".NET Assemblies": ["dll", "exe", "winmd", "netmodule"],
       },
     }
   );
 
   if (uris === undefined) {
-    return undefined;
+    return [];
   }
 
-  let strings = uris.map((uri) => uri.fsPath);
-  if (strings.length > 0) {
-    return strings[0];
-  } else {
-    return undefined;
-  }
+  return uris.map((uri) => uri.fsPath);
 }

@@ -14,7 +14,7 @@ import {
 } from "vscode";
 import IILSpyBackend from "../IILSpyBackend";
 import NodeData from "../../protocol/NodeData";
-import { getIconImageByNodeType } from "../../icons";
+import { getProductIconForNodeType } from "../../icons";
 
 interface PerformedSearch {
   term: string;
@@ -61,7 +61,7 @@ export class SearchResultTreeProvider implements TreeDataProvider<SearchTreeNode
           arguments: [nodeData],
           title: "Decompile",
         },
-        iconPath: getIconImageByNodeType(nodeData.node),
+        iconPath: new ThemeIcon(getProductIconForNodeType(nodeData.node?.type)),
       };
     }
   }

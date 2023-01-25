@@ -69,62 +69,7 @@ export function getIconImageByTokenType(
   };
 }
 
-export function getIconImageByNodeType(node?: Node): ThenableTreeIconPath {
-  let name: string | undefined;
-
-  if (node) {
-    switch (node.type) {
-      case NodeType.Assembly:
-        name = "Assembly";
-        break;
-      case NodeType.Namespace:
-        name = "Namespace";
-        break;
-      case NodeType.Event:
-        name = "Event";
-        break;
-      case NodeType.Field:
-        name = "Field";
-        break;
-      case NodeType.Method:
-        name = "Method";
-        break;
-      case NodeType.Class:
-        name = "Class";
-        break;
-      case NodeType.Enum:
-        name = "EnumItem";
-        break;
-      case NodeType.Interface:
-        name = "Interface";
-        break;
-      case NodeType.Struct:
-        name = "Structure";
-        break;
-      case NodeType.Const:
-        name = "Constant";
-        break;
-      case NodeType.Property:
-        name = "Property";
-        break;
-      default:
-        name = "Misc";
-        break;
-    }
-  }
-
-  const normalName = name + "_16x.svg";
-  const inverseName = name + "_inverse_16x.svg";
-  const lightIconPath = path.join(__dirname, "..", "resources", normalName);
-  const darkIconPath = path.join(__dirname, "..", "resources", inverseName);
-
-  return {
-    light: lightIconPath,
-    dark: darkIconPath,
-  };
-}
-
-export function getProductIconByNodeType(
+export function getProductIconForNodeType(
   nodeType: NodeType | undefined
 ): string {
   switch (nodeType) {
@@ -146,6 +91,8 @@ export function getProductIconByNodeType(
       return "symbol-interface";
     case NodeType.Struct:
       return "symbol-struct";
+    case NodeType.Delegate:
+      return "symbol-class";
     case NodeType.Const:
       return "symbol-constant";
     case NodeType.Property:

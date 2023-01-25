@@ -48,5 +48,10 @@ namespace TestAssembly
         {
             return base.ToString();
         }
+
+        public static SomeClass operator &(SomeClass a, SomeClass b)
+        {
+            return null;
+        }
     }
 }

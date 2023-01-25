@@ -11,21 +11,16 @@ import {
   TreeItemCollapsibleState,
   ProviderResult,
   window,
+  ThemeIcon,
 } from "vscode";
 import { TokenType } from "./TokenType";
 import { MemberSubKind } from "./MemberSubKind";
-import * as path from "path";
 import { DecompiledCode, LanguageName } from "../protocol/DecompileResponse";
 import MemberData from "../protocol/MemberData";
 import IILSpyBackend from "./IILSpyBackend";
 import AssemblyData from "../protocol/AssemblyData";
 import { MemberNode } from "./MemberNode";
 import { makeHandle } from "./utils";
-
-interface ThenableTreeIconPath {
-  light: string;
-  dark: string;
-}
 
 export class DecompiledTreeProvider implements TreeDataProvider<MemberNode> {
   private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
@@ -101,75 +96,41 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode> {
       },
       contextValue:
         element.type === TokenType.AssemblyDefinition ? "assemblyNode" : void 0,
-      iconPath: this.getIconByTokenType(element),
+      iconPath: new ThemeIcon(this.getIconByTokenType(element)),
     };
   }
 
-  getIconByTokenType(node: MemberNode): ThenableTreeIconPath {
-    let name: string | undefined;
-
+  getIconByTokenType(node: MemberNode): string {
     switch (node.type) {
       case TokenType.AssemblyDefinition:
-        name = "Assembly";
-        break;
+        return "library";
       case TokenType.NamespaceDefinition:
-        name = "Namespace";
-        break;
+        return "symbol-namespace";
       case TokenType.EventDefinition:
-        name = "Event";
-        break;
+        return "symbol-event";
       case TokenType.FieldDefinition:
-        name = "Field";
-        break;
+        return "symbol-field";
       case TokenType.MethodDefinition:
-        name = "Method";
-        break;
+        return "symbol-method";
       case TokenType.TypeDefinition:
         switch (node.memberSubKind) {
           case MemberSubKind.Enum:
-            name = "EnumItem";
-            break;
+            return "symbol-enum";
           case MemberSubKind.Interface:
-            name = "Interface";
-            break;
+            return "symbol-interface";
           case MemberSubKind.Struct:
-            name = "Structure";
-            break;
+            return "symbol-struct";
           default:
-            name = "Class";
-            break;
+            return "symbol-class";
         }
         break;
       case TokenType.LocalConstant:
-        name = "Constant";
-        break;
+        return "symbol-constant";
       case TokenType.PropertyDefinition:
-        name = "Property";
-        break;
+        return "symbol-property";
       default:
-        name = "Misc";
-        break;
+        return "question";
     }
-
-    const normalName = name + "_16x.svg";
-    const inverseName = name + "_inverse_16x.svg";
-    const lightIconPath = path.join(
-      __dirname,
-      "..",
-      "resources",
-      normalName
-    );
-    const darkIconPath = path.join(
-      __dirname,
-      "..",
-      "resources",
-      inverseName
-    );
-
-    return {
-      light: lightIconPath,
-      dark: darkIconPath,
-    };
   }
 
   public findNode(predicate: (node: MemberNode) => boolean) {

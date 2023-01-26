@@ -11,6 +11,7 @@ import {
   TreeItemCollapsibleState,
   ProviderResult,
   window,
+  ThemeIcon,
 } from "vscode";
 import { TokenType } from "./TokenType";
 import { MemberSubKind } from "./MemberSubKind";
@@ -20,7 +21,7 @@ import IILSpyBackend from "./IILSpyBackend";
 import AssemblyData from "../protocol/AssemblyData";
 import { MemberNode } from "./MemberNode";
 import { makeHandle } from "./utils";
-import { getIconImageByTokenType } from "../icons";
+import { getIconForMemberNode } from "../icons";
 
 export class DecompiledTreeProvider implements TreeDataProvider<MemberNode> {
   private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
@@ -96,7 +97,7 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode> {
       },
       contextValue:
         element.type === TokenType.AssemblyDefinition ? "assemblyNode" : void 0,
-      iconPath: getIconImageByTokenType(element),
+      iconPath: new ThemeIcon(getIconForMemberNode(element)),
     };
   }
 

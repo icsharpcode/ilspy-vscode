@@ -22,20 +22,24 @@ public class CSharpLanguage : ILanguage
     public string EventToString(IEvent @event, bool includeDeclaringTypeName, bool includeNamespace, bool includeNamespaceOfDeclaringTypeName)
     {
         if (@event == null)
+        {
             throw new ArgumentNullException(nameof(@event));
+        }
         return EntityToString(@event, includeDeclaringTypeName, includeNamespace, includeNamespaceOfDeclaringTypeName);
     }
 
     public string FieldToString(IField field, bool includeDeclaringTypeName, bool includeNamespace, bool includeNamespaceOfDeclaringTypeName)
     {
         if (field == null)
+        {
             throw new ArgumentNullException(nameof(field));
+        }
         return EntityToString(field, includeDeclaringTypeName, includeNamespace, includeNamespaceOfDeclaringTypeName);
     }
 
     public string GetEntityName(PEFile module, EntityHandle handle, bool fullName, bool omitGenerics)
     {
-        MetadataReader metadata = module.Metadata;
+        var metadata = module.Metadata;
         switch (handle.Kind)
         {
             case HandleKind.TypeDefinition:
@@ -44,7 +48,9 @@ public class CSharpLanguage : ILanguage
                 var fd = metadata.GetFieldDefinition((FieldDefinitionHandle) handle);
                 var declaringType = fd.GetDeclaringType();
                 if (fullName)
+                {
                     return ToCSharpString(metadata, declaringType, fullName, omitGenerics) + "." + metadata.GetString(fd.Name);
+                }
                 return metadata.GetString(fd.Name);
             case HandleKind.MethodDefinition:
                 var md = metadata.GetMethodDefinition((MethodDefinitionHandle) handle);
@@ -60,10 +66,14 @@ public class CSharpLanguage : ILanguage
                     case "Finalize":
                         const MethodAttributes finalizerAttributes = (MethodAttributes.Virtual | MethodAttributes.Family | MethodAttributes.HideBySig);
                         if ((md.Attributes & finalizerAttributes) != finalizerAttributes)
+                        {
                             goto default;
-                        MethodSignature<IType> methodSignature = md.DecodeSignature(MetadataExtensions.MinimalSignatureTypeProvider, default);
+                        }
+                        var methodSignature = md.DecodeSignature(MetadataExtensions.MinimalSignatureTypeProvider, default);
                         if (methodSignature.GenericParameterCount != 0 || methodSignature.ParameterTypes.Length != 0)
+                        {
                             goto default;
+                        }
                         td = metadata.GetTypeDefinition(declaringType);
                         methodName = "~" + ReflectionHelper.SplitTypeParameterCountFromReflectionName(metadata.GetString(td.Name));
                         break;
@@ -76,7 +86,9 @@ public class CSharpLanguage : ILanguage
                             foreach (var h in genericParams)
                             {
                                 if (i > 0)
+                                {
                                     methodName += ",";
+                                }
                                 var gp = metadata.GetGenericParameter(h);
                                 methodName += metadata.GetString(gp.Name);
                             }
@@ -85,22 +97,28 @@ public class CSharpLanguage : ILanguage
                         break;
                 }
                 if (fullName)
+                {
                     return ToCSharpString(metadata, declaringType, fullName, omitGenerics) + "." + methodName;
+                }
                 return methodName;
             case HandleKind.EventDefinition:
                 var ed = metadata.GetEventDefinition((EventDefinitionHandle) handle);
                 declaringType = metadata.GetMethodDefinition(ed.GetAccessors().GetAny()).GetDeclaringType();
                 if (fullName && !declaringType.IsNil)
+                {
                     return ToCSharpString(metadata, declaringType, fullName, omitGenerics) + "." + metadata.GetString(ed.Name);
+                }
                 return metadata.GetString(ed.Name);
             case HandleKind.PropertyDefinition:
                 var pd = metadata.GetPropertyDefinition((PropertyDefinitionHandle) handle);
                 declaringType = metadata.GetMethodDefinition(pd.GetAccessors().GetAny()).GetDeclaringType();
                 if (fullName && !declaringType.IsNil)
+                {
                     return ToCSharpString(metadata, declaringType, fullName, omitGenerics) + "." + metadata.GetString(pd.Name);
+                }
                 return metadata.GetString(pd.Name);
             default:
-                return null;
+                return "";
         }
     }
 
@@ -112,14 +130,18 @@ public class CSharpLanguage : ILanguage
     public string MethodToString(IMethod method, bool includeDeclaringTypeName, bool includeNamespace, bool includeNamespaceOfDeclaringTypeName)
     {
         if (method == null)
+        {
             throw new ArgumentNullException(nameof(method));
+        }
         return EntityToString(method, includeDeclaringTypeName, includeNamespace, includeNamespaceOfDeclaringTypeName);
     }
 
     public string PropertyToString(IProperty property, bool includeDeclaringTypeName, bool includeNamespace, bool includeNamespaceOfDeclaringTypeName)
     {
         if (property == null)
+        {
             throw new ArgumentNullException(nameof(property));
+        }
         return EntityToString(property, includeDeclaringTypeName, includeNamespace, includeNamespaceOfDeclaringTypeName);
     }
 
@@ -131,7 +153,9 @@ public class CSharpLanguage : ILanguage
     public string TypeToString(IType type, bool includeNamespace)
     {
         if (type == null)
+        {
             throw new ArgumentNullException(nameof(type));
+        }
         var ambience = CreateAmbience();
         // Do not forget to update CSharpAmbienceTests.ILSpyMainTreeViewFlags, if this ever changes.
         if (includeNamespace)
@@ -155,37 +179,48 @@ public class CSharpLanguage : ILanguage
         }
     }
 
-    static string EntityToString(IEntity entity, bool includeDeclaringTypeName, bool includeNamespace, bool includeNamespaceOfDeclaringTypeName)
+    private static string EntityToString(IEntity entity, bool includeDeclaringTypeName, bool includeNamespace, bool includeNamespaceOfDeclaringTypeName)
     {
         // Do not forget to update CSharpAmbienceTests, if this ever changes.
         var ambience = CreateAmbience();
         ambience.ConversionFlags |= ConversionFlags.ShowReturnType | ConversionFlags.ShowParameterList | ConversionFlags.ShowParameterModifiers;
         if (includeDeclaringTypeName)
+        {
             ambience.ConversionFlags |= ConversionFlags.ShowDeclaringType;
+        }
         if (includeNamespace)
+        {
             ambience.ConversionFlags |= ConversionFlags.UseFullyQualifiedTypeNames;
+        }
         if (includeNamespaceOfDeclaringTypeName)
+        {
             ambience.ConversionFlags |= ConversionFlags.UseFullyQualifiedEntityNames;
+        }
         return ambience.ConvertSymbol(entity);
     }
 
-    static CSharpAmbience CreateAmbience() => new CSharpAmbience
+    private static CSharpAmbience CreateAmbience()
     {
-        ConversionFlags = ConversionFlags.ShowTypeParameterList | ConversionFlags.PlaceReturnTypeAfterParameterList | ConversionFlags.UseNullableSpecifierForValueTypes
-    };
+        return new CSharpAmbience
+        {
+            ConversionFlags = ConversionFlags.ShowTypeParameterList | ConversionFlags.PlaceReturnTypeAfterParameterList | ConversionFlags.UseNullableSpecifierForValueTypes
+        };
+    }
 
-    string ToCSharpString(MetadataReader metadata, TypeDefinitionHandle handle, bool fullName, bool omitGenerics)
+    private string ToCSharpString(MetadataReader metadata, TypeDefinitionHandle handle, bool fullName, bool omitGenerics)
     {
-        StringBuilder builder = new StringBuilder();
+        var builder = new StringBuilder();
         var currentTypeDefHandle = handle;
         var typeDef = metadata.GetTypeDefinition(currentTypeDefHandle);
 
         while (!currentTypeDefHandle.IsNil)
         {
             if (builder.Length > 0)
+            {
                 builder.Insert(0, '.');
+            }
             typeDef = metadata.GetTypeDefinition(currentTypeDefHandle);
-            var part = ReflectionHelper.SplitTypeParameterCountFromReflectionName(metadata.GetString(typeDef.Name), out int typeParamCount);
+            string part = ReflectionHelper.SplitTypeParameterCountFromReflectionName(metadata.GetString(typeDef.Name), out int typeParamCount);
             var genericParams = typeDef.GetGenericParameters();
             if (!omitGenerics && genericParams.Count > 0)
             {
@@ -200,7 +235,9 @@ public class CSharpLanguage : ILanguage
             builder.Insert(0, part);
             currentTypeDefHandle = typeDef.GetDeclaringType();
             if (!fullName)
+            {
                 break;
+            }
         }
 
         if (fullName && !typeDef.Namespace.IsNil)

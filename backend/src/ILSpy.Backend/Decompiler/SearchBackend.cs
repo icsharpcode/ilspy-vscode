@@ -360,7 +360,10 @@ public class SearchBackend
         }
 
         request.Keywords = keywords.ToArray();
-        request.RegEx = regex;
+        if (regex != null)
+        {
+            request.RegEx = regex;
+        }
         request.SearchResultFactory = new SearchResultFactory();
         //request.TreeNodeFactory = new TreeNodeFactory();
         request.DecompilerSettings = new DecompilerSettings();

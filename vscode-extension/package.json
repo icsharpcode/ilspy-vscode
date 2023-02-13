@@ -202,7 +202,7 @@
 		"@vscode/test-electron": "^2.2.3",
 		"eslint": "^8.33.0",
 		"glob": "^8.1.0",
-		"minimist": "^1.2.7",
+		"minimist": "^1.2.8",
 		"mocha": "^10.2.0",
 		"terser-webpack-plugin": "^5.3.6",
 		"ts-loader": "^9.4.2",

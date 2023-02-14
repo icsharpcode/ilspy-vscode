@@ -4,11 +4,11 @@ using ICSharpCode.ILSpyX;
 using System;
 using System.Xml.Linq;
 
-public class SettingsProvider : ISettingsProvider
+public class DummySettingsProvider : ISettingsProvider
 {
     private XElement root;
 
-    public SettingsProvider()
+    public DummySettingsProvider()
     {
         root = new XElement("Root");
     }

@@ -4,6 +4,7 @@
 namespace ILSpy.Backend.Decompiler;
 
 using ICSharpCode.Decompiler;
+using ICSharpCode.Decompiler.Disassembler;
 using ICSharpCode.Decompiler.TypeSystem;
 using ICSharpCode.ILSpy.Search;
 using ICSharpCode.ILSpyX;
@@ -25,11 +26,13 @@ public class SearchBackend
     private readonly AssemblyList assemblyList;
     private readonly IComparer<SearchResult> resultsComparer = SearchResult.ComparerByName;
     private readonly AssemblyListManager assemblyListManager;
+    private readonly ILSpySettings ilspySettings;
 
-    public SearchBackend(ILoggerFactory loggerFactory, AssemblyListManager assemblyListManager)
+    public SearchBackend(ILoggerFactory loggerFactory, AssemblyListManager assemblyListManager, ILSpySettings ilspySettings)
     {
         logger = loggerFactory.CreateLogger<SearchBackend>();
         this.assemblyListManager = assemblyListManager;
+        this.ilspySettings = ilspySettings;
         assemblyList = assemblyListManager.LoadList(AssemblyListManager.DefaultListName);
     }
 
@@ -365,8 +368,7 @@ public class SearchBackend
             request.RegEx = regex;
         }
         request.SearchResultFactory = new SearchResultFactory();
-        //request.TreeNodeFactory = new TreeNodeFactory();
-        request.DecompilerSettings = new DecompilerSettings();
+        request.DecompilerSettings = ilspySettings.DecompilerSettings;
 
         return request;
     }

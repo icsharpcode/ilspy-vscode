@@ -9,8 +9,8 @@ public class SearchBackendTests
 {
     private static SearchBackend CreateSearchBackend()
     {
-        var assemblyListManager = new AssemblyListManager(new SettingsProvider());
-        var searchBackend = new SearchBackend(new NullLoggerFactory(), assemblyListManager);
+        var assemblyListManager = new AssemblyListManager(new DummySettingsProvider());
+        var searchBackend = new SearchBackend(new NullLoggerFactory(), assemblyListManager, new ILSpySettings());
         searchBackend.AddAssembly(
             Path.Combine(Path.GetDirectoryName(typeof(SearchBackendTests).Assembly.Location) ?? "", "TestAssembly.dll"));
         return searchBackend;

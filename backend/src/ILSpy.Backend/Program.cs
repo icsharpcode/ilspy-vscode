@@ -54,7 +54,8 @@ namespace ILSpy.Backend
 
         static void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<ISettingsProvider, SettingsProvider>();
+            services.AddSingleton<ISettingsProvider, DummySettingsProvider>();
+            services.AddSingleton<ILSpySettings>();
             services.AddSingleton<AssemblyListManager>();
             services.AddSingleton<SearchBackend>();
             services.AddSingleton<IDecompilerBackend, DecompilerBackend>();

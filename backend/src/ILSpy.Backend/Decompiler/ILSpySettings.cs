@@ -11,8 +11,6 @@ namespace ILSpy.Backend.Decompiler
         public DecompilerSettings DecompilerSettings { get; } = new DecompilerSettings
         {
             ThrowOnAssemblyResolveErrors = false,
-            AutomaticProperties = false,
-            AutomaticEvents = false
         };
     }
 }

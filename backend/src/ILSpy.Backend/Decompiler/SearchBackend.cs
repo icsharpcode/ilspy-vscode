@@ -89,7 +89,7 @@ public class SearchBackend
 
                 }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).ConfigureAwait(false);
 
-                return resultQueue.OrderBy(r => r, resultsComparer).Select(ConvertResultToNode);
+                return resultQueue.Where(IsNotAccessor).OrderBy(r => r, resultsComparer).Select(ConvertResultToNode);
             }
             catch (TaskCanceledException)
             {
@@ -98,6 +98,16 @@ public class SearchBackend
         }
 
         return Enumerable.Empty<NodeData>();
+    }
+
+    bool IsNotAccessor(SearchResult searchResult)
+    {
+        if (searchResult is MemberSearchResult memberSearchResult)
+        {
+            return memberSearchResult.Member.SymbolKind != SymbolKind.Accessor;
+        }
+
+        return true;
     }
 
     NodeData ConvertResultToNode(SearchResult result)

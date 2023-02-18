@@ -2,6 +2,15 @@
 
 All notable changes to the "ilspy-vscode" extension will be documented in this file.
 
+## 0.14
+
+- Introduction of symbol search
+- New "Reload assembly" command in "Decompiled Members" tree
+- "Decompiled Members" now properly sorted
+- Usage of VS Code built-in icons for different symbol types instead of shipping our own icon set
+- Extension package (VSIX) now optimized and smaller in size
+- Extension is now loaded a bit later to avoid slowing down VS Code startup unnecessarily
+
 ## 0.13.1
 
 - Fix zombie backend processes still running after VS Code was closed on Linux and macOS

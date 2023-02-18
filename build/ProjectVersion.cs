@@ -2,5 +2,5 @@
 
 static class ProjectVersion
 {
-    public static Version Version => new("0.13.1");
+    public static Version Version => new("0.14.0");
 }

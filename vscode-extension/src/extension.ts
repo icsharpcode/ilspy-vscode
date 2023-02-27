@@ -64,7 +64,7 @@ export async function activate(context: ExtensionContext) {
       serverOptions,
       clientOptions
     );
-    client.trace = Trace.Verbose;
+    await client.setTrace(Trace.Verbose);
 
     client.onDidChangeState((e) => {
       switch (e.newState) {

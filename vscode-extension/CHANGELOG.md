@@ -2,6 +2,10 @@
 
 All notable changes to the "ilspy-vscode" extension will be documented in this file.
 
+## 0.14.1
+
+- Fix for missing output language selection
+
 ## 0.14
 
 - Introduction of symbol search

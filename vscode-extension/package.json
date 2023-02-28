@@ -142,7 +142,7 @@
 				{
 					"command": "ilspy.selectOutputLanguage",
 					"group": "navigation",
-					"when": "resourceScheme == ilspylegacy"
+					"when": "resourceScheme == ilspylegacy || resourceScheme == ilspy"
 				}
 			],
 			"commandPalette": [
@@ -164,7 +164,7 @@
 				},
 				{
 					"command": "ilspy.selectOutputLanguage",
-					"when": "resourceScheme == ilspylegacy"
+					"when": "resourceScheme == ilspylegacy || resourceScheme == ilspy"
 				},
 				{
 					"command": "ilspy.search",

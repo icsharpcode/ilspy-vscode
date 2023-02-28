@@ -6,7 +6,7 @@
 import * as vscode from "vscode";
 import { DecompilerTextDocumentContentProvider } from "../decompiler/DecompilerTextDocumentContentProvider";
 import { languageInfos } from "../decompiler/languageInfos";
-import { ILSPY_URI_SCHEME_LEGACY } from "../decompiler/nodeUri";
+import { ILSPY_URI_SCHEME, ILSPY_URI_SCHEME_LEGACY } from "../decompiler/nodeUri";
 import {
   getDefaultOutputLanguage,
   setDefaultOutputLanguage,
@@ -25,7 +25,11 @@ export function registerSelectOutputLanguage(
     "ilspy.selectOutputLanguage",
     async () => {
       let document = vscode.window.activeTextEditor?.document;
-      if (document?.uri.scheme !== ILSPY_URI_SCHEME_LEGACY) {
+      if (document === undefined) {
+        return;
+      }
+      const scheme = document?.uri.scheme;
+      if (scheme !== ILSPY_URI_SCHEME_LEGACY && scheme !== ILSPY_URI_SCHEME) {
         return;
       }
 

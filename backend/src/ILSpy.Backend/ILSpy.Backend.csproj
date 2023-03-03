@@ -11,6 +11,15 @@
     <Version>0.14.1</Version>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>..\..\..\vscode-extension\bin\ilspy-backend</OutputPath>
+    <WarningLevel>4</WarningLevel>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>..\..\..\vscode-extension\bin\ilspy-backend</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="ICSharpCode.Decompiler" Version="8.0.0.7246-preview3" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />

@@ -80,6 +80,16 @@ namespace ILSpy.Backend.Protocol
 
     #endregion
 
+    #region listAssemblyReferences
+
+    [Serial, Method("ilspy/listAssemblyReferences", Direction.ClientToServer)]
+    public record ListAssemblyReferencesRequest(string? AssemblyPath)
+        : IRequest<ListAssemblyReferencesResponse>;
+
+    public record ListAssemblyReferencesResponse(IEnumerable<string>? References);
+
+    #endregion
+
     #region listTypes
 
     [Serial, Method("ilspy/listTypes", Direction.ClientToServer)]

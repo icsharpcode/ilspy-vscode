@@ -44,6 +44,7 @@ namespace ILSpy.Backend
                     .WithHandler<DecompileTypeHandler>()
                     .WithHandler<ListMembersHandler>()
                     .WithHandler<ListNamespacesHandler>()
+                    .WithHandler<ListAssemblyReferencesHandler>()
                     .WithHandler<ListTypesHandler>()
                     .WithHandler<RemoveAssemblyHandler>()
                     .WithHandler<SearchHandler>()

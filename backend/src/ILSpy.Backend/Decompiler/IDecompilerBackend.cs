@@ -11,6 +11,7 @@ public interface IDecompilerBackend
 {
     AssemblyData? AddAssembly(string? path);
     bool RemoveAssembly(string? path);
+    IEnumerable<string> ListAssemblyReferences(string? assemblyPath);
     IEnumerable<string> ListNamespaces(string? assemblyPath);
     IEnumerable<MemberData> ListTypes(string? assemblyPath, string? @namespace);
     IDictionary<string, string> GetCode(string? assemblyPath, EntityHandle handle);

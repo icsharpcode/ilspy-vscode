@@ -132,7 +132,13 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode> {
     } else if (element.rid === -2) {
       return this.getNamespaces(element.assembly);
     } else if (element.rid === -1) {
-      return this.getTypes(element.assembly, element.name);
+      switch (element.type) {
+        case TokenType.AssemblyReference:
+          return this.getAssemblyReferences(element.assembly);
+        case TokenType.NamespaceDefinition:
+        default:
+          return this.getTypes(element.assembly, element.name);
+        }
     } else {
       return this.getMembers(element);
     }
@@ -147,9 +153,20 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode> {
     const result = await this.backend.sendListNamespaces({
       assemblyPath: assembly,
     });
-    return (
-      result?.namespaces.map(
-        (n) =>
+    const nodes: MemberNode[] = [];
+    nodes.push(
+      new MemberNode(
+        assembly,
+        "References",
+        -1,
+        TokenType.AssemblyReference,
+        MemberSubKind.Other,
+        -2
+      )
+    );
+    if (result !== null) {
+      for (let n of result.namespaces.values()) {
+        nodes.push(
           new MemberNode(
             assembly,
             n,
@@ -157,6 +174,27 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode> {
             TokenType.NamespaceDefinition,
             MemberSubKind.None,
             -2
+          )
+        );
+      }
+    }
+    return nodes;
+  }
+
+  async getAssemblyReferences(assembly: string): Promise<MemberNode[]> {
+    const result = await this.backend.sendListAssemblyReferences({
+      assemblyPath: assembly
+    });
+    return (
+      result?.references.map(
+        (t) =>
+          new MemberNode(
+            assembly,
+            t,
+            -1,
+            TokenType.AssemblyReference,
+            MemberSubKind.None,
+            -1
           )
       ) ?? []
     );

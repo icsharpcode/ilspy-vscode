@@ -17,6 +17,8 @@ import {
 } from "./nodeUri";
 import { isTypeNode, makeHandle } from "./utils";
 import { NodeType } from "../protocol/NodeType";
+import { TokenType } from "./TokenType";
+import { MemberSubKind } from "./MemberSubKind";
 
 export class DecompilerTextDocumentContentProvider
   implements vscode.TextDocumentContentProvider
@@ -64,12 +66,30 @@ export class DecompilerTextDocumentContentProvider
     }
 
     if (element.rid === -1) {
-      let name = element.name.length === 0 ? "<global>" : element.name;
-      let namespaceCode: DecompiledCode = {};
-      namespaceCode[LanguageName.CSharp] = "namespace " + name + " { }";
-      namespaceCode[LanguageName.IL] = "namespace " + name + "";
+      let code: DecompiledCode = {};
 
-      return Promise.resolve(namespaceCode);
+      if (element.type === TokenType.NamespaceDefinition) {
+        let name = element.name.length === 0 ? "namespace <global>" : "namespace " + element.name;
+        code[LanguageName.CSharp] = name + " { }";
+        code[LanguageName.IL] = name;
+      } else if (element.type === TokenType.AssemblyReference) {
+        let s = "";
+        if (element.memberSubKind !== MemberSubKind.None) {
+          const result = await this.backend.sendListAssemblyReferences({
+            assemblyPath: element.assembly
+          });
+          if (result !== null) {
+            for (var ar of result.references.values()) {
+              s += `// ${ar}\n`;
+            }
+          }
+        } else {
+          s = `// ${element.name}`;
+        }
+        code[LanguageName.CSharp] = code[LanguageName.IL] = s;
+      }
+
+      return Promise.resolve(code);
     }
 
     if (element.mayHaveChildren) {

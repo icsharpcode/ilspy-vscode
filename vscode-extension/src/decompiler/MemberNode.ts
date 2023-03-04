@@ -43,7 +43,8 @@ export class MemberNode {
     return (
       this.type === TokenType.TypeDefinition ||
       this.type === TokenType.AssemblyDefinition ||
-      this.type === TokenType.NamespaceDefinition
+      this.type === TokenType.NamespaceDefinition ||
+      (this.type === TokenType.AssemblyReference && this.memberSubKind !== MemberSubKind.None)
     );
   }
 

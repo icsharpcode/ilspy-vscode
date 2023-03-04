@@ -6,6 +6,7 @@ using ILSpy.Backend.Decompiler;
 using ILSpy.Backend.Handlers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using OmniSharp.Extensions.LanguageServer.Protocol.Window;
 using OmniSharp.Extensions.LanguageServer.Server;
 using Serilog;
 using System;
@@ -48,6 +49,8 @@ namespace ILSpy.Backend
                     .WithHandler<RemoveAssemblyHandler>()
                     .WithHandler<SearchHandler>()
                  );
+
+            server.LogInfo($"ILSpy Backend PID: {Environment.ProcessId}");
 
             await server.WasShutDown;
         }

@@ -16,6 +16,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 public class DecompilerBackend : IDecompilerBackend
@@ -88,6 +89,18 @@ public class DecompilerBackend : IDecompilerBackend
         }
 
         return false;
+    }
+
+    public CSharpDecompiler? GetDecompiler(string assembly)
+    {
+        return decompilers.ContainsKey(assembly) ? decompilers[assembly] : null;
+    }
+
+    public IEnumerable<AssemblyData> GetLoadedAssemblies()
+    {
+        return decompilers.Select(decompiler => CreateAssemblyData(decompiler.Value, decompiler.Key))
+            .Where(data => data is not null)
+            .Cast<AssemblyData>();
     }
 
     public IEnumerable<MemberData> GetMembers(string? assemblyPath, TypeDefinitionHandle handle)

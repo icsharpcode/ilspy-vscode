@@ -20,5 +20,7 @@ public enum NodeType
     Field,
     Method,
     Const,
-    Property
+    Property,
+    AssemblyReference,
+    ReferencesRoot
 }

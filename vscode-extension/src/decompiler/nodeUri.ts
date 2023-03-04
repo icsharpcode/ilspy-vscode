@@ -42,7 +42,7 @@ export function uriToMemberNode(uri: vscode.Uri): MemberNode | undefined {
 
 export function nodeDataToUri(nodeData: NodeData): vscode.Uri {
   return vscode.Uri.file(
-    path.join(nodeData.node?.assemblyPath ?? "", nodeData.symbolName)
+    path.join(nodeData.node?.assemblyPath ?? "", nodeData.node?.name ?? "")
   ).with({
     scheme: ILSPY_URI_SCHEME,
     query: [

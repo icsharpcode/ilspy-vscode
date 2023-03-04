@@ -102,11 +102,11 @@ public class SearchBackend
             Node: new Node(
                 AssemblyPath: result.Assembly,
                 Type: GetNodeType(result),
+                Name: memberSearchResult?.Member?.Name ?? result.Name,
                 SymbolToken: memberSearchResult != null ? MetadataTokens.GetToken(memberSearchResult.Member.MetadataToken) : 0,
                 ParentSymbolToken:
                     memberSearchResult?.Member.DeclaringTypeDefinition?.MetadataToken != null ?
                     MetadataTokens.GetToken(memberSearchResult.Member.DeclaringTypeDefinition.MetadataToken) : 0),
-            SymbolName: memberSearchResult?.Member?.Name ?? result.Name,
             DisplayName: result.Name,
             Description: result.Location,
             MayHaveChildren: memberSearchResult?.Member is ITypeDefinition,

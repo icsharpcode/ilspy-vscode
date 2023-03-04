@@ -63,6 +63,7 @@ namespace ILSpy.Backend
             services.AddSingleton<AssemblyListManager>();
             services.AddSingleton<SingleThreadAssemblyList>();
             services.AddSingleton<SearchBackend>();
+            services.AddSingleton<NodeDecompiler>();
             services.AddSingleton<IDecompilerBackend, DecompilerBackend>();
         }
     }

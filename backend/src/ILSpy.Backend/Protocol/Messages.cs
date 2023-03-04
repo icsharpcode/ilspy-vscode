@@ -45,6 +45,10 @@ namespace ILSpy.Backend.Protocol
     public record DecompileTypeRequest(string? AssemblyPath, int Handle)
         : IRequest<DecompileResponse>;
 
+    [Serial, Method("ilspy/decompileNode", Direction.ClientToServer)]
+    public record DecompileNodeRequest(Node Node)
+        : IRequest<DecompileResponse>;
+
     public record DecompileResponse(
         IDictionary<string, string>? DecompiledCode,
         bool IsError,

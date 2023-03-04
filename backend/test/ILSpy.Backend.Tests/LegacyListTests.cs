@@ -1,15 +1,13 @@
 using ILSpy.Backend.Decompiler;
 using Microsoft.Extensions.Logging.Abstractions;
 using Mono.Cecil;
-using System;
-using System.ComponentModel.DataAnnotations;
 using System.Reflection.Metadata.Ecma335;
 
 namespace ILSpy.Backend.Tests;
 
 public class LegacyListTests
 {
-    private static string AssemblyPath => Path.Combine(Path.GetDirectoryName(typeof(DecompileNodeTests).Assembly.Location) ?? "", "TestAssembly.dll");
+    private static string AssemblyPath => Path.Combine(Path.GetDirectoryName(typeof(NodeDecompilerTests).Assembly.Location) ?? "", "TestAssembly.dll");
 
     private static DecompilerBackend CreateDecompilerBackend()
     {

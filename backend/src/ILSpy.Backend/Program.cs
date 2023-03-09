@@ -60,6 +60,7 @@ namespace ILSpy.Backend
             services.AddSingleton<ISettingsProvider, DummySettingsProvider>();
             services.AddSingleton<ILSpySettings>();
             services.AddSingleton<AssemblyListManager>();
+            services.AddSingleton<SingleThreadAssemblyList>();
             services.AddSingleton<SearchBackend>();
             services.AddSingleton<IDecompilerBackend, DecompilerBackend>();
         }

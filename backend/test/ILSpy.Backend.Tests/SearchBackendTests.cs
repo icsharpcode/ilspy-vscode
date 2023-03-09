@@ -7,11 +7,12 @@ namespace ILSpy.Backend.Tests;
 
 public class SearchBackendTests
 {
-    private static SearchBackend CreateSearchBackend()
+    private static async Task<SearchBackend> CreateSearchBackend()
     {
         var assemblyListManager = new AssemblyListManager(new DummySettingsProvider());
-        var searchBackend = new SearchBackend(new NullLoggerFactory(), assemblyListManager, new ILSpySettings());
-        searchBackend.AddAssembly(
+        var assemblyList = new SingleThreadAssemblyList(assemblyListManager);
+        var searchBackend = new SearchBackend(new NullLoggerFactory(), assemblyList, new ILSpySettings());
+        await searchBackend.AddAssembly(
             Path.Combine(Path.GetDirectoryName(typeof(SearchBackendTests).Assembly.Location) ?? "", "TestAssembly.dll"));
         return searchBackend;
     }
@@ -19,7 +20,7 @@ public class SearchBackendTests
     [Fact]
     public async Task ClassName()
     {
-        var searchBackend = CreateSearchBackend();
+        var searchBackend = await CreateSearchBackend();
         var nodeData = await searchBackend.Search("SomeClass", new CancellationToken());
         Assert.Collection(nodeData,
                 node => {
@@ -56,7 +57,7 @@ public class SearchBackendTests
     [Fact]
     public async Task InterfaceNameLowerCase()
     {
-        var searchBackend = CreateSearchBackend();
+        var searchBackend = await CreateSearchBackend();
         var nodeData = await searchBackend.Search("isomeinterface", new CancellationToken());
         Assert.Collection(nodeData,
                 node => {
@@ -72,7 +73,7 @@ public class SearchBackendTests
     [Fact]
     public async Task EnumConstants()
     {
-        var searchBackend = CreateSearchBackend();
+        var searchBackend = await CreateSearchBackend();
         var nodeData = await searchBackend.Search("E1", new CancellationToken());
         Assert.Collection(nodeData,
                 node => {
@@ -88,7 +89,7 @@ public class SearchBackendTests
     [Fact]
     public async Task VirtualClassMethod()
     {
-        var searchBackend = CreateSearchBackend();
+        var searchBackend = await CreateSearchBackend();
         var nodeData = await searchBackend.Search("VirtualMethod", new CancellationToken());
         Assert.Collection(nodeData,
                 node => {
@@ -104,7 +105,7 @@ public class SearchBackendTests
     [Fact]
     public async Task OverrideClassMethod()
     {
-        var searchBackend = CreateSearchBackend();
+        var searchBackend = await CreateSearchBackend();
         var nodeData = await searchBackend.Search("ToString", new CancellationToken());
         Assert.Collection(nodeData,
                 node => {
@@ -120,7 +121,7 @@ public class SearchBackendTests
     [Fact]
     public async Task Delegate()
     {
-        var searchBackend = CreateSearchBackend();
+        var searchBackend = await CreateSearchBackend();
         var nodeData = await searchBackend.Search("SomeDelegate", new CancellationToken());
         Assert.Collection(nodeData,
                 node => {

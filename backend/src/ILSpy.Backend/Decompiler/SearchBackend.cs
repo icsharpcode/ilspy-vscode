@@ -1,10 +1,6 @@
 // Copyright (c) 2022 ICSharpCode
 // Licensed under the MIT license. See the LICENSE file in the project
 
-namespace ILSpy.Backend.Decompiler;
-
-using ICSharpCode.Decompiler;
-using ICSharpCode.Decompiler.Disassembler;
 using ICSharpCode.Decompiler.TypeSystem;
 using ICSharpCode.ILSpy.Search;
 using ICSharpCode.ILSpyX;
@@ -20,41 +16,30 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
+namespace ILSpy.Backend.Decompiler;
+
 public class SearchBackend
 {
     private readonly ILogger logger;
-    private readonly AssemblyList assemblyList;
     private readonly IComparer<SearchResult> resultsComparer = SearchResult.ComparerByName;
-    private readonly AssemblyListManager assemblyListManager;
+    private readonly SingleThreadAssemblyList assemblyList;
     private readonly ILSpySettings ilspySettings;
 
-    public SearchBackend(ILoggerFactory loggerFactory, AssemblyListManager assemblyListManager, ILSpySettings ilspySettings)
+    public SearchBackend(ILoggerFactory loggerFactory, SingleThreadAssemblyList assemblyList, ILSpySettings ilspySettings)
     {
         logger = loggerFactory.CreateLogger<SearchBackend>();
-        this.assemblyListManager = assemblyListManager;
+        this.assemblyList = assemblyList;
         this.ilspySettings = ilspySettings;
-        assemblyList = assemblyListManager.LoadList(AssemblyListManager.DefaultListName);
     }
 
-    public void AddAssembly(string? path)
+    public async Task AddAssembly(string path)
     {
-        if (!string.IsNullOrEmpty(path))
-        {
-            assemblyList.Open(path);
-            assemblyListManager.SaveList(assemblyList);
-        }
+        await assemblyList.AddAssembly(path);
     }
 
-    public void RemoveAssembly(string? path)
+    public async Task RemoveAssembly(string path)
     {
-        if (!string.IsNullOrEmpty(path))
-        {
-            var assembly = assemblyList.FindAssembly(path);
-            if (assembly != null)
-            {
-                assemblyList.Unload(assembly);
-            }
-        }
+        await assemblyList.RemoveAssembly(path);
     }
 
     public async Task<IEnumerable<NodeData>> Search(string searchTerm, CancellationToken cancellationToken)

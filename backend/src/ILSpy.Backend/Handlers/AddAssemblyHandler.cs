@@ -21,17 +21,15 @@ namespace ILSpy.Backend.Handlers
             this.searchBackend = searchBackend;
         }
 
-        public Task<AddAssemblyResponse> Handle(AddAssemblyRequest request, CancellationToken cancellationToken)
+        public async Task<AddAssemblyResponse> Handle(AddAssemblyRequest request, CancellationToken cancellationToken)
         {
             if (request.AssemblyPath != null)
             {
-                searchBackend.AddAssembly(request.AssemblyPath);
+                await searchBackend.AddAssembly(request.AssemblyPath);
             }
 
             var result = request.AssemblyPath != null ? decompilerBackend.AddAssembly(request.AssemblyPath) : null;
-            return Task.FromResult(new AddAssemblyResponse(
-                Added: result != null,
-                AssemblyData: result));
+            return new AddAssemblyResponse(Added: result != null, AssemblyData: result);
         }
     }
 }

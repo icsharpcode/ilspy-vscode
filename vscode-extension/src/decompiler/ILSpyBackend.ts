@@ -35,6 +35,11 @@ import {
   ListNamespacesResponse,
 } from "../protocol/listNamespaces";
 import {
+  ListAssemblyReferencesParams,
+  ListAssemblyReferencesRequest,
+  ListAssemblyReferencesResponse,
+} from "../protocol/listAssemblyReferences";
+import {
   ListTypesParams,
   ListTypesRequest,
   ListTypesResponse,
@@ -107,6 +112,12 @@ export default class ILSpyBackend implements IILSpyBackend {
     params: ListNamespacesParams
   ): Promise<ListNamespacesResponse | null> {
     return this.languageClient.sendRequest(ListNamespacesRequest.type, params);
+  }
+
+  public sendListAssemblyReferences(
+    params: ListAssemblyReferencesParams
+  ): Promise<ListAssemblyReferencesResponse | null> {
+    return this.languageClient.sendRequest(ListAssemblyReferencesRequest.type, params);
   }
 
   public sendListTypes(

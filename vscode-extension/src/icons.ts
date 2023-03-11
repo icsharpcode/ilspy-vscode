@@ -37,6 +37,8 @@ export function getIconForMemberNode(node: MemberNode): string {
       return "symbol-constant";
     case TokenType.PropertyDefinition:
       return "symbol-property";
+    case TokenType.AssemblyReference:
+      return node.memberSubKind === MemberSubKind.Other ? "folder-library" : "library";
     default:
       return "question";
   }

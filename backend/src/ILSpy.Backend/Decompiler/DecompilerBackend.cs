@@ -353,4 +353,20 @@ public class DecompilerBackend : IDecompilerBackend
         }
         return namespaces.OrderBy(n => n);
     }
-}
+
+   public IEnumerable<string> ListAssemblyReferences(string? assemblyPath)
+    {
+        if (assemblyPath == null)
+        {
+            return Enumerable.Empty<string>();
+        }
+
+        var decompiler = decompilers[assemblyPath];
+        HashSet<string> references = new(decompiler.TypeSystem.NameComparer);
+        foreach (var ar in decompiler.TypeSystem.MainModule.PEFile.AssemblyReferences)
+        {
+            references.Add(ar.FullName);
+        }
+        return references.OrderBy(n => n);
+    }
+ }

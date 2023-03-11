@@ -20,6 +20,10 @@ import {
   ListNamespacesParams,
   ListNamespacesResponse,
 } from "../protocol/listNamespaces";
+import {
+  ListAssemblyReferencesParams,
+  ListAssemblyReferencesResponse,
+} from "../protocol/listAssemblyReferences";
 import { ListTypesParams, ListTypesResponse } from "../protocol/listTypes";
 import NodeData from "../protocol/NodeData";
 import {
@@ -58,6 +62,10 @@ export default interface IILSpyBackend {
   sendListNamespaces(
     params: ListNamespacesParams
   ): Promise<ListNamespacesResponse | null>;
+
+  sendListAssemblyReferences(
+    params: ListAssemblyReferencesParams
+  ): Promise<ListAssemblyReferencesResponse | null>;
 
   sendListTypes(params: ListTypesParams): Promise<ListTypesResponse | null>;
 

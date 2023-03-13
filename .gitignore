@@ -299,3 +299,6 @@ node_modules
 bin
 .vscode-test
 *.vsix
+
+# Nuke Build
+.nuke/temp/

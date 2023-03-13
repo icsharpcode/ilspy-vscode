@@ -2,6 +2,11 @@
 
 All notable changes to the "ilspy-vscode" extension will be documented in this file.
 
+## 0.15
+
+- Assembly references are now shown in tree
+- Fix for failing unload/reload of assemblies in tree
+
 ## 0.14.1
 
 - Fix for missing output language selection

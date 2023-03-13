@@ -8,7 +8,7 @@
     <Product>ILSpy .NET Decompiler</Product>
     <Copyright>Copyright 2017-2023 ICSharpCode, Microsoft Corporation</Copyright>
     <Nullable>enable</Nullable>
-    <Version>0.14.1</Version>
+    <Version>0.15.0</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">

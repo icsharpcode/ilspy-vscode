@@ -92,8 +92,10 @@ public class DecompilerBackend : IDecompilerBackend
 
     public IEnumerable<MemberData> GetMembers(string? assemblyPath, TypeDefinitionHandle handle)
     {
-        if (handle.IsNil || (assemblyPath == null))
+        if (handle.IsNil || (assemblyPath == null) || !decompilers.ContainsKey(assemblyPath))
+        {
             return Array.Empty<MemberData>();
+        }
 
         var typeSystem = decompilers[assemblyPath].TypeSystem;
         var c = typeSystem.MainModule.GetDefinition(handle);
@@ -141,8 +143,10 @@ public class DecompilerBackend : IDecompilerBackend
 
     private string GetCSharpCode(string assemblyPath, EntityHandle handle)
     {
-        if (handle.IsNil)
+        if (handle.IsNil || !decompilers.ContainsKey(assemblyPath))
+        {
             return string.Empty;
+        }
 
         var dc = decompilers[assemblyPath];
         var module = dc.TypeSystem.MainModule;
@@ -168,8 +172,10 @@ public class DecompilerBackend : IDecompilerBackend
 
     private string GetILCode(string assemblyPath, EntityHandle handle)
     {
-        if (handle.IsNil)
+        if (handle.IsNil || !decompilers.ContainsKey(assemblyPath))
+        {
             return string.Empty;
+        }
 
         var dc = decompilers[assemblyPath];
         var module = dc.TypeSystem.MainModule;
@@ -307,7 +313,7 @@ public class DecompilerBackend : IDecompilerBackend
 
     public IEnumerable<MemberData> ListTypes(string? assemblyPath, string? @namespace)
     {
-        if ((assemblyPath == null) || (@namespace == null))
+        if ((assemblyPath == null) || (@namespace == null) || !decompilers.ContainsKey(assemblyPath))
         {
             yield break;
         }
@@ -339,7 +345,7 @@ public class DecompilerBackend : IDecompilerBackend
 
     public IEnumerable<string> ListNamespaces(string? assemblyPath)
     {
-        if (assemblyPath == null)
+        if (assemblyPath == null || !decompilers.ContainsKey(assemblyPath))
         {
             return Enumerable.Empty<string>();
         }
@@ -354,9 +360,9 @@ public class DecompilerBackend : IDecompilerBackend
         return namespaces.OrderBy(n => n);
     }
 
-   public IEnumerable<string> ListAssemblyReferences(string? assemblyPath)
+    public IEnumerable<string> ListAssemblyReferences(string? assemblyPath)
     {
-        if (assemblyPath == null)
+        if (assemblyPath == null || !decompilers.ContainsKey(assemblyPath))
         {
             return Enumerable.Empty<string>();
         }
@@ -369,4 +375,4 @@ public class DecompilerBackend : IDecompilerBackend
         }
         return references.OrderBy(n => n);
     }
- }
+}

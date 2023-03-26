@@ -199,7 +199,7 @@
 		"@types/vscode": "^1.74.0",
 		"@typescript-eslint/eslint-plugin": "^5.56.0",
 		"@typescript-eslint/parser": "^5.55.0",
-		"@vscode/test-electron": "^2.2.3",
+		"@vscode/test-electron": "^2.3.0",
 		"eslint": "^8.35.0",
 		"glob": "^9.3.0",
 		"minimist": "^1.2.8",

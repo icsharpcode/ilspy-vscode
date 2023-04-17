@@ -25,7 +25,7 @@ import {
   ListAssemblyReferencesResponse,
 } from "../protocol/listAssemblyReferences";
 import { ListTypesParams, ListTypesResponse } from "../protocol/listTypes";
-import NodeData from "../protocol/NodeData";
+import Node from "../protocol/Node";
 import {
   RemoveAssemblyParams,
   RemoveAssemblyResponse,

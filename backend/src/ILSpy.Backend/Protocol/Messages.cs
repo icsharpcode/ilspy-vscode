@@ -46,7 +46,7 @@ namespace ILSpy.Backend.Protocol
         : IRequest<DecompileResponse>;
 
     [Serial, Method("ilspy/decompileNode", Direction.ClientToServer)]
-    public record DecompileNodeRequest(Node Node)
+    public record DecompileNodeRequest(NodeMetadata Node)
         : IRequest<DecompileResponse>;
 
     public record DecompileResponse(
@@ -110,7 +110,7 @@ namespace ILSpy.Backend.Protocol
     public record SearchRequest(string Term)
         : IRequest<SearchResponse>;
 
-    public record SearchResponse(IEnumerable<NodeData>? Results);
+    public record SearchResponse(IEnumerable<Node>? Results);
 
     #endregion
 }

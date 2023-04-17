@@ -56,7 +56,7 @@ import {
   SearchRequest,
   SearchResponse,
 } from "../protocol/search";
-import NodeData from "../protocol/NodeData";
+import Node from "../protocol/Node";
 
 export default class ILSpyBackend implements IILSpyBackend {
   public readonly assemblies = new Map<string, AssemblyData>();

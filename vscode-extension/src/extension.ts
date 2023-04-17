@@ -36,7 +36,7 @@ import {
 } from "./decompiler/nodeUri";
 import { registerSearch } from "./commands/search";
 import { SearchResultTreeProvider } from "./decompiler/search/SearchResultTreeProvider";
-import NodeData from "./protocol/NodeData";
+import Node from "./protocol/Node";
 import { registerDecompileNode } from "./commands/decompileNode";
 
 let client: LanguageClient;
@@ -113,7 +113,7 @@ export async function activate(context: ExtensionContext) {
     new DecompilerTextDocumentContentProvider(ilspyBackend);
 
   const searchTreeProvider = new SearchResultTreeProvider(ilspyBackend);
-  const searchResultTreeView: TreeView<NodeData> = window.createTreeView(
+  const searchResultTreeView: TreeView<Node> = window.createTreeView(
     "ilspySearchResultsContainer",
     {
       treeDataProvider: searchTreeProvider,

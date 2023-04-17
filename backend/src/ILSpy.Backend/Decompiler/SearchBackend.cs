@@ -42,7 +42,7 @@ public class SearchBackend
         await assemblyList.RemoveAssembly(path);
     }
 
-    public async Task<IEnumerable<NodeData>> Search(string searchTerm, CancellationToken cancellationToken)
+    public async Task<IEnumerable<Node>> Search(string searchTerm, CancellationToken cancellationToken)
     {
         if (!string.IsNullOrEmpty(searchTerm))
         {
@@ -82,7 +82,7 @@ public class SearchBackend
             }
         }
 
-        return Enumerable.Empty<NodeData>();
+        return Enumerable.Empty<Node>();
     }
 
     bool IsNotAccessor(SearchResult searchResult)
@@ -95,11 +95,11 @@ public class SearchBackend
         return true;
     }
 
-    NodeData ConvertResultToNode(SearchResult result)
+    Node ConvertResultToNode(SearchResult result)
     {
         var memberSearchResult = result as MemberSearchResult;
-        return new NodeData(
-            Node: new Node(
+        return new Node(
+            Metadata: new NodeMetadata(
                 AssemblyPath: result.Assembly,
                 Type: GetNodeType(result),
                 Name: memberSearchResult?.Member?.Name ?? result.Name,

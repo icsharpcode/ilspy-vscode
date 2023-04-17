@@ -40,7 +40,7 @@ public class NodeDecompilerTests
     {
         var decompilerBackend = CreateDecompilerBackend();
         var nodeDecompiler = new NodeDecompiler(decompilerBackend);
-        var node = new Node(AssemblyPath, NodeType.Assembly, AssemblyPath, 0, 0);
+        var node = new NodeMetadata(AssemblyPath, NodeType.Assembly, AssemblyPath, 0, 0);
         Assert.Equal(
 $"// {AssemblyPath}" +
 @"
@@ -75,7 +75,7 @@ using System.Runtime.Versioning;
     {
         var decompilerBackend = CreateDecompilerBackend();
         var nodeDecompiler = new NodeDecompiler(decompilerBackend);
-        var node = new Node(AssemblyPath, NodeType.Namespace, "A.B.C.D", 0, 0);
+        var node = new NodeMetadata(AssemblyPath, NodeType.Namespace, "A.B.C.D", 0, 0);
         Assert.Equal(
 @"namespace A.B.C.D { }",
             nodeDecompiler.GetCode(node)?[LanguageNames.CSharp]);
@@ -86,7 +86,7 @@ using System.Runtime.Versioning;
     {
         var decompilerBackend = CreateDecompilerBackend();
         var nodeDecompiler = new NodeDecompiler(decompilerBackend);
-        var node = new Node(AssemblyPath, NodeType.Namespace, "", 0, 0);
+        var node = new NodeMetadata(AssemblyPath, NodeType.Namespace, "", 0, 0);
         Assert.Equal(
 @"namespace <global> { }",
             nodeDecompiler.GetCode(node)?[LanguageNames.CSharp]);
@@ -98,7 +98,7 @@ using System.Runtime.Versioning;
         var decompilerBackend = CreateDecompilerBackend();
         var nodeDecompiler = new NodeDecompiler(decompilerBackend);
         int typeToken = GetTypeToken(decompilerBackend, "Generics", "AClass");
-        var node = new Node(AssemblyPath, NodeType.Class, "", typeToken, 0);
+        var node = new NodeMetadata(AssemblyPath, NodeType.Class, "", typeToken, 0);
         Assert.Equal(
 @"namespace Generics;
 
@@ -130,7 +130,7 @@ public class AClass
         var decompilerBackend = CreateDecompilerBackend();
         var nodeDecompiler = new NodeDecompiler(decompilerBackend);
         int typeToken = GetTypeToken(decompilerBackend, "TestAssembly", "ISomeInterface");
-        var node = new Node(AssemblyPath, NodeType.Interface, "", typeToken, 0);
+        var node = new NodeMetadata(AssemblyPath, NodeType.Interface, "", typeToken, 0);
         Assert.Equal(
 @"namespace TestAssembly;
 
@@ -148,7 +148,7 @@ public interface ISomeInterface
         var decompilerBackend = CreateDecompilerBackend();
         var nodeDecompiler = new NodeDecompiler(decompilerBackend);
         int typeToken = GetTypeToken(decompilerBackend, "TestAssembly", "SomeStruct");
-        var node = new Node(AssemblyPath, NodeType.Struct, "", typeToken, 0);
+        var node = new NodeMetadata(AssemblyPath, NodeType.Struct, "", typeToken, 0);
         Assert.Equal(
 @"namespace TestAssembly;
 
@@ -166,7 +166,7 @@ public struct SomeStruct
         var decompilerBackend = CreateDecompilerBackend();
         var nodeDecompiler = new NodeDecompiler(decompilerBackend);
         int typeToken = GetTypeToken(decompilerBackend, "TestAssembly", "SomeEnum");
-        var node = new Node(AssemblyPath, NodeType.Enum, "", typeToken, 0);
+        var node = new NodeMetadata(AssemblyPath, NodeType.Enum, "", typeToken, 0);
         Assert.Equal(
 @"namespace TestAssembly;
 
@@ -187,7 +187,7 @@ public enum SomeEnum
         var nodeDecompiler = new NodeDecompiler(decompilerBackend);
         int typeToken = GetTypeToken(decompilerBackend, "TestAssembly", "SomeClass");
         int memberToken = GetMemberToken(decompilerBackend, typeToken, "ToString() : string");
-        var node = new Node(AssemblyPath, NodeType.Method, "", memberToken, typeToken);
+        var node = new NodeMetadata(AssemblyPath, NodeType.Method, "", memberToken, typeToken);
         Assert.Equal(
 @"public override string ToString()
 {
@@ -204,7 +204,7 @@ public enum SomeEnum
         var nodeDecompiler = new NodeDecompiler(decompilerBackend);
         int typeToken = GetTypeToken(decompilerBackend, "TestAssembly", "SomeClass");
         int memberToken = GetMemberToken(decompilerBackend, typeToken, "_ProgId");
-        var node = new Node(AssemblyPath, NodeType.Field, "", memberToken, typeToken);
+        var node = new NodeMetadata(AssemblyPath, NodeType.Field, "", memberToken, typeToken);
         Assert.Equal(
 @"private int _ProgId;
 ",
@@ -218,7 +218,7 @@ public enum SomeEnum
         var nodeDecompiler = new NodeDecompiler(decompilerBackend);
         int typeToken = GetTypeToken(decompilerBackend, "TestAssembly", "SomeClass");
         int memberToken = GetMemberToken(decompilerBackend, typeToken, "ProgId");
-        var node = new Node(AssemblyPath, NodeType.Property, "", memberToken, typeToken);
+        var node = new NodeMetadata(AssemblyPath, NodeType.Property, "", memberToken, typeToken);
         Assert.Equal(
 @"public int ProgId
 {
@@ -242,7 +242,7 @@ public enum SomeEnum
         var nodeDecompiler = new NodeDecompiler(decompilerBackend);
         int typeToken = GetTypeToken(decompilerBackend, "TestAssembly", "SomeClass");
         int memberToken = GetMemberToken(decompilerBackend, typeToken, "SomeClass(int)");
-        var node = new Node(AssemblyPath, NodeType.Method, "", memberToken, typeToken);
+        var node = new NodeMetadata(AssemblyPath, NodeType.Method, "", memberToken, typeToken);
         Assert.Equal(
 @"internal SomeClass(int ProgramId)
 {
@@ -257,7 +257,7 @@ public enum SomeEnum
     {
         var decompilerBackend = CreateDecompilerBackend();
         var nodeDecompiler = new NodeDecompiler(decompilerBackend);
-        var node = new Node(AssemblyPath, NodeType.ReferencesRoot, "References", 0, 0);
+        var node = new NodeMetadata(AssemblyPath, NodeType.ReferencesRoot, "References", 0, 0);
         Assert.Equal(
 @"// System.Runtime, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
             nodeDecompiler.GetCode(node)?[LanguageNames.CSharp]);
@@ -268,7 +268,7 @@ public enum SomeEnum
     {
         var decompilerBackend = CreateDecompilerBackend();
         var nodeDecompiler = new NodeDecompiler(decompilerBackend);
-        var node = new Node(AssemblyPath, NodeType.AssemblyReference,
+        var node = new NodeMetadata(AssemblyPath, NodeType.AssemblyReference,
             "System.Runtime, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", 0, 0);
         Assert.Equal(
 @"// System.Runtime, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",

@@ -17,7 +17,7 @@ namespace ILSpy.Backend.Decompiler
             this.decompilerBackend = decompilerBackend;
         }
 
-        public IDictionary<string, string>? GetCode(Node node)
+        public IDictionary<string, string>? GetCode(NodeMetadata node)
         {
             return node.Type switch
             {
@@ -43,7 +43,7 @@ namespace ILSpy.Backend.Decompiler
             };
         }
 
-        private IDictionary<string, string> GetReferencesRootCode(Node node)
+        private IDictionary<string, string> GetReferencesRootCode(NodeMetadata node)
         {
             var references = decompilerBackend.ListAssemblyReferences(node.AssemblyPath);
             var code = string.Join('\n', references.Select(reference => $"// {reference}"));
@@ -55,7 +55,7 @@ namespace ILSpy.Backend.Decompiler
             };
         }
 
-        private IDictionary<string, string> GetReferenceCode(Node node)
+        private IDictionary<string, string> GetReferenceCode(NodeMetadata node)
         {
             var code = $"// {node.Name}";
             return new Dictionary<string, string>

@@ -6,7 +6,7 @@
 import { MemberNode } from "./decompiler/MemberNode";
 import { MemberSubKind } from "./decompiler/MemberSubKind";
 import { TokenType } from "./decompiler/TokenType";
-import Node from "./protocol/Node";
+import NodeMetadata from "./protocol/NodeMetadata";
 import { NodeType } from "./protocol/NodeType";
 
 export function getIconForMemberNode(node: MemberNode): string {

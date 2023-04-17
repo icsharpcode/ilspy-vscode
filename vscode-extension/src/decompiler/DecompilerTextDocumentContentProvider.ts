@@ -11,7 +11,6 @@ import { MemberNode } from "./MemberNode";
 import {
   ILSPY_URI_SCHEME,
   ILSPY_URI_SCHEME_LEGACY,
-  NodeFromUri,
   uriToMemberNode,
   uriToNode,
 } from "./nodeUri";
@@ -19,6 +18,8 @@ import { isTypeNode, makeHandle } from "./utils";
 import { NodeType } from "../protocol/NodeType";
 import { TokenType } from "./TokenType";
 import { MemberSubKind } from "./MemberSubKind";
+import Node from "../protocol/Node";
+import NodeMetadata from "../protocol/NodeMetadata";
 
 export class DecompilerTextDocumentContentProvider
   implements vscode.TextDocumentContentProvider
@@ -69,14 +70,17 @@ export class DecompilerTextDocumentContentProvider
       let code: DecompiledCode = {};
 
       if (element.type === TokenType.NamespaceDefinition) {
-        let name = element.name.length === 0 ? "namespace <global>" : "namespace " + element.name;
+        let name =
+          element.name.length === 0
+            ? "namespace <global>"
+            : "namespace " + element.name;
         code[LanguageName.CSharp] = name + " { }";
         code[LanguageName.IL] = name;
       } else if (element.type === TokenType.AssemblyReference) {
         let s = "";
         if (element.memberSubKind !== MemberSubKind.None) {
           const result = await this.backend.sendListAssemblyReferences({
-            assemblyPath: element.assembly
+            assemblyPath: element.assembly,
           });
           if (result !== null) {
             for (var ar of result.references.values()) {
@@ -109,17 +113,17 @@ export class DecompilerTextDocumentContentProvider
   }
 
   private async getCodeFromNode(
-    element: NodeFromUri
+    node: NodeMetadata
   ): Promise<DecompiledCode | undefined> {
-    if (element.type === NodeType.Assembly) {
+    if (node.type === NodeType.Assembly) {
       const result = await this.backend.sendDecompileAssembly({
-        assemblyPath: element.assemblyPath,
+        assemblyPath: node.assemblyPath,
       });
       return result?.decompiledCode;
     }
 
-    if (element.type === NodeType.Namespace) {
-      let name = element.name.length === 0 ? "<global>" : element.name;
+    if (node.type === NodeType.Namespace) {
+      let name = node.name.length === 0 ? "<global>" : node.name;
       let namespaceCode: DecompiledCode = {};
       namespaceCode[LanguageName.CSharp] = "namespace " + name + " { }";
       namespaceCode[LanguageName.IL] = "namespace " + name + "";
@@ -127,17 +131,17 @@ export class DecompilerTextDocumentContentProvider
       return Promise.resolve(namespaceCode);
     }
 
-    if (isTypeNode(element.type)) {
+    if (isTypeNode(node.type)) {
       const result = await this.backend.sendDecompileType({
-        assemblyPath: element.assemblyPath,
-        handle: element.symbolToken,
+        assemblyPath: node.assemblyPath,
+        handle: node.symbolToken,
       });
       return result?.decompiledCode;
     } else {
       const result = await this.backend.sendDecompileMember({
-        assemblyPath: element.assemblyPath,
-        type: element.parentSymbolToken,
-        member: element.symbolToken,
+        assemblyPath: node.assemblyPath,
+        type: node.parentSymbolToken,
+        member: node.symbolToken,
       });
       return result?.decompiledCode;
     }

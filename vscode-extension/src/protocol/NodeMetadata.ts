@@ -3,13 +3,12 @@
  *  Licensed under the MIT License. See LICENSE.TXT in the project root for license information.
  *-----------------------------------------------------------------------------------------------*/
 
-import Node from "./Node";
-import { SymbolModifiers } from "./SymbolModifiers";
+import { NodeType } from "./NodeType";
 
-export default interface NodeData {
-  node?: Node;
-  displayName: string;
-  description: string;
-  mayHaveChildren: boolean;
-  modifiers: SymbolModifiers;
+export default interface NodeMetadata {
+  assemblyPath: string;
+  type: NodeType;
+  name: string;
+  symbolToken: number;
+  parentSymbolToken: number;
 }

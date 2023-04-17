@@ -6,14 +6,12 @@
 import * as vscode from "vscode";
 import * as path from "path";
 import { MemberNode } from "./MemberNode";
+import NodeMetadata from "../protocol/NodeMetadata";
 import Node from "../protocol/Node";
-import NodeData from "../protocol/NodeData";
 import { NodeType } from "../protocol/NodeType";
 
 export const ILSPY_URI_SCHEME_LEGACY = "ilspylegacy";
 export const ILSPY_URI_SCHEME = "ilspy";
-
-export type NodeFromUri = Node & { name: string };
 
 export function memberNodeToUri(node: MemberNode): vscode.Uri {
   return vscode.Uri.file(path.join(node.assembly, node.name)).with({
@@ -40,20 +38,23 @@ export function uriToMemberNode(uri: vscode.Uri): MemberNode | undefined {
   );
 }
 
-export function nodeDataToUri(nodeData: NodeData): vscode.Uri {
+export function nodeDataToUri(nodeData: Node): vscode.Uri {
   return vscode.Uri.file(
-    path.join(nodeData.node?.assemblyPath ?? "", nodeData.node?.name ?? "")
+    path.join(
+      nodeData.metadata?.assemblyPath ?? "",
+      nodeData.metadata?.name ?? ""
+    )
   ).with({
     scheme: ILSPY_URI_SCHEME,
     query: [
-      nodeData.node?.symbolToken,
-      nodeData.node?.type,
-      nodeData.node?.parentSymbolToken,
+      nodeData.metadata?.symbolToken,
+      nodeData.metadata?.type,
+      nodeData.metadata?.parentSymbolToken,
     ].join(":"),
   });
 }
 
-export function uriToNode(uri: vscode.Uri): NodeFromUri | undefined {
+export function uriToNode(uri: vscode.Uri): NodeMetadata | undefined {
   if (uri.scheme !== ILSPY_URI_SCHEME) {
     return undefined;
   }

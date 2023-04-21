@@ -31,6 +31,7 @@ import {
   RemoveAssemblyResponse,
 } from "../protocol/removeAssembly";
 import { SearchParams, SearchResponse } from "../protocol/search";
+import { DecompileNodeParams } from "../protocol/decompileNode";
 
 export default interface IILSpyBackend {
   readonly assemblies: Map<string, AssemblyData>;
@@ -53,6 +54,10 @@ export default interface IILSpyBackend {
 
   sendDecompileType(
     params: DecompileTypeParams
+  ): Promise<DecompileResponse | null>;
+
+  sendDecompileNode(
+    params: DecompileNodeParams
   ): Promise<DecompileResponse | null>;
 
   sendListMembers(

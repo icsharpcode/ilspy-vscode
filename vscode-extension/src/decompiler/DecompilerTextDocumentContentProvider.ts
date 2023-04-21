@@ -14,11 +14,9 @@ import {
   uriToMemberNode,
   uriToNode,
 } from "./nodeUri";
-import { isTypeNode, makeHandle } from "./utils";
-import { NodeType } from "../protocol/NodeType";
+import { makeHandle } from "./utils";
 import { TokenType } from "./TokenType";
 import { MemberSubKind } from "./MemberSubKind";
-import Node from "../protocol/Node";
 import NodeMetadata from "../protocol/NodeMetadata";
 
 export class DecompilerTextDocumentContentProvider
@@ -45,11 +43,11 @@ export class DecompilerTextDocumentContentProvider
         code?.[this.getDocumentOutputLanguage(uri)] ?? "// No code available"
       );
     } else {
-      const node = uriToNode(uri);
-      if (!node) {
+      const nodeMetadata = uriToNode(uri);
+      if (!nodeMetadata) {
         return "// Invalid URI";
       }
-      const code = await this.getCodeFromNode(node);
+      const code = await this.getCodeFromNode(nodeMetadata);
       return (
         code?.[this.getDocumentOutputLanguage(uri)] ?? "// No code available"
       );
@@ -115,36 +113,7 @@ export class DecompilerTextDocumentContentProvider
   private async getCodeFromNode(
     node: NodeMetadata
   ): Promise<DecompiledCode | undefined> {
-    if (node.type === NodeType.Assembly) {
-      const result = await this.backend.sendDecompileAssembly({
-        assemblyPath: node.assemblyPath,
-      });
-      return result?.decompiledCode;
-    }
-
-    if (node.type === NodeType.Namespace) {
-      let name = node.name.length === 0 ? "<global>" : node.name;
-      let namespaceCode: DecompiledCode = {};
-      namespaceCode[LanguageName.CSharp] = "namespace " + name + " { }";
-      namespaceCode[LanguageName.IL] = "namespace " + name + "";
-
-      return Promise.resolve(namespaceCode);
-    }
-
-    if (isTypeNode(node.type)) {
-      const result = await this.backend.sendDecompileType({
-        assemblyPath: node.assemblyPath,
-        handle: node.symbolToken,
-      });
-      return result?.decompiledCode;
-    } else {
-      const result = await this.backend.sendDecompileMember({
-        assemblyPath: node.assemblyPath,
-        type: node.parentSymbolToken,
-        member: node.symbolToken,
-      });
-      return result?.decompiledCode;
-    }
+    return (await this.backend.sendDecompileNode({ node }))?.decompiledCode;
   }
 
   setDocumentOutputLanguage(uri: vscode.Uri, language: LanguageName) {

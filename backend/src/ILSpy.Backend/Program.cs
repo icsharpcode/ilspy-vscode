@@ -43,6 +43,7 @@ namespace ILSpy.Backend
                     .WithHandler<DecompileAssemblyHandler>()
                     .WithHandler<DecompileMemberHandler>()
                     .WithHandler<DecompileTypeHandler>()
+                    .WithHandler<DecompileNodeHandler>()
                     .WithHandler<ListMembersHandler>()
                     .WithHandler<ListNamespacesHandler>()
                     .WithHandler<ListAssemblyReferencesHandler>()

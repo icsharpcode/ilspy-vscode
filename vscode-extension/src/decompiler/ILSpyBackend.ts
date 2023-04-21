@@ -57,6 +57,10 @@ import {
   SearchResponse,
 } from "../protocol/search";
 import Node from "../protocol/Node";
+import {
+  DecompileNodeParams,
+  DecompileNodeRequest,
+} from "../protocol/decompileNode";
 
 export default class ILSpyBackend implements IILSpyBackend {
   public readonly assemblies = new Map<string, AssemblyData>();
@@ -102,6 +106,12 @@ export default class ILSpyBackend implements IILSpyBackend {
     return this.languageClient.sendRequest(DecompileTypeRequest.type, params);
   }
 
+  public sendDecompileNode(
+    params: DecompileNodeParams
+  ): Promise<DecompileResponse | null> {
+    return this.languageClient.sendRequest(DecompileNodeRequest.type, params);
+  }
+
   public sendListMembers(
     params: ListMembersParams
   ): Promise<ListMembersResponse | null> {
@@ -117,7 +127,10 @@ export default class ILSpyBackend implements IILSpyBackend {
   public sendListAssemblyReferences(
     params: ListAssemblyReferencesParams
   ): Promise<ListAssemblyReferencesResponse | null> {
-    return this.languageClient.sendRequest(ListAssemblyReferencesRequest.type, params);
+    return this.languageClient.sendRequest(
+      ListAssemblyReferencesRequest.type,
+      params
+    );
   }
 
   public sendListTypes(

@@ -119,15 +119,7 @@ public class SearchBackend
         NamespaceSearchResult => NodeType.Namespace,
         MemberSearchResult msr => msr.Member switch
         {
-            ITypeDefinition typeDefinition => typeDefinition.Kind switch
-            {
-                TypeKind.Class => NodeType.Class,
-                TypeKind.Delegate => NodeType.Delegate,
-                TypeKind.Enum => NodeType.Enum,
-                TypeKind.Interface => NodeType.Interface,
-                TypeKind.Struct => NodeType.Struct,
-                _ => NodeType.Unknown
-            },
+            ITypeDefinition typeDefinition => NodeProvider.GetNodeTypeFromTypeKind(typeDefinition.Kind),
             IMethod => NodeType.Method,
             IField => NodeType.Field,
             IEvent => NodeType.Event,

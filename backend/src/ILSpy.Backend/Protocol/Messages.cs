@@ -62,6 +62,16 @@ namespace ILSpy.Backend.Protocol
 
     #endregion
 
+    #region getNodes
+
+    [Serial, Method("ilspy/getNodes", Direction.ClientToServer)]
+    public record GetNodesRequest(NodeMetadata NodeMetadata)
+        : IRequest<GetNodesResponse>;
+
+    public record GetNodesResponse(IEnumerable<Node>? Nodes);
+
+    #endregion
+
     #region listMembers
 
     [Serial, Method("ilspy/listMembers", Direction.ClientToServer)]

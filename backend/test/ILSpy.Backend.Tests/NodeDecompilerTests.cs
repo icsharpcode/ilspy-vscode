@@ -152,7 +152,7 @@ public interface ISomeInterface
         Assert.Equal(
 @"namespace TestAssembly;
 
-public struct SomeStruct
+internal struct SomeStruct
 {
     public int Prop { get; set; }
 }

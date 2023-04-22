@@ -48,6 +48,7 @@ namespace ILSpy.Backend
                     .WithHandler<ListNamespacesHandler>()
                     .WithHandler<ListAssemblyReferencesHandler>()
                     .WithHandler<ListTypesHandler>()
+                    .WithHandler<GetNodesHandler>()
                     .WithHandler<RemoveAssemblyHandler>()
                     .WithHandler<SearchHandler>()
                  );
@@ -64,6 +65,7 @@ namespace ILSpy.Backend
             services.AddSingleton<AssemblyListManager>();
             services.AddSingleton<SingleThreadAssemblyList>();
             services.AddSingleton<SearchBackend>();
+            services.AddSingleton<NodeProvider>();
             services.AddSingleton<NodeDecompiler>();
             services.AddSingleton<IDecompilerBackend, DecompilerBackend>();
         }

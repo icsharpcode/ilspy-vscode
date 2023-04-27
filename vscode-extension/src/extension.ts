@@ -91,7 +91,7 @@ export async function activate(context: ExtensionContext) {
 
   const ilspyBackend = new ILSpyBackend(client);
   const decompileTreeProvider = new DecompiledTreeProvider(ilspyBackend);
-  const decompileTreeView: TreeView<MemberNode> = window.createTreeView(
+  const decompileTreeView: TreeView<Node> = window.createTreeView(
     "ilspyDecompiledMembers",
     {
       treeDataProvider: decompileTreeProvider,

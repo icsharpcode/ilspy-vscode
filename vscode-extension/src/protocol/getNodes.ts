@@ -10,26 +10,30 @@ import {
   RequestHandler,
   RequestType,
 } from "vscode-languageclient";
-import DecompileResponse from "./DecompileResponse";
 import NodeMetadata from "./NodeMetadata";
+import Node from "./Node";
 
-export interface DecompileNodeParams {
+export interface GetNodesParams {
   nodeMetadata: NodeMetadata;
 }
 
-export namespace DecompileNodeRequest {
+export interface GetNodesResponse {
+  nodes?: Node[];
+}
+
+export namespace GetNodesRequest {
   export const type = new RequestType<
-    DecompileNodeParams,
-    DecompileResponse | null,
+    GetNodesParams,
+    GetNodesResponse | null,
     never
-  >("ilspy/decompileNode", ParameterStructures.byName);
+  >("ilspy/getNodes", ParameterStructures.byName);
   export type HandlerSignature = RequestHandler<
-    DecompileNodeParams,
-    DecompileResponse | null,
+    GetNodesParams,
+    GetNodesResponse | null,
     void
   >;
   export type MiddlewareSignature = (
     token: CancellationToken,
     next: HandlerSignature
-  ) => HandlerResult<DecompileResponse | null, void>;
+  ) => HandlerResult<GetNodesResponse | null, void>;
 }

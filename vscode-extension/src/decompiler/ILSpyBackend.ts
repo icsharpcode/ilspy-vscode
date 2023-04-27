@@ -61,6 +61,11 @@ import {
   DecompileNodeParams,
   DecompileNodeRequest,
 } from "../protocol/decompileNode";
+import {
+  GetNodesParams,
+  GetNodesRequest,
+  GetNodesResponse,
+} from "../protocol/getNodes";
 
 export default class ILSpyBackend implements IILSpyBackend {
   public readonly assemblies = new Map<string, AssemblyData>();
@@ -110,6 +115,12 @@ export default class ILSpyBackend implements IILSpyBackend {
     params: DecompileNodeParams
   ): Promise<DecompileResponse | null> {
     return this.languageClient.sendRequest(DecompileNodeRequest.type, params);
+  }
+
+  public sendGetNodes(
+    params: GetNodesParams
+  ): Promise<GetNodesResponse | null> {
+    return this.languageClient.sendRequest(GetNodesRequest.type, params);
   }
 
   public sendListMembers(

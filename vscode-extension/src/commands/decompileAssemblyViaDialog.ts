@@ -5,12 +5,12 @@
 
 import * as vscode from "vscode";
 import { DecompiledTreeProvider } from "../decompiler/DecompiledTreeProvider";
-import { MemberNode } from "../decompiler/MemberNode";
 import { addAssemblyFromFilePath } from "./utils";
+import Node from "../protocol/Node";
 
 export function registerDecompileAssemblyViaDialog(
   decompiledTreeProvider: DecompiledTreeProvider,
-  decompiledTreeView: vscode.TreeView<MemberNode>
+  decompiledTreeView: vscode.TreeView<Node>
 ) {
   return vscode.commands.registerCommand(
     "ilspy.decompileAssemblyViaDialog",

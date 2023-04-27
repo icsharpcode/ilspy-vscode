@@ -6,8 +6,25 @@
 import { MemberNode } from "./decompiler/MemberNode";
 import { MemberSubKind } from "./decompiler/MemberSubKind";
 import { TokenType } from "./decompiler/TokenType";
-import NodeMetadata from "./protocol/NodeMetadata";
 import { NodeType } from "./protocol/NodeType";
+
+export const ProductIconMapping = {
+  [NodeType.Assembly]: "library",
+  [NodeType.Namespace]: "symbol-namespace",
+  [NodeType.Event]: "symbol-event",
+  [NodeType.Field]: "symbol-field",
+  [NodeType.Method]: "symbol-method",
+  [NodeType.Enum]: "symbol-enum",
+  [NodeType.Class]: "symbol-class",
+  [NodeType.Interface]: "symbol-interface",
+  [NodeType.Struct]: "symbol-struct",
+  [NodeType.Delegate]: "symbol-class",
+  [NodeType.Const]: "symbol-constant",
+  [NodeType.Property]: "symbol-property",
+  [NodeType.ReferencesRoot]: "folder-library",
+  [NodeType.AssemblyReference]: "library",
+  [NodeType.Unknown]: "question",
+};
 
 export function getIconForMemberNode(node: MemberNode): string {
   switch (node.type) {
@@ -38,40 +55,9 @@ export function getIconForMemberNode(node: MemberNode): string {
     case TokenType.PropertyDefinition:
       return "symbol-property";
     case TokenType.AssemblyReference:
-      return node.memberSubKind === MemberSubKind.Other ? "folder-library" : "library";
-    default:
-      return "question";
-  }
-}
-
-export function getProductIconForNodeType(
-  nodeType: NodeType | undefined
-): string {
-  switch (nodeType) {
-    case NodeType.Assembly:
-      return "library";
-    case NodeType.Namespace:
-      return "symbol-namespace";
-    case NodeType.Event:
-      return "symbol-event";
-    case NodeType.Field:
-      return "symbol-field";
-    case NodeType.Method:
-      return "symbol-method";
-    case NodeType.Enum:
-      return "symbol-enum";
-    case NodeType.Class:
-      return "symbol-class";
-    case NodeType.Interface:
-      return "symbol-interface";
-    case NodeType.Struct:
-      return "symbol-struct";
-    case NodeType.Delegate:
-      return "symbol-class";
-    case NodeType.Const:
-      return "symbol-constant";
-    case NodeType.Property:
-      return "symbol-property";
+      return node.memberSubKind === MemberSubKind.Other
+        ? "folder-library"
+        : "library";
     default:
       return "question";
   }

@@ -14,7 +14,8 @@ import {
 } from "vscode";
 import IILSpyBackend from "../IILSpyBackend";
 import Node from "../../protocol/Node";
-import { getProductIconForNodeType } from "../../icons";
+import { ProductIconMapping } from "../../icons";
+import { NodeType } from "../../protocol/NodeType";
 
 interface PerformedSearch {
   term: string;
@@ -64,7 +65,7 @@ export class SearchResultTreeProvider
           title: "Decompile",
         },
         iconPath: new ThemeIcon(
-          getProductIconForNodeType(nodeData.metadata?.type)
+          ProductIconMapping[nodeData.metadata?.type ?? NodeType.Unknown]
         ),
       };
     }

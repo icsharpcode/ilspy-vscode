@@ -46,7 +46,7 @@ namespace ILSpy.Backend.Protocol
         : IRequest<DecompileResponse>;
 
     [Serial, Method("ilspy/decompileNode", Direction.ClientToServer)]
-    public record DecompileNodeRequest(NodeMetadata Node)
+    public record DecompileNodeRequest(NodeMetadata NodeMetadata)
         : IRequest<DecompileResponse>;
 
     public record DecompileResponse(

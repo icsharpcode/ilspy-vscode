@@ -25,7 +25,7 @@ public class DecompileNodeHandler : IJsonRpcRequestHandler<DecompileNodeRequest,
 
     public Task<DecompileResponse> Handle(DecompileNodeRequest request, CancellationToken cancellationToken)
     {
-        return Task.FromResult(new DecompileResponse(nodeDecompiler.GetCode(request.Node)));
+        return Task.FromResult(new DecompileResponse(nodeDecompiler.GetCode(request.NodeMetadata)));
     }
 
 }

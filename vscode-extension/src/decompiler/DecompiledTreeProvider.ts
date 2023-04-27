@@ -13,17 +13,15 @@ import {
   window,
   ThemeIcon,
 } from "vscode";
-import { TokenType } from "./TokenType";
-import { MemberSubKind } from "./MemberSubKind";
-import { DecompiledCode, LanguageName } from "../protocol/DecompileResponse";
-import MemberData from "../protocol/MemberData";
+import { DecompiledCode } from "../protocol/DecompileResponse";
 import IILSpyBackend from "./IILSpyBackend";
 import AssemblyData from "../protocol/AssemblyData";
-import { MemberNode } from "./MemberNode";
-import { makeHandle } from "./utils";
-import { getIconForMemberNode } from "../icons";
+import Node from "../protocol/Node";
+import { NodeType } from "../protocol/NodeType";
+import NodeMetadata from "../protocol/NodeMetadata";
+import { ProductIconMapping } from "../icons";
 
-export class DecompiledTreeProvider implements TreeDataProvider<MemberNode> {
+export class DecompiledTreeProvider implements TreeDataProvider<Node> {
   private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
   readonly onDidChangeTreeData: Event<any> = this._onDidChangeTreeData.event;
 
@@ -80,203 +78,82 @@ export class DecompiledTreeProvider implements TreeDataProvider<MemberNode> {
     return false;
   }
 
-  public getTreeItem(element: MemberNode): TreeItem {
+  public getTreeItem(node: Node): TreeItem {
     return {
-      label: element.name,
-      tooltip:
-        element.type === TokenType.AssemblyDefinition
-          ? element.assembly
-          : element.name,
-      collapsibleState: element.mayHaveChildren
+      label: node.displayName,
+      tooltip: node.description,
+      collapsibleState: node.mayHaveChildren
         ? TreeItemCollapsibleState.Collapsed
         : void 0,
       command: {
-        command: "showCode",
-        arguments: [element],
+        command: "decompileNode",
+        arguments: [node],
         title: "Decompile",
       },
       contextValue:
-        element.type === TokenType.AssemblyDefinition ? "assemblyNode" : void 0,
-      iconPath: new ThemeIcon(getIconForMemberNode(element)),
+        node.metadata?.type === NodeType.Assembly ? "assemblyNode" : void 0,
+      iconPath: new ThemeIcon(
+        ProductIconMapping[node.metadata?.type ?? NodeType.Unknown]
+      ),
     };
   }
 
-  public findNode(predicate: (node: MemberNode) => boolean) {
-    return (this.getChildren() as MemberNode[]).find(predicate);
+  public findNode(predicate: (node: Node) => boolean) {
+    return (this.getChildren() as Node[]).find(predicate);
   }
 
-  public getChildren(
-    element?: MemberNode
-  ): MemberNode[] | Thenable<MemberNode[]> {
+  public getChildren(node?: Node): Node[] | Thenable<Node[]> {
     if (this.backend.assemblies.size <= 0) {
       return [];
     }
 
     // Nothing yet so add assembly nodes
-    if (!element) {
-      let result = [] as MemberNode[];
+    if (!node) {
+      let result = [] as Node[];
       for (let assemblyData of this.backend.assemblies.values()) {
-        result.push(
-          new MemberNode(
-            assemblyData.filePath,
-            getAssemblyNodeText(assemblyData),
-            -2,
-            TokenType.AssemblyDefinition,
-            MemberSubKind.None,
-            -3
-          )
-        );
+        result.push({
+          displayName: getAssemblyNodeText(assemblyData),
+          description: assemblyData.filePath,
+          mayHaveChildren: true,
+          metadata: {
+            assemblyPath: assemblyData.filePath,
+            type: NodeType.Assembly,
+            name: assemblyData.name,
+          } as NodeMetadata,
+        } as Node);
       }
 
       return result;
-    } else if (element.rid === -2) {
-      return this.getNamespaces(element.assembly);
-    } else if (element.rid === -1) {
-      switch (element.type) {
-        case TokenType.AssemblyReference:
-          return this.getAssemblyReferences(element.assembly);
-        case TokenType.NamespaceDefinition:
-        default:
-          return this.getTypes(element.assembly, element.name);
-        }
     } else {
-      return this.getMembers(element);
+      return this.getChildNodes(node);
     }
   }
 
-  public getParent?(element: MemberNode): ProviderResult<MemberNode> {
+  public getParent?(node: Node): ProviderResult<Node> {
     // Note: This allows releasing of assembly nodes in TreeView, which are placed in root. It won't work for other nodes.
     return undefined;
   }
 
-  async getNamespaces(assembly: string): Promise<MemberNode[]> {
-    const result = await this.backend.sendListNamespaces({
-      assemblyPath: assembly,
-    });
-    const nodes: MemberNode[] = [];
-    nodes.push(
-      new MemberNode(
-        assembly,
-        "References",
-        -1,
-        TokenType.AssemblyReference,
-        MemberSubKind.Other,
-        -2
-      )
-    );
-    if (result !== null) {
-      for (let n of result.namespaces.values()) {
-        nodes.push(
-          new MemberNode(
-            assembly,
-            n,
-            -1,
-            TokenType.NamespaceDefinition,
-            MemberSubKind.None,
-            -2
-          )
-        );
-      }
-    }
-    return nodes;
-  }
-
-  async getAssemblyReferences(assembly: string): Promise<MemberNode[]> {
-    const result = await this.backend.sendListAssemblyReferences({
-      assemblyPath: assembly
-    });
-    return (
-      result?.references.map(
-        (t) =>
-          new MemberNode(
-            assembly,
-            t,
-            -1,
-            TokenType.AssemblyReference,
-            MemberSubKind.None,
-            -1
-          )
-      ) ?? []
-    );
-  }
-
-  async getTypes(assembly: string, namespace: string): Promise<MemberNode[]> {
-    const result = await this.backend.sendListTypes({
-      assemblyPath: assembly,
-      namespace: namespace,
-    });
-    return (
-      result?.types.map(
-        (t) =>
-          new MemberNode(
-            assembly,
-            t.name,
-            getRid(t),
-            getHandleKind(t),
-            t.subKind,
-            -1
-          )
-      ) ?? []
-    );
-  }
-
-  async getMembers(element: MemberNode): Promise<MemberNode[]> {
-    if (element.mayHaveChildren) {
-      const result = await this.backend.sendListMembers({
-        assemblyPath: element.assembly,
-        handle: makeHandle(element),
-      });
-      return (
-        result?.members.map(
-          (m) =>
-            new MemberNode(
-              element.assembly,
-              m.name,
-              getRid(m),
-              getHandleKind(m),
-              m.subKind,
-              element.rid
-            )
-        ) ?? []
-      );
-    } else {
+  async getChildNodes(node: Node): Promise<Node[]> {
+    if (!node.metadata) {
       return [];
     }
+
+    const result = await this.backend.sendGetNodes({
+      nodeMetadata: node.metadata!,
+    });
+    return result?.nodes ?? [];
   }
 
-  public async getCode(
-    element: MemberNode
-  ): Promise<DecompiledCode | undefined> {
-    if (element.rid === -2) {
-      const result = await this.backend.sendDecompileAssembly({
-        assemblyPath: element.assembly,
-      });
-      return result?.decompiledCode;
+  public async getCode(node: Node): Promise<DecompiledCode | undefined> {
+    if (!node.metadata) {
+      return undefined;
     }
 
-    if (element.rid === -1) {
-      let name = element.name.length === 0 ? "<global>" : element.name;
-      let namespaceCode: DecompiledCode = {};
-      namespaceCode[LanguageName.CSharp] = "namespace " + name + " { }";
-      namespaceCode[LanguageName.IL] = "namespace " + name + "";
-
-      return Promise.resolve(namespaceCode);
-    }
-
-    if (element.mayHaveChildren) {
-      const result = await this.backend.sendDecompileType({
-        assemblyPath: element.assembly,
-        handle: makeHandle(element),
-      });
-      return result?.decompiledCode;
-    } else {
-      const result = await this.backend.sendDecompileMember({
-        assemblyPath: element?.assembly,
-        type: element?.parent,
-        member: makeHandle(element),
-      });
-      return result?.decompiledCode;
-    }
+    const result = await this.backend.sendDecompileNode({
+      nodeMetadata: node.metadata!,
+    });
+    return result?.decompiledCode;
   }
 }
 
@@ -288,13 +165,3 @@ function getAssemblyNodeText(assemblyData: AssemblyData) {
   return `${text}${additionalData ? ` (${additionalData})` : ""}`;
 }
 
-// extract the row-id by removing the first byte
-function getRid(member: MemberData): number {
-  return member.token & 0x00ffffff;
-}
-
-// extract the token/handle kind by shifting the first byte to the position of the first byte
-// apply bit-and 0xFF to the result to ensure that the other bytes are zero.
-function getHandleKind(member: MemberData): number {
-  return (member.token >> 24) & 0xff;
-}

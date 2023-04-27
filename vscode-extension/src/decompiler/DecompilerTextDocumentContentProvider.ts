@@ -111,9 +111,10 @@ export class DecompilerTextDocumentContentProvider
   }
 
   private async getCodeFromNode(
-    node: NodeMetadata
+    nodeMetadata: NodeMetadata
   ): Promise<DecompiledCode | undefined> {
-    return (await this.backend.sendDecompileNode({ node }))?.decompiledCode;
+    return (await this.backend.sendDecompileNode({ nodeMetadata }))
+      ?.decompiledCode;
   }
 
   setDocumentOutputLanguage(uri: vscode.Uri, language: LanguageName) {

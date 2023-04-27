@@ -17,4 +17,6 @@ export enum NodeType {
   Method,
   Const,
   Property,
+  AssemblyReference,
+  ReferencesRoot,
 }

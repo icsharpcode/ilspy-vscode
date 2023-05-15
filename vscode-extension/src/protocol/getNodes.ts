@@ -14,7 +14,7 @@ import NodeMetadata from "./NodeMetadata";
 import Node from "./Node";
 
 export interface GetNodesParams {
-  nodeMetadata: NodeMetadata;
+  nodeMetadata?: NodeMetadata;
 }
 
 export interface GetNodesResponse {

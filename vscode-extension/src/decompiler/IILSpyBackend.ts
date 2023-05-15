@@ -35,8 +35,6 @@ import { DecompileNodeParams } from "../protocol/decompileNode";
 import { GetNodesParams, GetNodesResponse } from "../protocol/getNodes";
 
 export default interface IILSpyBackend {
-  readonly assemblies: Map<string, AssemblyData>;
-
   sendAddAssembly(
     params: AddAssemblyParams
   ): Promise<AddAssemblyResponse | null>;

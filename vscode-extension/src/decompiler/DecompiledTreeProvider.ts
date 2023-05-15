@@ -36,7 +36,6 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
       assemblyPath: assembly,
     });
     if (response?.added && response?.assemblyData) {
-      this.backend.assemblies.set(assembly, response.assemblyData);
       this.refresh();
       return true;
     } else {
@@ -53,7 +52,6 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
       assemblyPath: assembly,
     });
     if (response?.removed) {
-      this.backend.assemblies.delete(assembly);
       this.refresh();
     }
     return response?.removed ?? false;
@@ -64,13 +62,10 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
       assemblyPath: assembly,
     });
     if (response?.removed) {
-      this.backend.assemblies.delete(assembly);
-
       const response = await this.backend.sendAddAssembly({
         assemblyPath: assembly,
       });
       if (response?.added && response?.assemblyData) {
-        this.backend.assemblies.set(assembly, response.assemblyData);
         this.refresh();
         return true;
       }
@@ -103,30 +98,7 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
   }
 
   public getChildren(node?: Node): Node[] | Thenable<Node[]> {
-    if (this.backend.assemblies.size <= 0) {
-      return [];
-    }
-
-    // Nothing yet so add assembly nodes
-    if (!node) {
-      let result = [] as Node[];
-      for (let assemblyData of this.backend.assemblies.values()) {
-        result.push({
-          displayName: getAssemblyNodeText(assemblyData),
-          description: assemblyData.filePath,
-          mayHaveChildren: true,
-          metadata: {
-            assemblyPath: assemblyData.filePath,
-            type: NodeType.Assembly,
-            name: assemblyData.name,
-          } as NodeMetadata,
-        } as Node);
-      }
-
-      return result;
-    } else {
-      return this.getChildNodes(node);
-    }
+    return this.getChildNodes(node);
   }
 
   public getParent?(node: Node): ProviderResult<Node> {
@@ -134,13 +106,9 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
     return undefined;
   }
 
-  async getChildNodes(node: Node): Promise<Node[]> {
-    if (!node.metadata) {
-      return [];
-    }
-
+  async getChildNodes(node?: Node): Promise<Node[]> {
     const result = await this.backend.sendGetNodes({
-      nodeMetadata: node.metadata!,
+      nodeMetadata: node?.metadata,
     });
     return result?.nodes ?? [];
   }
@@ -156,12 +124,3 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
     return result?.decompiledCode;
   }
 }
-
-function getAssemblyNodeText(assemblyData: AssemblyData) {
-  const text = assemblyData.name;
-  const additionalData = [assemblyData.version, assemblyData.targetFramework]
-    .filter((d) => d)
-    .join(", ");
-  return `${text}${additionalData ? ` (${additionalData})` : ""}`;
-}
-

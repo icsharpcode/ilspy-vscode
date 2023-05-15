@@ -68,8 +68,6 @@ import {
 } from "../protocol/getNodes";
 
 export default class ILSpyBackend implements IILSpyBackend {
-  public readonly assemblies = new Map<string, AssemblyData>();
-
   constructor(private languageClient: LanguageClient) {}
 
   public static getExecutable(context: vscode.ExtensionContext) {

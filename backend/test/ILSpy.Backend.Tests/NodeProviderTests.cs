@@ -27,6 +27,7 @@ public class NodeProviderTests
                     Assert.Equal(AssemblyPath, node.Description);
                     Assert.True(node.MayHaveChildren);
                     Assert.Equal(AssemblyPath, node.Metadata?.AssemblyPath);
+                    Assert.Equal(Path.GetFileName(AssemblyPath), node.Metadata?.Name);
                     Assert.Equal(NodeType.Assembly, node.Metadata?.Type);
                 });
     }
@@ -39,6 +40,7 @@ public class NodeProviderTests
         var list = nodeProvider.GetNodes(node);
         Assert.Collection(list,
                 node => {
+                    Assert.Equal("References", node.Metadata?.Name);
                     Assert.Equal("References", node.DisplayName);
                     Assert.Equal(NodeType.ReferencesRoot, node.Metadata?.Type);
                     Assert.True(node.MayHaveChildren);
@@ -49,31 +51,37 @@ public class NodeProviderTests
                     Assert.True(node.MayHaveChildren);
                 },
                 node => {
+                    Assert.Equal("A", node.Metadata?.Name);
                     Assert.Equal("A", node.DisplayName);
                     Assert.Equal(NodeType.Namespace, node.Metadata?.Type);
                     Assert.True(node.MayHaveChildren);
                 },
                 node => {
+                    Assert.Equal("A.B", node.Metadata?.Name);
                     Assert.Equal("A.B", node.DisplayName);
                     Assert.Equal(NodeType.Namespace, node.Metadata?.Type);
                     Assert.True(node.MayHaveChildren);
                 },
                 node => {
+                    Assert.Equal("A.B.C", node.Metadata?.Name);
                     Assert.Equal("A.B.C", node.DisplayName);
                     Assert.Equal(NodeType.Namespace, node.Metadata?.Type);
                     Assert.True(node.MayHaveChildren);
                 },
                 node => {
+                    Assert.Equal("A.B.C.D", node.Metadata?.Name);
                     Assert.Equal("A.B.C.D", node.DisplayName);
                     Assert.Equal(NodeType.Namespace, node.Metadata?.Type);
                     Assert.True(node.MayHaveChildren);
                 },
                 node => {
+                    Assert.Equal("Generics", node.Metadata?.Name);
                     Assert.Equal("Generics", node.DisplayName);
                     Assert.Equal(NodeType.Namespace, node.Metadata?.Type);
                     Assert.True(node.MayHaveChildren);
                 },
                 node => {
+                    Assert.Equal("TestAssembly", node.Metadata?.Name);
                     Assert.Equal("TestAssembly", node.DisplayName);
                     Assert.Equal(NodeType.Namespace, node.Metadata?.Type);
                     Assert.True(node.MayHaveChildren);
@@ -88,6 +96,7 @@ public class NodeProviderTests
         var list = nodeProvider.GetNodes(node);
         Assert.Collection(list,
                 node => {
+                    Assert.StartsWith("System.Runtime", node.Metadata?.Name);
                     Assert.StartsWith("System.Runtime, Version=", node.DisplayName);
                     Assert.False(node.MayHaveChildren);
                     Assert.Equal(AssemblyPath, node.Metadata?.AssemblyPath);
@@ -103,6 +112,7 @@ public class NodeProviderTests
         var list = nodeProvider.GetNodes(node);
         Assert.Collection(list,
                 node => {
+                    Assert.Equal("ISomeInterface", node.Metadata?.Name);
                     Assert.Equal("ISomeInterface", node.DisplayName);
                     Assert.Equal(NodeType.Interface, node.Metadata?.Type);
                     Assert.NotEqual(0, node.Metadata?.SymbolToken);
@@ -110,6 +120,7 @@ public class NodeProviderTests
                     Assert.True(node.MayHaveChildren);
                 },
                 node => {
+                    Assert.Equal("SomeClass", node.Metadata?.Name);
                     Assert.Equal("SomeClass", node.DisplayName);
                     Assert.Equal(NodeType.Class, node.Metadata?.Type);
                     Assert.NotEqual(0, node.Metadata?.SymbolToken);
@@ -117,6 +128,7 @@ public class NodeProviderTests
                     Assert.True(node.MayHaveChildren);
                 },
                 node => {
+                    Assert.Equal("SomeDelegate", node.Metadata?.Name);
                     Assert.Equal("SomeDelegate", node.DisplayName);
                     Assert.Equal(NodeType.Delegate, node.Metadata?.Type);
                     Assert.NotEqual(0, node.Metadata?.SymbolToken);
@@ -124,6 +136,7 @@ public class NodeProviderTests
                     Assert.True(node.MayHaveChildren);
                 },
                 node => {
+                    Assert.Equal("SomeEnum", node.Metadata?.Name);
                     Assert.Equal("SomeEnum", node.DisplayName);
                     Assert.Equal(NodeType.Enum, node.Metadata?.Type);
                     Assert.NotEqual(0, node.Metadata?.SymbolToken);
@@ -131,6 +144,7 @@ public class NodeProviderTests
                     Assert.True(node.MayHaveChildren);
                 },
                 node => {
+                    Assert.Equal("SomeStruct", node.Metadata?.Name);
                     Assert.Equal("SomeStruct", node.DisplayName);
                     Assert.Equal(NodeType.Struct, node.Metadata?.Type);
                     Assert.NotEqual(0, node.Metadata?.SymbolToken);

@@ -7,6 +7,7 @@ using ILSpy.Backend.Model;
 using Mono.Cecil;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
@@ -45,7 +46,7 @@ public class NodeProvider
                     new NodeMetadata(
                         AssemblyPath: assemblyData.FilePath,
                         Type: NodeType.Assembly,
-                        Name: assemblyData.FilePath,
+                        Name: Path.GetFileName(assemblyData.FilePath),
                         SymbolToken: 0,
                         ParentSymbolToken: 0),
                     DisplayName: GetAssemblyDisplayText(assemblyData),

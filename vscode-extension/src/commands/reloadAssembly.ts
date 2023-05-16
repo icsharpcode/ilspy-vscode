@@ -5,21 +5,21 @@
 
 import * as vscode from "vscode";
 import { DecompiledTreeProvider } from "../decompiler/DecompiledTreeProvider";
-import { MemberNode } from "../decompiler/MemberNode";
+import Node from "../protocol/Node";
 
 export function registerReloadAssembly(
   decompiledTreeProvider: DecompiledTreeProvider
 ) {
   return vscode.commands.registerCommand(
     "ilspy.reloadAssembly",
-    async (node: MemberNode) => {
-      if (!node) {
+    async (node: Node) => {
+      if (!node || !node.metadata) {
         vscode.window.showInformationMessage(
           'Please use context menu: right-click on the assembly node then select "Reload Assembly"'
         );
         return;
       }
-      await decompiledTreeProvider.reloadAssembly(node.assembly);
+      await decompiledTreeProvider.reloadAssembly(node.metadata.assemblyPath);
     }
   );
 }

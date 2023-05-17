@@ -15,10 +15,8 @@ import {
 } from "vscode";
 import { DecompiledCode } from "../protocol/DecompileResponse";
 import IILSpyBackend from "./IILSpyBackend";
-import AssemblyData from "../protocol/AssemblyData";
 import Node from "../protocol/Node";
 import { NodeType } from "../protocol/NodeType";
-import NodeMetadata from "../protocol/NodeMetadata";
 import { ProductIconMapping } from "../icons";
 
 export class DecompiledTreeProvider implements TreeDataProvider<Node> {

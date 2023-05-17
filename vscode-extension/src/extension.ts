@@ -27,13 +27,8 @@ import {
   workspace,
 } from "vscode";
 import { DecompilerTextDocumentContentProvider } from "./decompiler/DecompilerTextDocumentContentProvider";
-import { MemberNode } from "./decompiler/MemberNode";
-import { registerShowCode } from "./commands/showCode";
 import { registerSelectOutputLanguage } from "./commands/selectOutputLanguage";
-import {
-  ILSPY_URI_SCHEME,
-  ILSPY_URI_SCHEME_LEGACY,
-} from "./decompiler/nodeUri";
+import { ILSPY_URI_SCHEME } from "./decompiler/nodeUri";
 import { registerSearch } from "./commands/search";
 import { SearchResultTreeProvider } from "./decompiler/search/SearchResultTreeProvider";
 import Node from "./protocol/Node";
@@ -124,18 +119,11 @@ export async function activate(context: ExtensionContext) {
 
   disposables.push(
     workspace.registerTextDocumentContentProvider(
-      ILSPY_URI_SCHEME_LEGACY,
-      decompilerTextDocumentContentProvider
-    )
-  );
-  disposables.push(
-    workspace.registerTextDocumentContentProvider(
       ILSPY_URI_SCHEME,
       decompilerTextDocumentContentProvider
     )
   );
 
-  disposables.push(registerShowCode(decompilerTextDocumentContentProvider));
   disposables.push(
     registerDecompileNode(decompilerTextDocumentContentProvider)
   );

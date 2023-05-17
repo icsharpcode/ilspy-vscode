@@ -4,23 +4,10 @@ import {
   AddAssemblyResponse,
 } from "../../protocol/addAssembly";
 import AssemblyData from "../../protocol/AssemblyData";
-import { DecompileAssemblyParams } from "../../protocol/decompileAssembly";
-import { DecompileMemberParams } from "../../protocol/decompileMember";
+import { DecompileNodeParams } from "../../protocol/decompileNode";
 import DecompileResponse from "../../protocol/DecompileResponse";
 import { DecompileTypeParams } from "../../protocol/decompileType";
-import {
-  ListMembersParams,
-  ListMembersResponse,
-} from "../../protocol/listMembers";
-import {
-  ListNamespacesParams,
-  ListNamespacesResponse,
-} from "../../protocol/listNamespaces";
-import {
-  ListTypesParams,
-  ListTypesResponse,
-  ListTypesRequest,
-} from "../../protocol/listTypes";
+import { GetNodesParams, GetNodesResponse } from "../../protocol/getNodes";
 import {
   RemoveAssemblyParams,
   RemoveAssemblyResponse,
@@ -42,39 +29,15 @@ export default class MockILSpyBackend implements IILSpyBackend {
     return Promise.resolve(null);
   }
 
-  public sendDecompileAssembly(
-    params: DecompileAssemblyParams
+  public sendDecompileNode(
+    params: DecompileNodeParams
   ): Promise<DecompileResponse | null> {
     return Promise.resolve(null);
   }
 
-  public sendDecompileMember(
-    params: DecompileMemberParams
-  ): Promise<DecompileResponse | null> {
-    return Promise.resolve(null);
-  }
-
-  public sendDecompileType(
-    params: DecompileTypeParams
-  ): Promise<DecompileResponse | null> {
-    return Promise.resolve(null);
-  }
-
-  public sendListMembers(
-    params: ListMembersParams
-  ): Promise<ListMembersResponse | null> {
-    return Promise.resolve(null);
-  }
-
-  public sendListNamespaces(
-    params: ListNamespacesParams
-  ): Promise<ListNamespacesResponse | null> {
-    return Promise.resolve(null);
-  }
-
-  public sendListTypes(
-    params: ListTypesParams
-  ): Promise<ListTypesResponse | null> {
+  public sendGetNodes(
+    params: GetNodesParams
+  ): Promise<GetNodesResponse | null> {
     return Promise.resolve(null);
   }
 

@@ -79,6 +79,11 @@
 		],
 		"commands": [
 			{
+				"command": "ilspy.decompileSelectedAssembly",
+				"title": "Decompile selected assembly",
+				"category": "ILSpy"
+			},
+			{
 				"command": "ilspy.decompileAssemblyInWorkspace",
 				"title": "Add assembly from workspace",
 				"category": "ILSpy"
@@ -111,6 +116,13 @@
 			}
 		],
 		"menus": {
+			"explorer/context": [
+				{
+					"command": "ilspy.decompileSelectedAssembly",
+					"group": "navigation",
+					"when": "resourceExtname == .dll || resourceExtname == .exe || resourceExtname == .winmd || resourceExtname == .netmodule"
+				}
+			],
 			"view/title": [
 				{
 					"command": "ilspy.decompileAssemblyInWorkspace",

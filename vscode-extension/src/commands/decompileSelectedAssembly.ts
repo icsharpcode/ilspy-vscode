@@ -1,11 +1,11 @@
 import * as vscode from "vscode";
 import { DecompiledTreeProvider } from "../decompiler/DecompiledTreeProvider";
 import { addAssemblyToTree } from "./utils";
-import { MemberNode } from "../decompiler/MemberNode";
+import Node from "../protocol/Node";
 
 export function registerDecompileSelectedAssembly(
   decompiledTreeProvider: DecompiledTreeProvider,
-  decompiledTreeView: vscode.TreeView<MemberNode>
+  decompiledTreeView: vscode.TreeView<Node>
 ) {
   return vscode.commands.registerCommand(
     "ilspy.decompileSelectedAssembly",

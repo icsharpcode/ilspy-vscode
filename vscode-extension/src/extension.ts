@@ -14,6 +14,7 @@ import ILSpyBackend from "./decompiler/ILSpyBackend";
 import { DecompiledTreeProvider } from "./decompiler/DecompiledTreeProvider";
 import { registerDecompileAssemblyInWorkspace } from "./commands/decompileAssemblyInWorkspace";
 import { registerDecompileAssemblyViaDialog } from "./commands/decompileAssemblyViaDialog";
+import { registerDecompileSelectedAssembly } from "./commands/decompileSelectedAssembly";
 import { registerReloadAssembly } from "./commands/reloadAssembly";
 import { registerUnloadAssembly } from "./commands/unloadAssembly";
 import { acquireDotnetRuntime } from "./dotnet-acquire/acquire";
@@ -107,6 +108,9 @@ export async function activate(context: ExtensionContext) {
   );
   disposables.push(
     registerDecompileAssemblyViaDialog(decompileTreeProvider, decompileTreeView)
+  );
+  disposables.push(
+    registerDecompileSelectedAssembly(decompileTreeProvider, decompileTreeView)
   );
 
   const decompilerTextDocumentContentProvider =

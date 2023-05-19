@@ -1,17 +1,26 @@
 using ICSharpCode.Decompiler;
-using System;
-namespace ILSpy.Backend.Decompiler
-{
-    public class ILSpySettings
-    {
-        public ILSpySettings()
-        {
-        }
+using ICSharpCode.Decompiler.CSharp.OutputVisitor;
 
-        public DecompilerSettings DecompilerSettings { get; } = new DecompilerSettings
+namespace ILSpy.Backend.Decompiler;
+
+public class ILSpySettings
+{
+    private CSharpFormattingOptions formattingOptions;
+    private DecompilerSettings decompilerSettings;
+
+    public ILSpySettings()
+    {
+        formattingOptions = FormattingOptionsFactory.CreateAllman();
+        formattingOptions.IndentationString = "    ";
+
+        decompilerSettings = new DecompilerSettings
         {
             ThrowOnAssemblyResolveErrors = false,
+            CSharpFormattingOptions = formattingOptions
         };
     }
+
+
+    public DecompilerSettings DecompilerSettings => decompilerSettings;
 }
 

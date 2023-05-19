@@ -13,17 +13,20 @@ import {
   ThemeIcon,
 } from "vscode";
 import IILSpyBackend from "../IILSpyBackend";
-import NodeData from "../../protocol/NodeData";
-import { getProductIconForNodeType } from "../../icons";
+import Node from "../../protocol/Node";
+import { ProductIconMapping } from "../../icons";
+import { NodeType } from "../../protocol/NodeType";
 
 interface PerformedSearch {
   term: string;
-  results: NodeData[];
+  results: Node[];
 }
 
-export type SearchTreeNode = NodeData | PerformedSearch;
+export type SearchTreeNode = Node | PerformedSearch;
 
-export class SearchResultTreeProvider implements TreeDataProvider<SearchTreeNode> {
+export class SearchResultTreeProvider
+  implements TreeDataProvider<SearchTreeNode>
+{
   private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
   readonly onDidChangeTreeData: Event<any> = this._onDidChangeTreeData.event;
   private lastSearches: PerformedSearch[] = [];
@@ -51,7 +54,7 @@ export class SearchResultTreeProvider implements TreeDataProvider<SearchTreeNode
         iconPath: new ThemeIcon("search-view-icon"),
       };
     } else {
-      const nodeData = element as NodeData;
+      const nodeData = element as Node;
       return {
         label: nodeData.displayName,
         tooltip: nodeData.description,
@@ -61,13 +64,15 @@ export class SearchResultTreeProvider implements TreeDataProvider<SearchTreeNode
           arguments: [nodeData],
           title: "Decompile",
         },
-        iconPath: new ThemeIcon(getProductIconForNodeType(nodeData.node?.type)),
+        iconPath: new ThemeIcon(
+          ProductIconMapping[nodeData.metadata?.type ?? NodeType.Unknown]
+        ),
       };
     }
   }
 
   public findNode(predicate: (node: SearchTreeNode) => boolean) {
-    return (this.getChildren() as NodeData[]).find(predicate);
+    return (this.getChildren() as Node[]).find(predicate);
   }
 
   public getChildren(

@@ -8,16 +8,16 @@ import { nodeDataToUri } from "../decompiler/nodeUri";
 import { languageInfos } from "../decompiler/languageInfos";
 import { getDefaultOutputLanguage } from "../decompiler/settings";
 import { DecompilerTextDocumentContentProvider } from "../decompiler/DecompilerTextDocumentContentProvider";
-import NodeData from "../protocol/NodeData";
+import Node from "../protocol/Node";
 
-let lastSelectedNode: NodeData | undefined = undefined;
+let lastSelectedNode: Node | undefined = undefined;
 
 export function registerDecompileNode(
   contentProvider: DecompilerTextDocumentContentProvider
 ) {
   return vscode.commands.registerCommand(
     "decompileNode",
-    async (node: NodeData) => {
+    async (node: Node) => {
       if (lastSelectedNode === node) {
         return;
       }

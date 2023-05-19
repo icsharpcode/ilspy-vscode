@@ -11,14 +11,14 @@ import {
   RequestType,
 } from "vscode-languageclient";
 import AssemblyRequestParams from "./AssemblyRequestParams";
-import NodeData from "./NodeData";
+import Node from "./Node";
 
 export interface SearchParams {
   term: string;
 }
 
 export interface SearchResponse {
-  results: NodeData[];
+  results: Node[];
 }
 
 export namespace SearchRequest {

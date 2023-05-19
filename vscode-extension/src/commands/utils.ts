@@ -6,12 +6,12 @@
 import * as vscode from "vscode";
 import * as fs from "fs";
 import { DecompiledTreeProvider } from "../decompiler/DecompiledTreeProvider";
-import { MemberNode } from "../decompiler/MemberNode";
+import Node from "../protocol/Node";
 
 export function addAssemblyFromFilePath(
   filePath: string,
   decompiledTreeProvider: DecompiledTreeProvider,
-  decompiledTreeView: vscode.TreeView<MemberNode>
+  decompiledTreeView: vscode.TreeView<Node>
 ) {
   let assemblyFile = filePath;
   if (
@@ -32,12 +32,12 @@ export function addAssemblyFromFilePath(
 export async function addAssemblyToTree(
   assembly: string,
   decompiledTreeProvider: DecompiledTreeProvider,
-  decompiledTreeView: vscode.TreeView<MemberNode>
+  decompiledTreeView: vscode.TreeView<Node>
 ) {
   const added = await decompiledTreeProvider.addAssembly(assembly);
   if (added) {
     const newNode = decompiledTreeProvider.findNode(
-      (node) => node.assembly === assembly
+      (node) => node.metadata?.assemblyPath === assembly
     );
     if (newNode) {
       decompiledTreeView.reveal(newNode, { focus: true, select: true });

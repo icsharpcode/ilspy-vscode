@@ -42,7 +42,7 @@ public class SearchBackend
         await assemblyList.RemoveAssembly(path);
     }
 
-    public async Task<IEnumerable<NodeData>> Search(string searchTerm, CancellationToken cancellationToken)
+    public async Task<IEnumerable<Node>> Search(string searchTerm, CancellationToken cancellationToken)
     {
         if (!string.IsNullOrEmpty(searchTerm))
         {
@@ -82,7 +82,7 @@ public class SearchBackend
             }
         }
 
-        return Enumerable.Empty<NodeData>();
+        return Enumerable.Empty<Node>();
     }
 
     bool IsNotAccessor(SearchResult searchResult)
@@ -95,18 +95,18 @@ public class SearchBackend
         return true;
     }
 
-    NodeData ConvertResultToNode(SearchResult result)
+    Node ConvertResultToNode(SearchResult result)
     {
         var memberSearchResult = result as MemberSearchResult;
-        return new NodeData(
-            Node: new Node(
+        return new Node(
+            Metadata: new NodeMetadata(
                 AssemblyPath: result.Assembly,
                 Type: GetNodeType(result),
+                Name: memberSearchResult?.Member?.Name ?? result.Name,
                 SymbolToken: memberSearchResult != null ? MetadataTokens.GetToken(memberSearchResult.Member.MetadataToken) : 0,
                 ParentSymbolToken:
                     memberSearchResult?.Member.DeclaringTypeDefinition?.MetadataToken != null ?
                     MetadataTokens.GetToken(memberSearchResult.Member.DeclaringTypeDefinition.MetadataToken) : 0),
-            SymbolName: memberSearchResult?.Member?.Name ?? result.Name,
             DisplayName: result.Name,
             Description: result.Location,
             MayHaveChildren: memberSearchResult?.Member is ITypeDefinition,
@@ -119,15 +119,7 @@ public class SearchBackend
         NamespaceSearchResult => NodeType.Namespace,
         MemberSearchResult msr => msr.Member switch
         {
-            ITypeDefinition typeDefinition => typeDefinition.Kind switch
-            {
-                TypeKind.Class => NodeType.Class,
-                TypeKind.Delegate => NodeType.Delegate,
-                TypeKind.Enum => NodeType.Enum,
-                TypeKind.Interface => NodeType.Interface,
-                TypeKind.Struct => NodeType.Struct,
-                _ => NodeType.Unknown
-            },
+            ITypeDefinition typeDefinition => NodeProvider.GetNodeTypeFromTypeKind(typeDefinition.Kind),
             IMethod => NodeType.Method,
             IField => NodeType.Field,
             IEvent => NodeType.Event,

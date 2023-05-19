@@ -6,11 +6,8 @@
 import * as vscode from "vscode";
 import { DecompilerTextDocumentContentProvider } from "../decompiler/DecompilerTextDocumentContentProvider";
 import { languageInfos } from "../decompiler/languageInfos";
-import { ILSPY_URI_SCHEME, ILSPY_URI_SCHEME_LEGACY } from "../decompiler/nodeUri";
-import {
-  getDefaultOutputLanguage,
-  setDefaultOutputLanguage,
-} from "../decompiler/settings";
+import { ILSPY_URI_SCHEME } from "../decompiler/nodeUri";
+import { setDefaultOutputLanguage } from "../decompiler/settings";
 import { LanguageName } from "../protocol/DecompileResponse";
 
 type OutputLanguageQuickPickItem = vscode.QuickPickItem & {
@@ -29,7 +26,7 @@ export function registerSelectOutputLanguage(
         return;
       }
       const scheme = document?.uri.scheme;
-      if (scheme !== ILSPY_URI_SCHEME_LEGACY && scheme !== ILSPY_URI_SCHEME) {
+      if (scheme !== ILSPY_URI_SCHEME) {
         return;
       }
 

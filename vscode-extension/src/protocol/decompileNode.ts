@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------------------------------
- *  Copyright (c) 2021 ICSharpCode
+ *  Copyright (c) 2023 ICSharpCode
  *  Licensed under the MIT License. See LICENSE.TXT in the project root for license information.
  *-----------------------------------------------------------------------------------------------*/
 
@@ -10,30 +10,26 @@ import {
   RequestHandler,
   RequestType,
 } from "vscode-languageclient";
-import AssemblyRequestParams from "./AssemblyRequestParams";
-import MemberData from "./MemberData";
+import DecompileResponse from "./DecompileResponse";
+import NodeMetadata from "./NodeMetadata";
 
-export interface ListTypesParams extends AssemblyRequestParams {
-  namespace: string;
+export interface DecompileNodeParams {
+  nodeMetadata: NodeMetadata;
 }
 
-export interface ListTypesResponse {
-  types: MemberData[];
-}
-
-export namespace ListTypesRequest {
+export namespace DecompileNodeRequest {
   export const type = new RequestType<
-    ListTypesParams,
-    ListTypesResponse | null,
+    DecompileNodeParams,
+    DecompileResponse | null,
     never
-  >("ilspy/listTypes", ParameterStructures.byName);
+  >("ilspy/decompileNode", ParameterStructures.byName);
   export type HandlerSignature = RequestHandler<
-    ListTypesParams,
-    ListTypesResponse | null,
+    DecompileNodeParams,
+    DecompileResponse | null,
     void
   >;
   export type MiddlewareSignature = (
     token: CancellationToken,
     next: HandlerSignature
-  ) => HandlerResult<ListTypesResponse | null, void>;
+  ) => HandlerResult<DecompileResponse | null, void>;
 }

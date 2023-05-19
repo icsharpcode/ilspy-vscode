@@ -3,6 +3,7 @@
 
 namespace ILSpy.Backend.Decompiler;
 
+using ICSharpCode.Decompiler.CSharp;
 using ILSpy.Backend.Model;
 using System.Collections.Generic;
 using System.Reflection.Metadata;
@@ -16,4 +17,6 @@ public interface IDecompilerBackend
     IEnumerable<MemberData> ListTypes(string? assemblyPath, string? @namespace);
     IDictionary<string, string> GetCode(string? assemblyPath, EntityHandle handle);
     IEnumerable<MemberData> GetMembers(string? assemblyPath, TypeDefinitionHandle handle);
+    IEnumerable<AssemblyData> GetLoadedAssemblies();
+    CSharpDecompiler? GetDecompiler(string assembly);
 }

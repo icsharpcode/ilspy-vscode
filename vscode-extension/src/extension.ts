@@ -28,16 +28,11 @@ import {
   workspace,
 } from "vscode";
 import { DecompilerTextDocumentContentProvider } from "./decompiler/DecompilerTextDocumentContentProvider";
-import { MemberNode } from "./decompiler/MemberNode";
-import { registerShowCode } from "./commands/showCode";
 import { registerSelectOutputLanguage } from "./commands/selectOutputLanguage";
-import {
-  ILSPY_URI_SCHEME,
-  ILSPY_URI_SCHEME_LEGACY,
-} from "./decompiler/nodeUri";
+import { ILSPY_URI_SCHEME } from "./decompiler/nodeUri";
 import { registerSearch } from "./commands/search";
 import { SearchResultTreeProvider } from "./decompiler/search/SearchResultTreeProvider";
-import NodeData from "./protocol/NodeData";
+import Node from "./protocol/Node";
 import { registerDecompileNode } from "./commands/decompileNode";
 
 let client: LanguageClient;
@@ -92,7 +87,7 @@ export async function activate(context: ExtensionContext) {
 
   const ilspyBackend = new ILSpyBackend(client);
   const decompileTreeProvider = new DecompiledTreeProvider(ilspyBackend);
-  const decompileTreeView: TreeView<MemberNode> = window.createTreeView(
+  const decompileTreeView: TreeView<Node> = window.createTreeView(
     "ilspyDecompiledMembers",
     {
       treeDataProvider: decompileTreeProvider,
@@ -117,7 +112,7 @@ export async function activate(context: ExtensionContext) {
     new DecompilerTextDocumentContentProvider(ilspyBackend);
 
   const searchTreeProvider = new SearchResultTreeProvider(ilspyBackend);
-  const searchResultTreeView: TreeView<NodeData> = window.createTreeView(
+  const searchResultTreeView: TreeView<Node> = window.createTreeView(
     "ilspySearchResultsContainer",
     {
       treeDataProvider: searchTreeProvider,
@@ -128,18 +123,11 @@ export async function activate(context: ExtensionContext) {
 
   disposables.push(
     workspace.registerTextDocumentContentProvider(
-      ILSPY_URI_SCHEME_LEGACY,
-      decompilerTextDocumentContentProvider
-    )
-  );
-  disposables.push(
-    workspace.registerTextDocumentContentProvider(
       ILSPY_URI_SCHEME,
       decompilerTextDocumentContentProvider
     )
   );
 
-  disposables.push(registerShowCode(decompilerTextDocumentContentProvider));
   disposables.push(
     registerDecompileNode(decompilerTextDocumentContentProvider)
   );

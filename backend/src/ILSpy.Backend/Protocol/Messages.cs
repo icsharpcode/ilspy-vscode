@@ -28,22 +28,7 @@ namespace ILSpy.Backend.Protocol
 
     #endregion
 
-    #region decompileAssembly, decompileMember, decompileType
-
-    [Serial, Method("ilspy/decompileAssembly", Direction.ClientToServer)]
-    public record DecompileAssemblyRequest(string? AssemblyPath)
-        : IRequest<DecompileResponse>;
-
-    [Serial, Method("ilspy/decompileMember", Direction.ClientToServer)]
-    public record DecompileMemberRequest(
-        string? AssemblyPath,
-        int Type,
-        int Member
-    ) : IRequest<DecompileResponse>;
-
-    [Serial, Method("ilspy/decompileType", Direction.ClientToServer)]
-    public record DecompileTypeRequest(string? AssemblyPath, int Handle)
-        : IRequest<DecompileResponse>;
+    #region decompileNode
 
     [Serial, Method("ilspy/decompileNode", Direction.ClientToServer)]
     public record DecompileNodeRequest(NodeMetadata NodeMetadata)
@@ -65,52 +50,10 @@ namespace ILSpy.Backend.Protocol
     #region getNodes
 
     [Serial, Method("ilspy/getNodes", Direction.ClientToServer)]
-    public record GetNodesRequest(NodeMetadata NodeMetadata)
+    public record GetNodesRequest(NodeMetadata? NodeMetadata)
         : IRequest<GetNodesResponse>;
 
     public record GetNodesResponse(IEnumerable<Node>? Nodes);
-
-    #endregion
-
-    #region listMembers
-
-    [Serial, Method("ilspy/listMembers", Direction.ClientToServer)]
-    public record ListMembersRequest(
-        string? AssemblyPath,
-        int Handle
-    ) : IRequest<ListMembersResponse>;
-
-    public record ListMembersResponse(IEnumerable<MemberData>? Members);
-
-    #endregion
-
-    #region listNamespaces
-
-    [Serial, Method("ilspy/listNamespaces", Direction.ClientToServer)]
-    public record ListNamespacesRequest(string? AssemblyPath)
-        : IRequest<ListNamespacesResponse>;
-
-    public record ListNamespacesResponse(IEnumerable<string>? Namespaces);
-
-    #endregion
-
-    #region listAssemblyReferences
-
-    [Serial, Method("ilspy/listAssemblyReferences", Direction.ClientToServer)]
-    public record ListAssemblyReferencesRequest(string? AssemblyPath)
-        : IRequest<ListAssemblyReferencesResponse>;
-
-    public record ListAssemblyReferencesResponse(IEnumerable<string>? References);
-
-    #endregion
-
-    #region listTypes
-
-    [Serial, Method("ilspy/listTypes", Direction.ClientToServer)]
-    public record ListTypesRequest(string? AssemblyPath, string? Namespace)
-        : IRequest<ListTypesResponse>;
-
-    public record ListTypesResponse(IEnumerable<MemberData>? Types);
 
     #endregion
 

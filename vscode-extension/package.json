@@ -96,12 +96,14 @@
 			{
 				"command": "ilspy.unloadAssembly",
 				"title": "Unload Assembly",
-				"category": "ILSpy"
+				"category": "ILSpy",
+				"icon": "$(close)"
 			},
 			{
 				"command": "ilspy.reloadAssembly",
 				"title": "Reload Assembly",
-				"category": "ILSpy"
+				"category": "ILSpy",
+				"icon": "$(refresh)"
 			},
 			{
 				"command": "ilspy.selectOutputLanguage",
@@ -125,12 +127,9 @@
 			],
 			"view/title": [
 				{
-					"command": "ilspy.decompileAssemblyInWorkspace",
-					"when": "view == ilspyDecompiledMembers"
-				},
-				{
-					"command": "ilspy.decompileAssemblyViaDialog",
-					"when": "view == ilspyDecompiledMembers"
+					"submenu": "ilspy/view/assemblytree/add",
+					"when": "view == ilspyDecompiledMembers",
+					"group": "navigation"
 				},
 				{
 					"command": "ilspy.search",
@@ -138,23 +137,33 @@
 					"group": "navigation"
 				}
 			],
+			"ilspy/view/assemblytree/add": [
+				{
+					"command": "ilspy.decompileAssemblyInWorkspace",
+					"when": "view == ilspyDecompiledMembers"
+				},
+				{
+					"command": "ilspy.decompileAssemblyViaDialog",
+					"when": "view == ilspyDecompiledMembers"
+				}
+			],
 			"view/item/context": [
 				{
 					"command": "ilspy.unloadAssembly",
 					"when": "view == ilspyDecompiledMembers && viewItem == assemblyNode",
-					"group": "1_GeneralCommands@1"
+					"group": "inline"
 				},
 				{
 					"command": "ilspy.reloadAssembly",
 					"when": "view == ilspyDecompiledMembers && viewItem == assemblyNode",
-					"group": "1_GeneralCommands@1"
+					"group": "inline"
 				}
 			],
 			"editor/title": [
 				{
 					"command": "ilspy.selectOutputLanguage",
 					"group": "navigation",
-					"when": "resourceScheme == ilspylegacy || resourceScheme == ilspy"
+					"when": "resourceScheme == ilspy"
 				}
 			],
 			"commandPalette": [
@@ -176,14 +185,21 @@
 				},
 				{
 					"command": "ilspy.selectOutputLanguage",
-					"when": "resourceScheme == ilspylegacy || resourceScheme == ilspy"
+					"when": "resourceScheme == ilspy"
 				},
 				{
 					"command": "ilspy.search",
 					"when": "ilspy.backendAvailable"
 				}
 			]
-		}
+		},
+		"submenus": [
+			{
+				"id": "ilspy/view/assemblytree/add",
+				"label": "Add Assembly",
+				"icon": "$(add)"
+			}
+		]
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run package",

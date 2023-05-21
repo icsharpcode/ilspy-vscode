@@ -3,12 +3,12 @@ using ICSharpCode.Decompiler.CSharp.OutputVisitor;
 
 namespace ILSpy.Backend.Decompiler;
 
-public class ILSpySettings
+public class ILSpyBackendSettings
 {
     private CSharpFormattingOptions formattingOptions;
     private DecompilerSettings decompilerSettings;
 
-    public ILSpySettings()
+    public ILSpyBackendSettings()
     {
         formattingOptions = FormattingOptionsFactory.CreateAllman();
         formattingOptions.IndentationString = "    ";

@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See the LICENSE file in the project root for more information.
 
 using ICSharpCode.ILSpyX;
+using ICSharpCode.ILSpyX.Settings;
 using ILSpy.Backend.Decompiler;
 using ILSpy.Backend.Handlers;
 using Microsoft.Extensions.DependencyInjection;
@@ -54,7 +55,7 @@ namespace ILSpy.Backend
         static void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<ISettingsProvider, DummySettingsProvider>();
-            services.AddSingleton<ILSpySettings>();
+            services.AddSingleton<ILSpyBackendSettings>();
             services.AddSingleton<AssemblyListManager>();
             services.AddSingleton<SingleThreadAssemblyList>();
             services.AddSingleton<SearchBackend>();

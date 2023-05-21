@@ -23,12 +23,12 @@ public class DecompilerBackend : IDecompilerBackend
 {
     private readonly ILogger logger;
     private readonly Dictionary<string, CSharpDecompiler> decompilers = new();
-    private readonly ILSpySettings ilspySettings;
+    private readonly ILSpyBackendSettings ilspyBackendSettings;
 
-    public DecompilerBackend(ILoggerFactory loggerFactory, ILSpySettings ilspySettings)
+    public DecompilerBackend(ILoggerFactory loggerFactory, ILSpyBackendSettings ilspyBackendSettings)
     {
         logger = loggerFactory.CreateLogger<DecompilerBackend>();
-        this.ilspySettings = ilspySettings;
+        this.ilspyBackendSettings = ilspyBackendSettings;
     }
 
     public AssemblyData? AddAssembly(string? path)
@@ -38,7 +38,7 @@ public class DecompilerBackend : IDecompilerBackend
             try
             {
                 var assemblyResolver = AssemblyReferences.CreateAssemblyResolver(path);
-                var decompiler = new CSharpDecompiler(path, assemblyResolver, ilspySettings.DecompilerSettings);
+                var decompiler = new CSharpDecompiler(path, assemblyResolver, ilspyBackendSettings.DecompilerSettings);
                 decompilers[path] = decompiler;
                 return CreateAssemblyData(decompiler, path);
             }

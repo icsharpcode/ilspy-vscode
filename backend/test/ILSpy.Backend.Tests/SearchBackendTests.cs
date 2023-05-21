@@ -11,7 +11,7 @@ public class SearchBackendTests
     {
         var assemblyListManager = new AssemblyListManager(new DummySettingsProvider());
         var assemblyList = new SingleThreadAssemblyList(assemblyListManager);
-        var searchBackend = new SearchBackend(new NullLoggerFactory(), assemblyList, new ILSpySettings());
+        var searchBackend = new SearchBackend(new NullLoggerFactory(), assemblyList, new ILSpyBackendSettings());
         await searchBackend.AddAssembly(
             Path.Combine(Path.GetDirectoryName(typeof(SearchBackendTests).Assembly.Location) ?? "", "TestAssembly.dll"));
         return searchBackend;

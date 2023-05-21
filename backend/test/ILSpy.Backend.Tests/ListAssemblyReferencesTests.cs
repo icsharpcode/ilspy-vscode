@@ -8,7 +8,7 @@ public class ListAssemblyReferencesTests
     [Fact]
     public void ListAssemblyReferencesFromTestAssembly()
     {
-        var d = new DecompilerBackend(new NullLoggerFactory(), new ILSpySettings());
+        var d = new DecompilerBackend(new NullLoggerFactory(), new ILSpyBackendSettings());
         string path = Path.Combine(Path.GetDirectoryName(typeof(ListAssemblyReferencesTests).Assembly.Location) ?? "", "TestAssembly.dll");
         d.AddAssembly(path);
         string[] references = d.ListAssemblyReferences(path).ToArray();

@@ -23,13 +23,13 @@ public class SearchBackend
     private readonly ILogger logger;
     private readonly IComparer<SearchResult> resultsComparer = SearchResult.ComparerByName;
     private readonly SingleThreadAssemblyList assemblyList;
-    private readonly ILSpySettings ilspySettings;
+    private readonly ILSpyBackendSettings ilspyBackendSettings;
 
-    public SearchBackend(ILoggerFactory loggerFactory, SingleThreadAssemblyList assemblyList, ILSpySettings ilspySettings)
+    public SearchBackend(ILoggerFactory loggerFactory, SingleThreadAssemblyList assemblyList, ILSpyBackendSettings ilspyBackendSettings)
     {
         logger = loggerFactory.CreateLogger<SearchBackend>();
         this.assemblyList = assemblyList;
-        this.ilspySettings = ilspySettings;
+        this.ilspyBackendSettings = ilspyBackendSettings;
     }
 
     public async Task AddAssembly(string path)
@@ -355,7 +355,7 @@ public class SearchBackend
             request.RegEx = regex;
         }
         request.SearchResultFactory = new SearchResultFactory();
-        request.DecompilerSettings = ilspySettings.DecompilerSettings;
+        request.DecompilerSettings = ilspyBackendSettings.DecompilerSettings;
 
         return request;
     }

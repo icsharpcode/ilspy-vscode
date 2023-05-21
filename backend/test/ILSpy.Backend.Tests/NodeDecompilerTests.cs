@@ -11,7 +11,7 @@ public class NodeDecompilerTests
 
     private static DecompilerBackend CreateDecompilerBackend()
     {
-        var decompilerBackend = new DecompilerBackend(new NullLoggerFactory(), new ILSpySettings());
+        var decompilerBackend = new DecompilerBackend(new NullLoggerFactory(), new ILSpyBackendSettings());
         decompilerBackend.AddAssembly(AssemblyPath);
 
         return decompilerBackend;

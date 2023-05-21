@@ -1,6 +1,7 @@
 namespace ILSpy.Backend.Decompiler;
 
 using ICSharpCode.ILSpyX;
+using ICSharpCode.ILSpyX.Settings;
 using System;
 using System.Xml.Linq;
 

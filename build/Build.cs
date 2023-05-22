@@ -62,7 +62,7 @@ class Build : NukeBuild
         .DependsOn(Versionize)
         .Executes(() =>
         {
-            EnsureCleanDirectory(VSCodeExtensionBinDir);
+            VSCodeExtensionBinDir.CreateOrCleanDirectory();
             DotNetPublish(s => s
                 .SetProject(BackendDirectory / "src" / "ILSpy.Backend")
                 .SetConfiguration(Configuration.Release)
@@ -107,7 +107,7 @@ class Build : NukeBuild
             NpmInstall(s => s
                 .SetPackages("@vscode/vsce")
                 .SetGlobal(true));
-            EnsureExistingDirectory(ArtifactsDirectory);
+            ArtifactsDirectory.CreateDirectory();
             var vsixFileName = $"ilspy-vscode-{ProjectVersion.Version.ToString(3)}.vsix";
             using var vsceProcess = StartProcess("vsce", $"package -o {ArtifactsDirectory / vsixFileName}", VSCodeExtensionDir);
             vsceProcess.AssertZeroExitCode();

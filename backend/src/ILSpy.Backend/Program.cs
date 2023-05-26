@@ -3,6 +3,7 @@
 
 using ICSharpCode.ILSpyX;
 using ICSharpCode.ILSpyX.Settings;
+using ILSpy.Backend.Application;
 using ILSpy.Backend.Decompiler;
 using ILSpy.Backend.Handlers;
 using Microsoft.Extensions.DependencyInjection;
@@ -59,9 +60,7 @@ namespace ILSpy.Backend
             services.AddSingleton<AssemblyListManager>();
             services.AddSingleton<SingleThreadAssemblyList>();
             services.AddSingleton<SearchBackend>();
-            services.AddSingleton<NodeProvider>();
-            services.AddSingleton<NodeDecompiler>();
-            services.AddSingleton<IDecompilerBackend, DecompilerBackend>();
+            services.AddSingleton<ILSpyXApplication>();
         }
     }
 }

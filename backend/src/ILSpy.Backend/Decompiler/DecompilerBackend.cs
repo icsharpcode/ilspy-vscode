@@ -103,6 +103,17 @@ public class DecompilerBackend : IDecompilerBackend
             .Cast<AssemblyData>();
     }
 
+    public AssemblyData GetLoadedAssembly(string assemblyPath)
+    {
+        var assemblyData = GetLoadedAssemblies()
+            .Where(assemblyData => assemblyData.FilePath == assemblyPath).FirstOrDefault();
+        if (assemblyData is null)
+        {
+            throw new InvalidOperationException($"Assembly '{assemblyPath}' not loaded.");
+        }
+        return assemblyData;
+    }
+
     public IEnumerable<MemberData> GetMembers(string? assemblyPath, TypeDefinitionHandle handle)
     {
         if (handle.IsNil || (assemblyPath == null) || !decompilers.ContainsKey(assemblyPath))
@@ -354,38 +365,5 @@ public class DecompilerBackend : IDecompilerBackend
                 Token: MetadataTokens.GetToken(t.MetadataToken),
                 SubKind: t.Kind);
         }
-    }
-
-    public IEnumerable<string> ListNamespaces(string? assemblyPath)
-    {
-        if (assemblyPath == null || !decompilers.ContainsKey(assemblyPath))
-        {
-            return Enumerable.Empty<string>();
-        }
-
-        var decompiler = decompilers[assemblyPath];
-        var types = decompiler.TypeSystem.MainModule.TopLevelTypeDefinitions;
-        HashSet<string> namespaces = new(decompiler.TypeSystem.NameComparer);
-        foreach (var type in types)
-        {
-            namespaces.Add(type.Namespace);
-        }
-        return namespaces.OrderBy(n => n);
-    }
-
-    public IEnumerable<string> ListAssemblyReferences(string? assemblyPath)
-    {
-        if (assemblyPath == null || !decompilers.ContainsKey(assemblyPath))
-        {
-            return Enumerable.Empty<string>();
-        }
-
-        var decompiler = decompilers[assemblyPath];
-        HashSet<string> references = new(decompiler.TypeSystem.NameComparer);
-        foreach (var ar in decompiler.TypeSystem.MainModule.PEFile.AssemblyReferences)
-        {
-            references.Add(ar.FullName);
-        }
-        return references.OrderBy(n => n);
     }
 }

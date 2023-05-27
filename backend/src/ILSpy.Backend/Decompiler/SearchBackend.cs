@@ -6,6 +6,7 @@ using ICSharpCode.ILSpy.Search;
 using ICSharpCode.ILSpyX;
 using ICSharpCode.ILSpyX.Search;
 using ILSpy.Backend.Model;
+using ILSpy.Backend.TreeProviders;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
@@ -119,7 +120,7 @@ public class SearchBackend
         NamespaceSearchResult => NodeType.Namespace,
         MemberSearchResult msr => msr.Member switch
         {
-            ITypeDefinition typeDefinition => NodeProvider.GetNodeTypeFromTypeKind(typeDefinition.Kind),
+            ITypeDefinition typeDefinition => NodeTypeHelper.GetNodeTypeFromTypeKind(typeDefinition.Kind),
             IMethod => NodeType.Method,
             IField => NodeType.Field,
             IEvent => NodeType.Event,
@@ -132,77 +133,37 @@ public class SearchBackend
     SymbolModifiers GetSymbolModifiers(SearchResult result)
     {
         SymbolModifiers modifiers = SymbolModifiers.None;
-
         switch (result)
         {
             case MemberSearchResult memberSearchResult:
                 switch (memberSearchResult.Member)
                 {
                     case ITypeDefinition typeDefinition:
-                        MapSymbolModifier(ref modifiers, SymbolModifiers.Abstract, typeDefinition.IsAbstract);
-                        MapSymbolModifier(ref modifiers, SymbolModifiers.Static, typeDefinition.IsStatic);
-                        MapSymbolModifier(ref modifiers, SymbolModifiers.ReadOnly, typeDefinition.IsReadOnly);
-                        MapSymbolModifier(ref modifiers, SymbolModifiers.Sealed, typeDefinition.IsSealed);
+                        NodeTypeHelper.MapSymbolModifier(ref modifiers, SymbolModifiers.Abstract, typeDefinition.IsAbstract);
+                        NodeTypeHelper.MapSymbolModifier(ref modifiers, SymbolModifiers.Static, typeDefinition.IsStatic);
+                        NodeTypeHelper.MapSymbolModifier(ref modifiers, SymbolModifiers.ReadOnly, typeDefinition.IsReadOnly);
+                        NodeTypeHelper.MapSymbolModifier(ref modifiers, SymbolModifiers.Sealed, typeDefinition.IsSealed);
                         break;
-
                     case IField field:
-                        MapSymbolModifier(ref modifiers, SymbolModifiers.Abstract, field.IsAbstract);
-                        MapSymbolModifier(ref modifiers, SymbolModifiers.Virtual, field.IsVirtual);
-                        MapSymbolModifier(ref modifiers, SymbolModifiers.Override, field.IsOverride);
-                        MapSymbolModifier(ref modifiers, SymbolModifiers.Static, field.IsStatic);
-                        MapSymbolModifier(ref modifiers, SymbolModifiers.Sealed, field.IsSealed);
-                        MapSymbolModifier(ref modifiers, SymbolModifiers.ReadOnly, field.IsReadOnly);
+                        NodeTypeHelper.MapSymbolModifier(ref modifiers, SymbolModifiers.Abstract, field.IsAbstract);
+                        NodeTypeHelper.MapSymbolModifier(ref modifiers, SymbolModifiers.Virtual, field.IsVirtual);
+                        NodeTypeHelper.MapSymbolModifier(ref modifiers, SymbolModifiers.Override, field.IsOverride);
+                        NodeTypeHelper.MapSymbolModifier(ref modifiers, SymbolModifiers.Static, field.IsStatic);
+                        NodeTypeHelper.MapSymbolModifier(ref modifiers, SymbolModifiers.Sealed, field.IsSealed);
+                        NodeTypeHelper.MapSymbolModifier(ref modifiers, SymbolModifiers.ReadOnly, field.IsReadOnly);
                         break;
-
                     case IMember member:
-                        MapSymbolModifier(ref modifiers, SymbolModifiers.Abstract, member.IsAbstract);
-                        MapSymbolModifier(ref modifiers, SymbolModifiers.Virtual, member.IsVirtual);
-                        MapSymbolModifier(ref modifiers, SymbolModifiers.Override, member.IsOverride);
-                        MapSymbolModifier(ref modifiers, SymbolModifiers.Static, member.IsStatic);
-                        MapSymbolModifier(ref modifiers, SymbolModifiers.Sealed, member.IsSealed);
+                        NodeTypeHelper.MapSymbolModifier(ref modifiers, SymbolModifiers.Abstract, member.IsAbstract);
+                        NodeTypeHelper.MapSymbolModifier(ref modifiers, SymbolModifiers.Virtual, member.IsVirtual);
+                        NodeTypeHelper.MapSymbolModifier(ref modifiers, SymbolModifiers.Override, member.IsOverride);
+                        NodeTypeHelper.MapSymbolModifier(ref modifiers, SymbolModifiers.Static, member.IsStatic);
+                        NodeTypeHelper.MapSymbolModifier(ref modifiers, SymbolModifiers.Sealed, member.IsSealed);
                         break;
                 }
-
-                MapSymbolModifierFromAccessibility(ref modifiers, memberSearchResult.Member.Accessibility);
+                NodeTypeHelper.MapSymbolModifierFromAccessibility(ref modifiers, memberSearchResult.Member.Accessibility);
                 break;
         }
-
         return modifiers;
-    }
-
-    private void MapSymbolModifier(ref SymbolModifiers modifiers, SymbolModifiers modifier, bool condition)
-    {
-        if (condition)
-        {
-            modifiers |= modifier;
-        }
-    }
-
-    private void MapSymbolModifierFromAccessibility(ref SymbolModifiers modifiers, Accessibility accessibility)
-    {
-        switch (accessibility)
-        {
-            case Accessibility.Private:
-                modifiers |= SymbolModifiers.Private;
-                break;
-            case Accessibility.ProtectedAndInternal:
-                modifiers |= SymbolModifiers.Protected | SymbolModifiers.Private;
-                break;
-            case Accessibility.Protected:
-                modifiers |= SymbolModifiers.Protected;
-                break;
-            case Accessibility.Internal:
-                modifiers |= SymbolModifiers.Internal;
-                break;
-            case Accessibility.ProtectedOrInternal:
-                modifiers |= SymbolModifiers.Protected | SymbolModifiers.Internal;
-                break;
-            case Accessibility.Public:
-                modifiers |= SymbolModifiers.Public;
-                break;
-            default:
-                break;
-        }
     }
 
     SearchRequest CreateSearchRequest(string input, SearchMode searchMode)

@@ -3,6 +3,7 @@
 
 namespace ILSpy.Backend.Handlers;
 
+using ILSpy.Backend.Application;
 using ILSpy.Backend.Decompiler;
 using ILSpy.Backend.Model;
 using ILSpy.Backend.Protocol;
@@ -16,16 +17,17 @@ using System.Threading.Tasks;
 [Serial, Method("ilspy/decompileNode", Direction.ClientToServer)]
 public class DecompileNodeHandler : IJsonRpcRequestHandler<DecompileNodeRequest, DecompileResponse>
 {
-    private readonly NodeDecompiler nodeDecompiler;
+    private readonly ILSpyXApplication application;
 
-    public DecompileNodeHandler(NodeDecompiler nodeDecompiler)
+    public DecompileNodeHandler(ILSpyXApplication application)
     {
-        this.nodeDecompiler = nodeDecompiler;
+        this.application = application;
     }
 
     public Task<DecompileResponse> Handle(DecompileNodeRequest request, CancellationToken cancellationToken)
     {
-        return Task.FromResult(new DecompileResponse(nodeDecompiler.GetCode(request.NodeMetadata)));
+        return Task.FromResult(new DecompileResponse(
+            application.TreeNodeProviders.ForNode(request.NodeMetadata).Decompile(request.NodeMetadata)));
     }
 
 }

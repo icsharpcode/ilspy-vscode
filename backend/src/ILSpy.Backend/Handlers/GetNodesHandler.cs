@@ -3,6 +3,7 @@
 
 namespace ILSpy.Backend.Handlers;
 
+using ILSpy.Backend.Application;
 using ILSpy.Backend.Decompiler;
 using ILSpy.Backend.Model;
 using ILSpy.Backend.Protocol;
@@ -16,16 +17,17 @@ using System.Threading.Tasks;
 [Serial, Method("ilspy/getNodes", Direction.ClientToServer)]
 public class GetNodesHandler : IJsonRpcRequestHandler<GetNodesRequest, GetNodesResponse>
 {
-    private readonly NodeProvider nodeProvider;
+    private readonly ILSpyXApplication application;
 
-    public GetNodesHandler(NodeProvider nodeProvider)
+    public GetNodesHandler(ILSpyXApplication application)
     {
-        this.nodeProvider = nodeProvider;
+        this.application = application;
     }
 
     public Task<GetNodesResponse> Handle(GetNodesRequest request, CancellationToken cancellationToken)
     {
-        return Task.FromResult(new GetNodesResponse(nodeProvider.GetNodes(request.NodeMetadata)));
+        return Task.FromResult(new GetNodesResponse(
+            application.TreeNodeProviders.ForNode(request.NodeMetadata).GetChildren(request.NodeMetadata)));
     }
 
 }

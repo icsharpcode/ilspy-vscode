@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See the LICENSE file in the project root for more information.
 
+using ILSpy.Backend.Application;
 using ILSpy.Backend.Decompiler;
 using ILSpy.Backend.Protocol;
 using OmniSharp.Extensions.JsonRpc;
@@ -12,12 +13,12 @@ namespace ILSpy.Backend.Handlers
     [Serial, Method("ilspy/removeAssembly", Direction.ClientToServer)]
     public class RemoveAssemblyHandler : IJsonRpcRequestHandler<RemoveAssemblyRequest, RemoveAssemblyResponse>
     {
-        private readonly IDecompilerBackend decompilerBackend;
+        private readonly ILSpyXApplication application;
         private readonly SearchBackend searchBackend;
 
-        public RemoveAssemblyHandler(IDecompilerBackend decompilerBackend, SearchBackend searchBackend)
+        public RemoveAssemblyHandler(ILSpyXApplication application, SearchBackend searchBackend)
         {
-            this.decompilerBackend = decompilerBackend;
+            this.application = application;
             this.searchBackend = searchBackend;
         }
 
@@ -28,7 +29,7 @@ namespace ILSpy.Backend.Handlers
                 await searchBackend.RemoveAssembly(request.AssemblyPath);
             }
 
-            bool result = request.AssemblyPath != null && decompilerBackend.RemoveAssembly(request.AssemblyPath);
+            bool result = request.AssemblyPath != null && application.DecompilerBackend.RemoveAssembly(request.AssemblyPath);
             return new RemoveAssemblyResponse(Removed: result);
         }
     }

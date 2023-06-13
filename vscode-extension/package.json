@@ -41,6 +41,11 @@
 							"Decompile to C# by default",
 							"Decompile to readable IL instructions by default"
 						]
+					},
+					"ilspy.loadPreviousAssemblies": {
+						"description": "If activated, the list of loaded assemblies is stored with current workspace and is restored on re-opening.",
+						"type": "boolean",
+						"default": "true"
 					}
 				}
 			}

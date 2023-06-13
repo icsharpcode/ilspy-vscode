@@ -86,7 +86,10 @@ export async function activate(context: ExtensionContext) {
   }
 
   const ilspyBackend = new ILSpyBackend(client);
-  const decompileTreeProvider = new DecompiledTreeProvider(ilspyBackend);
+  const decompileTreeProvider = new DecompiledTreeProvider(
+    context,
+    ilspyBackend
+  );
   const decompileTreeView: TreeView<Node> = window.createTreeView(
     "ilspyDecompiledMembers",
     {
@@ -94,6 +97,7 @@ export async function activate(context: ExtensionContext) {
     }
   );
   disposables.push(decompileTreeView);
+  decompileTreeProvider.loadAssemblyListFromConfig();
 
   disposables.push(
     registerDecompileAssemblyInWorkspace(

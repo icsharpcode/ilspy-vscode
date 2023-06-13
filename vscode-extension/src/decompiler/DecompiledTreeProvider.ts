@@ -12,21 +12,32 @@ import {
   ProviderResult,
   window,
   ThemeIcon,
+  ExtensionContext,
 } from "vscode";
 import { DecompiledCode } from "../protocol/DecompileResponse";
 import IILSpyBackend from "./IILSpyBackend";
 import Node from "../protocol/Node";
 import { NodeType } from "../protocol/NodeType";
 import { ProductIconMapping } from "../icons";
+import { getAssemblyList, updateAssemblyListIfNeeded } from "./settings";
 
 export class DecompiledTreeProvider implements TreeDataProvider<Node> {
   private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
   readonly onDidChangeTreeData: Event<any> = this._onDidChangeTreeData.event;
 
-  constructor(private backend: IILSpyBackend) {}
+  constructor(
+    private extensionContext: ExtensionContext,
+    private backend: IILSpyBackend
+  ) {}
 
   public refresh(): void {
     this._onDidChangeTreeData.fire(null);
+  }
+
+  public async loadAssemblyListFromConfig() {
+    getAssemblyList(this.extensionContext).forEach(
+      async (assemblyPath) => await this.addAssembly(assemblyPath)
+    );
   }
 
   public async addAssembly(assembly: string): Promise<boolean> {
@@ -108,6 +119,16 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
     const result = await this.backend.sendGetNodes({
       nodeMetadata: node?.metadata,
     });
+
+    if (!node && result?.nodes) {
+      updateAssemblyListIfNeeded(
+        this.extensionContext,
+        result.nodes
+          .filter((node) => node.metadata?.type === NodeType.Assembly)
+          .map((node) => node.metadata!.assemblyPath)
+      );
+    }
+
     return result?.nodes ?? [];
   }
 

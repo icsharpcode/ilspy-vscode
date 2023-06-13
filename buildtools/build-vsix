@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+
+mkdir ./artifacts
+
+cd ./vscode-extension
+npm install
+npm run package
+npm install @vscode/vsce -g
+vsce package -o ../artifacts/ilspy-vscode.vsix

@@ -32,6 +32,11 @@ import {
   GetNodesRequest,
   GetNodesResponse,
 } from "../protocol/getNodes";
+import {
+  InitWithAssembliesParams,
+  InitWithAssembliesRequest,
+  InitWithAssembliesResponse,
+} from "../protocol/initWithAssemblies";
 
 export default class ILSpyBackend implements IILSpyBackend {
   constructor(private languageClient: LanguageClient) {}
@@ -39,6 +44,15 @@ export default class ILSpyBackend implements IILSpyBackend {
   public static getExecutable(context: vscode.ExtensionContext) {
     return context.asAbsolutePath(
       path.join("bin", "ilspy-backend", "ILSpy.Backend.dll")
+    );
+  }
+
+  public sendInitWithAssemblies(
+    params: InitWithAssembliesParams
+  ): Promise<InitWithAssembliesResponse | null> {
+    return this.languageClient.sendRequest(
+      InitWithAssembliesRequest.type,
+      params
     );
   }
 

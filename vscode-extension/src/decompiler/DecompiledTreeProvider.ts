@@ -34,10 +34,21 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
     this._onDidChangeTreeData.fire(null);
   }
 
-  public async loadAssemblyListFromConfig() {
-    getAssemblyList(this.extensionContext).forEach(
-      async (assemblyPath) => await this.addAssembly(assemblyPath)
-    );
+  public async initWithAssemblies(): Promise<boolean> {
+    const assemblyPaths = getAssemblyList(this.extensionContext);
+    const response = await this.backend.sendInitWithAssemblies({
+      assemblyPaths,
+    });
+    if (response?.loadedAssemblies) {
+      this.refresh();
+      return true;
+    } else {
+      window.showWarningMessage(
+        `Assemblies could not be restored from last session.`
+      );
+    }
+
+    return false;
   }
 
   public async addAssembly(assembly: string): Promise<boolean> {

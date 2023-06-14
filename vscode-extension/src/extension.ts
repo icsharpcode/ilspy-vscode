@@ -97,7 +97,7 @@ export async function activate(context: ExtensionContext) {
     }
   );
   disposables.push(decompileTreeView);
-  decompileTreeProvider.loadAssemblyListFromConfig();
+  decompileTreeProvider.initWithAssemblies();
 
   disposables.push(
     registerDecompileAssemblyInWorkspace(

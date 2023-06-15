@@ -8,6 +8,16 @@ using System.Collections.Generic;
 
 namespace ILSpy.Backend.Protocol
 {
+    #region initWithAssemblies
+
+    [Serial, Method("ilspy/initWithAssemblies", Direction.ClientToServer)]
+    public record InitWithAssembliesRequest(string[] AssemblyPaths)
+        : IRequest<InitWithAssembliesResponse>;
+
+    public record InitWithAssembliesResponse(AssemblyData[]? LoadedAssemblies);
+
+    #endregion
+
     #region addAssembly
 
     [Serial, Method("ilspy/addAssembly", Direction.ClientToServer)]

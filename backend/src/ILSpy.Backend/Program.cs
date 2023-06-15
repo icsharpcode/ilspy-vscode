@@ -41,6 +41,7 @@ namespace ILSpy.Backend
                             .SetMinimumLevel(LogLevel.Debug))
                     .AddDefaultLoggingProvider()
                     .WithServices(ConfigureServices)
+                    .WithHandler<InitWithAssembliesHandler>()
                     .WithHandler<AddAssemblyHandler>()
                     .WithHandler<DecompileNodeHandler>()
                     .WithHandler<GetNodesHandler>()

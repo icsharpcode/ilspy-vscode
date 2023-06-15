@@ -15,8 +15,16 @@ import {
 import { SearchParams, SearchResponse } from "../protocol/search";
 import { DecompileNodeParams } from "../protocol/decompileNode";
 import { GetNodesParams, GetNodesResponse } from "../protocol/getNodes";
+import {
+  InitWithAssembliesParams,
+  InitWithAssembliesResponse,
+} from "../protocol/initWithAssemblies";
 
 export default interface IILSpyBackend {
+  sendInitWithAssemblies(
+    params: InitWithAssembliesParams
+  ): Promise<InitWithAssembliesResponse | null>;
+
   sendAddAssembly(
     params: AddAssemblyParams
   ): Promise<AddAssemblyResponse | null>;

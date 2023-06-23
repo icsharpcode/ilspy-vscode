@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+
+PROJECTVERSION=`cat .projectversion`
+
+update_csproj() {
+    sed -i '' "s/<Version>.*<\/Version>/<Version>$PROJECTVERSION<\/Version>/g" $1
+}
+
+update_package_json() {
+    sed -i '' "s/\"version\": \".*\",/\"version\": \"$PROJECTVERSION\",/g" $1
+}
+
+update_package_json ./vscode-extension/package.json
+update_csproj ./backend/src/ILSpy.Backend/ILSpy.Backend.csproj

@@ -63,7 +63,7 @@
 			"explorer": [
 				{
 					"id": "ilspyDecompiledMembers",
-					"name": "ILSpy Decompiled Members",
+					"name": "ILSpy: Assemblies",
 					"when": "ilspy.backendAvailable"
 				}
 			],

@@ -12,7 +12,7 @@ export function registerDecompileSelectedAssembly(
     async (file) => {
       if (file) {
         await addAssemblyToTree(
-          file.path,
+          file.fsPath,
           decompiledTreeProvider,
           decompiledTreeView
         );

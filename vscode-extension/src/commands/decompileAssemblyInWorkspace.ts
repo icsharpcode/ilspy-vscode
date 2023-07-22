@@ -16,7 +16,6 @@ export function registerDecompileAssemblyInWorkspace(
   return vscode.commands.registerCommand(
     "ilspy.decompileAssemblyInWorkspace",
     async () => {
-      // The code you place here will be executed every time your command is executed
       const assembly = await pickAssembly();
       if (assembly) {
         await addAssemblyToTree(
@@ -36,7 +35,9 @@ async function pickAssembly(): Promise<AssemblyQuickPickItem | undefined> {
     createAssemblyQuickPickItem(info)
   );
   if (quickPickItems.length === 0) {
-    vscode.window.showInformationMessage("No assembly found inside the workspace");
+    vscode.window.showInformationMessage(
+      "No assembly found inside the workspace"
+    );
   } else {
     return await vscode.window.showQuickPick<AssemblyQuickPickItem>(
       quickPickItems
@@ -70,15 +71,17 @@ async function findAssemblies(): Promise<string[]> {
     /*include*/ "{**/*.dll,**/*.exe,**/*.winmd,**/*.netmodule}",
     /*exclude*/ "{**/node_modules/**,**/.git/**,**/bower_components/**}"
   );
-  return resources.map((uri) => uri.fsPath).sort((s1, s2) => {
-    if (s1 > s2) {
-      return 1;
-    } else if (s1 < s2) {
-      return -1;
-    } else {
-      return 0;
-    }
-  });
+  return resources
+    .map((uri) => uri.fsPath)
+    .sort((s1, s2) => {
+      if (s1 > s2) {
+        return 1;
+      } else if (s1 < s2) {
+        return -1;
+      } else {
+        return 0;
+      }
+    });
 }
 
 function createAssemblyQuickPickItem(

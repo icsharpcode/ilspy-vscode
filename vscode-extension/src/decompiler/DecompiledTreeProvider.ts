@@ -113,8 +113,8 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
     };
   }
 
-  public findNode(predicate: (node: Node) => boolean) {
-    return (this.getChildren() as Node[]).find(predicate);
+  public async findNode(predicate: (node: Node) => boolean) {
+    return ((await this.getChildren()) as Node[]).find(predicate);
   }
 
   public getChildren(node?: Node): Node[] | Thenable<Node[]> {

@@ -36,7 +36,7 @@ export async function addAssemblyToTree(
 ) {
   const added = await decompiledTreeProvider.addAssembly(assembly);
   if (added) {
-    const newNode = decompiledTreeProvider.findNode(
+    const newNode = await decompiledTreeProvider.findNode(
       (node) => node.metadata?.assemblyPath === assembly
     );
     if (newNode) {

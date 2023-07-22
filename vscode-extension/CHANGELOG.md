@@ -2,10 +2,14 @@
 
 All notable changes to the "ilspy-vscode" extension will be documented in this file.
 
+## 0.16.1
+
+- Fixes for 2 issues with adding assemblies from workspace
+
 ## 0.16
 
 - List of decompiled assemblies is now persisted per workspace: Assemblies will appear again as soon as workspace is reloaded. This behavior can be disabled in VS Code settings.
-- Decompile any assembly directly from Explorer view 
+- Decompile any assembly directly from Explorer view
 - Small improvements in assembly list (buttons instead of context menus)
 
 ## 0.15

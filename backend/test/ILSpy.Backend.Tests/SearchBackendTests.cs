@@ -132,7 +132,7 @@ public class SearchBackendTests
                     Assert.Equal(SymbolModifiers.Public | SymbolModifiers.Sealed, node.SymbolModifiers);
                 },
                 node => {
-                    Assert.Equal("SomeDelegate.SomeDelegate(object, IntPtr)", node.DisplayName);
+                    Assert.Equal("SomeDelegate.SomeDelegate(object, nint)", node.DisplayName);
                     Assert.Equal("TestAssembly.SomeDelegate", node.Description);
                     Assert.Equal(NodeType.Method, node.Metadata?.Type);
                     Assert.False(node.MayHaveChildren);

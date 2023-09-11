@@ -242,7 +242,7 @@
 		"typescript": "^5.1.6",
 		"webpack": "5.88.2",
 		"webpack-cli": "5.1.4",
-		"@vscode/vsce": "^2.19.0"
+		"@vscode/vsce": "^2.21.0"
 	},
 	"extensionDependencies": [
 		"ms-dotnettools.vscode-dotnet-runtime"

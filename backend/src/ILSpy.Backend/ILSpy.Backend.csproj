@@ -21,7 +21,7 @@
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="ICSharpCode.ILSpyX" Version="8.1.0.7455" />
+		<PackageReference Include="ICSharpCode.ILSpyX" Version="8.1.1.7464" />
 		<PackageReference Include="Mono.Cecil" Version="0.11.5" />
 		<PackageReference Include="OmniSharp.Extensions.LanguageServer" Version="0.19.7" />
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />

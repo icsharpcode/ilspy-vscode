@@ -11,6 +11,13 @@ updates:
     directory: "/vscode-extension/"
     schedule:
       interval: "weekly"
+    ignore:
+      - dependency-name: "@types/vscode"
+      - dependency-name: "@types/node"
+        versions: [">18"]
+    groups:
+      dev-dependencies:
+        dependency-type: "development"
 
   - package-ecosystem: "nuget"
     directory: "/backend/src/ILSpy.Backend/"

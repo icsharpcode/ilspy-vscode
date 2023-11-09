@@ -13,6 +13,7 @@ import {
   window,
   ThemeIcon,
   ExtensionContext,
+  commands,
 } from "vscode";
 import { DecompiledCode } from "../protocol/DecompileResponse";
 import IILSpyBackend from "./IILSpyBackend";
@@ -131,13 +132,17 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
       nodeMetadata: node?.metadata,
     });
 
-    if (!node && result?.nodes) {
-      updateAssemblyListIfNeeded(
-        this.extensionContext,
-        result.nodes
-          .filter((node) => node.metadata?.type === NodeType.Assembly)
-          .map((node) => node.metadata!.assemblyPath)
-      );
+    if (!node) {
+      if (result?.nodes) {
+        updateAssemblyListIfNeeded(
+          this.extensionContext,
+          result.nodes
+            .filter((node) => node.metadata?.type === NodeType.Assembly)
+            .map((node) => node.metadata!.assemblyPath)
+        );
+      }
+
+      setTreeWithNodes(result?.nodes !== undefined && result.nodes?.length > 0);
     }
 
     return result?.nodes ?? [];
@@ -153,4 +158,8 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
     });
     return result?.decompiledCode;
   }
+}
+
+function setTreeWithNodes(treeWithNodes: boolean) {
+  commands.executeCommand("setContext", "ilspy.treeWithNodes", treeWithNodes);
 }

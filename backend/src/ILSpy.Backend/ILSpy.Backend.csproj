@@ -7,7 +7,6 @@
     <Product>ILSpy .NET Decompiler</Product>
     <Copyright>Copyright 2017-2023 ICSharpCode, Microsoft Corporation</Copyright>
     <Nullable>enable</Nullable>
-    <Version>0.16.1</Version>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>..\..\..\vscode-extension\bin\ilspy-backend</OutputPath>

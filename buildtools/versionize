@@ -1,0 +1,20 @@
+#!/usr/bin/env sh
+
+PROJECTVERSION=`cat .projectversion`
+
+update_csproj() {
+    echo "<Project>" > ./backend/Directory.Build.props
+    echo "    <PropertyGroup>" >> ./backend/Directory.Build.props
+    echo "        <Version>$PROJECTVERSION.0</Version>" >> ./backend/Directory.Build.props
+    echo "    </PropertyGroup>" >> ./backend/Directory.Build.props
+    echo "</Project>" >> ./backend/Directory.Build.props
+}
+
+update_package_json() {
+    pushd vscode-extension
+    npm version --git-tag-version false --allow-same-version true -- $PROJECTVERSION
+    popd
+}
+
+update_package_json
+update_csproj

@@ -8,7 +8,7 @@ import * as os from "os";
 import { IDotnetAcquireResult } from "./types";
 import OutputWindowLogger from "../OutputWindowLogger";
 
-const netRuntimeVersion = "6.0";
+const netRuntimeVersion = "8.0";
 
 export async function acquireDotnetRuntime(
   context: vscode.ExtensionContext,

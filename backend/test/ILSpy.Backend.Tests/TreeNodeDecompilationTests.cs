@@ -56,14 +56,14 @@ using System.Runtime.Versioning;
 [assembly: CompilationRelaxations(8)]
 [assembly: RuntimeCompatibility(WrapNonExceptionThrows = true)]
 [assembly: Debuggable(DebuggableAttribute.DebuggingModes.Default | DebuggableAttribute.DebuggingModes.DisableOptimizations | DebuggableAttribute.DebuggingModes.IgnoreSymbolStoreSequencePoints | DebuggableAttribute.DebuggingModes.EnableEditAndContinue)]
-[assembly: TargetFramework("".NETCoreApp,Version=v6.0"", FrameworkDisplayName = "".NET 6.0"")]
+[assembly: TargetFramework("".NETCoreApp,Version=v8.0"", FrameworkDisplayName = "".NET 8.0"")]
 [assembly: AssemblyCompany(""TestAssembly"")]
 [assembly: AssemblyConfiguration(""Debug"")]
 [assembly: AssemblyFileVersion(""1.0.0.0"")]
-[assembly: AssemblyInformationalVersion(""1.0.0"")]
 [assembly: AssemblyProduct(""TestAssembly"")]
 [assembly: AssemblyTitle(""TestAssembly"")]
 [assembly: AssemblyVersion(""1.0.0.0"")]
+[module: RefSafetyRules(11)]
 
 ",
             application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata)?[LanguageNames.CSharp]);
@@ -247,7 +247,7 @@ public enum SomeEnum
         var application = CreateTestApplication();
         var nodeMetadata = new NodeMetadata(AssemblyPath, NodeType.ReferencesRoot, "References", 0, 0);
         Assert.Equal(
-@"// System.Runtime, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
+@"// System.Runtime, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
             application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata)?[LanguageNames.CSharp]);
     }
 

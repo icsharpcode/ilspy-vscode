@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31112.23
@@ -22,11 +22,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{A40CFEFF-8
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestAssembly", "test\TestAssembly\TestAssembly.csproj", "{98030DE1-DC87-4E74-8201-FE8E93E826B5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ILSpy.Backend", "src\ILSpy.Backend\ILSpy.Backend.csproj", "{A97B9A08-1EC0-4D6E-B9B6-9A9C643552E7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ILSpy.Backend", "src\ILSpy.Backend\ILSpy.Backend.csproj", "{A97B9A08-1EC0-4D6E-B9B6-9A9C643552E7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "..\build\_build.csproj", "{49185332-9D6E-4342-B069-33C438F72680}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ILSpy.Backend.Tests", "test\ILSpy.Backend.Tests\ILSpy.Backend.Tests.csproj", "{9CD52FC4-0345-4D46-A297-3F53D8F25170}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ILSpy.Backend.Tests", "test\ILSpy.Backend.Tests\ILSpy.Backend.Tests.csproj", "{9CD52FC4-0345-4D46-A297-3F53D8F25170}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -62,12 +60,6 @@ Global
 		{A97B9A08-1EC0-4D6E-B9B6-9A9C643552E7}.Release|x64.Build.0 = Release|Any CPU
 		{A97B9A08-1EC0-4D6E-B9B6-9A9C643552E7}.Release|x86.ActiveCfg = Release|Any CPU
 		{A97B9A08-1EC0-4D6E-B9B6-9A9C643552E7}.Release|x86.Build.0 = Release|Any CPU
-		{49185332-9D6E-4342-B069-33C438F72680}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{49185332-9D6E-4342-B069-33C438F72680}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{49185332-9D6E-4342-B069-33C438F72680}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{49185332-9D6E-4342-B069-33C438F72680}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{49185332-9D6E-4342-B069-33C438F72680}.Release|x64.ActiveCfg = Release|Any CPU
-		{49185332-9D6E-4342-B069-33C438F72680}.Release|x86.ActiveCfg = Release|Any CPU
 		{9CD52FC4-0345-4D46-A297-3F53D8F25170}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9CD52FC4-0345-4D46-A297-3F53D8F25170}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9CD52FC4-0345-4D46-A297-3F53D8F25170}.Debug|x64.ActiveCfg = Debug|Any CPU

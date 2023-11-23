@@ -23,7 +23,7 @@ jobs:
       - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: 6.0.x
+          dotnet-version: 8.0.x
 
       - name: Check .NET Core version
         run: dotnet --version
@@ -32,11 +32,14 @@ jobs:
         with:
           node-version: "18"
 
-      - name: Build
-        run: ./build.sh vsix
+      - name: Publish Backend
+        run: buildtools/publish-backend
 
-      - name: Test
-        run: ./build.sh test-backend
+      - name: Test Backend
+        run: buildtools/test-backend
+
+      - name: Build Extension
+        run: buildtools/build-vsix
 
       - name: Archive artifacts
         if: github.ref == 'refs/heads/master'

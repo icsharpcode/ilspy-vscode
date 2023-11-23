@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+
+PROJECTVERSION=`cat .projectversion`
+
+dotnet publish ./backend/src/ILSpy.Backend/ILSpy.Backend.csproj --configuration Release --self-contained false -p:UseAppHost=false -p:Version=$PROJECTVERSION --output ./vscode-extension/bin/ilspy-backend

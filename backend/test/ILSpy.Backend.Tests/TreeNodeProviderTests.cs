@@ -24,7 +24,7 @@ public class TreeNodeProviderTests
         var list = application.TreeNodeProviders.Root.GetChildren(null);
         Assert.Collection(list,
                 node => {
-                    Assert.Equal("TestAssembly, 1.0.0.0, .NETCoreApp, v6.0", node.DisplayName);
+                    Assert.Equal("TestAssembly, 1.0.0.0, .NETCoreApp, v8.0", node.DisplayName);
                     Assert.Equal(AssemblyPath, node.Description);
                     Assert.True(node.MayHaveChildren);
                     Assert.Equal(AssemblyPath, node.Metadata?.AssemblyPath);

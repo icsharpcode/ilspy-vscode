@@ -222,7 +222,7 @@
 		"path": "^0.12.7",
 		"temp-dir": "^3.0.0",
 		"terser": "^5.24.0",
-		"vscode-languageclient": "^8.1.0"
+		"vscode-languageclient": "^9.0.1"
 	},
 	"devDependencies": {
 		"@types/chai": "^4.3.11",

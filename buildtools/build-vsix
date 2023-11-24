@@ -1,6 +1,7 @@
 #!/usr/bin/env sh
 
-PROJECTVERSION=`cat .projectversion`
+dotnet tool restore
+SEMVER=`dotnet-gitversion -showvariable SemVer`
 
 mkdir ./artifacts
 
@@ -8,4 +9,4 @@ cd ./vscode-extension
 npm install
 npm run package
 npm install @vscode/vsce -g
-vsce package -o ../artifacts/ilspy-vscode-$PROJECTVERSION.vsix
+vsce package -o ../artifacts/ilspy-vscode-$SEMVER.vsix

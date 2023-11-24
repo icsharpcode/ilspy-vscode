@@ -1,7 +1,8 @@
 #!/usr/bin/env sh
 
-dotnet tool restore
-SEMVER=`dotnet-gitversion -showvariable SemVer`
+buildtools/versionize
+
+SEMVER=`dotnet dotnet-gitversion -showvariable SemVer`
 
 mkdir ./artifacts
 

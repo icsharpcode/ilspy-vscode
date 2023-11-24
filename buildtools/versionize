@@ -2,9 +2,9 @@
 
 dotnet tool restore
 
-SEMVER=`dotnet-gitversion -showvariable SemVer`
-ASSEMBLY_VERSION=`dotnet-gitversion -showvariable NuGetVersionV2`
-ASSEMBLY_FILEVERSION=`dotnet-gitversion -showvariable AssemblySemFileVer`
+SEMVER=`dotnet dotnet-gitversion -showvariable SemVer`
+ASSEMBLY_VERSION=`dotnet dotnet-gitversion -showvariable NuGetVersionV2`
+ASSEMBLY_FILEVERSION=`dotnet dotnet-gitversion -showvariable AssemblySemFileVer`
 
 update_csproj() {
     echo "<Project>" > ./backend/Directory.Build.props

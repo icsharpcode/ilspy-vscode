@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+dotnet tool restore
+echo `dotnet dotnet-gitversion -showvariable SemVer`

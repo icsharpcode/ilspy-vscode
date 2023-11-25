@@ -1,12 +1,12 @@
 #!/usr/bin/env sh
 
-buildtools/versionize
-
+dotnet tool restore
 SEMVER=`dotnet dotnet-gitversion -showvariable SemVer`
 
 mkdir ./artifacts
 
 cd ./vscode-extension
+npm version --git-tag-version false --allow-same-version true -- $SEMVER
 npm install
 npm run package
 npm install @vscode/vsce -g

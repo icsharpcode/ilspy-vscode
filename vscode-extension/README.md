@@ -14,15 +14,21 @@ workspace in a list for selection.
 The `Decompile IL Assembly (pick file)` command allows choosing an assembly using the file picker dialog. The dialog
 should also allow one to type in the full path, for example, `c:/temp/a.dll` or `/home/user/b.dll`.
 
-If the file is a valid .NET assembly, a tree view named `ILSPY DECOMPILED MEMBERS` is added into the Explorer view.
+If the file is a valid .NET assembly, a tree view named `ILSPY: ASSEMBLIES` is added into the Explorer view.
 It allows expanding and selecting various nodes, whose decompiled C# code is shown in the editor.
 
-Loaded assemblies can be closed by right-click on the assemly nodes to show the context menu then select `Unload Assembly` menu item.
+Loaded assemblies can be closed by hovering the assemly nodes and clicking the "X" icon.
+
+Further features are:
+
+- Symbol search across all loaded assemblies
+- Choosing decompilation language
+- Saving list of loaded assemblies along with currently open workspace
 
 ## Requirements
 
 - Visual Studio Code >= 1.74
-- .NET 6.0 (installed automatically on first start)
+- .NET 8.0 (installed automatically on first start)
 
 ## What's New
 
@@ -36,10 +42,15 @@ Please file any issues at https://github.com/icsharpcode/ilspy-vscode/issues
 
 First install:
 
-- Node.js (newer than 4.3.1)
-- Npm (newer than 2.14.12)
+- Node.js (18 or newer)
+- Npm (8 or newer)
 
-- Compile and prepare ILSpy.Backend: `../build backend` (or `../build.sh backend`)
+- Compile and prepare ILSpy.Backend:
+
+```
+cd ..
+buildtools/build-backend
+```
 
 - Run `npm i`
 - Run `npm run compile`

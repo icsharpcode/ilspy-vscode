@@ -23,7 +23,8 @@ npm i @vscode/vsce -g
 Compile and package all parts:
 
 ```
-./build vsix
+./buildtools/publish-backend
+./buildtools/build-vsix
 ```
 
 An installable `.vsix` file should be generated in `artifacts` folder, if everything is fine.
@@ -31,17 +32,18 @@ An installable `.vsix` file should be generated in `artifacts` folder, if everyt
 Compile only backend server from console:
 
 ```
-./build backend
+cd backend
+dotnet build
 ```
 
-Or open `backend/ILSpy-server.sln` in Visual Studio 2019 (>= 16.9) or another .NET IDE.
-
-Compile VSCode extension itself:
+Run backend tests:
 
 ```
-./build compile-extension
-./build test-extension
+cd backend
+dotnet test
 ```
+
+Or open `backend/ILSpy-server.sln` in Visual Studio 2022 (>= 17.8) or another .NET IDE.
 
 To develop and debug the VSCode extension, install [Visual Studio Code](https://code.visualstudio.com/),
 then run

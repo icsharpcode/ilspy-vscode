@@ -2,6 +2,12 @@
 
 All notable changes to the "ilspy-vscode" extension will be documented in this file.
 
+## 0.17
+
+- Upgrade to ICSharpCode.Decompiler 8.2 (see release notes for [ILSpy 8.2](https://github.com/icsharpcode/ILSpy/releases/tag/v8.2) to get more details)
+- Backend process now migrated to .NET 8, so extension locally downloads a .NET 8 runtime on startup
+- Search button not shown in "ILSPY: Assemblies" view anymore, when no assemblies were loaded
+
 ## 0.16.1
 
 - Fixes for 2 issues with adding assemblies from workspace

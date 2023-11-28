@@ -11,10 +11,9 @@
 			"presentation": {
 				"reveal": "never"
 			},
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			}
+			"group": "build",
+			"label": "npm: watch",
+			"detail": "tsc -watch -p ./"
 		}
 	]
 }

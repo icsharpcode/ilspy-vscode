@@ -18,9 +18,9 @@ public class AssemblyNodeProvider : ITreeNodeProvider
         this.application = application;
     }
 
-    public IDictionary<string, string>? Decompile(NodeMetadata nodeMetadata)
+    public DecompileResult Decompile(NodeMetadata nodeMetadata, string language)
     {
-        return application.DecompilerBackend.GetCode(nodeMetadata.AssemblyPath, EntityHandle.AssemblyDefinition);
+        return application.DecompilerBackend.GetCode(nodeMetadata.AssemblyPath, EntityHandle.AssemblyDefinition, language);
     }
 
     public IEnumerable<Node> CreateNodes()

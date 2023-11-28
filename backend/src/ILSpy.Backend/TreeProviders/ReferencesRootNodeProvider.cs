@@ -16,17 +16,12 @@ public class ReferencesRootNodeProvider : ITreeNodeProvider
         this.application = application;
     }
 
-    public IDictionary<string, string>? Decompile(NodeMetadata nodeMetadata)
+    public DecompileResult Decompile(NodeMetadata nodeMetadata, string language)
     {
         var code = string.Join('\n',
             GetAssemblyReferences(nodeMetadata.AssemblyPath)
                 .Select(reference => $"// {reference}"));
-
-        return new Dictionary<string, string>
-        {
-            [LanguageNames.CSharp] = code,
-            [LanguageNames.IL] = code,
-        };
+        return DecompileResult.WithCode(code);
     }
 
     private IEnumerable<string> GetAssemblyReferences(string assemblyPath)

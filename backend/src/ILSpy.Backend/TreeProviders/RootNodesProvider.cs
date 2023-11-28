@@ -1,4 +1,5 @@
 using ILSpy.Backend.Application;
+using ILSpy.Backend.Decompiler;
 using ILSpy.Backend.Model;
 using System;
 using System.Collections.Generic;
@@ -14,9 +15,9 @@ public class RootNodesProvider : ITreeNodeProvider
         this.application = application;
     }
 
-    public IDictionary<string, string>? Decompile(NodeMetadata nodeMetadata)
+    public DecompileResult Decompile(NodeMetadata nodeMetadata, string language)
     {
-        return null;
+        return DecompileResult.Empty();
     }
 
     public IEnumerable<Node> GetChildren(NodeMetadata? nodeMetadata)

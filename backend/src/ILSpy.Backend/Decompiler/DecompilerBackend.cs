@@ -16,7 +16,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
-using System.Runtime.InteropServices;
 using System.Threading;
 
 public class DecompilerBackend : IDecompilerBackend
@@ -148,24 +147,21 @@ public class DecompilerBackend : IDecompilerBackend
         }
     }
 
-    public IDictionary<string, string> GetCode(string? assemblyPath, EntityHandle handle)
+    public DecompileResult GetCode(string? assemblyPath, EntityHandle handle, string language)
     {
-        if (assemblyPath != null)
+        if (assemblyPath is not null)
         {
-            var csharpCode = GetCSharpCode(assemblyPath, handle);
-            var ilCode = GetILCode(assemblyPath, handle);
-
-            return new Dictionary<string, string>()
+            return language switch
             {
-                { LanguageNames.CSharp, csharpCode },
-                { LanguageNames.IL, ilCode },
+                LanguageNames.IL => DecompileResult.WithCode(GetILCode(assemblyPath, handle)),
+                _ => DecompileResult.WithCode(GetCSharpCode(assemblyPath, handle, language))
             };
         }
 
-        return new Dictionary<string, string>();
+        return DecompileResult.WithError("No assembly given");
     }
 
-    private string GetCSharpCode(string assemblyPath, EntityHandle handle)
+    private string GetCSharpCode(string assemblyPath, EntityHandle handle, string language)
     {
         if (handle.IsNil || !decompilers.ContainsKey(assemblyPath))
         {

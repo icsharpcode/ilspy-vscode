@@ -15,7 +15,6 @@ import {
   ExtensionContext,
   commands,
 } from "vscode";
-import { DecompiledCode } from "../protocol/DecompileResponse";
 import IILSpyBackend from "./IILSpyBackend";
 import Node from "../protocol/Node";
 import { NodeType } from "../protocol/NodeType";
@@ -146,17 +145,6 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
     }
 
     return result?.nodes ?? [];
-  }
-
-  public async getCode(node: Node): Promise<DecompiledCode | undefined> {
-    if (!node.metadata) {
-      return undefined;
-    }
-
-    const result = await this.backend.sendDecompileNode({
-      nodeMetadata: node.metadata!,
-    });
-    return result?.decompiledCode;
   }
 }
 

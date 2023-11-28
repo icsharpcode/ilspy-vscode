@@ -8,12 +8,8 @@ export enum LanguageName {
   IL = "il",
 }
 
-export interface DecompiledCode {
-  [index: string]: string;
-}
-
 export default interface DecompileResponse {
-  decompiledCode: DecompiledCode;
+  decompiledCode?: string;
   isError: boolean;
   errorMessage?: string;
 }

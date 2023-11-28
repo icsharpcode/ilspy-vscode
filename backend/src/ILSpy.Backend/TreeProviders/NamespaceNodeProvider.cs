@@ -4,6 +4,7 @@ using ILSpy.Backend.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace ILSpy.Backend.TreeProviders;
 
@@ -16,13 +17,13 @@ public class NamespaceNodeProvider : ITreeNodeProvider
         this.application = application;
     }
 
-    public IDictionary<string, string>? Decompile(NodeMetadata nodeMetadata)
+    public DecompileResult Decompile(NodeMetadata nodeMetadata, string language)
     {
         string namespaceName = string.IsNullOrEmpty(nodeMetadata.Name) ? "<global>" : nodeMetadata.Name;
-        return new Dictionary<string, string>
+        return language switch
         {
-            [LanguageNames.CSharp] = $"namespace {namespaceName} {{ }}",
-            [LanguageNames.IL] = $"namespace {namespaceName}",
+            LanguageNames.IL => DecompileResult.WithCode($"namespace {namespaceName}"),
+            _ => DecompileResult.WithCode($"namespace {namespaceName} {{ }}")
         };
     }
 

@@ -16,14 +16,10 @@ public class AssemblyReferenceNodeProvider : ITreeNodeProvider
         this.application = application;
     }
 
-    public IDictionary<string, string>? Decompile(NodeMetadata nodeMetadata)
+    public DecompileResult Decompile(NodeMetadata nodeMetadata, string language)
     {
         var code = $"// {nodeMetadata.Name}";
-        return new Dictionary<string, string>
-        {
-            [LanguageNames.CSharp] = code,
-            [LanguageNames.IL] = code,
-        };
+        return DecompileResult.WithCode(code);
     }
 
     public IEnumerable<Node> CreateNodes(string assemblyPath)

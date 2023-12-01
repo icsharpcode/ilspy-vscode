@@ -15,6 +15,7 @@ import NodeMetadata from "./NodeMetadata";
 
 export interface DecompileNodeParams {
   nodeMetadata: NodeMetadata;
+  language: string;
 }
 
 export namespace DecompileNodeRequest {

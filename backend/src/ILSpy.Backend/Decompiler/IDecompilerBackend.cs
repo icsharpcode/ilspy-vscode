@@ -13,7 +13,7 @@ public interface IDecompilerBackend
     AssemblyData? AddAssembly(string? path);
     bool RemoveAssembly(string? path);
     IEnumerable<MemberData> ListTypes(string? assemblyPath, string? @namespace);
-    IDictionary<string, string> GetCode(string? assemblyPath, EntityHandle handle);
+    DecompileResult GetCode(string? assemblyPath, EntityHandle handle, string language);
     IEnumerable<MemberData> GetMembers(string? assemblyPath, TypeDefinitionHandle handle);
     IEnumerable<AssemblyData> GetLoadedAssemblies();
     CSharpDecompiler? GetDecompiler(string assembly);

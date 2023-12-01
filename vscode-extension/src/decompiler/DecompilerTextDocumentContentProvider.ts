@@ -4,7 +4,7 @@
  *-----------------------------------------------------------------------------------------------*/
 
 import * as vscode from "vscode";
-import { DecompiledCode, LanguageName } from "../protocol/DecompileResponse";
+import { LanguageName } from "../protocol/DecompileResponse";
 import { getDefaultOutputLanguage } from "./settings";
 import IILSpyBackend from "./IILSpyBackend";
 import { ILSPY_URI_SCHEME, uriToNode } from "./nodeUri";
@@ -29,19 +29,21 @@ export class DecompilerTextDocumentContentProvider
       if (!nodeMetadata) {
         return "// Invalid URI";
       }
-      const code = await this.getCodeFromNode(nodeMetadata);
-      return (
-        code?.[this.getDocumentOutputLanguage(uri)] ?? "// No code available"
+      const code = await this.getCodeFromNode(
+        nodeMetadata,
+        this.getDocumentOutputLanguage(uri)
       );
+      return code ?? "// No code available";
     }
 
     return "";
   }
 
   private async getCodeFromNode(
-    nodeMetadata: NodeMetadata
-  ): Promise<DecompiledCode | undefined> {
-    return (await this.backend.sendDecompileNode({ nodeMetadata }))
+    nodeMetadata: NodeMetadata,
+    language: string
+  ): Promise<string | undefined> {
+    return (await this.backend.sendDecompileNode({ nodeMetadata, language }))
       ?.decompiledCode;
   }
 

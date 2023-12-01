@@ -4,13 +4,8 @@
 namespace ILSpy.Backend.Handlers;
 
 using ILSpy.Backend.Application;
-using ILSpy.Backend.Decompiler;
-using ILSpy.Backend.Model;
 using ILSpy.Backend.Protocol;
 using OmniSharp.Extensions.JsonRpc;
-using System.Collections.Generic;
-using System.Reflection.Metadata;
-using System.Reflection.Metadata.Ecma335;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -27,7 +22,7 @@ public class DecompileNodeHandler : IJsonRpcRequestHandler<DecompileNodeRequest,
     public Task<DecompileResponse> Handle(DecompileNodeRequest request, CancellationToken cancellationToken)
     {
         return Task.FromResult(new DecompileResponse(
-            application.TreeNodeProviders.ForNode(request.NodeMetadata).Decompile(request.NodeMetadata)));
+            application.TreeNodeProviders.ForNode(request.NodeMetadata).Decompile(request.NodeMetadata, request.Language)));
     }
 
 }

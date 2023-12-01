@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2021 ICSharpCode
 // Licensed under the MIT license. See the LICENSE file in the project root for more information.
 
+using ILSpy.Backend.Decompiler;
 using ILSpy.Backend.Model;
 using MediatR;
 using OmniSharp.Extensions.JsonRpc;
@@ -41,18 +42,18 @@ namespace ILSpy.Backend.Protocol
     #region decompileNode
 
     [Serial, Method("ilspy/decompileNode", Direction.ClientToServer)]
-    public record DecompileNodeRequest(NodeMetadata NodeMetadata)
+    public record DecompileNodeRequest(NodeMetadata NodeMetadata, string Language)
         : IRequest<DecompileResponse>;
 
     public record DecompileResponse(
-        IDictionary<string, string>? DecompiledCode,
+        string? DecompiledCode,
         bool IsError,
         string? ErrorMessage
     )
     {
-        public DecompileResponse(IDictionary<string, string>? DecompiledCode) : this(DecompiledCode, false, null) { }
-
-        public DecompileResponse(bool IsError, string? ErrorMessage) : this(null, IsError, ErrorMessage) { }
+        public DecompileResponse(DecompileResult decompileResult) :
+            this(decompileResult.DecompiledCode, decompileResult.IsError, decompileResult.ErrorMessage)
+        { }
     }
 
     #endregion

@@ -17,11 +17,12 @@ public class TypeNodeProvider : ITreeNodeProvider
         this.application = application;
     }
 
-    public IDictionary<string, string>? Decompile(NodeMetadata nodeMetadata)
+    public DecompileResult Decompile(NodeMetadata nodeMetadata, string language)
     {
         return application.DecompilerBackend.GetCode(
             nodeMetadata.AssemblyPath,
-            MetadataTokens.EntityHandle(nodeMetadata.SymbolToken));
+            MetadataTokens.EntityHandle(nodeMetadata.SymbolToken),
+            language);
     }
 
     public IEnumerable<Node> CreateNodes(string assemblyPath, string @namespace)

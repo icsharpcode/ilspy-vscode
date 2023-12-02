@@ -17,12 +17,12 @@ public class NamespaceNodeProvider : ITreeNodeProvider
         this.application = application;
     }
 
-    public DecompileResult Decompile(NodeMetadata nodeMetadata, string language)
+    public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
     {
         string namespaceName = string.IsNullOrEmpty(nodeMetadata.Name) ? "<global>" : nodeMetadata.Name;
-        return language switch
+        return outputLanguage switch
         {
-            LanguageNames.IL => DecompileResult.WithCode($"namespace {namespaceName}"),
+            LanguageName.IL => DecompileResult.WithCode($"namespace {namespaceName}"),
             _ => DecompileResult.WithCode($"namespace {namespaceName} {{ }}")
         };
     }

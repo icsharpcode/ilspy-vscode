@@ -18,10 +18,16 @@ using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Threading;
 
+class CachedCSharpDecompiler(CSharpDecompiler decompiler, string outputLanguage)
+{
+    public CSharpDecompiler Decompiler { get; } = decompiler;
+    public string OutputLanguage { get; } = outputLanguage;
+}
+
 public class DecompilerBackend : IDecompilerBackend
 {
     private readonly ILogger logger;
-    private readonly Dictionary<string, CSharpDecompiler> decompilers = new();
+    private readonly Dictionary<string, CachedCSharpDecompiler> decompilers = new();
     private readonly ILSpyBackendSettings ilspyBackendSettings;
 
     public DecompilerBackend(ILoggerFactory loggerFactory, ILSpyBackendSettings ilspyBackendSettings)
@@ -32,14 +38,11 @@ public class DecompilerBackend : IDecompilerBackend
 
     public AssemblyData? AddAssembly(string? path)
     {
-        if (path != null)
+        if (path is not null)
         {
             try
             {
-                var assemblyResolver = AssemblyReferences.CreateAssemblyResolver(path);
-                var decompiler = new CSharpDecompiler(path, assemblyResolver, ilspyBackendSettings.DecompilerSettings);
-                decompilers[path] = decompiler;
-                return CreateAssemblyData(decompiler, path);
+                return CreateAssemblyData(GetDecompiler(path), path);
             }
             catch (Exception ex)
             {
@@ -80,9 +83,9 @@ public class DecompilerBackend : IDecompilerBackend
         {
             if (decompilers.ContainsKey(path))
             {
-                var decompiler = decompilers[path];
+                var cachedDecompiler = decompilers[path];
                 decompilers.Remove(path);
-                decompiler.TypeSystem.MainModule.PEFile.Dispose();
+                DisposeDecompiler(cachedDecompiler.Decompiler);
                 return true;
             }
         }
@@ -90,14 +93,42 @@ public class DecompilerBackend : IDecompilerBackend
         return false;
     }
 
-    public CSharpDecompiler? GetDecompiler(string assembly)
+    private void DisposeDecompiler(CSharpDecompiler decompiler)
     {
-        return decompilers.ContainsKey(assembly) ? decompilers[assembly] : null;
+        decompiler.TypeSystem.MainModule.PEFile.Dispose();
+    }
+
+    public CSharpDecompiler GetDecompiler(string assembly, string? outputLanguage = null)
+    {
+        CSharpDecompiler? decompiler = null;
+        if (decompilers.TryGetValue(assembly, out var cachedDecompiler))
+        {
+            if (outputLanguage is null || cachedDecompiler.OutputLanguage == outputLanguage)
+            {
+                decompiler = cachedDecompiler.Decompiler;
+            }
+            else
+            {
+                DisposeDecompiler(cachedDecompiler.Decompiler);
+            }
+        }
+
+        if (decompiler is null)
+        {
+            var assemblyResolver = AssemblyReferences.CreateAssemblyResolver(assembly);
+            decompiler = new CSharpDecompiler(
+                assembly,
+                assemblyResolver,
+                ilspyBackendSettings.CreateDecompilerSettings(outputLanguage ?? LanguageName.CSharpLatest));
+            decompilers[assembly] = new CachedCSharpDecompiler(decompiler, outputLanguage ?? LanguageName.CSharpLatest);
+        }
+
+        return decompiler;
     }
 
     public IEnumerable<AssemblyData> GetLoadedAssemblies()
     {
-        return decompilers.Select(decompiler => CreateAssemblyData(decompiler.Value, decompiler.Key))
+        return decompilers.Select(decompiler => CreateAssemblyData(decompiler.Value.Decompiler, decompiler.Key))
             .Where(data => data is not null)
             .Cast<AssemblyData>();
     }
@@ -120,7 +151,7 @@ public class DecompilerBackend : IDecompilerBackend
             return Array.Empty<MemberData>();
         }
 
-        var typeSystem = decompilers[assemblyPath].TypeSystem;
+        var typeSystem = GetDecompiler(assemblyPath).TypeSystem;
         var c = typeSystem.MainModule.GetDefinition(handle);
 
         return c == null
@@ -147,44 +178,44 @@ public class DecompilerBackend : IDecompilerBackend
         }
     }
 
-    public DecompileResult GetCode(string? assemblyPath, EntityHandle handle, string language)
+    public DecompileResult GetCode(string? assemblyPath, EntityHandle handle, string outputLanguage)
     {
         if (assemblyPath is not null)
         {
-            return language switch
+            return outputLanguage switch
             {
-                LanguageNames.IL => DecompileResult.WithCode(GetILCode(assemblyPath, handle)),
-                _ => DecompileResult.WithCode(GetCSharpCode(assemblyPath, handle, language))
+                LanguageName.IL => DecompileResult.WithCode(GetILCode(assemblyPath, handle)),
+                _ => DecompileResult.WithCode(GetCSharpCode(assemblyPath, handle, outputLanguage))
             };
         }
 
         return DecompileResult.WithError("No assembly given");
     }
 
-    private string GetCSharpCode(string assemblyPath, EntityHandle handle, string language)
+    private string GetCSharpCode(string assemblyPath, EntityHandle handle, string outputLanguage)
     {
-        if (handle.IsNil || !decompilers.ContainsKey(assemblyPath))
+        if (handle.IsNil)
         {
             return string.Empty;
         }
 
-        var dc = decompilers[assemblyPath];
-        var module = dc.TypeSystem.MainModule;
+        var decompiler = GetDecompiler(assemblyPath, outputLanguage);
+        var module = decompiler.TypeSystem.MainModule;
 
         switch (handle.Kind)
         {
             case HandleKind.AssemblyDefinition:
-                return GetAssemblyCode(assemblyPath, dc);
+                return GetAssemblyCode(assemblyPath, decompiler);
             case HandleKind.TypeDefinition:
-                var td = module.GetDefinition((TypeDefinitionHandle) handle);
-                if (td.DeclaringType == null)
-                    return dc.DecompileTypesAsString(new[] { (TypeDefinitionHandle) handle });
-                return dc.DecompileAsString(handle);
+                var typeDefinition = module.GetDefinition((TypeDefinitionHandle) handle);
+                if (typeDefinition.DeclaringType == null)
+                    return decompiler.DecompileTypesAsString(new[] { (TypeDefinitionHandle) handle });
+                return decompiler.DecompileAsString(handle);
             case HandleKind.FieldDefinition:
             case HandleKind.MethodDefinition:
             case HandleKind.PropertyDefinition:
             case HandleKind.EventDefinition:
-                return dc.DecompileAsString(handle);
+                return decompiler.DecompileAsString(handle);
         }
 
         return string.Empty;
@@ -192,13 +223,13 @@ public class DecompilerBackend : IDecompilerBackend
 
     private string GetILCode(string assemblyPath, EntityHandle handle)
     {
-        if (handle.IsNil || !decompilers.ContainsKey(assemblyPath))
+        if (handle.IsNil)
         {
             return string.Empty;
         }
 
-        var dc = decompilers[assemblyPath];
-        var module = dc.TypeSystem.MainModule;
+        var decompiler = GetDecompiler(assemblyPath);
+        var module = decompiler.TypeSystem.MainModule;
         var textOutput = new PlainTextOutput();
         var disassembler = CreateDisassembler(assemblyPath, module, textOutput);
 
@@ -338,7 +369,7 @@ public class DecompilerBackend : IDecompilerBackend
             yield break;
         }
 
-        var decompiler = decompilers[assemblyPath];
+        var decompiler = GetDecompiler(assemblyPath);
         var currentNamespace = decompiler.TypeSystem.MainModule.RootNamespace;
         string[] parts = @namespace.Split('.');
 

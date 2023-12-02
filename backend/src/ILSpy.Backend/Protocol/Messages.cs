@@ -42,7 +42,7 @@ namespace ILSpy.Backend.Protocol
     #region decompileNode
 
     [Serial, Method("ilspy/decompileNode", Direction.ClientToServer)]
-    public record DecompileNodeRequest(NodeMetadata NodeMetadata, string Language)
+    public record DecompileNodeRequest(NodeMetadata NodeMetadata, string OutputLanguage)
         : IRequest<DecompileResponse>;
 
     public record DecompileResponse(

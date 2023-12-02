@@ -30,11 +30,24 @@
 				"title": "ILSpy",
 				"properties": {
 					"ilspy.defaultOutputLanguage": {
-						"description": "Defines to which language ILSpy will decompile assemblies by default. Note that you can choose a different language for a specific view later.",
+						"description": "Defines to which language or language variant ILSpy will decompile assemblies by default. Note that you can choose a different language for a specific view later.",
 						"type": "string",
-						"default": "C#",
+						"default": "C# 11.0 / VS 2022.4",
 						"enum": [
-							"C#",
+							"C# 11.0 / VS 2022.4",
+							"C# 10.0 / VS 2022",
+							"C# 9.0 / VS 2019.8",
+							"C# 8.0 / VS 2019",
+							"C# 7.3 / VS 2017.7",
+							"C# 7.2 / VS 2017.4",
+							"C# 7.1 / VS 2017.3",
+							"C# 7.0 / VS 2017",
+							"C# 6.0 / VS 2015",
+							"C# 5.0 / VS 2012",
+							"C# 4.0 / VS 2010",
+							"C# 3.0 / VS 2008",
+							"C# 2.0 / VS 2005",
+							"C# 1.0 / VS .NET",
 							"IL"
 						],
 						"enumDescriptions": [

@@ -316,7 +316,7 @@ public class SearchBackend
             request.RegEx = regex;
         }
         request.SearchResultFactory = new SearchResultFactory();
-        request.DecompilerSettings = ilspyBackendSettings.DecompilerSettings;
+        request.DecompilerSettings = ilspyBackendSettings.CreateDecompilerSettings();
 
         return request;
     }

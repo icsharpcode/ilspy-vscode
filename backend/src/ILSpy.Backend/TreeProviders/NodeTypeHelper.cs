@@ -7,10 +7,10 @@ namespace ILSpy.Backend.TreeProviders;
 public static class NodeTypeHelper
 {
     public static bool IsTypeNode(NodeType nodeType) =>
-        (nodeType is (NodeType.Class or NodeType.Enum or NodeType.Delegate or NodeType.Interface or NodeType.Struct));
+        nodeType is NodeType.Class or NodeType.Enum or NodeType.Delegate or NodeType.Interface or NodeType.Struct;
 
     public static bool IsMemberNode(NodeType nodeType) =>
-        (nodeType is (NodeType.Event or NodeType.Const or NodeType.Field or NodeType.Method or NodeType.Property));
+        nodeType is NodeType.Event or NodeType.Const or NodeType.Field or NodeType.Method or NodeType.Property;
 
     public static NodeType GetNodeTypeFromTypeKind(TypeKind typeKind) => typeKind switch
     {

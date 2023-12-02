@@ -8,7 +8,7 @@ import { DecompilerTextDocumentContentProvider } from "../decompiler/DecompilerT
 import { languageInfos } from "../decompiler/languageInfos";
 import { ILSPY_URI_SCHEME } from "../decompiler/nodeUri";
 import { setDefaultOutputLanguage } from "../decompiler/settings";
-import { LanguageName } from "../protocol/DecompileResponse";
+import { LanguageName } from "../protocol/LanguageName";
 
 type OutputLanguageQuickPickItem = vscode.QuickPickItem & {
   languageName: string;

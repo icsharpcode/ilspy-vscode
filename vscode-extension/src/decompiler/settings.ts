@@ -1,11 +1,15 @@
 import * as vscode from "vscode";
-import { languageFromDisplayName, LanguageInfo } from "./languageInfos";
-import { LanguageName } from "../protocol/DecompileResponse";
+import {
+  DEFAULT_OUTPUT_LANGUAGE,
+  languageFromDisplayName,
+  LanguageInfo,
+} from "./languageInfos";
+import { LanguageName } from "../protocol/LanguageName";
 
 export function getDefaultOutputLanguage() {
   return (languageFromDisplayName(
     vscode.workspace.getConfiguration("ilspy").get("defaultOutputLanguage")
-  ) ?? LanguageName.CSharp) as LanguageName;
+  ) ?? DEFAULT_OUTPUT_LANGUAGE) as LanguageName;
 }
 
 export function setDefaultOutputLanguage(languageInfo: LanguageInfo) {

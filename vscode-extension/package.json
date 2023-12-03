@@ -177,13 +177,6 @@
 					"group": "inline"
 				}
 			],
-			"editor/title": [
-				{
-					"command": "ilspy.selectOutputLanguage",
-					"group": "navigation",
-					"when": "resourceScheme == ilspy"
-				}
-			],
 			"commandPalette": [
 				{
 					"command": "ilspy.decompileAssemblyInWorkspace",

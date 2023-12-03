@@ -69,7 +69,46 @@ export function registerSelectOutputLanguage(
           document,
           languageInfo.vsLanguageMode
         );
+        updateSelectOutputLanguageStatusBarItem(contentProvider);
       }
     }
   );
+}
+
+let selectOutputLanguageStatusBarItem: vscode.StatusBarItem;
+
+export function registerSelectOutputLanguageStatusBarItem(
+  contentProvider: DecompilerTextDocumentContentProvider
+) {
+  selectOutputLanguageStatusBarItem = vscode.window.createStatusBarItem(
+    vscode.StatusBarAlignment.Right,
+    100
+  );
+  selectOutputLanguageStatusBarItem.command = "ilspy.selectOutputLanguage";
+  updateSelectOutputLanguageStatusBarItem(contentProvider);
+
+  const eventHandlerDisposable = vscode.window.onDidChangeActiveTextEditor(() =>
+    updateSelectOutputLanguageStatusBarItem(contentProvider)
+  );
+
+  return [selectOutputLanguageStatusBarItem, eventHandlerDisposable];
+}
+
+function updateSelectOutputLanguageStatusBarItem(
+  contentProvider: DecompilerTextDocumentContentProvider
+) {
+  const document = vscode.window.activeTextEditor?.document;
+  if (document !== undefined && document.uri.scheme === ILSPY_URI_SCHEME) {
+    const languageInfo =
+      languageInfos[contentProvider.getDocumentOutputLanguage(document?.uri)];
+    if (languageInfo !== undefined) {
+      selectOutputLanguageStatusBarItem.text = `Output: ${languageInfo.displayName}`;
+      selectOutputLanguageStatusBarItem.tooltip =
+        "Click to select a different language";
+      selectOutputLanguageStatusBarItem.show();
+    }
+    return;
+  }
+
+  selectOutputLanguageStatusBarItem.hide();
 }

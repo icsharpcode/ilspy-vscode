@@ -76,6 +76,12 @@ public class TreeNodeProviderTests
                     Assert.True(node.MayHaveChildren);
                 },
                 node => {
+                    Assert.Equal("CSharpVariants", node.Metadata?.Name);
+                    Assert.Equal("CSharpVariants", node.DisplayName);
+                    Assert.Equal(NodeType.Namespace, node.Metadata?.Type);
+                    Assert.True(node.MayHaveChildren);
+                },
+                node => {
                     Assert.Equal("Generics", node.Metadata?.Name);
                     Assert.Equal("Generics", node.DisplayName);
                     Assert.Equal(NodeType.Namespace, node.Metadata?.Type);

@@ -37,6 +37,10 @@ import { registerSearch } from "./commands/search";
 import { SearchResultTreeProvider } from "./decompiler/search/SearchResultTreeProvider";
 import Node from "./protocol/Node";
 import { registerDecompileNode } from "./commands/decompileNode";
+import {
+  createDecompiledTreeView,
+  createSearchResultTreeView,
+} from "./view/treeViews";
 
 let client: LanguageClient;
 
@@ -89,44 +93,42 @@ export async function activate(context: ExtensionContext) {
   }
 
   const ilspyBackend = new ILSpyBackend(client);
-  const decompileTreeProvider = new DecompiledTreeProvider(
+  const decompiledTreeProvider = new DecompiledTreeProvider(
     context,
     ilspyBackend
   );
-  const decompileTreeView: TreeView<Node> = window.createTreeView(
-    "ilspyDecompiledMembers",
-    {
-      treeDataProvider: decompileTreeProvider,
-    }
-  );
-  disposables.push(decompileTreeView);
-  decompileTreeProvider.initWithAssemblies();
+  const decompiledTreeView = createDecompiledTreeView(decompiledTreeProvider);
+  disposables.push(decompiledTreeView);
+  decompiledTreeProvider.initWithAssemblies();
 
   disposables.push(
     registerDecompileAssemblyInWorkspace(
-      decompileTreeProvider,
-      decompileTreeView
+      decompiledTreeProvider,
+      decompiledTreeView
     )
   );
   disposables.push(
-    registerDecompileAssemblyViaDialog(decompileTreeProvider, decompileTreeView)
+    registerDecompileAssemblyViaDialog(
+      decompiledTreeProvider,
+      decompiledTreeView
+    )
   );
   disposables.push(
-    registerDecompileSelectedAssembly(decompileTreeProvider, decompileTreeView)
+    registerDecompileSelectedAssembly(
+      decompiledTreeProvider,
+      decompiledTreeView
+    )
   );
 
   const decompilerTextDocumentContentProvider =
     new DecompilerTextDocumentContentProvider(ilspyBackend);
 
-  const searchTreeProvider = new SearchResultTreeProvider(ilspyBackend);
-  const searchResultTreeView: TreeView<Node> = window.createTreeView(
-    "ilspySearchResultsContainer",
-    {
-      treeDataProvider: searchTreeProvider,
-    }
+  const searchResultTreeProvider = new SearchResultTreeProvider(ilspyBackend);
+  const searchResultTreeView = createSearchResultTreeView(
+    searchResultTreeProvider
   );
   disposables.push(searchResultTreeView);
-  disposables.push(registerSearch(searchTreeProvider));
+  disposables.push(registerSearch(searchResultTreeProvider));
 
   disposables.push(
     workspace.registerTextDocumentContentProvider(
@@ -148,8 +150,8 @@ export async function activate(context: ExtensionContext) {
     )
   );
 
-  disposables.push(registerReloadAssembly(decompileTreeProvider));
-  disposables.push(registerUnloadAssembly(decompileTreeProvider));
+  disposables.push(registerReloadAssembly(decompiledTreeProvider));
+  disposables.push(registerUnloadAssembly(decompiledTreeProvider));
 
   context.subscriptions.push(...disposables);
 }

@@ -30,8 +30,27 @@ export function registerSelectOutputLanguage(
         return;
       }
 
+      const currentDocumentOutputLanguage =
+        contentProvider.getDocumentOutputLanguage(document?.uri);
+      const languageInfoEntries = Object.entries(languageInfos);
       const language = await vscode.window.showQuickPick(
-        Object.entries(languageInfos)
+        languageInfoEntries
+          .sort((languageInfo1, languageInfo2) => {
+            const langInfo1Active =
+              languageInfo1[0] === currentDocumentOutputLanguage;
+            const langInfo2Active =
+              languageInfo2[0] === currentDocumentOutputLanguage;
+            if (langInfo1Active && !langInfo2Active) {
+              return -1;
+            } else if (!langInfo1Active && langInfo2Active) {
+              return 1;
+            }
+
+            return (
+              languageInfoEntries.indexOf(languageInfo2) -
+              languageInfoEntries.indexOf(languageInfo1)
+            );
+          })
           .map((languageInfoEntry) => {
             const [languageName, languageInfo] = languageInfoEntry;
             const isActive =
@@ -43,15 +62,6 @@ export function registerSelectOutputLanguage(
               languageName,
               isActive,
             } as OutputLanguageQuickPickItem;
-          })
-          .sort((item1, item2) => {
-            if (item1.isActive && !item2.isActive) {
-              return -1;
-            } else if (!item1.isActive && item2.isActive) {
-              return 1;
-            }
-
-            return item1.label.localeCompare(item2.label);
           }),
         {
           title: "Please select language of decompiled code output",

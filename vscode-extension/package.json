@@ -51,7 +51,20 @@
 							"IL"
 						],
 						"enumDescriptions": [
-							"Decompile to C# by default",
+							"Decompile to C# 11.0 by default",
+							"Decompile to C# 10.0 by default",
+							"Decompile to C# 9.0 by default",
+							"Decompile to C# 8.0 by default",
+							"Decompile to C# 7.3 by default",
+							"Decompile to C# 7.2 by default",
+							"Decompile to C# 7.1 by default",
+							"Decompile to C# 7.0 by default",
+							"Decompile to C# 6.0 by default",
+							"Decompile to C# 5.0 by default",
+							"Decompile to C# 4.0 by default",
+							"Decompile to C# 3.0 by default",
+							"Decompile to C# 2.0 by default",
+							"Decompile to C# 1.0 by default",
 							"Decompile to readable IL instructions by default"
 						]
 					},

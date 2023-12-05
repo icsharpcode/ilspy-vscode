@@ -4,11 +4,11 @@
  *-----------------------------------------------------------------------------------------------*/
 
 import * as vscode from "vscode";
-import { LanguageName } from "../protocol/DecompileResponse";
 import { getDefaultOutputLanguage } from "./settings";
 import IILSpyBackend from "./IILSpyBackend";
 import { ILSPY_URI_SCHEME, uriToNode } from "./nodeUri";
 import NodeMetadata from "../protocol/NodeMetadata";
+import { LanguageName } from "../protocol/LanguageName";
 
 export class DecompilerTextDocumentContentProvider
   implements vscode.TextDocumentContentProvider
@@ -41,10 +41,14 @@ export class DecompilerTextDocumentContentProvider
 
   private async getCodeFromNode(
     nodeMetadata: NodeMetadata,
-    language: string
+    outputLanguage: string
   ): Promise<string | undefined> {
-    return (await this.backend.sendDecompileNode({ nodeMetadata, language }))
-      ?.decompiledCode;
+    return (
+      await this.backend.sendDecompileNode({
+        nodeMetadata,
+        outputLanguage,
+      })
+    )?.decompiledCode;
   }
 
   setDocumentOutputLanguage(uri: vscode.Uri, language: LanguageName) {

@@ -28,7 +28,10 @@ import {
   workspace,
 } from "vscode";
 import { DecompilerTextDocumentContentProvider } from "./decompiler/DecompilerTextDocumentContentProvider";
-import { registerSelectOutputLanguage } from "./commands/selectOutputLanguage";
+import {
+  registerSelectOutputLanguage,
+  registerSelectOutputLanguageStatusBarItem,
+} from "./commands/selectOutputLanguage";
 import { ILSPY_URI_SCHEME } from "./decompiler/nodeUri";
 import { registerSearch } from "./commands/search";
 import { SearchResultTreeProvider } from "./decompiler/search/SearchResultTreeProvider";
@@ -139,6 +142,12 @@ export async function activate(context: ExtensionContext) {
   disposables.push(
     registerSelectOutputLanguage(decompilerTextDocumentContentProvider)
   );
+  disposables.push(
+    ...registerSelectOutputLanguageStatusBarItem(
+      decompilerTextDocumentContentProvider
+    )
+  );
+
   disposables.push(registerReloadAssembly(decompileTreeProvider));
   disposables.push(registerUnloadAssembly(decompileTreeProvider));
 

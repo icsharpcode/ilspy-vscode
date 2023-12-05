@@ -9,5 +9,5 @@ namespace ILSpy.Backend.TreeProviders;
 public interface ITreeNodeProvider
 {
     public IEnumerable<Node> GetChildren(NodeMetadata? nodeMetadata) => Enumerable.Empty<Node>();
-    DecompileResult Decompile(NodeMetadata nodeMetadata, string language);
+    DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage);
 }

@@ -22,7 +22,9 @@ public class DecompileNodeHandler : IJsonRpcRequestHandler<DecompileNodeRequest,
     public Task<DecompileResponse> Handle(DecompileNodeRequest request, CancellationToken cancellationToken)
     {
         return Task.FromResult(new DecompileResponse(
-            application.TreeNodeProviders.ForNode(request.NodeMetadata).Decompile(request.NodeMetadata, request.Language)));
+            application.TreeNodeProviders
+                .ForNode(request.NodeMetadata)
+                .Decompile(request.NodeMetadata, request.OutputLanguage)));
     }
 
 }

@@ -15,7 +15,7 @@ public class RootNodesProvider : ITreeNodeProvider
         this.application = application;
     }
 
-    public DecompileResult Decompile(NodeMetadata nodeMetadata, string language)
+    public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
     {
         return DecompileResult.Empty();
     }

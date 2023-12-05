@@ -66,7 +66,7 @@ using System.Runtime.Versioning;
 [module: RefSafetyRules(11)]
 
 ",
-            application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageNames.CSharp).DecompiledCode);
+            application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);
     }
 
     [Fact]
@@ -76,7 +76,7 @@ using System.Runtime.Versioning;
         var nodeMetadata = new NodeMetadata(AssemblyPath, NodeType.Namespace, "A.B.C.D", 0, 0);
         Assert.Equal(
 @"namespace A.B.C.D { }",
-            application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageNames.CSharp).DecompiledCode);
+            application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);
     }
 
     [Fact]
@@ -86,7 +86,7 @@ using System.Runtime.Versioning;
         var nodeMetadata = new NodeMetadata(AssemblyPath, NodeType.Namespace, "", 0, 0);
         Assert.Equal(
 @"namespace <global> { }",
-            application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageNames.CSharp).DecompiledCode);
+            application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);
     }
 
     [Fact]
@@ -117,7 +117,7 @@ public class AClass
     }
 }
 ",
-            application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageNames.CSharp).DecompiledCode);
+            application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);
     }
 
     [Fact]
@@ -134,7 +134,7 @@ public interface ISomeInterface
     int i { get; set; }
 }
 ",
-            application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageNames.CSharp).DecompiledCode);
+            application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);
     }
 
     [Fact]
@@ -151,7 +151,7 @@ internal struct SomeStruct
     public int Prop { get; set; }
 }
 ",
-            application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageNames.CSharp).DecompiledCode);
+            application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);
     }
 
     [Fact]
@@ -170,7 +170,7 @@ public enum SomeEnum
     E3
 }
 ",
-            application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageNames.CSharp).DecompiledCode);
+            application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);
     }
 
     [Fact]
@@ -186,7 +186,7 @@ public enum SomeEnum
     return base.ToString();
 }
 ",
-            application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageNames.CSharp).DecompiledCode);
+            application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);
     }
 
     [Fact]
@@ -199,7 +199,7 @@ public enum SomeEnum
         Assert.Equal(
 @"private int _ProgId;
 ",
-            application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageNames.CSharp).DecompiledCode);
+            application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);
     }
 
     [Fact]
@@ -222,7 +222,7 @@ public enum SomeEnum
     }
 }
 ",
-            application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageNames.CSharp).DecompiledCode);
+            application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);
     }
 
     [Fact]
@@ -238,7 +238,7 @@ public enum SomeEnum
     ProgId = ProgramId;
 }
 ",
-            application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageNames.CSharp).DecompiledCode);
+            application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);
     }
 
     [Fact]
@@ -248,7 +248,7 @@ public enum SomeEnum
         var nodeMetadata = new NodeMetadata(AssemblyPath, NodeType.ReferencesRoot, "References", 0, 0);
         Assert.Equal(
 @"// System.Runtime, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
-            application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageNames.CSharp).DecompiledCode);
+            application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);
     }
 
     [Fact]
@@ -259,6 +259,62 @@ public enum SomeEnum
             "System.Runtime, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", 0, 0);
         Assert.Equal(
 @"// System.Runtime, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
-            application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageNames.CSharp).DecompiledCode);
+            application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);
+    }
+
+    [Fact]
+    public void CSharpVariant_Latest()
+    {
+        var application = CreateTestApplication();
+        int typeToken = GetTypeToken(application.DecompilerBackend, "CSharpVariants", "CSharpVariants");
+        var nodeMetadata = new NodeMetadata(AssemblyPath, NodeType.Interface, "", typeToken, 0);
+        Assert.Equal(
+@"namespace CSharpVariants;
+
+public class CSharpVariants
+{
+    public string? nullableMember;
+}
+",
+            application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);
+    }
+
+    [Fact]
+    public void CSharpVariant_8()
+    {
+        var application = CreateTestApplication();
+        int typeToken = GetTypeToken(application.DecompilerBackend, "CSharpVariants", "CSharpVariants");
+        var nodeMetadata = new NodeMetadata(AssemblyPath, NodeType.Interface, "", typeToken, 0);
+        Assert.Equal(
+@"namespace CSharpVariants
+{
+    public class CSharpVariants
+    {
+        public string? nullableMember;
+    }
+}
+",
+            application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageName.CSharp_8).DecompiledCode);
+    }
+
+    [Fact]
+    public void CSharpVariant_1()
+    {
+        var application = CreateTestApplication();
+        int typeToken = GetTypeToken(application.DecompilerBackend, "CSharpVariants", "CSharpVariants");
+        var nodeMetadata = new NodeMetadata(AssemblyPath, NodeType.Interface, "", typeToken, 0);
+        Assert.Equal(
+@"using System.Runtime.CompilerServices;
+
+namespace CSharpVariants
+{
+    public class CSharpVariants
+    {
+        [Nullable(2)]
+        public string nullableMember;
+    }
+}
+",
+            application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageName.CSharp_1).DecompiledCode);
     }
 }

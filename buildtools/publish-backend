@@ -1,3 +1,3 @@
 #!/usr/bin/env sh
 
-dotnet publish ./backend/src/ILSpy.Backend/ILSpy.Backend.csproj --configuration Release --self-contained false -p:UseAppHost=false --output ./vscode-extension/bin/ilspy-backend
+dotnet publish ./backend/ILSpyX.Backend/ILSpyX.Backend.csproj --configuration Release --self-contained false -p:UseAppHost=false --output ./vscode-extension/bin/ilspy-backend

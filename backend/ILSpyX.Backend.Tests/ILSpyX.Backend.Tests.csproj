@@ -6,11 +6,11 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>..\..\..\vscode-extension\bin\ilspy-backend</OutputPath>
+    <OutputPath>..\..\vscode-extension\bin\ilspy-backend</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <OutputPath>..\..\..\vscode-extension\bin\ilspy-backend</OutputPath>
+    <OutputPath>..\..\vscode-extension\bin\ilspy-backend</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
   <ItemGroup>
@@ -25,7 +25,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TestAssembly\TestAssembly.csproj" />
-    <ProjectReference Include="..\..\src\ILSpy.Backend\ILSpy.Backend.csproj" />
+    <ProjectReference Include="..\ILSpyX.Backend\ILSpyX.Backend.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Microsoft.Extensions.Logging" />

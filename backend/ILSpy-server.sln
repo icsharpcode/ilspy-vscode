@@ -13,18 +13,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\.gitignore = ..\.gitignore
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{52028C35-5636-452C-A5BE-46B0EA0EF5D2}"
-	ProjectSection(SolutionItems) = preProject
-		src\packages.props = src\packages.props
-	EndProjectSection
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestAssembly", "TestAssembly\TestAssembly.csproj", "{98030DE1-DC87-4E74-8201-FE8E93E826B5}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{A40CFEFF-8CA9-4EAE-BA24-A2339CE505A9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ILSpyX.Backend", "ILSpyX.Backend\ILSpyX.Backend.csproj", "{A97B9A08-1EC0-4D6E-B9B6-9A9C643552E7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestAssembly", "test\TestAssembly\TestAssembly.csproj", "{98030DE1-DC87-4E74-8201-FE8E93E826B5}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ILSpy.Backend", "src\ILSpy.Backend\ILSpy.Backend.csproj", "{A97B9A08-1EC0-4D6E-B9B6-9A9C643552E7}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ILSpy.Backend.Tests", "test\ILSpy.Backend.Tests\ILSpy.Backend.Tests.csproj", "{9CD52FC4-0345-4D46-A297-3F53D8F25170}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ILSpyX.Backend.Tests", "ILSpyX.Backend.Tests\ILSpyX.Backend.Tests.csproj", "{9CD52FC4-0345-4D46-A297-3F53D8F25170}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,11 +68,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{98030DE1-DC87-4E74-8201-FE8E93E826B5} = {A40CFEFF-8CA9-4EAE-BA24-A2339CE505A9}
-		{A97B9A08-1EC0-4D6E-B9B6-9A9C643552E7} = {52028C35-5636-452C-A5BE-46B0EA0EF5D2}
-		{9CD52FC4-0345-4D46-A297-3F53D8F25170} = {A40CFEFF-8CA9-4EAE-BA24-A2339CE505A9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EFAC308B-D2E0-45A1-BB49-EE205AA52626}

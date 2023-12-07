@@ -258,7 +258,7 @@
 		"mocha": "^10.2.0",
 		"terser-webpack-plugin": "^5.3.9",
 		"ts-loader": "^9.5.1",
-		"typescript": "^5.3.2",
+		"typescript": "^5.3.3",
 		"webpack": "5.89.0",
 		"webpack-cli": "5.1.4",
 		"@vscode/vsce": "^2.22.0"

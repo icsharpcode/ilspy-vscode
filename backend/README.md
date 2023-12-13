@@ -25,7 +25,7 @@ cd ilspy-vscode/backend
 dotnet build
 ```
 
-or open `backend/ILSpy-server.sln` in Visual Studio 2022 (>= 17.8) or another .NET IDE.
+or open `backend/ILSpy-backend.sln` in Visual Studio 2022 (>= 17.8) or another .NET IDE.
 
 ## License
 

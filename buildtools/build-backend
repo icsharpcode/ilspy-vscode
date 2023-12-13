@@ -1,3 +1,3 @@
 #!/usr/bin/env sh
 
-dotnet build ./backend/ILSpy-server.sln --configuration Debug
+dotnet build ./backend/ILSpy-backend.sln --configuration Debug

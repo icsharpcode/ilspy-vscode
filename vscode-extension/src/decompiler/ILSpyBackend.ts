@@ -43,7 +43,7 @@ export default class ILSpyBackend implements IILSpyBackend {
 
   public static getExecutable(context: vscode.ExtensionContext) {
     return context.asAbsolutePath(
-      path.join("bin", "ilspy-backend", "ILSpy.Backend.dll")
+      path.join("bin", "ilspy-backend", "ILSpyX.Backend.LSP.dll")
     );
   }
 

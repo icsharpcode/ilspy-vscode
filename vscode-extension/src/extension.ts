@@ -19,14 +19,7 @@ import { registerReloadAssembly } from "./commands/reloadAssembly";
 import { registerUnloadAssembly } from "./commands/unloadAssembly";
 import { acquireDotnetRuntime } from "./dotnet-acquire/acquire";
 import OutputWindowLogger from "./OutputWindowLogger";
-import {
-  commands,
-  Disposable,
-  ExtensionContext,
-  TreeView,
-  window,
-  workspace,
-} from "vscode";
+import { commands, Disposable, ExtensionContext, workspace } from "vscode";
 import { DecompilerTextDocumentContentProvider } from "./decompiler/DecompilerTextDocumentContentProvider";
 import {
   registerSelectOutputLanguage,
@@ -35,7 +28,6 @@ import {
 import { ILSPY_URI_SCHEME } from "./decompiler/nodeUri";
 import { registerSearch } from "./commands/search";
 import { SearchResultTreeProvider } from "./decompiler/search/SearchResultTreeProvider";
-import Node from "./protocol/Node";
 import { registerDecompileNode } from "./commands/decompileNode";
 import {
   createDecompiledTreeView,
@@ -72,15 +64,15 @@ export async function activate(context: ExtensionContext) {
     client.onDidChangeState((e) => {
       switch (e.newState) {
         case State.Running:
-          logger.writeLine("ILSpy Backend is running");
+          logger.writeLine("ILSpy LSP Backend is running");
           setBackendAvailable(true);
           break;
         case State.Starting:
-          logger.writeLine("ILSpy Backend is starting...");
+          logger.writeLine("ILSpy LSP Backend is starting...");
           setBackendAvailable(false);
           break;
         case State.Stopped:
-          logger.writeLine("ILSpy Backend has stopped");
+          logger.writeLine("ILSpyF LSP Backend has stopped");
           setBackendAvailable(false);
           break;
       }

@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 
-cd ./backend/test/ILSpy.Backend.Tests
+cd ./backend/ILSpyX.Backend.Tests
 dotnet test

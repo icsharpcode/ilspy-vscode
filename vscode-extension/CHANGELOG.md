@@ -2,6 +2,12 @@
 
 All notable changes to the "ilspy-vscode" extension will be documented in this file.
 
+## 0.18
+
+- Select C# language version for decompilation
+- New "Collapse All" button in tree views
+- Internal restructuring of the project on backend side, separating an LSP layer from basic decompilation, assembly tree handling and search
+
 ## 0.17
 
 - Upgrade to ICSharpCode.Decompiler 8.2 (see release notes for [ILSpy 8.2](https://github.com/icsharpcode/ILSpy/releases/tag/v8.2) to get more details)

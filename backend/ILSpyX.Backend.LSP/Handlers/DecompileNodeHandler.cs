@@ -1,13 +1,14 @@
 // Copyright (c) 2023 ICSharpCode
 // Licensed under the MIT license. See the LICENSE file in the project root for more information.
 
-namespace ILSpy.Backend.Handlers;
 
 using ILSpy.Backend.Application;
-using ILSpy.Backend.Protocol;
+using ILSpyX.Backend.LSP.Protocol;
 using OmniSharp.Extensions.JsonRpc;
 using System.Threading;
 using System.Threading.Tasks;
+
+namespace ILSpyX.Backend.LSP.Handlers;
 
 [Serial, Method("ilspy/decompileNode", Direction.ClientToServer)]
 public class DecompileNodeHandler : IJsonRpcRequestHandler<DecompileNodeRequest, DecompileResponse>

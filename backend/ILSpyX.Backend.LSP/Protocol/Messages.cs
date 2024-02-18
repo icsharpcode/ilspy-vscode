@@ -7,7 +7,7 @@ using MediatR;
 using OmniSharp.Extensions.JsonRpc;
 using System.Collections.Generic;
 
-namespace ILSpy.Backend.Protocol
+namespace ILSpyX.Backend.LSP.Protocol
 {
     #region initWithAssemblies
 

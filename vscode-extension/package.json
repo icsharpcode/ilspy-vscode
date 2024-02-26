@@ -240,7 +240,7 @@
 		"os": "^0.1.2",
 		"path": "^0.12.7",
 		"temp-dir": "^3.0.0",
-		"terser": "^5.27.0",
+		"terser": "^5.28.1",
 		"vscode-languageclient": "^9.0.1"
 	},
 	"devDependencies": {

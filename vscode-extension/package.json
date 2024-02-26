@@ -244,7 +244,7 @@
 		"vscode-languageclient": "^9.0.1"
 	},
 	"devDependencies": {
-		"@types/chai": "^4.3.11",
+		"@types/chai": "^4.3.12",
 		"@types/glob": "^8.1.0",
 		"@types/mocha": "^10.0.6",
 		"@types/node": "^18.19.17",

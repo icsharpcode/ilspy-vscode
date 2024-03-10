@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+RELEASEVERSION=`dotnet dotnet-gitversion -showvariable MajorMinorPatch`
+git tag v$RELEASEVERSION

@@ -4,9 +4,9 @@ All notable changes to the "ilspy-vscode" extension will be documented in this f
 
 ## 0.18
 
-- Select C# language version for decompilation
+- Users may choose a C# language version for decompilation
 - New "Collapse All" button in tree views
-- Internal restructuring of the project on backend side, separating an LSP layer from basic decompilation, assembly tree handling and search
+- Internal restructuring of the project on backend side, separating a Language Server layer from basic decompilation, assembly tree handling and search
 
 ## 0.17
 

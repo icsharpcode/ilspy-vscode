@@ -63,7 +63,7 @@ public class SearchBackend
                     {
                         foreach (var loadedAssembly in assemblies)
                         {
-                            var module = loadedAssembly.GetPEFileOrNull();
+                            var module = loadedAssembly.GetMetadataFileOrNull();
                             if (module == null)
                                 continue;
                             searcher.Search(module, cancellationToken);

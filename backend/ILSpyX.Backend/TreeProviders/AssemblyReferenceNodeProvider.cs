@@ -31,7 +31,7 @@ public class AssemblyReferenceNodeProvider : ITreeNodeProvider
         }
 
         HashSet<string> references = new(decompiler.TypeSystem.NameComparer);
-        foreach (var ar in decompiler.TypeSystem.MainModule.PEFile.AssemblyReferences)
+        foreach (var ar in decompiler.TypeSystem.MainModule.MetadataFile.AssemblyReferences)
         {
             references.Add(ar.FullName);
         }

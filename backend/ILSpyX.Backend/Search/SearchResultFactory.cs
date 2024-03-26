@@ -84,15 +84,15 @@ internal class SearchResultFactory : ISearchResultFactory
             Fitness = CalculateFitness(entity),
             Name = GetLanguageSpecificName(entity),
             Location = declaringType != null ? language.TypeToString(declaringType, includeNamespace: true) : entity.Namespace,
-            Assembly = entity?.ParentModule?.PEFile?.FileName,
-            ToolTip = entity?.ParentModule?.PEFile?.FileName,
-            //Image = Images.Assembly,
-            //LocationImage = declaringType != null ? TypeTreeNode.GetIcon(declaringType) : Images.Namespace,
-            //AssemblyImage = Images.Assembly,
+            Assembly = entity?.ParentModule?.MetadataFile?.FileName ?? "",
+            ToolTip = entity?.ParentModule?.MetadataFile?.FileName,
+            Image = new object(),
+            LocationImage = new object(),
+            AssemblyImage = new object(),
         };
     }
 
-    public ResourceSearchResult Create(PEFile module, Resource resource, ITreeNode node, ITreeNode parent)
+    public ResourceSearchResult Create(MetadataFile module, Resource resource, ITreeNode node, ITreeNode parent)
     {
         return new ResourceSearchResult
         {
@@ -104,11 +104,11 @@ internal class SearchResultFactory : ISearchResultFactory
             Location = (string) parent.Text,
             Assembly = module.FullName,
             ToolTip = module.FileName,
-            //AssemblyImage = Images.Assembly,
+            AssemblyImage = new object(),
         };
     }
 
-    public AssemblySearchResult Create(PEFile module)
+    public AssemblySearchResult Create(MetadataFile module)
     {
         return new AssemblySearchResult
         {
@@ -118,13 +118,13 @@ internal class SearchResultFactory : ISearchResultFactory
             Location = module.FileName,
             Assembly = module.FullName,
             ToolTip = module.FileName,
-            //Image = Images.Assembly,
-            //LocationImage = Images.Library,
-            //AssemblyImage = Images.Assembly,
+            Image = new object(),
+            LocationImage = new object(),
+            AssemblyImage = new object(),
         };
     }
 
-    public NamespaceSearchResult Create(PEFile module, INamespace ns)
+    public NamespaceSearchResult Create(MetadataFile module, INamespace ns)
     {
         var name = ns.FullName.Length == 0 ? "-" : ns.FullName;
         return new NamespaceSearchResult
@@ -134,22 +134,9 @@ internal class SearchResultFactory : ISearchResultFactory
             Fitness = 1.0f / name.Length,
             Location = module.Name,
             Assembly = module.FullName,
-            //Image = Images.Namespace,
-            //LocationImage = Images.Assembly,
-            //AssemblyImage = Images.Assembly,
+            Image = new object(),
+            LocationImage = new object(),
+            AssemblyImage = new object(),
         };
     }
 }
-
-//internal class TreeNodeFactory : ITreeNodeFactory
-//{
-//    public ITreeNode Create(Resource resource)
-//    {
-//        return ResourceTreeNode.Create(resource);
-//    }
-
-//    public ITreeNode CreateResourcesList(PEFile module)
-//    {
-//        return new ResourceListTreeNode(module);
-//    }
-//}

@@ -56,7 +56,7 @@ public class DecompilerBackend : IDecompilerBackend
 
     public AssemblyData? CreateAssemblyData(CSharpDecompiler decompiler, string assemblyFile)
     {
-        var module = decompiler.TypeSystem.MainModule.PEFile;
+        var module = decompiler.TypeSystem.MainModule.MetadataFile;
         var metadata = module.Metadata;
         if (metadata != null)
         {
@@ -96,7 +96,7 @@ public class DecompilerBackend : IDecompilerBackend
 
     private void DisposeDecompiler(CSharpDecompiler decompiler)
     {
-        decompiler.TypeSystem.MainModule.PEFile.Dispose();
+        (decompiler.TypeSystem.MainModule.MetadataFile as PEFile)?.Dispose();
     }
 
     public CSharpDecompiler GetDecompiler(string assembly, string? outputLanguage = null)
@@ -240,19 +240,19 @@ public class DecompilerBackend : IDecompilerBackend
                 GetAssemblyILCode(disassembler, assemblyPath, module, textOutput);
                 return textOutput.ToString();
             case HandleKind.TypeDefinition:
-                disassembler.DisassembleType(module.PEFile, (TypeDefinitionHandle) handle);
+                disassembler.DisassembleType(module.MetadataFile, (TypeDefinitionHandle) handle);
                 return textOutput.ToString();
             case HandleKind.FieldDefinition:
-                disassembler.DisassembleField(module.PEFile, (FieldDefinitionHandle) handle);
+                disassembler.DisassembleField(module.MetadataFile, (FieldDefinitionHandle) handle);
                 return textOutput.ToString();
             case HandleKind.MethodDefinition:
-                disassembler.DisassembleMethod(module.PEFile, (MethodDefinitionHandle) handle);
+                disassembler.DisassembleMethod(module.MetadataFile, (MethodDefinitionHandle) handle);
                 return textOutput.ToString();
             case HandleKind.PropertyDefinition:
-                disassembler.DisassembleProperty(module.PEFile, (PropertyDefinitionHandle) handle);
+                disassembler.DisassembleProperty(module.MetadataFile, (PropertyDefinitionHandle) handle);
                 return textOutput.ToString();
             case HandleKind.EventDefinition:
-                disassembler.DisassembleEvent(module.PEFile, (EventDefinitionHandle) handle);
+                disassembler.DisassembleEvent(module.MetadataFile, (EventDefinitionHandle) handle);
                 return textOutput.ToString();
         }
 
@@ -270,7 +270,7 @@ public class DecompilerBackend : IDecompilerBackend
         };
         var resolver = new UniversalAssemblyResolver(assemblyPath,
             throwOnError: true,
-            targetFramework: module.PEFile.DetectTargetFrameworkId());
+            targetFramework: module.MetadataFile.DetectTargetFrameworkId());
         dis.AssemblyResolver = resolver;
         dis.DebugInfo = null;
 
@@ -281,7 +281,7 @@ public class DecompilerBackend : IDecompilerBackend
     {
         output.WriteLine("// " + assemblyPath);
         output.WriteLine();
-        var peFile = module.PEFile;
+        var peFile = module.MetadataFile;
         var metadata = peFile.Metadata;
 
         disassembler.WriteAssemblyReferences(metadata);
@@ -297,7 +297,7 @@ public class DecompilerBackend : IDecompilerBackend
     {
         using var output = new StringWriter();
         WriteCommentLine(output, assemblyPath);
-        var module = decompiler.TypeSystem.MainModule.PEFile;
+        var module = decompiler.TypeSystem.MainModule.MetadataFile;
         var metadata = module.Metadata;
         if (metadata.IsAssembly)
         {
@@ -324,7 +324,7 @@ public class DecompilerBackend : IDecompilerBackend
             output.Write(globalType.FullName);
             output.WriteLine();
         }
-        var corHeader = module.Reader.PEHeaders.CorHeader;
+        var corHeader = module.CorHeader;
         if (corHeader != null)
         {
             var entrypointHandle = MetadataTokenHelpers.EntityHandleOrNil(corHeader.EntryPointTokenOrRelativeVirtualAddress);
@@ -338,16 +338,22 @@ public class DecompilerBackend : IDecompilerBackend
                     output.WriteLine();
                 }
             }
-            output.WriteLine("// Architecture: " + module.GetPlatformDisplayName());
+            if (module is PEFile peFileModule)
+            {
+                output.WriteLine("// Architecture: " + peFileModule.GetPlatformDisplayName());
+            }
             if ((corHeader.Flags & System.Reflection.PortableExecutable.CorFlags.ILOnly) == 0)
             {
                 output.WriteLine("// This assembly contains unmanaged code.");
             }
         }
-        string runtimeName = module.GetRuntimeDisplayName();
-        if (runtimeName != null)
+        if (module is PEFile peFile)
         {
-            output.WriteLine("// Runtime: " + runtimeName);
+            string runtimeName = peFile.GetRuntimeDisplayName();
+            if (runtimeName != null)
+            {
+                output.WriteLine("// Runtime: " + runtimeName);
+            }
         }
         output.WriteLine();
 

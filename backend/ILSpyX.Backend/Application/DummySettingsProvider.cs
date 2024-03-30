@@ -1,4 +1,4 @@
-namespace ILSpy.Backend.Decompiler;
+namespace ILSpyX.Backend.Application;
 
 using ICSharpCode.ILSpyX;
 using ICSharpCode.ILSpyX.Settings;

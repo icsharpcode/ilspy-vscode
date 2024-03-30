@@ -1,6 +1,7 @@
 using ILSpy.Backend.Application;
 using ILSpy.Backend.Decompiler;
 using ILSpy.Backend.Model;
+using ILSpyX.Backend.Application;
 using Microsoft.Extensions.Logging.Abstractions;
 using Mono.Cecil;
 

@@ -1,6 +1,8 @@
 using ICSharpCode.ILSpyX;
 using ILSpy.Backend.Decompiler;
 using ILSpy.Backend.Model;
+using ILSpyX.Backend.Application;
+using ILSpyX.Backend.Search;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace ILSpy.Backend.Tests;

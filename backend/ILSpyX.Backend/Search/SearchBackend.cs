@@ -2,11 +2,12 @@
 // Licensed under the MIT license. See the LICENSE file in the project
 
 using ICSharpCode.Decompiler.TypeSystem;
-using ICSharpCode.ILSpy.Search;
 using ICSharpCode.ILSpyX;
 using ICSharpCode.ILSpyX.Search;
+using ILSpy.Backend.Decompiler;
 using ILSpy.Backend.Model;
 using ILSpy.Backend.TreeProviders;
+using ILSpyX.Backend.Application;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
@@ -17,7 +18,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ILSpy.Backend.Decompiler;
+namespace ILSpyX.Backend.Search;
 
 public class SearchBackend
 {
@@ -132,7 +133,7 @@ public class SearchBackend
 
     SymbolModifiers GetSymbolModifiers(SearchResult result)
     {
-        SymbolModifiers modifiers = SymbolModifiers.None;
+        var modifiers = SymbolModifiers.None;
         switch (result)
         {
             case MemberSearchResult memberSearchResult:
@@ -170,8 +171,8 @@ public class SearchBackend
     {
         string[] parts = input.Split(' '); // NativeMethods.CommandLineToArgumentArray(input);
 
-        SearchRequest request = new SearchRequest();
-        List<string> keywords = new List<string>();
+        var request = new SearchRequest();
+        var keywords = new List<string>();
         Regex? regex = null;
         request.Mode = searchMode;
 

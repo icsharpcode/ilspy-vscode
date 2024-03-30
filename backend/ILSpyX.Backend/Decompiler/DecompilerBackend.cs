@@ -9,6 +9,7 @@ using ICSharpCode.Decompiler.Disassembler;
 using ICSharpCode.Decompiler.Metadata;
 using ICSharpCode.Decompiler.TypeSystem;
 using ILSpy.Backend.Model;
+using ILSpyX.Backend.Application;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;

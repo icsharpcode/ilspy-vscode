@@ -1,13 +1,8 @@
 ﻿// Copyright(c) 2021 ICSharpCode
 // Licensed under the MIT license. See the LICENSE file in the project root for more information.
 
-using ICSharpCode.ILSpyX;
-using ICSharpCode.ILSpyX.Settings;
 using ILSpy.Backend.Application;
-using ILSpy.Backend.Decompiler;
-using ILSpyX.Backend.Application;
 using ILSpyX.Backend.LSP.Handlers;
-using ILSpyX.Backend.Search;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OmniSharp.Extensions.LanguageServer.Protocol.Window;
@@ -49,6 +44,7 @@ class Program
                 .WithHandler<GetNodesHandler>()
                 .WithHandler<RemoveAssemblyHandler>()
                 .WithHandler<SearchHandler>()
+                .WithHandler<AnalyzeHandler>()
              );
 
         server.LogInfo($"ILSpy LSP Backend PID: {Environment.ProcessId}");

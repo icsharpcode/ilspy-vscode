@@ -105,8 +105,7 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
         arguments: [node],
         title: "Decompile",
       },
-      contextValue:
-        node.metadata?.type === NodeType.Assembly ? "assemblyNode" : void 0,
+      contextValue: getNodeContextValue(node),
       iconPath: new ThemeIcon(
         ProductIconMapping[node.metadata?.type ?? NodeType.Unknown]
       ),
@@ -150,4 +149,23 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
 
 function setTreeWithNodes(treeWithNodes: boolean) {
   commands.executeCommand("setContext", "ilspy.treeWithNodes", treeWithNodes);
+}
+
+function getNodeContextValue(node: Node) {
+  switch (node.metadata?.type) {
+    case NodeType.Assembly:
+      return "assemblyNode";
+    case NodeType.Class:
+    case NodeType.Interface:
+    case NodeType.Event:
+    case NodeType.Method:
+    case NodeType.Enum:
+    case NodeType.Const:
+    case NodeType.Property:
+      return "analyzableNode";
+    default:
+      break;
+  }
+
+  return undefined;
 }

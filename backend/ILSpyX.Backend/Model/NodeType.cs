@@ -1,9 +1,6 @@
 // Copyright (c) 2022 ICSharpCode
 // Licensed under the MIT license. See the LICENSE file in the project
 
-// Copyright (c) 2022 ICSharpCode
-// Licensed under the MIT license. See the LICENSE file in the project
-
 namespace ILSpy.Backend.Model;
 
 public enum NodeType
@@ -22,5 +19,6 @@ public enum NodeType
     Const,
     Property,
     AssemblyReference,
-    ReferencesRoot
+    ReferencesRoot,
+    Analyzer
 }

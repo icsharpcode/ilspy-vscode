@@ -23,4 +23,3 @@ export const ProductIconMapping = {
   [NodeType.Unknown]: "question",
   [NodeType.Analyzer]: "question",
 };
-

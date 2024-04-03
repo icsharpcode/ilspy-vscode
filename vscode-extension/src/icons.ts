@@ -21,5 +21,5 @@ export const ProductIconMapping = {
   [NodeType.ReferencesRoot]: "folder-library",
   [NodeType.AssemblyReference]: "library",
   [NodeType.Unknown]: "question",
+  [NodeType.Analyzer]: "question",
 };
-

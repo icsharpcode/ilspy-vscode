@@ -37,6 +37,11 @@ import {
   InitWithAssembliesRequest,
   InitWithAssembliesResponse,
 } from "../protocol/initWithAssemblies";
+import {
+  AnalyzeParams,
+  AnalyzeRequest,
+  AnalyzeResponse,
+} from "../protocol/analyze";
 
 export default class ILSpyBackend implements IILSpyBackend {
   constructor(private languageClient: LanguageClient) {}
@@ -82,5 +87,9 @@ export default class ILSpyBackend implements IILSpyBackend {
 
   public sendSearch(params: SearchParams): Promise<SearchResponse | null> {
     return this.languageClient.sendRequest(SearchRequest.type, params);
+  }
+
+  sendAnalyze(params: AnalyzeParams): Promise<AnalyzeResponse | null> {
+    return this.languageClient.sendRequest(AnalyzeRequest.type, params);
   }
 }

@@ -77,4 +77,14 @@ namespace ILSpyX.Backend.LSP.Protocol
     public record SearchResponse(IEnumerable<Node>? Results);
 
     #endregion
+
+    #region analyze
+
+    [Serial, Method("ilspy/analyze", Direction.ClientToServer)]
+    public record AnalyzeRequest(NodeMetadata? NodeMetadata)
+        : IRequest<AnalyzeResponse>;
+
+    public record AnalyzeResponse(IEnumerable<Node>? Results);
+
+    #endregion
 }

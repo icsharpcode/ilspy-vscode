@@ -19,4 +19,5 @@ export enum NodeType {
   Property,
   AssemblyReference,
   ReferencesRoot,
+  Analyzer,
 }

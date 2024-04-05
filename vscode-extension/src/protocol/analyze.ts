@@ -14,7 +14,7 @@ import Node from "./Node";
 import NodeMetadata from "./NodeMetadata";
 
 export interface AnalyzeParams {
-  node?: NodeMetadata;
+  nodeMetadata?: NodeMetadata;
 }
 
 export interface AnalyzeResponse {

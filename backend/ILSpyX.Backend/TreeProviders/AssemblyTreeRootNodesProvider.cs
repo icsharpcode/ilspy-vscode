@@ -1,17 +1,17 @@
 using ILSpy.Backend.Application;
 using ILSpy.Backend.Decompiler;
 using ILSpy.Backend.Model;
-using ILSpy.Backend.TreeProviders;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace ILSpyX.Backend.TreeProviders.Analyzers;
+namespace ILSpy.Backend.TreeProviders;
 
-public class MethodUsedByProvider : ITreeNodeProvider
+public class AssemblyTreeRootNodesProvider : ITreeNodeProvider
 {
     private readonly ILSpyXApplication application;
 
-    public MethodUsedByProvider(ILSpyXApplication application)
+    public AssemblyTreeRootNodesProvider(ILSpyXApplication application)
     {
         this.application = application;
     }
@@ -21,9 +21,9 @@ public class MethodUsedByProvider : ITreeNodeProvider
         return DecompileResult.Empty();
     }
 
-    public IEnumerable<Node> GetChildren(NodeMetadata? nodeMetadata)
+    public async Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
     {
-        return application.TreeNodeProviders.Assembly.CreateNodes();
+        return await application.TreeNodeProviders.Assembly.CreateNodesAsync();
     }
 }
 

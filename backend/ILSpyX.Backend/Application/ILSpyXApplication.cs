@@ -2,10 +2,10 @@ using ICSharpCode.ILSpyX;
 using ICSharpCode.ILSpyX.Settings;
 using ILSpy.Backend.Decompiler;
 using ILSpy.Backend.TreeProviders;
+using ILSpyX.Backend.Analyzers;
 using ILSpyX.Backend.Application;
 using ILSpyX.Backend.Search;
 using Microsoft.Extensions.Logging;
-using System.Reflection;
 
 namespace ILSpy.Backend.Application;
 
@@ -20,6 +20,7 @@ public class ILSpyXApplication
         DecompilerBackend = new DecompilerBackend(loggerFactory, BackendSettings, AssemblyList);
         TreeNodeProviders = new TreeNodeProviders(this);
         SearchBackend = new SearchBackend(AssemblyList, BackendSettings);
+        AnalyzerBackend = new AnalyzerBackend();
     }
 
     public ILSpyBackendSettings BackendSettings { get; }
@@ -35,5 +36,7 @@ public class ILSpyXApplication
     public AssemblyListManager AssemblyListManager { get; }
 
     public SearchBackend SearchBackend { get; }
+
+    public AnalyzerBackend AnalyzerBackend { get; }
 }
 

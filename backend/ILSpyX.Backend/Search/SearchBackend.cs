@@ -4,6 +4,7 @@
 using ICSharpCode.Decompiler.TypeSystem;
 using ICSharpCode.ILSpyX;
 using ICSharpCode.ILSpyX.Search;
+using ILSpy.Backend.Application;
 using ILSpy.Backend.Decompiler;
 using ILSpy.Backend.Model;
 using ILSpy.Backend.TreeProviders;

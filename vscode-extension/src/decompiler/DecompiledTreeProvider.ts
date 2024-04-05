@@ -18,8 +18,8 @@ import {
 import IILSpyBackend from "./IILSpyBackend";
 import Node from "../protocol/Node";
 import { NodeType } from "../protocol/NodeType";
-import { ProductIconMapping } from "../icons";
 import { getAssemblyList, updateAssemblyListIfNeeded } from "./settings";
+import { getNodeIcon } from "../icons";
 
 export class DecompiledTreeProvider implements TreeDataProvider<Node> {
   private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
@@ -106,9 +106,7 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
         title: "Decompile",
       },
       contextValue: getNodeContextValue(node),
-      iconPath: new ThemeIcon(
-        ProductIconMapping[node.metadata?.type ?? NodeType.Unknown]
-      ),
+      iconPath: new ThemeIcon(getNodeIcon(node.metadata?.type)),
     };
   }
 

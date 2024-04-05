@@ -91,6 +91,8 @@ public class SingleThreadAssemblyList
         return completionSource.Task;
     }
 
+    public AssemblyList? AssemblyList => assemblyList;
+
     public async Task<IList<LoadedAssembly>> GetAllAssemblies()
     {
         return assemblyList is not null

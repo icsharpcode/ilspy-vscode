@@ -14,8 +14,8 @@ import {
 } from "vscode";
 import IILSpyBackend from "../IILSpyBackend";
 import Node from "../../protocol/Node";
-import { ProductIconMapping } from "../../icons";
 import { NodeType } from "../../protocol/NodeType";
+import { getNodeIcon } from "../../icons";
 
 interface PerformedAnalyze {
   symbol: string;
@@ -41,8 +41,8 @@ export class AnalyzeResultTreeProvider
     this.lastAnalyzes.push({
       symbol: node.displayName,
       results:
-        (await this.backend.sendAnalyze({ node: node.metadata }))?.results ??
-        [],
+        (await this.backend.sendAnalyze({ nodeMetadata: node.metadata }))
+          ?.results ?? [],
     });
     this.refresh();
   }
@@ -66,9 +66,7 @@ export class AnalyzeResultTreeProvider
           arguments: [nodeData],
           title: "Decompile",
         },
-        iconPath: new ThemeIcon(
-          ProductIconMapping[nodeData.metadata?.type ?? NodeType.Unknown]
-        ),
+        iconPath: new ThemeIcon(getNodeIcon(nodeData.metadata?.type)),
       };
     }
   }

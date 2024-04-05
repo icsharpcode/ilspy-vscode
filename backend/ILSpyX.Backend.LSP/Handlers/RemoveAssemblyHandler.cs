@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See the LICENSE file in the project root for more information.
 
 using ILSpy.Backend.Application;
+using ILSpy.Backend.Decompiler;
 using ILSpyX.Backend.LSP.Protocol;
 using OmniSharp.Extensions.JsonRpc;
 using System.Threading;

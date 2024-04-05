@@ -11,4 +11,5 @@ export default interface NodeMetadata {
   name: string;
   symbolToken: number;
   parentSymbolToken: number;
+  subType?: string;
 }

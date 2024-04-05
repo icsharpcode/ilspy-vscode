@@ -1,8 +1,5 @@
-using ILSpy.Backend.Application;
 using ILSpy.Backend.Model;
-using ILSpyX.Backend.Application;
 using ILSpyX.Backend.Tests;
-using Microsoft.Extensions.Logging.Abstractions;
 using Mono.Cecil;
 
 namespace ILSpy.Backend.Tests;
@@ -13,7 +10,7 @@ public class TreeNodeProviderTests
     public async Task GetRootNodes()
     {
         var application = await TestHelper.CreateTestApplication();
-        var list = await application.TreeNodeProviders.Root.GetChildrenAsync(null);
+        var list = await application.TreeNodeProviders.AssemblyTreeRoot.GetChildrenAsync(null);
         Assert.Collection(list,
                 node => {
                     Assert.Equal("TestAssembly, 1.0.0.0, .NETCoreApp, v8.0", node.DisplayName);

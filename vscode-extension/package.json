@@ -247,7 +247,7 @@
 		"@types/chai": "^4.3.16",
 		"@types/glob": "^8.1.0",
 		"@types/mocha": "^10.0.6",
-		"@types/node": "^18.19.31",
+		"@types/node": "^18.19.33",
 		"@types/vscode": "^1.74.0",
 		"@typescript-eslint/eslint-plugin": "^7.7.1",
 		"@typescript-eslint/parser": "^7.7.1",

@@ -253,7 +253,7 @@
 		"@typescript-eslint/parser": "^7.10.0",
 		"@vscode/test-electron": "^2.3.9",
 		"eslint": "^8.57.0",
-		"glob": "^10.3.12",
+		"glob": "^10.4.1",
 		"minimist": "^1.2.8",
 		"mocha": "^10.4.0",
 		"terser-webpack-plugin": "^5.3.10",

@@ -139,6 +139,12 @@ public interface ISomeInterface
 internal struct SomeStruct
 {
     public int Prop { get; set; }
+
+    public string StructMethod()
+    {
+        SomeClass someClass = new SomeClass();
+        return someClass.ToString();
+    }
 }
 ",
             application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);
@@ -292,7 +298,7 @@ public class CSharpVariants
     {
         var application = await TestHelper.CreateTestApplication();
         int typeToken = GetTypeToken(application.DecompilerBackend, "CSharpVariants", "CSharpVariants");
-        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Interface, "", typeToken, 0);
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Class, "", typeToken, 0);
         Assert.Equal(
 @"using System.Runtime.CompilerServices;
 

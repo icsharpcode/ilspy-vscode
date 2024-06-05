@@ -32,6 +32,7 @@
             "outFiles": [
                 "${workspaceFolder}/vscode-extension/dist/**/*.js"
             ],
+            "cwd": "${workspaceFolder}/vscode-extension",
             "preLaunchTask": "${defaultBuildTask}"
         },
         {

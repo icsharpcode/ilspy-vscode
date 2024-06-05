@@ -9,19 +9,24 @@ import { SearchResultTreeProvider } from "../decompiler/search/SearchResultTreeP
 export function registerSearch(
   searchResultTreeProvider: SearchResultTreeProvider
 ) {
-  return vscode.commands.registerCommand("ilspy.search", async () => {
-    const searchTerm = await vscode.window.showInputBox({
-      prompt: "Please enter the search term",
-    });
+  return vscode.commands.registerCommand(
+    "ilspy.search",
+    async (term?: string) => {
+      const searchTerm =
+        term ??
+        (await vscode.window.showInputBox({
+          prompt: "Please enter the search term",
+        }));
 
-    if (searchTerm) {
-      vscode.commands.executeCommand(
-        "setContext",
-        "ilspy.searchResultsToShow",
-        true
-      );
-      searchResultTreeProvider.performSearch(searchTerm);
-      vscode.commands.executeCommand("ilspySearchResultsContainer.focus");
+      if (searchTerm) {
+        vscode.commands.executeCommand(
+          "setContext",
+          "ilspy.searchResultsToShow",
+          true
+        );
+        searchResultTreeProvider.performSearch(searchTerm);
+        vscode.commands.executeCommand("ilspySearchResultsContainer.focus");
+      }
     }
-  });
+  );
 }

@@ -164,7 +164,8 @@
 			],
 			"editor/context": [
 				{
-					"command": "ilspy.searchEditorSelection"
+					"command": "ilspy.searchEditorSelection",
+					"when": "ilspy.backendAvailable && ilspy.treeWithNodes"
 				}
 			],
 			"view/title": [

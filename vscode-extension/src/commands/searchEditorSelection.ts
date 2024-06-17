@@ -11,21 +11,22 @@ export function registerSearchEditorSelection() {
     async () => {
       const editor = vscode.window.activeTextEditor;
       if (!editor) {
-        vscode.window.showWarningMessage("Editor undefined!");
         return;
       }
 
       const selection = editor.selection;
       if (selection.isEmpty) {
-        vscode.window.showWarningMessage("Selection empty!");
-        return;
+        await vscode.commands.executeCommand(
+          "editor.action.smartSelect.expand"
+        );
       }
 
+      const expandedSelection = editor.selection;
       const selectionRange = new vscode.Range(
-        selection.start.line,
-        selection.start.character,
-        selection.end.line,
-        selection.end.character
+        expandedSelection.start.line,
+        expandedSelection.start.character,
+        expandedSelection.end.line,
+        expandedSelection.end.character
       );
       const selectedText = editor.document.getText(selectionRange);
       vscode.commands.executeCommand("ilspy.search", selectedText);

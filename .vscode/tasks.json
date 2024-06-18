@@ -49,13 +49,14 @@
         {
             "type": "npm",
             "script": "watch",
-            "problemMatcher": "$tsc-watch",
+            "problemMatcher": "$ts-webpack-watch",
             "isBackground": true,
             "options": {
                 "cwd": "${workspaceFolder}/vscode-extension"
             },
             "presentation": {
-                "reveal": "never"
+                "reveal": "never",
+                "group": "watchers"
             },
             "group": {
                 "kind": "build",

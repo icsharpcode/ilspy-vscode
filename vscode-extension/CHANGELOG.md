@@ -2,6 +2,10 @@
 
 All notable changes to the "ilspy-vscode" extension will be documented in this file.
 
+## 0.19
+
+- Add "Search with ILSpy" command in editor's context menu. This allows to search any text or symbol name with ILSpy's symbol search.
+
 ## 0.18
 
 - Users may choose a C# language version for decompilation

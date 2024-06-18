@@ -33,6 +33,7 @@ import {
   createDecompiledTreeView,
   createSearchResultTreeView,
 } from "./view/treeViews";
+import { registerSearchEditorSelection } from "./commands/searchEditorSelection";
 
 let client: LanguageClient;
 
@@ -144,6 +145,8 @@ export async function activate(context: ExtensionContext) {
 
   disposables.push(registerReloadAssembly(decompiledTreeProvider));
   disposables.push(registerUnloadAssembly(decompiledTreeProvider));
+
+  disposables.push(registerSearchEditorSelection());
 
   context.subscriptions.push(...disposables);
 }

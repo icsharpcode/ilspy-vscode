@@ -146,6 +146,12 @@
 				"title": "Search in Decompiled Assemblies",
 				"category": "ILSpy",
 				"icon": "$(search-view-icon)"
+			},
+			{
+				"command": "ilspy.searchEditorSelection",
+				"title": "Search with ILSpy",
+				"category": "ILSpy",
+				"icon": "$(search-view-icon)"
 			}
 		],
 		"menus": {
@@ -154,6 +160,12 @@
 					"command": "ilspy.decompileSelectedAssembly",
 					"group": "navigation",
 					"when": "resourceExtname == .dll || resourceExtname == .exe || resourceExtname == .winmd || resourceExtname == .netmodule"
+				}
+			],
+			"editor/context": [
+				{
+					"command": "ilspy.searchEditorSelection",
+					"when": "ilspy.backendAvailable && ilspy.treeWithNodes"
 				}
 			],
 			"view/title": [

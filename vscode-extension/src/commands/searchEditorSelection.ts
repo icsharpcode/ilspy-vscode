@@ -14,21 +14,10 @@ export function registerSearchEditorSelection() {
         return;
       }
 
-      const selection = editor.selection;
-      if (selection.isEmpty) {
-        await vscode.commands.executeCommand(
-          "editor.action.smartSelect.expand"
-        );
-      }
-
-      const expandedSelection = editor.selection;
-      const selectionRange = new vscode.Range(
-        expandedSelection.start.line,
-        expandedSelection.start.character,
-        expandedSelection.end.line,
-        expandedSelection.end.character
+      const wordRange = editor.document.getWordRangeAtPosition(
+        editor.selection.start
       );
-      const selectedText = editor.document.getText(selectionRange);
+      const selectedText = editor.document.getText(wordRange);
       vscode.commands.executeCommand("ilspy.search", selectedText);
     }
   );

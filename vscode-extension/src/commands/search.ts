@@ -5,18 +5,20 @@
 
 import * as vscode from "vscode";
 import { SearchResultTreeProvider } from "../decompiler/search/SearchResultTreeProvider";
+import Node from "../protocol/Node";
 
 export function registerSearch(
   searchResultTreeProvider: SearchResultTreeProvider
 ) {
   return vscode.commands.registerCommand(
     "ilspy.search",
-    async (term?: string) => {
+    async (term?: string | Node) => {
       const searchTerm =
-        term ??
-        (await vscode.window.showInputBox({
-          prompt: "Please enter the search term",
-        }));
+        typeof term === "string"
+          ? term
+          : await vscode.window.showInputBox({
+              prompt: "Please enter the search term",
+            });
 
       if (searchTerm) {
         vscode.commands.executeCommand(

@@ -46,3 +46,29 @@ export function updateAssemblyListIfNeeded(
     extensionContext.workspaceState.update("assemblies", assemblies);
   }
 }
+
+type DotnetRuntimeSetting = { version: string; path: string };
+
+export function getCachedDotnetRuntimePath(
+  extensionContext: vscode.ExtensionContext,
+  expectedVersion: string
+) {
+  const dotnetRuntimeSetting =
+    extensionContext.globalState.get<DotnetRuntimeSetting>("dotnetRuntime");
+  if (dotnetRuntimeSetting?.version === expectedVersion) {
+    return dotnetRuntimeSetting.path;
+  }
+
+  return undefined;
+}
+
+export function cacheDotnetRuntimePath(
+  extensionContext: vscode.ExtensionContext,
+  version: string,
+  path: string
+) {
+  extensionContext.globalState.update("dotnetRuntime", {
+    version,
+    path,
+  });
+}

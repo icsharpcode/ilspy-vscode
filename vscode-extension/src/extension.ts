@@ -17,7 +17,7 @@ import { registerDecompileAssemblyViaDialog } from "./commands/decompileAssembly
 import { registerDecompileSelectedAssembly } from "./commands/decompileSelectedAssembly";
 import { registerReloadAssembly } from "./commands/reloadAssembly";
 import { registerUnloadAssembly } from "./commands/unloadAssembly";
-import { acquireDotnetRuntime } from "./dotnet-acquire/acquire";
+import { resolveDotnetRuntime } from "./dotnet-acquire/resolveDotnetRuntime";
 import OutputWindowLogger from "./OutputWindowLogger";
 import { commands, Disposable, ExtensionContext, workspace } from "vscode";
 import { DecompilerTextDocumentContentProvider } from "./decompiler/DecompilerTextDocumentContentProvider";
@@ -44,7 +44,7 @@ export async function activate(context: ExtensionContext) {
 
   setBackendAvailable(false);
 
-  const dotnetCli = await acquireDotnetRuntime(context, logger);
+  const dotnetCli = await resolveDotnetRuntime(context, logger);
   if (dotnetCli) {
     const backendExecutable = ILSpyBackend.getExecutable(context);
     const serverOptions: ServerOptions = {

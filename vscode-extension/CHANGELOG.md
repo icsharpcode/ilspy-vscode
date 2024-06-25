@@ -5,6 +5,7 @@ All notable changes to the "ilspy-vscode" extension will be documented in this f
 ## 0.19
 
 - Add "Search with ILSpy" command in editor's context menu. This allows to search any text or symbol name with ILSpy's symbol search.
+- Fix: Reuse previously acquired .NET runtime, if no internet connection is available during VS Code start. Before the fix the extension used to hang during initialization, if no connection to the update server was available.
 
 ## 0.18
 

@@ -15,8 +15,30 @@ updates:
       - dependency-name: "@types/vscode"
       - dependency-name: "@types/node"
         versions: [">=19"]
+    groups:
+      prod-dependencies:
+        dependency-type: "production"
+        update-types:
+          - "major"
+          - "minor"
+      prod-patch-dependencies:
+        dependency-type: "production"
+        update-types:
+          - "patch"
+      dev-dependencies:
+        dependency-type: "development"
 
   - package-ecosystem: "nuget"
-    directory: "/backend/src/ILSpy.Backend/"
+    directories:
+      - "/backend/ILSpyX.Backend/"
+      - "/backend/ILSpyX.Backend.LSP/"
+      - "/backend/ILSpyX.Backend.Tests/"
     schedule:
       interval: "weekly"
+    major-minor-dependencies:
+      update-types:
+        - "major"
+        - "minor"
+    patch-dependencies:
+      update-types:
+        - "patch"

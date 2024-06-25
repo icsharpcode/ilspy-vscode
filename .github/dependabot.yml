@@ -35,10 +35,11 @@ updates:
       - "/backend/ILSpyX.Backend.Tests/"
     schedule:
       interval: "weekly"
-    major-minor-dependencies:
-      update-types:
-        - "major"
-        - "minor"
-    patch-dependencies:
-      update-types:
-        - "patch"
+    groups:
+      major-minor-dependencies:
+        update-types:
+          - "major"
+          - "minor"
+      patch-dependencies:
+        update-types:
+          - "patch"

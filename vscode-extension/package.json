@@ -264,7 +264,8 @@
 		"@typescript-eslint/eslint-plugin": "^7.14.1",
 		"@typescript-eslint/parser": "^7.14.1",
 		"@vscode/test-electron": "^2.4.0",
-		"eslint": "^9.5.0",
+		"@vscode/vsce": "^2.29.0",
+		"eslint": "^8.57.0",
 		"glob": "^10.4.2",
 		"minimist": "^1.2.8",
 		"mocha": "^10.5.1",
@@ -272,8 +273,7 @@
 		"ts-loader": "^9.5.1",
 		"typescript": "^5.5.2",
 		"webpack": "5.92.1",
-		"webpack-cli": "5.1.4",
-		"@vscode/vsce": "^2.29.0"
+		"webpack-cli": "5.1.4"
 	},
 	"extensionDependencies": [
 		"ms-dotnettools.vscode-dotnet-runtime"

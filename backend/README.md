@@ -2,7 +2,7 @@
 
 ## ILSpy.Backend
 
-A backend service providing a [Language Service Procotol](https://microsoft.github.io/language-server-protocol/) interface to `ICSharpCode.Decompiler` API.
+A backend service providing a [Language Server Procotol](https://microsoft.github.io/language-server-protocol/) interface to `ICSharpCode.Decompiler` API.
 
 Apart from general service initialization, following custom LSP messages are supported:
 

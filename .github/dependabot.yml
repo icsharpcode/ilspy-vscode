@@ -15,6 +15,9 @@ updates:
       - dependency-name: "@types/vscode"
       - dependency-name: "@types/node"
         versions: [">=19"]
+      - dependency-name: "eslint"
+        versions:
+          - ">=9"
     groups:
       prod-dependencies:
         dependency-type: "production"

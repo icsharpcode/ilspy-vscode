@@ -14,7 +14,7 @@ updates:
     ignore:
       - dependency-name: "@types/vscode"
       - dependency-name: "@types/node"
-        versions: [">=19"]
+        versions: [">20"]
       - dependency-name: "eslint"
         versions:
           - ">=9"

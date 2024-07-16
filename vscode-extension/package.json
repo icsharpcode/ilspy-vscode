@@ -15,7 +15,7 @@
 		"url": "https://github.com/icsharpcode/ilspy-vscode"
 	},
 	"engines": {
-		"vscode": "^1.74.0"
+		"vscode": "^1.91.0"
 	},
 	"categories": [
 		"Other"

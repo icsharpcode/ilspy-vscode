@@ -2,16 +2,32 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "Build All",
+            "dependsOn": [
+                "Build Backend",
+                "Build Extension"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
             "label": "Build Backend",
             "command": "dotnet",
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/backend/src/ILSpy.Backend/ILSpy.Backend.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
-            "problemMatcher": "$msCompile"
+            "options": {
+                "cwd": "${workspaceFolder}/backend"
+            },
+            "problemMatcher": "$msCompile",
+            "group": {
+                "kind": "build",
+            }
         },
         {
             "label": "Publish Backend",
@@ -47,6 +63,7 @@
             "problemMatcher": "$msCompile"
         },
         {
+            "label": "Build Extension",
             "type": "npm",
             "script": "watch",
             "problemMatcher": "$ts-webpack-watch",
@@ -60,7 +77,6 @@
             },
             "group": {
                 "kind": "build",
-                "isDefault": true
             }
         }
     ]

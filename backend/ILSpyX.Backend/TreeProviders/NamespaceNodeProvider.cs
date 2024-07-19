@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 
 namespace ILSpy.Backend.TreeProviders;
 
@@ -29,7 +30,7 @@ public class NamespaceNodeProvider : ITreeNodeProvider
 
     public IEnumerable<Node> CreateNodes(string assemblyPath)
     {
-        var decompiler = application.DecompilerBackend.GetDecompiler(assemblyPath);
+        var decompiler = application.DecompilerBackend.CreateDecompiler(assemblyPath);
         if (decompiler is null)
         {
             return Enumerable.Empty<Node>();
@@ -57,14 +58,15 @@ public class NamespaceNodeProvider : ITreeNodeProvider
             ));
     }
 
-    public IEnumerable<Node> GetChildren(NodeMetadata? nodeMetadata)
+    public Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
     {
         if (nodeMetadata?.Type != NodeType.Namespace)
         {
-            return Enumerable.Empty<Node>();
+            return Task.FromResult(Enumerable.Empty<Node>());
         }
 
-        return application.TreeNodeProviders.Type.CreateNodes(nodeMetadata.AssemblyPath, nodeMetadata.Name);
+        return Task.FromResult(
+            application.TreeNodeProviders.Type.CreateNodes(nodeMetadata.AssemblyPath, nodeMetadata.Name));
     }
 }
 

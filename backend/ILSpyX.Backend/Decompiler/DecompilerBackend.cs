@@ -1,13 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See the LICENSE file in the project root for more information.
 
-namespace ILSpy.Backend.Decompiler;
-
 using ICSharpCode.Decompiler;
 using ICSharpCode.Decompiler.CSharp;
 using ICSharpCode.Decompiler.Disassembler;
 using ICSharpCode.Decompiler.Metadata;
 using ICSharpCode.Decompiler.TypeSystem;
+using ICSharpCode.ILSpyX;
 using ILSpy.Backend.Model;
 using ILSpyX.Backend.Application;
 using Microsoft.Extensions.Logging;
@@ -18,32 +17,31 @@ using System.Linq;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Threading;
+using System.Threading.Tasks;
 
-class CachedCSharpDecompiler(CSharpDecompiler decompiler, string outputLanguage)
-{
-    public CSharpDecompiler Decompiler { get; } = decompiler;
-    public string OutputLanguage { get; } = outputLanguage;
-}
+namespace ILSpy.Backend.Decompiler;
 
-public class DecompilerBackend : IDecompilerBackend
+public class DecompilerBackend
 {
     private readonly ILogger logger;
-    private readonly Dictionary<string, CachedCSharpDecompiler> decompilers = new();
     private readonly ILSpyBackendSettings ilspyBackendSettings;
+    private readonly AssemblyList assemblyList;
 
-    public DecompilerBackend(ILoggerFactory loggerFactory, ILSpyBackendSettings ilspyBackendSettings)
+    public DecompilerBackend(ILoggerFactory loggerFactory, ILSpyBackendSettings ilspyBackendSettings, AssemblyList assemblyList)
     {
         logger = loggerFactory.CreateLogger<DecompilerBackend>();
         this.ilspyBackendSettings = ilspyBackendSettings;
+        this.assemblyList = assemblyList;
     }
 
-    public AssemblyData? AddAssembly(string? path)
+    public async Task<AssemblyData?> AddAssemblyAsync(string? path)
     {
         if (path is not null)
         {
             try
             {
-                return CreateAssemblyData(GetDecompiler(path), path);
+                var loadedAssembly = assemblyList.OpenAssembly(path);
+                return await CreateAssemblyDataAsync(loadedAssembly);
             }
             catch (Exception ex)
             {
@@ -54,25 +52,18 @@ public class DecompilerBackend : IDecompilerBackend
         return null;
     }
 
-    public AssemblyData? CreateAssemblyData(CSharpDecompiler decompiler, string assemblyFile)
+    public async Task<AssemblyData?> CreateAssemblyDataAsync(LoadedAssembly loadedAssembly)
     {
-        var module = decompiler.TypeSystem.MainModule.MetadataFile;
-        var metadata = module.Metadata;
-        if (metadata != null)
+        var metaDataFile = await loadedAssembly.GetMetadataFileOrNullAsync();
+        if (metaDataFile is not null)
         {
-            AssemblyData assemblyData = new(Path.GetFileNameWithoutExtension(assemblyFile), assemblyFile);
-            if (metadata.IsAssembly)
+            var version = metaDataFile.Metadata.GetAssemblyDefinition().Version;
+            var targetFrameworkId = await loadedAssembly.GetTargetFrameworkIdAsync();
+            return new AssemblyData(loadedAssembly.ShortName, loadedAssembly.FileName)
             {
-                var assemblyDefinition = metadata.GetAssemblyDefinition();
-                assemblyData.Version = assemblyDefinition.Version.ToString();
-                var targetFrameworkId = module.DetectTargetFrameworkId();
-                if (!string.IsNullOrEmpty(targetFrameworkId))
-                {
-                    assemblyData.TargetFramework = targetFrameworkId.Replace("Version=", " ");
-                }
-            }
-
-            return assemblyData;
+                Version = version.ToString(),
+                TargetFramework = !string.IsNullOrEmpty(targetFrameworkId) ? targetFrameworkId.Replace("Version=", " ") : null
+            };
         }
 
         return null;
@@ -80,13 +71,12 @@ public class DecompilerBackend : IDecompilerBackend
 
     public bool RemoveAssembly(string? path)
     {
-        if (path != null)
+        if (path is not null)
         {
-            if (decompilers.ContainsKey(path))
+            var loadedAssembly = assemblyList.FindAssembly(path);
+            if (loadedAssembly is not null)
             {
-                var cachedDecompiler = decompilers[path];
-                decompilers.Remove(path);
-                DisposeDecompiler(cachedDecompiler.Decompiler);
+                assemblyList.Unload(loadedAssembly);
                 return true;
             }
         }
@@ -94,78 +84,61 @@ public class DecompilerBackend : IDecompilerBackend
         return false;
     }
 
-    private void DisposeDecompiler(CSharpDecompiler decompiler)
+    public CSharpDecompiler? CreateDecompiler(string assembly, string? outputLanguage = null)
     {
-        (decompiler.TypeSystem.MainModule.MetadataFile as PEFile)?.Dispose();
-    }
-
-    public CSharpDecompiler GetDecompiler(string assembly, string? outputLanguage = null)
-    {
-        CSharpDecompiler? decompiler = null;
-        if (decompilers.TryGetValue(assembly, out var cachedDecompiler))
+        var loadedAssembly = assemblyList.FindAssembly(assembly);
+        if (loadedAssembly is not null)
         {
-            if (outputLanguage is null || cachedDecompiler.OutputLanguage == outputLanguage)
-            {
-                decompiler = cachedDecompiler.Decompiler;
-            }
-            else
-            {
-                DisposeDecompiler(cachedDecompiler.Decompiler);
-            }
-        }
-
-        if (decompiler is null)
-        {
-            var assemblyResolver = AssemblyReferences.CreateAssemblyResolver(assembly);
-            decompiler = new CSharpDecompiler(
+            return new CSharpDecompiler(
                 assembly,
-                assemblyResolver,
+                loadedAssembly.GetAssemblyResolver(true),
                 ilspyBackendSettings.CreateDecompilerSettings(outputLanguage ?? LanguageName.CSharpLatest));
-            decompilers[assembly] = new CachedCSharpDecompiler(decompiler, outputLanguage ?? LanguageName.CSharpLatest);
         }
 
-        return decompiler;
+        return null;
     }
 
-    public IEnumerable<AssemblyData> GetLoadedAssemblies()
+    public async Task<IEnumerable<AssemblyData>> GetLoadedAssembliesAsync()
     {
-        return decompilers.Select(decompiler => CreateAssemblyData(decompiler.Value.Decompiler, decompiler.Key))
+        return (await Task.WhenAll(
+            (await assemblyList.GetAllAssemblies()).Select(async loadedAssembly => await CreateAssemblyDataAsync(loadedAssembly))))
             .Where(data => data is not null)
             .Cast<AssemblyData>();
     }
 
-    public AssemblyData GetLoadedAssembly(string assemblyPath)
-    {
-        var assemblyData = GetLoadedAssemblies()
-            .Where(assemblyData => assemblyData.FilePath == assemblyPath).FirstOrDefault();
-        if (assemblyData is null)
-        {
-            throw new InvalidOperationException($"Assembly '{assemblyPath}' not loaded.");
-        }
-        return assemblyData;
-    }
-
     public IEnumerable<MemberData> GetMembers(string? assemblyPath, TypeDefinitionHandle handle)
     {
-        if (handle.IsNil || (assemblyPath == null) || !decompilers.ContainsKey(assemblyPath))
+        if (handle.IsNil || (assemblyPath is null))
         {
             return Array.Empty<MemberData>();
         }
 
-        var typeSystem = GetDecompiler(assemblyPath).TypeSystem;
-        var c = typeSystem.MainModule.GetDefinition(handle);
+        var loadedAssembly = assemblyList.FindAssembly(assemblyPath);
+        if (loadedAssembly is null)
+        {
+            return Array.Empty<MemberData>();
+        }
 
-        return c == null
+        var decompiler = CreateDecompiler(assemblyPath);
+        if (decompiler is null)
+        {
+            return Array.Empty<MemberData>();
+        }
+
+        var typeSystem = decompiler.TypeSystem;
+        var definition = typeSystem.MainModule.GetDefinition(handle);
+
+        return definition == null
             ? new List<MemberData>()
-            : c.NestedTypes
+            : definition.NestedTypes
                 .Select(typeDefinition => new MemberData(
                     Name: typeDefinition.TypeToString(includeNamespace: false),
                     Token: MetadataTokens.GetToken(typeDefinition.MetadataToken),
                     SubKind: typeDefinition.Kind))
-                .Union(c.Fields.Select(GetMemberData).OrderBy(m => m.Name))
-                .Union(c.Properties.Select(GetMemberData).OrderBy(m => m.Name))
-                .Union(c.Events.Select(GetMemberData).OrderBy(m => m.Name))
-                .Union(c.Methods.Select(GetMemberData).OrderBy(m => m.Name));
+                .Union(definition.Fields.Select(GetMemberData).OrderBy(m => m.Name))
+                .Union(definition.Properties.Select(GetMemberData).OrderBy(m => m.Name))
+                .Union(definition.Events.Select(GetMemberData).OrderBy(m => m.Name))
+                .Union(definition.Methods.Select(GetMemberData).OrderBy(m => m.Name));
 
         static MemberData GetMemberData(IMember member)
         {
@@ -200,7 +173,12 @@ public class DecompilerBackend : IDecompilerBackend
             return string.Empty;
         }
 
-        var decompiler = GetDecompiler(assemblyPath, outputLanguage);
+        var decompiler = CreateDecompiler(assemblyPath, outputLanguage);
+        if (decompiler is null)
+        {
+            return string.Empty;
+        }
+
         var module = decompiler.TypeSystem.MainModule;
 
         switch (handle.Kind)
@@ -229,7 +207,12 @@ public class DecompilerBackend : IDecompilerBackend
             return string.Empty;
         }
 
-        var decompiler = GetDecompiler(assemblyPath);
+        var decompiler = CreateDecompiler(assemblyPath);
+        if (decompiler is null)
+        {
+            return string.Empty;
+        }
+
         var module = decompiler.TypeSystem.MainModule;
         var textOutput = new PlainTextOutput();
         var disassembler = CreateDisassembler(assemblyPath, module, textOutput);
@@ -371,12 +354,23 @@ public class DecompilerBackend : IDecompilerBackend
 
     public IEnumerable<MemberData> ListTypes(string? assemblyPath, string? @namespace)
     {
-        if ((assemblyPath == null) || (@namespace == null) || !decompilers.ContainsKey(assemblyPath))
+        if ((assemblyPath == null) || (@namespace == null))
         {
             yield break;
         }
 
-        var decompiler = GetDecompiler(assemblyPath);
+        var loadedAssembly = assemblyList.FindAssembly(assemblyPath);
+        if (loadedAssembly is null)
+        {
+            yield break;
+        }
+
+        var decompiler = CreateDecompiler(assemblyPath);
+        if (decompiler is null)
+        {
+            yield break;
+        }
+
         var currentNamespace = decompiler.TypeSystem.MainModule.RootNamespace;
         string[] parts = @namespace.Split('.');
 

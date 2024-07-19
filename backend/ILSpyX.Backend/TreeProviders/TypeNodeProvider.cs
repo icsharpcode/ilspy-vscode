@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
+using System.Threading.Tasks;
 
 namespace ILSpy.Backend.TreeProviders;
 
@@ -27,7 +28,7 @@ public class TypeNodeProvider : ITreeNodeProvider
 
     public IEnumerable<Node> CreateNodes(string assemblyPath, string @namespace)
     {
-        var decompiler = application.DecompilerBackend.GetDecompiler(assemblyPath);
+        var decompiler = application.DecompilerBackend.CreateDecompiler(assemblyPath);
         if (decompiler is null)
         {
             yield break;
@@ -42,7 +43,10 @@ public class TypeNodeProvider : ITreeNodeProvider
             {
                 var nested = currentNamespace.GetChildNamespace(part);
                 if (nested == null)
+                {
                     yield break;
+                }
+
                 currentNamespace = nested;
             }
         }
@@ -65,14 +69,14 @@ public class TypeNodeProvider : ITreeNodeProvider
         }
     }
 
-    public IEnumerable<Node> GetChildren(NodeMetadata? nodeMetadata)
+    public async Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
     {
         if (nodeMetadata is null || !NodeTypeHelper.IsTypeNode(nodeMetadata.Type))
         {
             return Enumerable.Empty<Node>();
         }
 
-        return application.TreeNodeProviders.Member.CreateNodes(
+        return await application.TreeNodeProviders.Member.CreateNodesAsync(
             nodeMetadata.AssemblyPath, nodeMetadata.SymbolToken);
     }
 }

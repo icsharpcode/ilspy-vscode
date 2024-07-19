@@ -20,10 +20,10 @@ public class GetNodesHandler : IJsonRpcRequestHandler<GetNodesRequest, GetNodesR
         this.application = application;
     }
 
-    public Task<GetNodesResponse> Handle(GetNodesRequest request, CancellationToken cancellationToken)
+    public async Task<GetNodesResponse> Handle(GetNodesRequest request, CancellationToken cancellationToken)
     {
-        return Task.FromResult(new GetNodesResponse(
-            application.TreeNodeProviders.ForNode(request.NodeMetadata).GetChildren(request.NodeMetadata)));
+        return new GetNodesResponse(
+            await application.TreeNodeProviders.ForNode(request.NodeMetadata).GetChildrenAsync(request.NodeMetadata));
     }
 
 }

@@ -14,22 +14,15 @@ namespace ILSpyX.Backend.LSP.Handlers;
 public class AddAssemblyHandler : IJsonRpcRequestHandler<AddAssemblyRequest, AddAssemblyResponse>
 {
     private readonly ILSpyXApplication application;
-    private readonly SearchBackend searchBackend;
 
-    public AddAssemblyHandler(ILSpyXApplication application, SearchBackend searchBackend)
+    public AddAssemblyHandler(ILSpyXApplication application)
     {
         this.application = application;
-        this.searchBackend = searchBackend;
     }
 
     public async Task<AddAssemblyResponse> Handle(AddAssemblyRequest request, CancellationToken cancellationToken)
     {
-        if (request.AssemblyPath != null)
-        {
-            await searchBackend.AddAssembly(request.AssemblyPath);
-        }
-
-        var result = request.AssemblyPath != null ? application.DecompilerBackend.AddAssembly(request.AssemblyPath) : null;
+        var result = request.AssemblyPath != null ? await application.DecompilerBackend.AddAssemblyAsync(request.AssemblyPath) : null;
         return new AddAssemblyResponse(Added: result != null, AssemblyData: result);
     }
 }

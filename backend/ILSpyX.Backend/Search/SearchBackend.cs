@@ -8,7 +8,6 @@ using ILSpy.Backend.Decompiler;
 using ILSpy.Backend.Model;
 using ILSpy.Backend.TreeProviders;
 using ILSpyX.Backend.Application;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -22,26 +21,14 @@ namespace ILSpyX.Backend.Search;
 
 public class SearchBackend
 {
-    private readonly ILogger logger;
     private readonly IComparer<SearchResult> resultsComparer = SearchResult.ComparerByName;
-    private readonly SingleThreadAssemblyList assemblyList;
+    private readonly AssemblyList assemblyList;
     private readonly ILSpyBackendSettings ilspyBackendSettings;
 
-    public SearchBackend(ILoggerFactory loggerFactory, SingleThreadAssemblyList assemblyList, ILSpyBackendSettings ilspyBackendSettings)
+    public SearchBackend(AssemblyList assemblyList, ILSpyBackendSettings ilspyBackendSettings)
     {
-        logger = loggerFactory.CreateLogger<SearchBackend>();
         this.assemblyList = assemblyList;
         this.ilspyBackendSettings = ilspyBackendSettings;
-    }
-
-    public async Task AddAssembly(string path)
-    {
-        await assemblyList.AddAssembly(path);
-    }
-
-    public async Task RemoveAssembly(string path)
-    {
-        await assemblyList.RemoveAssembly(path);
     }
 
     public async Task<IEnumerable<Node>> Search(string searchTerm, CancellationToken cancellationToken)

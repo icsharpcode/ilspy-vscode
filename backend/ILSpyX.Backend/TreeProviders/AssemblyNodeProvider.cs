@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection.Metadata;
+using System.Threading.Tasks;
 
 namespace ILSpy.Backend.TreeProviders;
 
@@ -24,9 +25,9 @@ public class AssemblyNodeProvider : ITreeNodeProvider
             nodeMetadata.AssemblyPath, EntityHandle.AssemblyDefinition, outputLanguage);
     }
 
-    public IEnumerable<Node> CreateNodes()
+    public async Task<IEnumerable<Node>> CreateNodesAsync()
     {
-        return application.DecompilerBackend.GetLoadedAssemblies()
+        return (await application.DecompilerBackend.GetLoadedAssembliesAsync())
             .Select(assemblyData =>
                 new Node(
                     new NodeMetadata(
@@ -49,16 +50,16 @@ public class AssemblyNodeProvider : ITreeNodeProvider
             .Where(d => d is not null));
     }
 
-    public IEnumerable<Node> GetChildren(NodeMetadata? nodeMetadata)
+    public Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
     {
         if (nodeMetadata?.Type != NodeType.Assembly)
         {
-            return Enumerable.Empty<Node>();
+            return Task.FromResult(Enumerable.Empty<Node>());
         }
 
-        return
+        return Task.FromResult(
             new[] { application.TreeNodeProviders.ReferencesRoot.CreateNode(nodeMetadata.AssemblyPath) }
-                .Concat(application.TreeNodeProviders.Namespace.CreateNodes(nodeMetadata.AssemblyPath));
+                .Concat(application.TreeNodeProviders.Namespace.CreateNodes(nodeMetadata.AssemblyPath)));
     }
 }
 

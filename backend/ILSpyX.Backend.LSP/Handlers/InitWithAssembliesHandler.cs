@@ -4,7 +4,6 @@
 using ILSpy.Backend.Application;
 using ILSpy.Backend.Model;
 using ILSpyX.Backend.LSP.Protocol;
-using ILSpyX.Backend.Search;
 using OmniSharp.Extensions.JsonRpc;
 using System.Collections.Generic;
 using System.Threading;
@@ -16,12 +15,10 @@ namespace ILSpyX.Backend.LSP.Handlers;
 public class InitWithAssembliesHandler : IJsonRpcRequestHandler<InitWithAssembliesRequest, InitWithAssembliesResponse>
 {
     private readonly ILSpyXApplication application;
-    private readonly SearchBackend searchBackend;
 
-    public InitWithAssembliesHandler(ILSpyXApplication application, SearchBackend searchBackend)
+    public InitWithAssembliesHandler(ILSpyXApplication application)
     {
         this.application = application;
-        this.searchBackend = searchBackend;
     }
 
     public async Task<InitWithAssembliesResponse> Handle(InitWithAssembliesRequest request, CancellationToken cancellationToken)
@@ -29,8 +26,7 @@ public class InitWithAssembliesHandler : IJsonRpcRequestHandler<InitWithAssembli
         var loadedAssemblyDatas = new List<AssemblyData>();
         foreach (var assemblyPath in request.AssemblyPaths)
         {
-            await searchBackend.AddAssembly(assemblyPath);
-            var assemblyData = application.DecompilerBackend.AddAssembly(assemblyPath);
+            var assemblyData = await application.DecompilerBackend.AddAssemblyAsync(assemblyPath);
             if (assemblyData is not null)
             {
                 loadedAssemblyDatas.Add(assemblyData);

@@ -3,6 +3,7 @@ using ILSpy.Backend.Decompiler;
 using ILSpy.Backend.Model;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ILSpy.Backend.TreeProviders;
 
@@ -20,9 +21,9 @@ public class RootNodesProvider : ITreeNodeProvider
         return DecompileResult.Empty();
     }
 
-    public IEnumerable<Node> GetChildren(NodeMetadata? nodeMetadata)
+    public async Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
     {
-        return application.TreeNodeProviders.Assembly.CreateNodes();
+        return await application.TreeNodeProviders.Assembly.CreateNodesAsync();
     }
 }
 

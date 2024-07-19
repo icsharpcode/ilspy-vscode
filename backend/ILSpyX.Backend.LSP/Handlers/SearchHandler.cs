@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2022 ICSharpCode
 // Licensed under the MIT license. See the LICENSE file in the project root for more information.
 
+using ILSpy.Backend.Application;
 using ILSpyX.Backend.LSP.Protocol;
 using ILSpyX.Backend.Search;
 using OmniSharp.Extensions.JsonRpc;
@@ -14,9 +15,9 @@ public class SearchHandler : IJsonRpcRequestHandler<SearchRequest, SearchRespons
 {
     private readonly SearchBackend searchBackend;
 
-    public SearchHandler(SearchBackend searchBackend)
+    public SearchHandler(ILSpyXApplication application)
     {
-        this.searchBackend = searchBackend;
+        searchBackend = application.SearchBackend;
     }
 
     public async Task<SearchResponse> Handle(SearchRequest request, CancellationToken cancellationToken)

@@ -58,11 +58,6 @@ class Program
 
     static void ConfigureServices(IServiceCollection services)
     {
-        services.AddSingleton<ISettingsProvider, DummySettingsProvider>();
-        services.AddSingleton<ILSpyBackendSettings>();
-        services.AddSingleton<AssemblyListManager>();
-        services.AddSingleton<SingleThreadAssemblyList>();
-        services.AddSingleton<SearchBackend>();
         services.AddSingleton<ILSpyXApplication>();
     }
 }

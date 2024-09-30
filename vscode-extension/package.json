@@ -256,15 +256,15 @@
 		"vscode-languageclient": "^9.0.1"
 	},
 	"devDependencies": {
-		"@types/chai": "^4.3.19",
+		"@types/chai": "^5.0.0",
 		"@types/glob": "^8.1.0",
 		"@types/mocha": "^10.0.8",
 		"@types/node": "^20.0.0",
 		"@types/vscode": "^1.74.0",
-		"@typescript-eslint/eslint-plugin": "^8.7.0",
-		"@typescript-eslint/parser": "^8.7.0",
+		"@typescript-eslint/eslint-plugin": "^8.8.0",
+		"@typescript-eslint/parser": "^8.8.0",
 		"@vscode/test-electron": "^2.4.1",
-		"@vscode/vsce": "^3.1.0",
+		"@vscode/vsce": "^3.1.1",
 		"eslint": "^8.57.1",
 		"glob": "^11.0.0",
 		"minimist": "^1.2.8",
@@ -272,7 +272,7 @@
 		"terser-webpack-plugin": "^5.3.10",
 		"ts-loader": "^9.5.1",
 		"typescript": "^5.6.2",
-		"webpack": "5.94.0",
+		"webpack": "5.95.0",
 		"webpack-cli": "5.1.4"
 	},
 	"extensionDependencies": [

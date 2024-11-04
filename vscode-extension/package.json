@@ -248,7 +248,7 @@
 	},
 	"dependencies": {
 		"ansi-regex": "^6.1.0",
-		"chai": "^5.1.1",
+		"chai": "^5.1.2",
 		"os": "^0.1.2",
 		"path": "^0.12.7",
 		"temp-dir": "^3.0.0",
@@ -256,7 +256,7 @@
 		"vscode-languageclient": "^9.0.1"
 	},
 	"devDependencies": {
-		"@types/chai": "^5.0.0",
+		"@types/chai": "^5.0.1",
 		"@types/glob": "^8.1.0",
 		"@types/mocha": "^10.0.9",
 		"@types/node": "^20.0.0",

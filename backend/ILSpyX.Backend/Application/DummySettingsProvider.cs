@@ -1,6 +1,5 @@
 namespace ILSpyX.Backend.Application;
 
-using ICSharpCode.ILSpyX;
 using ICSharpCode.ILSpyX.Settings;
 using System;
 using System.Xml.Linq;
@@ -20,15 +19,14 @@ public class DummySettingsProvider : ISettingsProvider
         }
     }
 
-    public ISettingsProvider Load()
-    {
-        // No-op
-        return this;
-    }
-
     public void Update(Action<XElement> action)
     {
         action(root);
+    }
+
+    public void SaveSettings(XElement section)
+    {
+        // No-op
     }
 }
 

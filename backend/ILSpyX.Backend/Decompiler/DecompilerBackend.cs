@@ -87,10 +87,11 @@ public class DecompilerBackend
     public CSharpDecompiler? CreateDecompiler(string assembly, string? outputLanguage = null)
     {
         var loadedAssembly = assemblyList.FindAssembly(assembly);
-        if (loadedAssembly is not null)
+        var metadataFile = loadedAssembly?.GetMetadataFileOrNull();
+        if (loadedAssembly is not null && metadataFile is not null)
         {
             return new CSharpDecompiler(
-                assembly,
+                metadataFile,
                 loadedAssembly.GetAssemblyResolver(true),
                 ilspyBackendSettings.CreateDecompilerSettings(outputLanguage ?? LanguageName.CSharpLatest));
         }

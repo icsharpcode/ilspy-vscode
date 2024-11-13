@@ -52,53 +52,56 @@ public class AnalyzerNodeProvider : ITreeNodeProvider
 
     public Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
     {
-        if (nodeMetadata is not null && nodeMetadata.Type == NodeType.Analyzer)
+        if (nodeMetadata is null || nodeMetadata.Type != NodeType.Analyzer)
         {
-            var analyzer = application.AnalyzerBackend.GetAnalyzerForNode(nodeMetadata)?.Instance;
-            if (analyzer is not null)
-            {
-                var context = new AnalyzerContext()
-                {
-                    CancellationToken = new CancellationToken(),
-                    Language = new CSharpLanguage(),
-                    AssemblyList = application.AssemblyList
-                };
-
-                var nodeEntity = application.DecompilerBackend.GetEntityFromHandle(
-                nodeMetadata.AssemblyPath, MetadataTokens.EntityHandle(nodeMetadata.SymbolToken));
-                if (nodeEntity is not null && analyzer.Show(nodeEntity))
-                {
-                    var symbols = analyzer.Analyze(nodeEntity, context);
-                    if (symbols is not null)
-                    {
-                        return Task.FromResult(
-                            symbols
-                                .OfType<IEntity>()
-                                .Select(entity => {
-                                    string nodeName = entity is IMethod method
-                                        ? method.MethodToString(false, false, false)
-                                        : entity.Name;
-                                    return new Node(
-                                        Metadata: new NodeMetadata(
-                                            AssemblyPath: entity.Compilation.MainModule.MetadataFile?.FileName ?? "",
-                                            Type: NodeTypeHelper.GetNodeTypeFromEntity(entity),
-                                            Name: nodeName,
-                                            SymbolToken: MetadataTokens.GetToken(entity.MetadataToken),
-                                            ParentSymbolToken:
-                                                entity.DeclaringTypeDefinition?.MetadataToken is not null ?
-                                                MetadataTokens.GetToken(entity.DeclaringTypeDefinition.MetadataToken) : 0),
-                                        DisplayName: nodeName,
-                                        Description: nodeName,
-                                        MayHaveChildren: false,
-                                        SymbolModifiers: NodeTypeHelper.GetSymbolModifiers(entity));
-                                })
-                        );
-                    }
-                }
-            }
+            return Task.FromResult(Enumerable.Empty<Node>());
         }
 
-        return Task.FromResult(Enumerable.Empty<Node>());
+        var analyzer = application.AnalyzerBackend.GetAnalyzerForNode(nodeMetadata)?.Instance;
+        if (analyzer is null)
+        {
+            return Task.FromResult(Enumerable.Empty<Node>());
+        }
+
+        var context = new AnalyzerContext()
+        {
+            CancellationToken = new CancellationToken(),
+            Language = new CSharpLanguage(),
+            AssemblyList = application.AssemblyList
+        };
+
+        var nodeEntity = application.DecompilerBackend.GetEntityFromHandle(
+            nodeMetadata.AssemblyPath, MetadataTokens.EntityHandle(nodeMetadata.SymbolToken));
+        if (nodeEntity is null || !analyzer.Show(nodeEntity))
+        {
+            return Task.FromResult(Enumerable.Empty<Node>());
+        }
+
+        return Task.FromResult(
+            analyzer.Analyze(nodeEntity, context)
+                .OfType<IEntity>()
+                .Select(entity => {
+                    string nodeName = entity is IMethod method
+                        ? method.MethodToString(false, false, false)
+                        : entity.Name;
+                    string location = (entity as IMember)?.DeclaringType.TypeToString(true) ?? "";
+                    return new Node(
+                        Metadata: new NodeMetadata(
+                            AssemblyPath: entity.Compilation.MainModule.MetadataFile?.FileName ?? "",
+                            Type: NodeTypeHelper.GetNodeTypeFromEntity(entity),
+                            Name: nodeName,
+                            SymbolToken: MetadataTokens.GetToken(entity.MetadataToken),
+                            ParentSymbolToken:
+                            entity.DeclaringTypeDefinition?.MetadataToken is not null
+                                ? MetadataTokens.GetToken(entity.DeclaringTypeDefinition.MetadataToken)
+                                : 0),
+                        DisplayName: nodeName,
+                        Description: location,
+                        MayHaveChildren: false,
+                        SymbolModifiers: NodeTypeHelper.GetSymbolModifiers(entity));
+                })
+        );
+
     }
 }
 

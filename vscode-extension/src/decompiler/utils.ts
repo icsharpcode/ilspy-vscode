@@ -1,3 +1,5 @@
+import { TreeItemCollapsibleState } from "vscode";
+import Node from "../protocol/Node";
 import { NodeType } from "../protocol/NodeType";
 
 export function isTypeNode(nodeType: NodeType) {
@@ -8,4 +10,15 @@ export function isTypeNode(nodeType: NodeType) {
     nodeType === NodeType.Interface ||
     nodeType === NodeType.Struct
   );
+}
+
+export function getTreeNodeCollapsibleState(
+  node: Node,
+  expandByDefault = false
+) {
+  return node.mayHaveChildren
+    ? expandByDefault
+      ? TreeItemCollapsibleState.Expanded
+      : TreeItemCollapsibleState.Collapsed
+    : TreeItemCollapsibleState.None;
 }

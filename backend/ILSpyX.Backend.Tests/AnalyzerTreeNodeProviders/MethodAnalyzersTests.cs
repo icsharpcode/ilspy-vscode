@@ -1,11 +1,11 @@
 using ILSpy.Backend.Model;
 
-namespace ILSpyX.Backend.Tests;
+namespace ILSpyX.Backend.Tests.AnalyzerTreeNodeProviders;
 
-public class AnalyzerTreeNodeProviderTests
+public class MethodAnalyzersTests
 {
     [Fact]
-    public async Task MethodAnalyzers()
+    public async Task UsedBy()
     {
         var application = await TestHelper.CreateTestApplication();
         var types = await application.TreeNodeProviders.Namespace.GetChildrenAsync(
@@ -35,7 +35,8 @@ public class AnalyzerTreeNodeProviderTests
         var callerStructTypeNode = types.First(node => node.Metadata?.Name == "SomeStruct");
         Assert.Collection(methodUsedByNodes,
             node => {
-                Assert.Equal("StructMethod() : string", node.Metadata?.Name);
+                Assert.Equal("StructMethod() : string", node.DisplayName);
+                Assert.Equal("TestAssembly.SomeStruct", node.Description);
                 Assert.Equal(NodeType.Method, node.Metadata?.Type);
                 Assert.Equal(callerStructTypeNode.Metadata?.SymbolToken, node.Metadata?.ParentSymbolToken);
                 Assert.Equal(SymbolModifiers.Public, node.SymbolModifiers);

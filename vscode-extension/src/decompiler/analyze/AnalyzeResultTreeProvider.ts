@@ -16,6 +16,7 @@ import IILSpyBackend from "../IILSpyBackend";
 import Node from "../../protocol/Node";
 import { NodeType } from "../../protocol/NodeType";
 import { getNodeIcon } from "../../icons";
+import { getTreeNodeCollapsibleState } from "../utils";
 
 export interface PerformedAnalyze {
   symbol: string;
@@ -60,22 +61,23 @@ export class AnalyzeResultTreeProvider
         collapsibleState: TreeItemCollapsibleState.Expanded,
         iconPath: new ThemeIcon("search-view-icon"),
       };
+    } else if (node.metadata?.type === NodeType.Analyzer) {
+      return {
+        label: node.displayName,
+        collapsibleState: getTreeNodeCollapsibleState(node),
+        iconPath: new ThemeIcon(getNodeIcon(node.metadata?.type)),
+      };
     } else {
       return {
         label: node.displayName,
+        description: node.description,
         tooltip: node.description,
-        collapsibleState:
-          node.metadata?.type === NodeType.Analyzer
-            ? TreeItemCollapsibleState.Collapsed
-            : TreeItemCollapsibleState.None,
-        command:
-          node.metadata?.type !== NodeType.Analyzer
-            ? {
-                command: "decompileNode",
-                arguments: [node],
-                title: "Decompile",
-              }
-            : undefined,
+        collapsibleState: getTreeNodeCollapsibleState(node),
+        command: {
+          command: "decompileNode",
+          arguments: [node],
+          title: "Decompile",
+        },
         iconPath: new ThemeIcon(getNodeIcon(node.metadata?.type)),
       };
     }

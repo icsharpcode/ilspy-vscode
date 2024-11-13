@@ -17,12 +17,18 @@ import Node from "../../protocol/Node";
 import { NodeType } from "../../protocol/NodeType";
 import { getNodeIcon } from "../../icons";
 
-interface PerformedAnalyze {
+export interface PerformedAnalyze {
   symbol: string;
   results: Node[];
 }
 
 export type AnalyzeTreeNode = Node | PerformedAnalyze;
+
+export function isPerformedAnalyzeNode(
+  node: AnalyzeTreeNode
+): node is PerformedAnalyze {
+  return "symbol" in node && "results" in node;
+}
 
 export class AnalyzeResultTreeProvider
   implements TreeDataProvider<AnalyzeTreeNode>
@@ -47,26 +53,30 @@ export class AnalyzeResultTreeProvider
     this.refresh();
   }
 
-  public getTreeItem(element: AnalyzeTreeNode): TreeItem {
-    if ((element as PerformedAnalyze).symbol) {
-      const performedSearch = element as PerformedAnalyze;
+  public getTreeItem(node: AnalyzeTreeNode): TreeItem {
+    if (isPerformedAnalyzeNode(node)) {
       return {
-        label: `Analyze "${performedSearch.symbol}"`,
+        label: `Analyze "${node.symbol}"`,
         collapsibleState: TreeItemCollapsibleState.Expanded,
         iconPath: new ThemeIcon("search-view-icon"),
       };
     } else {
-      const nodeData = element as Node;
       return {
-        label: nodeData.displayName,
-        tooltip: nodeData.description,
-        collapsibleState: TreeItemCollapsibleState.None,
-        command: {
-          command: "decompileNode",
-          arguments: [nodeData],
-          title: "Decompile",
-        },
-        iconPath: new ThemeIcon(getNodeIcon(nodeData.metadata?.type)),
+        label: node.displayName,
+        tooltip: node.description,
+        collapsibleState:
+          node.metadata?.type === NodeType.Analyzer
+            ? TreeItemCollapsibleState.Collapsed
+            : TreeItemCollapsibleState.None,
+        command:
+          node.metadata?.type !== NodeType.Analyzer
+            ? {
+                command: "decompileNode",
+                arguments: [node],
+                title: "Decompile",
+              }
+            : undefined,
+        iconPath: new ThemeIcon(getNodeIcon(node.metadata?.type)),
       };
     }
   }
@@ -76,17 +86,29 @@ export class AnalyzeResultTreeProvider
   }
 
   public getChildren(
-    element?: AnalyzeTreeNode
+    node?: AnalyzeTreeNode
   ): AnalyzeTreeNode[] | Thenable<AnalyzeTreeNode[]> {
-    if (!element) {
+    return this.getChildNodes(node);
+  }
+
+  async getChildNodes(node?: AnalyzeTreeNode): Promise<AnalyzeTreeNode[]> {
+    if (!node) {
       return [...this.lastAnalyzes].reverse();
     }
 
-    if ((element as PerformedAnalyze).symbol) {
-      return (element as PerformedAnalyze).results;
+    if (isPerformedAnalyzeNode(node)) {
+      return node.results;
     }
 
-    return [];
+    if (node.metadata?.type !== NodeType.Analyzer) {
+      return [];
+    }
+
+    const result = await this.backend.sendGetNodes({
+      nodeMetadata: node?.metadata,
+    });
+
+    return result?.nodes ?? [];
   }
 
   public getParent?(element: AnalyzeTreeNode): ProviderResult<AnalyzeTreeNode> {

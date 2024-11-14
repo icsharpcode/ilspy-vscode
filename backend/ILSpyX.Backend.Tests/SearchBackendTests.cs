@@ -1,7 +1,6 @@
 using ILSpy.Backend.Model;
-using ILSpyX.Backend.Tests;
 
-namespace ILSpy.Backend.Tests;
+namespace ILSpyX.Backend.Tests;
 
 public class SearchBackendTests
 {
@@ -127,5 +126,25 @@ public class SearchBackendTests
                     Assert.Equal(SymbolModifiers.Public, node.SymbolModifiers);
                 }
             );
+    }
+
+    [Fact]
+    public async Task SearchOnlyInAddedAssemblies()
+    {
+        var application = await TestHelper.CreateTestApplication();
+        var types = await application.TreeNodeProviders.Namespace.GetChildrenAsync(
+            new NodeMetadata(TestHelper.AssemblyPath, NodeType.Namespace, "TestAssembly", 0, 0));
+        var typeNode = types.First(node => node.Metadata?.Name == "SomeClass");
+        await application.TreeNodeProviders.Type.GetChildrenAsync(typeNode.Metadata);
+
+        var searchBackend = application.SearchBackend;
+        var nodeData = await searchBackend.Search("String", new CancellationToken());
+        Assert.Collection(nodeData,
+            node => {
+                Assert.Equal("SomeClass.ToString() : string", node.DisplayName);
+                Assert.Equal("TestAssembly.SomeClass", node.Description);
+                Assert.Equal(NodeType.Method, node.Metadata?.Type);
+            }
+        );
     }
 }

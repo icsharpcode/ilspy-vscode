@@ -38,7 +38,7 @@ public class SearchBackend
         {
             try
             {
-                var assemblies = await assemblyList.GetAllAssemblies();
+                var assemblies = (await assemblyList.GetAllAssemblies()).Where(assembly => !assembly.IsAutoLoaded);
 
                 var resultQueue = new ConcurrentQueue<SearchResult>();
                 var searchRequest = CreateSearchRequest(searchTerm, SearchMode.TypeAndMember);

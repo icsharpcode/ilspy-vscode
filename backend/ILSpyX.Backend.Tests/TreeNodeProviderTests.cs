@@ -1,8 +1,7 @@
 using ILSpy.Backend.Model;
-using ILSpyX.Backend.Tests;
 using Mono.Cecil;
 
-namespace ILSpy.Backend.Tests;
+namespace ILSpyX.Backend.Tests;
 
 public class TreeNodeProviderTests
 {
@@ -181,6 +180,13 @@ public class TreeNodeProviderTests
                 node => {
                     Assert.Equal("ProgId", node.Metadata?.Name);
                     Assert.Equal(NodeType.Property, node.Metadata?.Type);
+                    Assert.Equal(typeNode.Metadata?.SymbolToken, node.Metadata?.ParentSymbolToken);
+                    Assert.Equal(SymbolModifiers.Public, node.SymbolModifiers);
+                    Assert.False(node.MayHaveChildren);
+                },
+                node => {
+                    Assert.Equal("CallsFrameworkMethod() : string", node.Metadata?.Name);
+                    Assert.Equal(NodeType.Method, node.Metadata?.Type);
                     Assert.Equal(typeNode.Metadata?.SymbolToken, node.Metadata?.ParentSymbolToken);
                     Assert.Equal(SymbolModifiers.Public, node.SymbolModifiers);
                     Assert.False(node.MayHaveChildren);

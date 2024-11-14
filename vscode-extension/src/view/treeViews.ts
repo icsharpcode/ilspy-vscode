@@ -2,7 +2,10 @@ import { TreeView, window } from "vscode";
 import Node from "../protocol/Node";
 import { DecompiledTreeProvider } from "../decompiler/DecompiledTreeProvider";
 import { SearchResultTreeProvider } from "../decompiler/search/SearchResultTreeProvider";
-import { AnalyzeResultTreeProvider } from "../decompiler/analyze/AnalyzeResultTreeProvider";
+import {
+  AnalyzeResultTreeProvider,
+  AnalyzeTreeNode,
+} from "../decompiler/analyze/AnalyzeResultTreeProvider";
 
 export function createDecompiledTreeView(
   decompiledTreeProvider: DecompiledTreeProvider
@@ -24,7 +27,7 @@ export function createSearchResultTreeView(
 
 export function createAnalyzeResultTreeView(
   analyzeResultTreeProvider: AnalyzeResultTreeProvider
-): TreeView<Node> {
+): TreeView<AnalyzeTreeNode> {
   return window.createTreeView("ilspyAnalyzeResultsContainer", {
     treeDataProvider: analyzeResultTreeProvider,
     showCollapseAll: true,

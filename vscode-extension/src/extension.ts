@@ -131,7 +131,9 @@ export async function activate(context: ExtensionContext) {
     analyzeResultTreeProvider
   );
   disposables.push(analyzeResultTreeView);
-  disposables.push(registerAnalyze(analyzeResultTreeProvider));
+  disposables.push(
+    registerAnalyze(analyzeResultTreeProvider, analyzeResultTreeView)
+  );
 
   disposables.push(
     workspace.registerTextDocumentContentProvider(

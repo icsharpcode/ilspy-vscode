@@ -4,11 +4,15 @@
  *-----------------------------------------------------------------------------------------------*/
 
 import * as vscode from "vscode";
-import { AnalyzeResultTreeProvider } from "../decompiler/analyze/AnalyzeResultTreeProvider";
+import {
+  AnalyzeResultTreeProvider,
+  AnalyzeTreeNode,
+} from "../decompiler/analyze/AnalyzeResultTreeProvider";
 import Node from "../protocol/Node";
 
 export function registerAnalyze(
-  analyzeResultTreeProvider: AnalyzeResultTreeProvider
+  analyzeResultTreeProvider: AnalyzeResultTreeProvider,
+  analyzeResultTreeView: vscode.TreeView<AnalyzeTreeNode>
 ) {
   return vscode.commands.registerCommand(
     "ilspy.analyze",
@@ -18,8 +22,13 @@ export function registerAnalyze(
         "ilspy.analyzeResultsToShow",
         true
       );
-      analyzeResultTreeProvider.analyze(node);
+      await analyzeResultTreeProvider.analyze(node);
       vscode.commands.executeCommand("ilspyAnalyzeResultsContainer.focus");
+
+      const firstNode = analyzeResultTreeProvider.getFirstNode();
+      if (firstNode) {
+        analyzeResultTreeView.reveal(firstNode);
+      }
     }
   );
 }

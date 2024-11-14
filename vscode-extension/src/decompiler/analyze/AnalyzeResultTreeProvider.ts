@@ -54,6 +54,14 @@ export class AnalyzeResultTreeProvider
     this.refresh();
   }
 
+  public getFirstNode() {
+    if (this.lastAnalyzes.length > 0) {
+      return this.lastAnalyzes[this.lastAnalyzes.length - 1];
+    }
+
+    return undefined;
+  }
+
   public getTreeItem(node: AnalyzeTreeNode): TreeItem {
     if (isPerformedAnalyzeNode(node)) {
       return {

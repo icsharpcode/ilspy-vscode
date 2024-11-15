@@ -30,7 +30,4 @@
     <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.0" />
   </ItemGroup>
-   <PropertyGroup>
-    <RestoreSources>$(RestoreSources);../local_packages;https://api.nuget.org/v3/index.json</RestoreSources>
-  </PropertyGroup>
 </Project>

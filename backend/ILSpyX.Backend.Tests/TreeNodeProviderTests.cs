@@ -1,44 +1,32 @@
-using ILSpy.Backend.Application;
-using ILSpy.Backend.Decompiler;
 using ILSpy.Backend.Model;
-using Microsoft.Extensions.Logging.Abstractions;
 using Mono.Cecil;
 
-namespace ILSpy.Backend.Tests;
+namespace ILSpyX.Backend.Tests;
 
 public class TreeNodeProviderTests
 {
-    private static string AssemblyPath => Path.Combine(Path.GetDirectoryName(typeof(TreeNodeDecompilationTests).Assembly.Location) ?? "", "TestAssembly.dll");
-
-    private static ILSpyXApplication CreateTestApplication()
-    {
-        var application = new ILSpyXApplication(new NullLoggerFactory(), new ILSpyBackendSettings());
-        application.DecompilerBackend.AddAssembly(AssemblyPath);
-        return application;
-    }
-
     [Fact]
-    public void GetRootNodes()
+    public async Task GetRootNodes()
     {
-        var application = CreateTestApplication();
-        var list = application.TreeNodeProviders.Root.GetChildren(null);
+        var application = await TestHelper.CreateTestApplication();
+        var list = await application.TreeNodeProviders.AssemblyTreeRoot.GetChildrenAsync(null);
         Assert.Collection(list,
                 node => {
                     Assert.Equal("TestAssembly, 1.0.0.0, .NETCoreApp, v8.0", node.DisplayName);
-                    Assert.Equal(AssemblyPath, node.Description);
+                    Assert.Equal(TestHelper.AssemblyPath, node.Description);
                     Assert.True(node.MayHaveChildren);
-                    Assert.Equal(AssemblyPath, node.Metadata?.AssemblyPath);
-                    Assert.Equal(Path.GetFileName(AssemblyPath), node.Metadata?.Name);
+                    Assert.Equal(TestHelper.AssemblyPath, node.Metadata?.AssemblyPath);
+                    Assert.Equal(Path.GetFileName(TestHelper.AssemblyPath), node.Metadata?.Name);
                     Assert.Equal(NodeType.Assembly, node.Metadata?.Type);
                 });
     }
 
     [Fact]
-    public void GetAssemblyChildren()
+    public async Task GetAssemblyChildren()
     {
-        var application = CreateTestApplication();
-        var nodeMetadata = new NodeMetadata(AssemblyPath, NodeType.Assembly, AssemblyPath, 0, 0);
-        var list = application.TreeNodeProviders.ForNode(nodeMetadata).GetChildren(nodeMetadata);
+        var application = await TestHelper.CreateTestApplication();
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Assembly, TestHelper.AssemblyPath, 0, 0);
+        var list = await application.TreeNodeProviders.ForNode(nodeMetadata).GetChildrenAsync(nodeMetadata);
         Assert.Collection(list,
                 node => {
                     Assert.Equal("References", node.Metadata?.Name);
@@ -96,27 +84,27 @@ public class TreeNodeProviderTests
     }
 
     [Fact]
-    public void GetReferenceChildren()
+    public async Task GetReferenceChildren()
     {
-        var application = CreateTestApplication();
-        var nodeMetadata = new NodeMetadata(AssemblyPath, NodeType.ReferencesRoot, "References", 0, 0);
-        var list = application.TreeNodeProviders.ForNode(nodeMetadata).GetChildren(nodeMetadata);
+        var application = await TestHelper.CreateTestApplication();
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.ReferencesRoot, "References", 0, 0);
+        var list = await application.TreeNodeProviders.ForNode(nodeMetadata).GetChildrenAsync(nodeMetadata);
         Assert.Collection(list,
                 node => {
                     Assert.StartsWith("System.Runtime", node.Metadata?.Name);
                     Assert.StartsWith("System.Runtime, Version=", node.DisplayName);
                     Assert.False(node.MayHaveChildren);
-                    Assert.Equal(AssemblyPath, node.Metadata?.AssemblyPath);
+                    Assert.Equal(TestHelper.AssemblyPath, node.Metadata?.AssemblyPath);
                     Assert.Equal(NodeType.AssemblyReference, node.Metadata?.Type);
                 });
     }
 
     [Fact]
-    public void GetNamespaceChildren()
+    public async Task GetNamespaceChildren()
     {
-        var application = CreateTestApplication();
-        var nodeMetadata = new NodeMetadata(AssemblyPath, NodeType.Namespace, "TestAssembly", 0, 0);
-        var list = application.TreeNodeProviders.ForNode(nodeMetadata).GetChildren(nodeMetadata);
+        var application = await TestHelper.CreateTestApplication();
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Namespace, "TestAssembly", 0, 0);
+        var list = await application.TreeNodeProviders.ForNode(nodeMetadata).GetChildrenAsync(nodeMetadata);
         Assert.Collection(list,
                 node => {
                     Assert.Equal("ISomeInterface", node.Metadata?.Name);
@@ -166,13 +154,13 @@ public class TreeNodeProviderTests
     }
 
     [Fact]
-    public void GetTypeChildren()
+    public async Task GetTypeChildren()
     {
-        var application = CreateTestApplication();
-        var types = application.TreeNodeProviders.Namespace.GetChildren(
-            new NodeMetadata(AssemblyPath, NodeType.Namespace, "TestAssembly", 0, 0));
+        var application = await TestHelper.CreateTestApplication();
+        var types = await application.TreeNodeProviders.Namespace.GetChildrenAsync(
+            new NodeMetadata(TestHelper.AssemblyPath, NodeType.Namespace, "TestAssembly", 0, 0));
         var typeNode = types.Where(node => node.Metadata?.Name == "SomeClass").First();
-        var list = application.TreeNodeProviders.ForNode(typeNode.Metadata).GetChildren(typeNode.Metadata);
+        var list = await application.TreeNodeProviders.ForNode(typeNode.Metadata).GetChildrenAsync(typeNode.Metadata);
         Assert.Collection(list,
                 node => {
                     Assert.Equal("NestedC", node.Metadata?.Name);
@@ -192,6 +180,13 @@ public class TreeNodeProviderTests
                 node => {
                     Assert.Equal("ProgId", node.Metadata?.Name);
                     Assert.Equal(NodeType.Property, node.Metadata?.Type);
+                    Assert.Equal(typeNode.Metadata?.SymbolToken, node.Metadata?.ParentSymbolToken);
+                    Assert.Equal(SymbolModifiers.Public, node.SymbolModifiers);
+                    Assert.False(node.MayHaveChildren);
+                },
+                node => {
+                    Assert.Equal("CallsFrameworkMethod() : string", node.Metadata?.Name);
+                    Assert.Equal(NodeType.Method, node.Metadata?.Type);
                     Assert.Equal(typeNode.Metadata?.SymbolToken, node.Metadata?.ParentSymbolToken);
                     Assert.Equal(SymbolModifiers.Public, node.SymbolModifiers);
                     Assert.False(node.MayHaveChildren);

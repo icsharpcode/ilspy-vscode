@@ -37,7 +37,7 @@ public class CSharpLanguage : ILanguage
         return EntityToString(field, includeDeclaringTypeName, includeNamespace, includeNamespaceOfDeclaringTypeName);
     }
 
-    public string GetEntityName(PEFile module, EntityHandle handle, bool fullName, bool omitGenerics)
+    public string GetEntityName(MetadataFile module, EntityHandle handle, bool fullName, bool omitGenerics)
     {
         var metadata = module.Metadata;
         switch (handle.Kind)
@@ -247,6 +247,11 @@ public class CSharpLanguage : ILanguage
         }
 
         return builder.ToString();
+    }
+
+    public CodeMappingInfo GetCodeMappingInfo(MetadataFile module, EntityHandle member)
+    {
+        return CSharpDecompiler.GetCodeMappingInfo(module, member);
     }
 }
 

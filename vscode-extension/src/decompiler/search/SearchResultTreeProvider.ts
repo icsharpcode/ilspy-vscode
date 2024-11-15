@@ -14,8 +14,7 @@ import {
 } from "vscode";
 import IILSpyBackend from "../IILSpyBackend";
 import Node from "../../protocol/Node";
-import { ProductIconMapping } from "../../icons";
-import { NodeType } from "../../protocol/NodeType";
+import { getNodeIcon } from "../../icons";
 
 interface PerformedSearch {
   term: string;
@@ -24,9 +23,13 @@ interface PerformedSearch {
 
 export type SearchTreeNode = Node | PerformedSearch;
 
-export class SearchResultTreeProvider
-  implements TreeDataProvider<SearchTreeNode>
-{
+export function isPerformedSearchNode(
+  node: SearchTreeNode
+): node is PerformedSearch {
+  return "term" in node && "results" in node;
+}
+
+export class SearchResultTreeProvider implements TreeDataProvider<SearchTreeNode> {
   private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
   readonly onDidChangeTreeData: Event<any> = this._onDidChangeTreeData.event;
   private lastSearches: PerformedSearch[] = [];
@@ -45,28 +48,24 @@ export class SearchResultTreeProvider
     this.refresh();
   }
 
-  public getTreeItem(element: SearchTreeNode): TreeItem {
-    if ((element as PerformedSearch).term) {
-      const performedSearch = element as PerformedSearch;
+  public getTreeItem(node: SearchTreeNode): TreeItem {
+    if (isPerformedSearchNode(node)) {
       return {
-        label: `Search results for "${performedSearch.term}"`,
+        label: `Search results for "${node.term}"`,
         collapsibleState: TreeItemCollapsibleState.Expanded,
         iconPath: new ThemeIcon("search-view-icon"),
       };
     } else {
-      const nodeData = element as Node;
       return {
-        label: nodeData.displayName,
-        tooltip: nodeData.description,
+        label: node.displayName,
+        tooltip: node.description,
         collapsibleState: TreeItemCollapsibleState.None,
         command: {
           command: "decompileNode",
-          arguments: [nodeData],
+          arguments: [node],
           title: "Decompile",
         },
-        iconPath: new ThemeIcon(
-          ProductIconMapping[nodeData.metadata?.type ?? NodeType.Unknown]
-        ),
+        iconPath: new ThemeIcon(getNodeIcon(node.metadata?.type)),
       };
     }
   }
@@ -76,14 +75,14 @@ export class SearchResultTreeProvider
   }
 
   public getChildren(
-    element?: SearchTreeNode
+    node?: SearchTreeNode
   ): SearchTreeNode[] | Thenable<SearchTreeNode[]> {
-    if (!element) {
+    if (!node) {
       return [...this.lastSearches].reverse();
     }
 
-    if ((element as PerformedSearch).term) {
-      return (element as PerformedSearch).results;
+    if (isPerformedSearchNode(node)) {
+      return node.results;
     }
 
     return [];

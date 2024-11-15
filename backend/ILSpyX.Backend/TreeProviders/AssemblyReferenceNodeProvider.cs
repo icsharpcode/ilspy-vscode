@@ -4,6 +4,7 @@ using ILSpy.Backend.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace ILSpy.Backend.TreeProviders;
 
@@ -22,33 +23,35 @@ public class AssemblyReferenceNodeProvider : ITreeNodeProvider
         return DecompileResult.WithCode(code);
     }
 
-    public IEnumerable<Node> CreateNodes(string assemblyPath)
+    public Task<IEnumerable<Node>> CreateNodesAsync(string assemblyPath)
     {
-        var decompiler = application.DecompilerBackend.GetDecompiler(assemblyPath);
+        var decompiler = application.DecompilerBackend.CreateDecompiler(assemblyPath);
         if (decompiler is null)
         {
-            return Enumerable.Empty<Node>();
+            return Task.FromResult(Enumerable.Empty<Node>());
         }
 
         HashSet<string> references = new(decompiler.TypeSystem.NameComparer);
-        foreach (var ar in decompiler.TypeSystem.MainModule.PEFile.AssemblyReferences)
+        foreach (var ar in decompiler.TypeSystem.MainModule.MetadataFile.AssemblyReferences)
         {
             references.Add(ar.FullName);
         }
-        return references
-            .OrderBy(n => n)
-            .Select(reference => new Node(
-                    new NodeMetadata(
-                        AssemblyPath: assemblyPath,
-                        Type: NodeType.AssemblyReference,
-                        Name: reference,
-                        SymbolToken: 0,
-                        ParentSymbolToken: 0),
-                    DisplayName: reference,
-                    Description: string.Empty,
-                    MayHaveChildren: false,
-                    SymbolModifiers: SymbolModifiers.None
-                )); ;
+        return Task.FromResult(
+            references
+                .OrderBy(n => n)
+                .Select(reference => new Node(
+                        new NodeMetadata(
+                            AssemblyPath: assemblyPath,
+                            Type: NodeType.AssemblyReference,
+                            Name: reference,
+                            SymbolToken: 0,
+                            ParentSymbolToken: 0),
+                        DisplayName: reference,
+                        Description: string.Empty,
+                        MayHaveChildren: false,
+                        SymbolModifiers: SymbolModifiers.None
+                    ))
+        );
     }
 }
 

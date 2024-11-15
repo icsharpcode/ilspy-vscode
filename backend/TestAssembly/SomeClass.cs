@@ -53,5 +53,10 @@ namespace TestAssembly
         {
             return null;
         }
+
+        public string CallsFrameworkMethod()
+        {
+            return string.Join("Test1", "Test2", "Test3");
+        }
     }
 }

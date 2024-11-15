@@ -11,5 +11,11 @@
         ///  some public struct property with getter and setter.
         /// </summary>
         public int Prop { get; set; }
+
+        public string StructMethod()
+        {
+            var someClass = new SomeClass();
+            return someClass.ToString();
+        }
     }
 }

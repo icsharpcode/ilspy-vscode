@@ -5,7 +5,9 @@
 
 import { NodeType } from "./protocol/NodeType";
 
-export const ProductIconMapping = {
+const UNKNOWN_ICON = "question";
+
+const ProductIconMapping: { [key in NodeType]?: string } = {
   [NodeType.Assembly]: "library",
   [NodeType.Namespace]: "symbol-namespace",
   [NodeType.Event]: "symbol-event",
@@ -20,6 +22,10 @@ export const ProductIconMapping = {
   [NodeType.Property]: "symbol-property",
   [NodeType.ReferencesRoot]: "folder-library",
   [NodeType.AssemblyReference]: "library",
-  [NodeType.Unknown]: "question",
+  [NodeType.Unknown]: UNKNOWN_ICON,
+  [NodeType.Analyzer]: "question",
 };
 
+export function getNodeIcon(nodeType: NodeType | undefined) {
+  return ProductIconMapping[nodeType ?? NodeType.Unknown] ?? UNKNOWN_ICON;
+}

@@ -1,26 +1,16 @@
-using ILSpy.Backend.Application;
 using ILSpy.Backend.Decompiler;
 using ILSpy.Backend.Model;
-using Microsoft.Extensions.Logging.Abstractions;
+using ILSpyX.Backend.Tests;
 using System.Reflection.Metadata.Ecma335;
 
 namespace ILSpy.Backend.Tests;
 
 public class TreeNodeDecompilationTests
 {
-    private static string AssemblyPath => Path.Combine(Path.GetDirectoryName(typeof(TreeNodeDecompilationTests).Assembly.Location) ?? "", "TestAssembly.dll");
-
-    private static ILSpyXApplication CreateTestApplication()
-    {
-        var application = new ILSpyXApplication(new NullLoggerFactory(), new ILSpyBackendSettings());
-        application.DecompilerBackend.AddAssembly(AssemblyPath);
-        return application;
-    }
-
     private static int GetTypeToken(DecompilerBackend decompilerBackend, string @namespace, string name)
     {
         return decompilerBackend
-            .ListTypes(AssemblyPath, @namespace)
+            .ListTypes(TestHelper.AssemblyPath, @namespace)
             .Where(memberData => memberData.Name == name)
             .Select(memberData => memberData.Token)
             .FirstOrDefault();
@@ -29,19 +19,19 @@ public class TreeNodeDecompilationTests
     private static int GetMemberToken(DecompilerBackend decompilerBackend, int parentTypeToken, string name)
     {
         return decompilerBackend
-            .GetMembers(AssemblyPath, MetadataTokens.TypeDefinitionHandle(parentTypeToken))
+            .GetMembers(TestHelper.AssemblyPath, MetadataTokens.TypeDefinitionHandle(parentTypeToken))
             .Where(memberData => memberData.Name == name)
             .Select(memberData => memberData.Token)
             .FirstOrDefault();
     }
 
     [Fact]
-    public void Assembly()
+    public async Task Assembly()
     {
-        var application = CreateTestApplication();
-        var nodeMetadata = new NodeMetadata(AssemblyPath, NodeType.Assembly, AssemblyPath, 0, 0);
+        var application = await TestHelper.CreateTestApplication();
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Assembly, TestHelper.AssemblyPath, 0, 0);
         Assert.Equal(
-$"// {AssemblyPath}" +
+$"// {TestHelper.AssemblyPath}" +
 @"
 // TestAssembly, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
 // Global type: <Module>
@@ -70,31 +60,31 @@ using System.Runtime.Versioning;
     }
 
     [Fact]
-    public void Namespace()
+    public async Task Namespace()
     {
-        var application = CreateTestApplication();
-        var nodeMetadata = new NodeMetadata(AssemblyPath, NodeType.Namespace, "A.B.C.D", 0, 0);
+        var application = await TestHelper.CreateTestApplication();
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Namespace, "A.B.C.D", 0, 0);
         Assert.Equal(
 @"namespace A.B.C.D { }",
             application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);
     }
 
     [Fact]
-    public void GlobalNamespace()
+    public async Task GlobalNamespace()
     {
-        var application = CreateTestApplication();
-        var nodeMetadata = new NodeMetadata(AssemblyPath, NodeType.Namespace, "", 0, 0);
+        var application = await TestHelper.CreateTestApplication();
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Namespace, "", 0, 0);
         Assert.Equal(
 @"namespace <global> { }",
             application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);
     }
 
     [Fact]
-    public void Class()
+    public async Task Class()
     {
-        var application = CreateTestApplication();
+        var application = await TestHelper.CreateTestApplication();
         int typeToken = GetTypeToken(application.DecompilerBackend, "Generics", "AClass");
-        var nodeMetadata = new NodeMetadata(AssemblyPath, NodeType.Class, "", typeToken, 0);
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Class, "", typeToken, 0);
         Assert.Equal(
 @"namespace Generics;
 
@@ -121,11 +111,11 @@ public class AClass
     }
 
     [Fact]
-    public void Interface()
+    public async Task Interface()
     {
-        var application = CreateTestApplication();
+        var application = await TestHelper.CreateTestApplication();
         int typeToken = GetTypeToken(application.DecompilerBackend, "TestAssembly", "ISomeInterface");
-        var nodeMetadata = new NodeMetadata(AssemblyPath, NodeType.Interface, "", typeToken, 0);
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Interface, "", typeToken, 0);
         Assert.Equal(
 @"namespace TestAssembly;
 
@@ -138,28 +128,34 @@ public interface ISomeInterface
     }
 
     [Fact]
-    public void Struct()
+    public async Task Struct()
     {
-        var application = CreateTestApplication();
+        var application = await TestHelper.CreateTestApplication();
         int typeToken = GetTypeToken(application.DecompilerBackend, "TestAssembly", "SomeStruct");
-        var nodeMetadata = new NodeMetadata(AssemblyPath, NodeType.Struct, "", typeToken, 0);
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Struct, "", typeToken, 0);
         Assert.Equal(
 @"namespace TestAssembly;
 
 internal struct SomeStruct
 {
     public int Prop { get; set; }
+
+    public string StructMethod()
+    {
+        SomeClass someClass = new SomeClass();
+        return someClass.ToString();
+    }
 }
 ",
             application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);
     }
 
     [Fact]
-    public void Enum()
+    public async Task Enum()
     {
-        var application = CreateTestApplication();
+        var application = await TestHelper.CreateTestApplication();
         int typeToken = GetTypeToken(application.DecompilerBackend, "TestAssembly", "SomeEnum");
-        var nodeMetadata = new NodeMetadata(AssemblyPath, NodeType.Enum, "", typeToken, 0);
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Enum, "", typeToken, 0);
         Assert.Equal(
 @"namespace TestAssembly;
 
@@ -174,12 +170,12 @@ public enum SomeEnum
     }
 
     [Fact]
-    public void Method()
+    public async Task Method()
     {
-        var application = CreateTestApplication();
+        var application = await TestHelper.CreateTestApplication();
         int typeToken = GetTypeToken(application.DecompilerBackend, "TestAssembly", "SomeClass");
         int memberToken = GetMemberToken(application.DecompilerBackend, typeToken, "ToString() : string");
-        var nodeMetadata = new NodeMetadata(AssemblyPath, NodeType.Method, "", memberToken, typeToken);
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Method, "", memberToken, typeToken);
         Assert.Equal(
 @"public override string ToString()
 {
@@ -190,12 +186,12 @@ public enum SomeEnum
     }
 
     [Fact]
-    public void Field()
+    public async Task Field()
     {
-        var application = CreateTestApplication();
+        var application = await TestHelper.CreateTestApplication();
         int typeToken = GetTypeToken(application.DecompilerBackend, "TestAssembly", "SomeClass");
         int memberToken = GetMemberToken(application.DecompilerBackend, typeToken, "_ProgId");
-        var nodeMetadata = new NodeMetadata(AssemblyPath, NodeType.Field, "", memberToken, typeToken);
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Field, "", memberToken, typeToken);
         Assert.Equal(
 @"private int _ProgId;
 ",
@@ -203,12 +199,12 @@ public enum SomeEnum
     }
 
     [Fact]
-    public void Property()
+    public async Task Property()
     {
-        var application = CreateTestApplication();
+        var application = await TestHelper.CreateTestApplication();
         int typeToken = GetTypeToken(application.DecompilerBackend, "TestAssembly", "SomeClass");
         int memberToken = GetMemberToken(application.DecompilerBackend, typeToken, "ProgId");
-        var nodeMetadata = new NodeMetadata(AssemblyPath, NodeType.Property, "", memberToken, typeToken);
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Property, "", memberToken, typeToken);
         Assert.Equal(
 @"public int ProgId
 {
@@ -226,12 +222,12 @@ public enum SomeEnum
     }
 
     [Fact]
-    public void Constructor()
+    public async Task Constructor()
     {
-        var application = CreateTestApplication();
+        var application = await TestHelper.CreateTestApplication();
         int typeToken = GetTypeToken(application.DecompilerBackend, "TestAssembly", "SomeClass");
         int memberToken = GetMemberToken(application.DecompilerBackend, typeToken, "SomeClass(int)");
-        var nodeMetadata = new NodeMetadata(AssemblyPath, NodeType.Method, "", memberToken, typeToken);
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Method, "", memberToken, typeToken);
         Assert.Equal(
 @"internal SomeClass(int ProgramId)
 {
@@ -242,20 +238,20 @@ public enum SomeEnum
     }
 
     [Fact]
-    public void ReferencesRoot()
+    public async Task ReferencesRoot()
     {
-        var application = CreateTestApplication();
-        var nodeMetadata = new NodeMetadata(AssemblyPath, NodeType.ReferencesRoot, "References", 0, 0);
+        var application = await TestHelper.CreateTestApplication();
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.ReferencesRoot, "References", 0, 0);
         Assert.Equal(
 @"// System.Runtime, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
             application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);
     }
 
     [Fact]
-    public void AssemblyReference()
+    public async Task AssemblyReference()
     {
-        var application = CreateTestApplication();
-        var nodeMetadata = new NodeMetadata(AssemblyPath, NodeType.AssemblyReference,
+        var application = await TestHelper.CreateTestApplication();
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.AssemblyReference,
             "System.Runtime, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", 0, 0);
         Assert.Equal(
 @"// System.Runtime, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
@@ -263,11 +259,11 @@ public enum SomeEnum
     }
 
     [Fact]
-    public void CSharpVariant_Latest()
+    public async Task CSharpVariant_Latest()
     {
-        var application = CreateTestApplication();
+        var application = await TestHelper.CreateTestApplication();
         int typeToken = GetTypeToken(application.DecompilerBackend, "CSharpVariants", "CSharpVariants");
-        var nodeMetadata = new NodeMetadata(AssemblyPath, NodeType.Interface, "", typeToken, 0);
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Interface, "", typeToken, 0);
         Assert.Equal(
 @"namespace CSharpVariants;
 
@@ -280,11 +276,11 @@ public class CSharpVariants
     }
 
     [Fact]
-    public void CSharpVariant_8()
+    public async Task CSharpVariant_8()
     {
-        var application = CreateTestApplication();
+        var application = await TestHelper.CreateTestApplication();
         int typeToken = GetTypeToken(application.DecompilerBackend, "CSharpVariants", "CSharpVariants");
-        var nodeMetadata = new NodeMetadata(AssemblyPath, NodeType.Interface, "", typeToken, 0);
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Interface, "", typeToken, 0);
         Assert.Equal(
 @"namespace CSharpVariants
 {
@@ -298,11 +294,11 @@ public class CSharpVariants
     }
 
     [Fact]
-    public void CSharpVariant_1()
+    public async Task CSharpVariant_1()
     {
-        var application = CreateTestApplication();
+        var application = await TestHelper.CreateTestApplication();
         int typeToken = GetTypeToken(application.DecompilerBackend, "CSharpVariants", "CSharpVariants");
-        var nodeMetadata = new NodeMetadata(AssemblyPath, NodeType.Interface, "", typeToken, 0);
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Class, "", typeToken, 0);
         Assert.Equal(
 @"using System.Runtime.CompilerServices;
 

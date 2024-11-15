@@ -3,7 +3,7 @@ using ICSharpCode.Decompiler.CSharp;
 using ICSharpCode.Decompiler.CSharp.OutputVisitor;
 using ILSpy.Backend.Model;
 
-namespace ILSpy.Backend.Decompiler;
+namespace ILSpyX.Backend.Application;
 
 public class ILSpyBackendSettings
 {

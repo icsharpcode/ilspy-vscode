@@ -19,6 +19,7 @@ import {
   InitWithAssembliesParams,
   InitWithAssembliesResponse,
 } from "../protocol/initWithAssemblies";
+import { AnalyzeParams, AnalyzeResponse } from "../protocol/analyze";
 
 export default interface IILSpyBackend {
   sendInitWithAssemblies(
@@ -40,4 +41,5 @@ export default interface IILSpyBackend {
   sendGetNodes(params: GetNodesParams): Promise<GetNodesResponse | null>;
 
   sendSearch(params: SearchParams): Promise<SearchResponse | null>;
+  sendAnalyze(params: AnalyzeParams): Promise<AnalyzeResponse | null>;
 }

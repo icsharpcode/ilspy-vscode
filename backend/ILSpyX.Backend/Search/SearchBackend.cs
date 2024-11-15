@@ -2,12 +2,13 @@
 // Licensed under the MIT license. See the LICENSE file in the project
 
 using ICSharpCode.Decompiler.TypeSystem;
-using ICSharpCode.ILSpy.Search;
 using ICSharpCode.ILSpyX;
 using ICSharpCode.ILSpyX.Search;
+using ILSpy.Backend.Application;
+using ILSpy.Backend.Decompiler;
 using ILSpy.Backend.Model;
 using ILSpy.Backend.TreeProviders;
-using Microsoft.Extensions.Logging;
+using ILSpyX.Backend.Application;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -17,30 +18,18 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ILSpy.Backend.Decompiler;
+namespace ILSpyX.Backend.Search;
 
 public class SearchBackend
 {
-    private readonly ILogger logger;
     private readonly IComparer<SearchResult> resultsComparer = SearchResult.ComparerByName;
-    private readonly SingleThreadAssemblyList assemblyList;
+    private readonly AssemblyList assemblyList;
     private readonly ILSpyBackendSettings ilspyBackendSettings;
 
-    public SearchBackend(ILoggerFactory loggerFactory, SingleThreadAssemblyList assemblyList, ILSpyBackendSettings ilspyBackendSettings)
+    public SearchBackend(AssemblyList assemblyList, ILSpyBackendSettings ilspyBackendSettings)
     {
-        logger = loggerFactory.CreateLogger<SearchBackend>();
         this.assemblyList = assemblyList;
         this.ilspyBackendSettings = ilspyBackendSettings;
-    }
-
-    public async Task AddAssembly(string path)
-    {
-        await assemblyList.AddAssembly(path);
-    }
-
-    public async Task RemoveAssembly(string path)
-    {
-        await assemblyList.RemoveAssembly(path);
     }
 
     public async Task<IEnumerable<Node>> Search(string searchTerm, CancellationToken cancellationToken)
@@ -49,7 +38,7 @@ public class SearchBackend
         {
             try
             {
-                var assemblies = await assemblyList.GetAllAssemblies();
+                var assemblies = (await assemblyList.GetAllAssemblies()).Where(assembly => !assembly.IsAutoLoaded);
 
                 var resultQueue = new ConcurrentQueue<SearchResult>();
                 var searchRequest = CreateSearchRequest(searchTerm, SearchMode.TypeAndMember);
@@ -62,7 +51,7 @@ public class SearchBackend
                     {
                         foreach (var loadedAssembly in assemblies)
                         {
-                            var module = loadedAssembly.GetPEFileOrNull();
+                            var module = loadedAssembly.GetMetadataFileOrNull();
                             if (module == null)
                                 continue;
                             searcher.Search(module, cancellationToken);
@@ -132,7 +121,7 @@ public class SearchBackend
 
     SymbolModifiers GetSymbolModifiers(SearchResult result)
     {
-        SymbolModifiers modifiers = SymbolModifiers.None;
+        var modifiers = SymbolModifiers.None;
         switch (result)
         {
             case MemberSearchResult memberSearchResult:
@@ -170,8 +159,8 @@ public class SearchBackend
     {
         string[] parts = input.Split(' '); // NativeMethods.CommandLineToArgumentArray(input);
 
-        SearchRequest request = new SearchRequest();
-        List<string> keywords = new List<string>();
+        var request = new SearchRequest();
+        var keywords = new List<string>();
         Regex? regex = null;
         request.Mode = searchMode;
 

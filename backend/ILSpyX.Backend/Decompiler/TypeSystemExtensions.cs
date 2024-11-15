@@ -28,16 +28,17 @@ namespace ILSpy.Backend.Decompiler
             return TypeToStringInternal(type, includeNamespace, false);
         }
 
-        static string TypeToStringInternal(IType t, bool includeNamespace, bool useBuiltinTypeNames = true, ParameterModifier parameterModifier = ParameterModifier.None)
+        static string TypeToStringInternal(IType t, bool includeNamespace, bool useBuiltinTypeNames = true,
+            ReferenceKind referenceKind = ReferenceKind.None)
         {
-            TypeSystemAstBuilder builder = new();
-            builder.AlwaysUseShortTypeNames = !includeNamespace;
-            builder.UseKeywordsForBuiltinTypes = useBuiltinTypeNames;
-
-            const ParameterModifier refInOutModifier = ParameterModifier.Ref | ParameterModifier.Out | ParameterModifier.In;
+            TypeSystemAstBuilder builder = new()
+            {
+                AlwaysUseShortTypeNames = !includeNamespace, UseKeywordsForBuiltinTypes = useBuiltinTypeNames
+            };
 
             AstType astType = builder.ConvertType(t);
-            if ((parameterModifier & refInOutModifier) != 0 && astType is ComposedType ct && ct.HasRefSpecifier)
+            if (referenceKind is ReferenceKind.Ref or ReferenceKind.Out or ReferenceKind.In &&
+                astType is ComposedType { HasRefSpecifier: true } ct)
             {
                 ct.HasRefSpecifier = false;
             }
@@ -47,33 +48,15 @@ namespace ILSpy.Backend.Decompiler
             astType.AcceptVisitor(new CSharpOutputVisitor(w, TypeToStringFormattingOptions));
             string output = w.ToString();
 
-            switch (parameterModifier)
+            return referenceKind switch
             {
-                case ParameterModifier.Ref:
-                    output = "ref " + output;
-                    break;
-                case ParameterModifier.Out:
-                    output = "out " + output;
-                    break;
-                case ParameterModifier.In:
-                    output = "in " + output;
-                    break;
-            }
-
-            return output;
+                ReferenceKind.Ref => "ref " + output,
+                ReferenceKind.Out => "out " + output,
+                ReferenceKind.In => "in " + output,
+                _ => output
+            };
         }
-
-        static ParameterModifier GetModifier(IParameter p)
-        {
-            if (p.IsRef)
-                return ParameterModifier.Ref;
-            if (p.IsOut)
-                return ParameterModifier.Out;
-            if (p.IsIn)
-                return ParameterModifier.In;
-            return ParameterModifier.None;
-        }
-
+        
         public static string FieldToString(this IField field, bool includeDeclaringTypeName, bool includeNamespace, bool includeNamespaceOfDeclaringTypeName)
         {
             if (field == null)
@@ -115,7 +98,8 @@ namespace ILSpy.Backend.Decompiler
                 {
                     if (i > 0)
                         buffer.Append(", ");
-                    buffer.Append(TypeToStringInternal(param.Type, includeNamespace, parameterModifier: GetModifier(param)));
+                    buffer.Append(TypeToStringInternal(param.Type, includeNamespace,
+                        referenceKind: param.ReferenceKind));
                     i++;
                 }
 
@@ -174,7 +158,8 @@ namespace ILSpy.Backend.Decompiler
             {
                 if (i > 0)
                     buffer.Append(", ");
-                buffer.Append(TypeToStringInternal(param.Type, includeNamespace, parameterModifier: GetModifier(param)));
+                buffer.Append(
+                    TypeToStringInternal(param.Type, includeNamespace, referenceKind: param.ReferenceKind));
                 i++;
             }
 

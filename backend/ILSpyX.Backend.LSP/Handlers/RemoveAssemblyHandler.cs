@@ -4,7 +4,6 @@
 using ILSpy.Backend.Application;
 using ILSpy.Backend.Decompiler;
 using ILSpyX.Backend.LSP.Protocol;
-
 using OmniSharp.Extensions.JsonRpc;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,22 +14,15 @@ namespace ILSpyX.Backend.LSP.Handlers;
 public class RemoveAssemblyHandler : IJsonRpcRequestHandler<RemoveAssemblyRequest, RemoveAssemblyResponse>
 {
     private readonly ILSpyXApplication application;
-    private readonly SearchBackend searchBackend;
 
-    public RemoveAssemblyHandler(ILSpyXApplication application, SearchBackend searchBackend)
+    public RemoveAssemblyHandler(ILSpyXApplication application)
     {
         this.application = application;
-        this.searchBackend = searchBackend;
     }
 
-    public async Task<RemoveAssemblyResponse> Handle(RemoveAssemblyRequest request, CancellationToken cancellationToken)
+    public Task<RemoveAssemblyResponse> Handle(RemoveAssemblyRequest request, CancellationToken cancellationToken)
     {
-        if (request.AssemblyPath != null)
-        {
-            await searchBackend.RemoveAssembly(request.AssemblyPath);
-        }
-
         bool result = request.AssemblyPath != null && application.DecompilerBackend.RemoveAssembly(request.AssemblyPath);
-        return new RemoveAssemblyResponse(Removed: result);
+        return Task.FromResult(new RemoveAssemblyResponse(Removed: result));
     }
 }

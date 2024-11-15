@@ -18,8 +18,8 @@ import {
 import IILSpyBackend from "./IILSpyBackend";
 import Node from "../protocol/Node";
 import { NodeType } from "../protocol/NodeType";
-import { ProductIconMapping } from "../icons";
 import { getAssemblyList, updateAssemblyListIfNeeded } from "./settings";
+import { getNodeIcon } from "../icons";
 
 export class DecompiledTreeProvider implements TreeDataProvider<Node> {
   private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
@@ -105,11 +105,8 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
         arguments: [node],
         title: "Decompile",
       },
-      contextValue:
-        node.metadata?.type === NodeType.Assembly ? "assemblyNode" : void 0,
-      iconPath: new ThemeIcon(
-        ProductIconMapping[node.metadata?.type ?? NodeType.Unknown]
-      ),
+      contextValue: getNodeContextValue(node),
+      iconPath: new ThemeIcon(getNodeIcon(node.metadata?.type)),
     };
   }
 
@@ -150,4 +147,23 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
 
 function setTreeWithNodes(treeWithNodes: boolean) {
   commands.executeCommand("setContext", "ilspy.treeWithNodes", treeWithNodes);
+}
+
+function getNodeContextValue(node: Node) {
+  switch (node.metadata?.type) {
+    case NodeType.Assembly:
+      return "assemblyNode";
+    case NodeType.Class:
+    case NodeType.Interface:
+    case NodeType.Event:
+    case NodeType.Method:
+    case NodeType.Enum:
+    case NodeType.Const:
+    case NodeType.Property:
+      return "analyzableNode";
+    default:
+      break;
+  }
+
+  return undefined;
 }

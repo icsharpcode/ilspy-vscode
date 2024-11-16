@@ -58,6 +58,7 @@ export class SearchResultTreeProvider implements TreeDataProvider<SearchTreeNode
     } else {
       return {
         label: node.displayName,
+        description: node.description,
         tooltip: node.description,
         collapsibleState: TreeItemCollapsibleState.None,
         command: {

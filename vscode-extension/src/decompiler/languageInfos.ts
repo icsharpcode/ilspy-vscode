@@ -63,6 +63,10 @@ export const languageInfos: { [key: string]: LanguageInfo } = {
     displayName: "C# 11.0 / VS 2022.4",
     vsLanguageMode: "csharp",
   },
+  [LanguageName.CSharp_12]: {
+    displayName: "C# 12.0 / VS 2022.8",
+    vsLanguageMode: "csharp",
+  },
 };
 
 export const DEFAULT_OUTPUT_LANGUAGE: LanguageName = LanguageName.CSharp_11;

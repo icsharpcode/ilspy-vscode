@@ -44,7 +44,8 @@ public class ILSpyBackendSettings
             LanguageName.CSharp_9 => LanguageVersion.CSharp9_0,
             LanguageName.CSharp_10 => LanguageVersion.CSharp10_0,
             LanguageName.CSharp_11 => LanguageVersion.CSharp11_0,
-            _ => LanguageVersion.CSharp11_0,
+            LanguageName.CSharp_12 => LanguageVersion.CSharp12_0,
+            _ => LanguageVersion.CSharp12_0,
         };
     }
 }

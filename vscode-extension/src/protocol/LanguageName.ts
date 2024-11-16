@@ -19,4 +19,5 @@ export enum LanguageName {
   CSharp_9 = "cs-9",
   CSharp_10 = "cs-10",
   CSharp_11 = "cs-11",
+  CSharp_12 = "cs-12",
 }

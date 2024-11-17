@@ -1,4 +1,4 @@
-# ILSpy Visual Studio Code Extension [![Visual Studio Marketplace](https://img.shields.io/visual-studio-marketplace/v/icsharpcode.ilspy-vscode)](https://twitter.com/ilspy) [![Join the chat at https://gitter.im/icsharpcode/ILSpy](https://badges.gitter.im/icsharpcode/ILSpy.svg)](https://gitter.im/icsharpcode/ILSpy?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![CI](https://github.com/icsharpcode/ilspy-vscode/actions/workflows/ci.yml/badge.svg)](https://github.com/icsharpcode/ilspy-vscode/actions/workflows/ci.yml) 
+# ILSpy Visual Studio Code Extension [![Visual Studio Marketplace](https://img.shields.io/visual-studio-marketplace/v/icsharpcode.ilspy-vscode)](https://twitter.com/ilspy) [![Join the chat at https://gitter.im/icsharpcode/ILSpy](https://badges.gitter.im/icsharpcode/ILSpy.svg)](https://gitter.im/icsharpcode/ILSpy?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![CI](https://github.com/icsharpcode/ilspy-vscode/actions/workflows/ci.yml/badge.svg)](https://github.com/icsharpcode/ilspy-vscode/actions/workflows/ci.yml)
 
 You can install the extension in Visual Studio Code via the [marketplace](https://marketplace.visualstudio.com/items?itemName=icsharpcode.ilspy-vscode)
 
@@ -43,7 +43,7 @@ cd backend
 dotnet test
 ```
 
-Or open `backend/ILSpy-server.sln` in Visual Studio 2022 (>= 17.8) or another .NET IDE.
+Or open `backend/ILSpy-backend.sln` in Visual Studio 2022, Visual Studio Code or JetBrains Rider.
 
 To develop and debug the VSCode extension, install [Visual Studio Code](https://code.visualstudio.com/),
 then run

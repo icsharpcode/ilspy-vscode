@@ -69,7 +69,7 @@ export const languageInfos: { [key: string]: LanguageInfo } = {
   },
 };
 
-export const DEFAULT_OUTPUT_LANGUAGE: LanguageName = LanguageName.CSharp_11;
+export const DEFAULT_OUTPUT_LANGUAGE: LanguageName = LanguageName.CSharp_12;
 
 export const languageFromDisplayName = (name?: string) =>
   Object.entries(languageInfos).find(

@@ -82,7 +82,7 @@ export class AnalyzeResultTreeProvider
         tooltip: node.description,
         collapsibleState: getTreeNodeCollapsibleState(node),
         command: {
-          command: "decompileNode",
+          command: "ilspy.decompileNode",
           arguments: [node],
           title: "Decompile",
         },

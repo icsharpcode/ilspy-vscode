@@ -101,7 +101,7 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
         ? TreeItemCollapsibleState.Collapsed
         : void 0,
       command: {
-        command: "decompileNode",
+        command: "ilspy.decompileNode",
         arguments: [node],
         title: "Decompile",
       },

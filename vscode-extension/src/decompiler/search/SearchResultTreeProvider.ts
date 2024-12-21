@@ -62,7 +62,7 @@ export class SearchResultTreeProvider implements TreeDataProvider<SearchTreeNode
         tooltip: node.description,
         collapsibleState: TreeItemCollapsibleState.None,
         command: {
-          command: "decompileNode",
+          command: "ilspy.decompileNode",
           arguments: [node],
           title: "Decompile",
         },

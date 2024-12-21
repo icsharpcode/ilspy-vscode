@@ -16,7 +16,7 @@ export function registerDecompileNode(
   contentProvider: DecompilerTextDocumentContentProvider
 ) {
   return vscode.commands.registerCommand(
-    "decompileNode",
+    "ilspy.decompileNode",
     async (node: Node) => {
       if (lastSelectedNode === node) {
         return;

@@ -286,8 +286,8 @@
 		"@types/mocha": "^10.0.10",
 		"@types/node": "^20.0.0",
 		"@types/vscode": "^1.74.0",
-		"@typescript-eslint/eslint-plugin": "^8.18.1",
-		"@typescript-eslint/parser": "^8.18.1",
+		"@typescript-eslint/eslint-plugin": "^8.18.2",
+		"@typescript-eslint/parser": "^8.18.2",
 		"@vscode/test-electron": "^2.4.1",
 		"@vscode/vsce": "^3.2.1",
 		"eslint": "^8.57.1",
@@ -298,7 +298,7 @@
 		"ts-loader": "^9.5.1",
 		"typescript": "^5.7.2",
 		"webpack": "5.97.1",
-		"webpack-cli": "5.1.4"
+		"webpack-cli": "6.0.1"
 	},
 	"extensionDependencies": [
 		"ms-dotnettools.vscode-dotnet-runtime"

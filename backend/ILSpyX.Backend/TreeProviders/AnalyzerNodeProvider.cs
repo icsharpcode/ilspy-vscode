@@ -87,7 +87,7 @@ public class AnalyzerNodeProvider : ITreeNodeProvider
                     string location = (entity as IMember)?.DeclaringType.TypeToString(true) ?? "";
                     return new Node(
                         Metadata: new NodeMetadata(
-                            AssemblyPath: entity.ParentModule.MetadataFile?.FileName ?? "",
+                            AssemblyPath: entity.ParentModule?.MetadataFile?.FileName ?? "",
                             Type: NodeTypeHelper.GetNodeTypeFromEntity(entity),
                             Name: nodeName,
                             SymbolToken: MetadataTokens.GetToken(entity.MetadataToken),

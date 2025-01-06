@@ -31,7 +31,7 @@ public class MethodAnalyzersTests
 
         var methodUsedByNodes =
             await application.TreeNodeProviders.Analyzer.GetChildrenAsync(
-                analyzerNodes.First(analyzer => analyzer.Metadata.SubType == "MethodUsedByAnalyzer")?.Metadata);
+                analyzerNodes.First(analyzer => analyzer.Metadata?.SubType == "MethodUsedByAnalyzer")?.Metadata);
         var callerStructTypeNode = types.First(node => node.Metadata?.Name == "SomeStruct");
         Assert.Collection(methodUsedByNodes,
             node => {
@@ -71,7 +71,7 @@ public class MethodAnalyzersTests
 
         var methodUsesNodes =
             await application.TreeNodeProviders.Analyzer.GetChildrenAsync(
-                analyzerNodes.First(analyzer => analyzer.Metadata.SubType == "MethodUsesAnalyzer")?.Metadata);
+                analyzerNodes.First(analyzer => analyzer.Metadata?.SubType == "MethodUsesAnalyzer")?.Metadata);
         Assert.Collection(methodUsesNodes,
             node => {
                 Assert.Equal("Join(string?, string?[]) : string", node.DisplayName);

@@ -1,8 +1,8 @@
 ﻿// Copyright (c) 2021 ICSharpCode
 // Licensed under the MIT license. See the LICENSE file in the project root for more information.
 
-using ILSpy.Backend.Decompiler;
-using ILSpy.Backend.Model;
+using ILSpyX.Backend.Decompiler;
+using ILSpyX.Backend.Model;
 using MediatR;
 using OmniSharp.Extensions.JsonRpc;
 using System.Collections.Generic;

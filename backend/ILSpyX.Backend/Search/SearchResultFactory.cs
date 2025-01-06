@@ -21,7 +21,7 @@ using ICSharpCode.Decompiler.Metadata;
 using ICSharpCode.Decompiler.TypeSystem;
 using ICSharpCode.ILSpyX.Abstractions;
 using ICSharpCode.ILSpyX.Search;
-using ILSpy.Backend.Decompiler;
+using ILSpyX.Backend.Decompiler;
 
 namespace ILSpyX.Backend.Search;
 

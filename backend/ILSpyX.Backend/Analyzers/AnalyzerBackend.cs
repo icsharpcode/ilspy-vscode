@@ -1,5 +1,5 @@
 using ICSharpCode.ILSpyX.Analyzers;
-using ILSpy.Backend.Model;
+using ILSpyX.Backend.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;

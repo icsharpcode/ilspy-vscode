@@ -1,7 +1,7 @@
 using ICSharpCode.Decompiler;
 using ICSharpCode.Decompiler.CSharp;
 using ICSharpCode.Decompiler.CSharp.OutputVisitor;
-using ILSpy.Backend.Model;
+using ILSpyX.Backend.Model;
 
 namespace ILSpyX.Backend.Application;
 

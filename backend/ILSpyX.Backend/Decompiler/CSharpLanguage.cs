@@ -11,7 +11,7 @@ using System.Reflection;
 using System.Reflection.Metadata;
 using System.Text;
 
-namespace ILSpy.Backend.Decompiler;
+namespace ILSpyX.Backend.Decompiler;
 
 public class CSharpLanguage : ILanguage
 {

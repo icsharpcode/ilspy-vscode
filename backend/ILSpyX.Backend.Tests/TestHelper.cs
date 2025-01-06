@@ -1,5 +1,4 @@
-﻿using ILSpy.Backend.Application;
-using ILSpyX.Backend.Application;
+﻿using ILSpyX.Backend.Application;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace ILSpyX.Backend.Tests;

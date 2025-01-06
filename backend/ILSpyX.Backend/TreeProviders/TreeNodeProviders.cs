@@ -1,17 +1,12 @@
 using ICSharpCode.Decompiler.TypeSystem;
-using ICSharpCode.ILSpyX.Abstractions;
-using ICSharpCode.ILSpyX.Analyzers.Builtin;
-using ILSpy.Backend.Application;
-using ILSpy.Backend.Model;
-using ILSpyX.Backend.TreeProviders;
-using System;
-using System.Security.Cryptography;
+using ILSpyX.Backend.Application;
+using ILSpyX.Backend.Model;
 
-namespace ILSpy.Backend.TreeProviders;
+namespace ILSpyX.Backend.TreeProviders;
 
-public class TreeNodeProviders
+public class TreeNodeProviders(ILSpyXApplication application)
 {
-    private readonly ILSpyXApplication application;
+    private readonly ILSpyXApplication application = application;
 
     public ITreeNodeProvider ForNode(NodeMetadata? nodeMetadata) =>
         FromNodeType(nodeMetadata?.Type);
@@ -44,32 +39,15 @@ public class TreeNodeProviders
         _ => Dummy,
     };
 
-    public TreeNodeProviders(ILSpyXApplication application)
-    {
-        this.application = application;
-
-        Dummy = new DummyTreeNodeProvider();
-
-        AssemblyTreeRoot = new AssemblyTreeRootNodesProvider(application);
-        Assembly = new AssemblyNodeProvider(application);
-        ReferencesRoot = new ReferencesRootNodeProvider(application);
-        AssemblyReference = new AssemblyReferenceNodeProvider(application);
-        Namespace = new NamespaceNodeProvider(application);
-        Type = new TypeNodeProvider(application);
-        Member = new MemberNodeProvider(application);
-        AnalyzersRoot = new AnalyzersRootNodesProvider(application);
-        Analyzer = new AnalyzerNodeProvider(application);
-    }
-
-    public DummyTreeNodeProvider Dummy { get; }
-    public AssemblyTreeRootNodesProvider AssemblyTreeRoot { get; }
-    public AssemblyNodeProvider Assembly { get; }
-    public ReferencesRootNodeProvider ReferencesRoot { get; }
-    public AssemblyReferenceNodeProvider AssemblyReference { get; }
-    public NamespaceNodeProvider Namespace { get; }
-    public TypeNodeProvider Type { get; }
-    public MemberNodeProvider Member { get; }
-    public AnalyzersRootNodesProvider AnalyzersRoot { get; }
-    public AnalyzerNodeProvider Analyzer { get; }
+    public DummyTreeNodeProvider Dummy { get; } = new();
+    public AssemblyTreeRootNodesProvider AssemblyTreeRoot { get; } = new(application);
+    public AssemblyNodeProvider Assembly { get; } = new(application);
+    public ReferencesRootNodeProvider ReferencesRoot { get; } = new(application);
+    public AssemblyReferenceNodeProvider AssemblyReference { get; } = new(application);
+    public NamespaceNodeProvider Namespace { get; } = new(application);
+    public TypeNodeProvider Type { get; } = new(application);
+    public MemberNodeProvider Member { get; } = new(application);
+    public AnalyzersRootNodesProvider AnalyzersRoot { get; } = new(application);
+    public AnalyzerNodeProvider Analyzer { get; } = new(application);
 }
 

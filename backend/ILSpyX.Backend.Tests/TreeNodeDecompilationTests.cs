@@ -1,9 +1,8 @@
-using ILSpy.Backend.Decompiler;
-using ILSpy.Backend.Model;
-using ILSpyX.Backend.Tests;
+using ILSpyX.Backend.Decompiler;
+using ILSpyX.Backend.Model;
 using System.Reflection.Metadata.Ecma335;
 
-namespace ILSpy.Backend.Tests;
+namespace ILSpyX.Backend.Tests;
 
 public class TreeNodeDecompilationTests
 {

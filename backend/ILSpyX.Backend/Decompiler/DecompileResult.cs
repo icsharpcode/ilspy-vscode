@@ -1,4 +1,4 @@
-namespace ILSpy.Backend.Decompiler;
+namespace ILSpyX.Backend.Decompiler;
 
 public class DecompileResult
 {

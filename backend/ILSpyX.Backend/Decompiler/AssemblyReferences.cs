@@ -3,13 +3,9 @@
 
 using ICSharpCode.Decompiler.Metadata;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
-namespace ILSpy.Backend.Decompiler
+namespace ILSpyX.Backend.Decompiler
 {
     static class AssemblyReferences
     {

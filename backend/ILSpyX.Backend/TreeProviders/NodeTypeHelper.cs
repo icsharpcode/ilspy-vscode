@@ -1,8 +1,7 @@
 using ICSharpCode.Decompiler.TypeSystem;
-using ILSpy.Backend.Model;
-using System;
+using ILSpyX.Backend.Model;
 
-namespace ILSpy.Backend.TreeProviders;
+namespace ILSpyX.Backend.TreeProviders;
 
 public static class NodeTypeHelper
 {

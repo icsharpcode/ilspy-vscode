@@ -1,4 +1,4 @@
-using ILSpy.Backend.Model;
+using ILSpyX.Backend.Model;
 using Mono.Cecil;
 
 namespace ILSpyX.Backend.Tests;

@@ -3,6 +3,6 @@
 
 using ICSharpCode.Decompiler.TypeSystem;
 
-namespace ILSpy.Backend.Decompiler;
+namespace ILSpyX.Backend.Decompiler;
 
 public record MemberData(string? Name, int Token, TypeKind SubKind);

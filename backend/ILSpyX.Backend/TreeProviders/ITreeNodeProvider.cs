@@ -1,11 +1,10 @@
-using ILSpy.Backend.Decompiler;
-using ILSpy.Backend.Model;
-using System;
+using ILSpyX.Backend.Decompiler;
+using ILSpyX.Backend.Model;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ILSpy.Backend.TreeProviders;
+namespace ILSpyX.Backend.TreeProviders;
 
 public interface ITreeNodeProvider
 {

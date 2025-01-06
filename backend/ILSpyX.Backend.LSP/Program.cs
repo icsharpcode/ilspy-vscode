@@ -1,7 +1,7 @@
 ﻿// Copyright(c) 2021 ICSharpCode
 // Licensed under the MIT license. See the LICENSE file in the project root for more information.
 
-using ILSpy.Backend.Application;
+using ILSpyX.Backend.Application;
 using ILSpyX.Backend.LSP.Handlers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

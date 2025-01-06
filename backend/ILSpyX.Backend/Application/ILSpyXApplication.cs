@@ -1,13 +1,12 @@
 using ICSharpCode.ILSpyX;
 using ICSharpCode.ILSpyX.Settings;
-using ILSpy.Backend.Decompiler;
-using ILSpy.Backend.TreeProviders;
 using ILSpyX.Backend.Analyzers;
-using ILSpyX.Backend.Application;
+using ILSpyX.Backend.Decompiler;
 using ILSpyX.Backend.Search;
+using ILSpyX.Backend.TreeProviders;
 using Microsoft.Extensions.Logging;
 
-namespace ILSpy.Backend.Application;
+namespace ILSpyX.Backend.Application;
 
 public class ILSpyXApplication
 {

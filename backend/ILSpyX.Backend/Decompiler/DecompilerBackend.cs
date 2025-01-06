@@ -7,8 +7,8 @@ using ICSharpCode.Decompiler.Disassembler;
 using ICSharpCode.Decompiler.Metadata;
 using ICSharpCode.Decompiler.TypeSystem;
 using ICSharpCode.ILSpyX;
-using ILSpy.Backend.Model;
 using ILSpyX.Backend.Application;
+using ILSpyX.Backend.Model;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -19,20 +19,14 @@ using System.Reflection.Metadata.Ecma335;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ILSpy.Backend.Decompiler;
+namespace ILSpyX.Backend.Decompiler;
 
-public class DecompilerBackend
+public class DecompilerBackend(
+    ILoggerFactory loggerFactory,
+    ILSpyBackendSettings ilspyBackendSettings,
+    AssemblyList assemblyList)
 {
-    private readonly ILogger logger;
-    private readonly ILSpyBackendSettings ilspyBackendSettings;
-    private readonly AssemblyList assemblyList;
-
-    public DecompilerBackend(ILoggerFactory loggerFactory, ILSpyBackendSettings ilspyBackendSettings, AssemblyList assemblyList)
-    {
-        logger = loggerFactory.CreateLogger<DecompilerBackend>();
-        this.ilspyBackendSettings = ilspyBackendSettings;
-        this.assemblyList = assemblyList;
-    }
+    private readonly ILogger logger = loggerFactory.CreateLogger<DecompilerBackend>();
 
     public async Task<AssemblyData?> AddAssemblyAsync(string? path)
     {

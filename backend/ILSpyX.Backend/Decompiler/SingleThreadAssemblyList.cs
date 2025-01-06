@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace ILSpy.Backend.Decompiler;
+namespace ILSpyX.Backend.Decompiler;
 
 public class SingleThreadAssemblyList
 {

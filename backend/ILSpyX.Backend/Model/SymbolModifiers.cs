@@ -1,6 +1,6 @@
 using System;
 
-namespace ILSpy.Backend.Model;
+namespace ILSpyX.Backend.Model;
 
 [Flags]
 public enum SymbolModifiers

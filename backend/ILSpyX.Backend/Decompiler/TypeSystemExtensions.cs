@@ -2,16 +2,16 @@
 // Copyright(c) 2017 ICSharpCode
 // Licensed under the MIT license. See the LICENSE file in the project root for more information.
 
-using System;
-using System.IO;
-using System.Reflection.PortableExecutable;
-using System.Text;
 using ICSharpCode.Decompiler.CSharp.OutputVisitor;
 using ICSharpCode.Decompiler.CSharp.Syntax;
 using ICSharpCode.Decompiler.Metadata;
 using ICSharpCode.Decompiler.TypeSystem;
+using System;
+using System.IO;
+using System.Reflection.PortableExecutable;
+using System.Text;
 
-namespace ILSpy.Backend.Decompiler
+namespace ILSpyX.Backend.Decompiler
 {
     public static class TypeSystemExtensions
     {

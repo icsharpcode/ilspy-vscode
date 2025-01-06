@@ -1,11 +1,9 @@
 using ICSharpCode.Decompiler.TypeSystem;
 using ICSharpCode.ILSpyX.Analyzers;
-using ILSpy.Backend.Application;
-using ILSpy.Backend.Decompiler;
-using ILSpy.Backend.Model;
-using ILSpy.Backend.TreeProviders;
 using ILSpyX.Backend.Analyzers;
-using System;
+using ILSpyX.Backend.Application;
+using ILSpyX.Backend.Decompiler;
+using ILSpyX.Backend.Model;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
@@ -14,15 +12,8 @@ using System.Threading.Tasks;
 
 namespace ILSpyX.Backend.TreeProviders;
 
-public class AnalyzerNodeProvider : ITreeNodeProvider
+public class AnalyzerNodeProvider(ILSpyXApplication application) : ITreeNodeProvider
 {
-    private readonly ILSpyXApplication application;
-
-    public AnalyzerNodeProvider(ILSpyXApplication application)
-    {
-        this.application = application;
-    }
-
     public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
     {
         return DecompileResult.Empty();
@@ -30,24 +21,27 @@ public class AnalyzerNodeProvider : ITreeNodeProvider
 
     public Node? CreateNode(NodeMetadata? nodeMetadata, AnalyzerInstance analyzer)
     {
-        if (nodeMetadata is not null)
+        if (nodeMetadata is null)
         {
-            var nodeEntity = application.DecompilerBackend.GetEntityFromHandle(
-                nodeMetadata.AssemblyPath, MetadataTokens.EntityHandle(nodeMetadata.SymbolToken));
-            if (nodeEntity is not null && analyzer.Instance.Show(nodeEntity))
-            {
-                string displayName = analyzer.Header;
-                return new Node(
-                    Metadata: nodeMetadata with { Type = NodeType.Analyzer, SubType = analyzer.NodeSubType },
-                    DisplayName: displayName,
-                    Description: displayName,
-                    MayHaveChildren: true,
-                    SymbolModifiers: SymbolModifiers.None
-                );
-            }
+            return null;
         }
 
-        return null;
+        var nodeEntity = application.DecompilerBackend.GetEntityFromHandle(
+            nodeMetadata.AssemblyPath, MetadataTokens.EntityHandle(nodeMetadata.SymbolToken));
+        if (nodeEntity is null || !analyzer.Instance.Show(nodeEntity))
+        {
+            return null;
+        }
+
+        string displayName = analyzer.Header;
+        return new Node(
+            Metadata: nodeMetadata with { Type = NodeType.Analyzer, SubType = analyzer.NodeSubType },
+            DisplayName: displayName,
+            Description: displayName,
+            MayHaveChildren: true,
+            SymbolModifiers: SymbolModifiers.None
+        );
+
     }
 
     public Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
@@ -65,7 +59,7 @@ public class AnalyzerNodeProvider : ITreeNodeProvider
 
         var context = new AnalyzerContext()
         {
-            CancellationToken = new CancellationToken(),
+            CancellationToken = CancellationToken.None,
             Language = new CSharpLanguage(),
             AssemblyList = application.AssemblyList
         };

@@ -1,7 +1,7 @@
 // Copyright (c) 2022 ICSharpCode
 // Licensed under the MIT license. See the LICENSE file in the project
 
-namespace ILSpy.Backend.Model;
+namespace ILSpyX.Backend.Model;
 
 public enum NodeType
 {

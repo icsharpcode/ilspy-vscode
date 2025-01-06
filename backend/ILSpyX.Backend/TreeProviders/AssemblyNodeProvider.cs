@@ -1,24 +1,16 @@
-using ILSpy.Backend.Application;
-using ILSpy.Backend.Decompiler;
-using ILSpy.Backend.Model;
-using System;
+using ILSpyX.Backend.Application;
+using ILSpyX.Backend.Decompiler;
+using ILSpyX.Backend.Model;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Threading.Tasks;
 
-namespace ILSpy.Backend.TreeProviders;
+namespace ILSpyX.Backend.TreeProviders;
 
-public class AssemblyNodeProvider : ITreeNodeProvider
+public class AssemblyNodeProvider(ILSpyXApplication application) : ITreeNodeProvider
 {
-    private readonly ILSpyXApplication application;
-
-    public AssemblyNodeProvider(ILSpyXApplication application)
-    {
-        this.application = application;
-    }
-
     public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
     {
         return application.DecompilerBackend.GetCode(

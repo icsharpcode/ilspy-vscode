@@ -21,7 +21,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-      <PackageReference Include="ICSharpCode.ILSpyX" Version="9.0.0.7876-RC"/>
+      <PackageReference Include="ICSharpCode.ILSpyX" Version="9.0.0.7889"/>
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
     <PackageReference Include="Mono.Cecil" Version="0.11.6"/>
     <PackageReference Include="OmniSharp.Extensions.LanguageServer" Version="0.19.9" />

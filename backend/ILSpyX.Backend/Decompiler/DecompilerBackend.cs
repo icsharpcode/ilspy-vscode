@@ -35,7 +35,10 @@ public class DecompilerBackend(
             try
             {
                 var loadedAssembly = await assemblyList.AddAssembly(path);
-                return await CreateAssemblyDataAsync(loadedAssembly);
+                if (loadedAssembly is not null)
+                {
+                    return await CreateAssemblyDataAsync(loadedAssembly);
+                }
             }
             catch (Exception ex)
             {

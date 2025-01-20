@@ -24,6 +24,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+      <ProjectReference Include="..\ILSpyX.Backend.LSP\ILSpyX.Backend.LSP.csproj"/>
     <ProjectReference Include="..\TestAssembly\TestAssembly.csproj" />
     <ProjectReference Include="..\ILSpyX.Backend\ILSpyX.Backend.csproj" />
   </ItemGroup>

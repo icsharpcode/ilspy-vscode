@@ -7,7 +7,7 @@ public class SearchBackendTests
     [Fact]
     public async Task ClassName()
     {
-        var searchBackend = (await TestHelper.CreateTestApplication()).SearchBackend;
+        var searchBackend = (await TestHelper.CreateTestApplicationWithAssembly()).SearchBackend;
         var nodeData = await searchBackend.Search("SomeClass", new CancellationToken());
         Assert.Collection(nodeData,
                 node => {
@@ -44,7 +44,7 @@ public class SearchBackendTests
     [Fact]
     public async Task InterfaceNameLowerCase()
     {
-        var searchBackend = (await TestHelper.CreateTestApplication()).SearchBackend;
+        var searchBackend = (await TestHelper.CreateTestApplicationWithAssembly()).SearchBackend;
         var nodeData = await searchBackend.Search("isomeinterface", new CancellationToken());
         Assert.Collection(nodeData,
                 node => {
@@ -60,7 +60,7 @@ public class SearchBackendTests
     [Fact]
     public async Task EnumConstants()
     {
-        var searchBackend = (await TestHelper.CreateTestApplication()).SearchBackend;
+        var searchBackend = (await TestHelper.CreateTestApplicationWithAssembly()).SearchBackend;
         var nodeData = await searchBackend.Search("E1", new CancellationToken());
         Assert.Collection(nodeData,
                 node => {
@@ -76,7 +76,7 @@ public class SearchBackendTests
     [Fact]
     public async Task VirtualClassMethod()
     {
-        var searchBackend = (await TestHelper.CreateTestApplication()).SearchBackend;
+        var searchBackend = (await TestHelper.CreateTestApplicationWithAssembly()).SearchBackend;
         var nodeData = await searchBackend.Search("VirtualMethod", new CancellationToken());
         Assert.Collection(nodeData,
                 node => {
@@ -92,7 +92,7 @@ public class SearchBackendTests
     [Fact]
     public async Task OverrideClassMethod()
     {
-        var searchBackend = (await TestHelper.CreateTestApplication()).SearchBackend;
+        var searchBackend = (await TestHelper.CreateTestApplicationWithAssembly()).SearchBackend;
         var nodeData = await searchBackend.Search("ToString", new CancellationToken());
         Assert.Collection(nodeData,
                 node => {
@@ -108,7 +108,7 @@ public class SearchBackendTests
     [Fact]
     public async Task Delegate()
     {
-        var searchBackend = (await TestHelper.CreateTestApplication()).SearchBackend;
+        var searchBackend = (await TestHelper.CreateTestApplicationWithAssembly()).SearchBackend;
         var nodeData = await searchBackend.Search("SomeDelegate", new CancellationToken());
         Assert.Collection(nodeData,
                 node => {
@@ -131,7 +131,7 @@ public class SearchBackendTests
     [Fact]
     public async Task SearchOnlyInAddedAssemblies()
     {
-        var application = await TestHelper.CreateTestApplication();
+        var application = await TestHelper.CreateTestApplicationWithAssembly();
         var types = await application.TreeNodeProviders.Namespace.GetChildrenAsync(
             new NodeMetadata(TestHelper.AssemblyPath, NodeType.Namespace, "TestAssembly", 0, 0));
         var typeNode = types.First(node => node.Metadata?.Name == "SomeClass");

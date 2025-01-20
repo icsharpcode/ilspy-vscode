@@ -13,9 +13,10 @@ namespace ILSpyX.Backend.LSP.Handlers;
 public class RemoveAssemblyHandler(ILSpyXApplication application)
     : IJsonRpcRequestHandler<RemoveAssemblyRequest, RemoveAssemblyResponse>
 {
-    public Task<RemoveAssemblyResponse> Handle(RemoveAssemblyRequest request, CancellationToken cancellationToken)
+    public async Task<RemoveAssemblyResponse> Handle(RemoveAssemblyRequest request, CancellationToken cancellationToken)
     {
-        bool result = request.AssemblyPath != null && application.DecompilerBackend.RemoveAssembly(request.AssemblyPath);
-        return Task.FromResult(new RemoveAssemblyResponse(Removed: result));
+        bool result = request.AssemblyPath != null &&
+                      await application.DecompilerBackend.RemoveAssemblyAsync(request.AssemblyPath);
+        return new RemoveAssemblyResponse(Removed: result);
     }
 }

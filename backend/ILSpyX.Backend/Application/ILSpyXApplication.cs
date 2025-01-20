@@ -15,10 +15,10 @@ public class ILSpyXApplication
         BackendSettings = new ILSpyBackendSettings();
         SettingsProvider = new DummySettingsProvider();
         AssemblyListManager = new AssemblyListManager(SettingsProvider);
-        AssemblyList = AssemblyListManager.CreateDefaultList(AssemblyListManager.DefaultListName);
-        DecompilerBackend = new DecompilerBackend(loggerFactory, BackendSettings, AssemblyList);
+        SingleThreadAssemblyList = new SingleThreadAssemblyList(AssemblyListManager);
+        DecompilerBackend = new DecompilerBackend(loggerFactory, BackendSettings, SingleThreadAssemblyList);
         TreeNodeProviders = new TreeNodeProviders(this);
-        SearchBackend = new SearchBackend(AssemblyList, BackendSettings);
+        SearchBackend = new SearchBackend(SingleThreadAssemblyList, BackendSettings);
         AnalyzerBackend = new AnalyzerBackend();
     }
 
@@ -30,7 +30,7 @@ public class ILSpyXApplication
 
     public ISettingsProvider SettingsProvider { get; }
 
-    public AssemblyList AssemblyList { get; }
+    public SingleThreadAssemblyList SingleThreadAssemblyList { get; }
 
     public AssemblyListManager AssemblyListManager { get; }
 

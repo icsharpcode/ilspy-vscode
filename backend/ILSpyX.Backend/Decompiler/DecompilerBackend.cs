@@ -24,7 +24,7 @@ namespace ILSpyX.Backend.Decompiler;
 public class DecompilerBackend(
     ILoggerFactory loggerFactory,
     ILSpyBackendSettings ilspyBackendSettings,
-    AssemblyList assemblyList)
+    SingleThreadAssemblyList assemblyList)
 {
     private readonly ILogger logger = loggerFactory.CreateLogger<DecompilerBackend>();
 
@@ -34,7 +34,7 @@ public class DecompilerBackend(
         {
             try
             {
-                var loadedAssembly = assemblyList.OpenAssembly(path);
+                var loadedAssembly = await assemblyList.AddAssembly(path);
                 return await CreateAssemblyDataAsync(loadedAssembly);
             }
             catch (Exception ex)
@@ -49,33 +49,31 @@ public class DecompilerBackend(
     public async Task<AssemblyData?> CreateAssemblyDataAsync(LoadedAssembly loadedAssembly)
     {
         var metaDataFile = await loadedAssembly.GetMetadataFileOrNullAsync();
-        if (metaDataFile is not null)
+        if (metaDataFile is null)
         {
-            var version = metaDataFile.Metadata.GetAssemblyDefinition().Version;
-            var targetFrameworkId = await loadedAssembly.GetTargetFrameworkIdAsync();
-            return new AssemblyData(loadedAssembly.ShortName, loadedAssembly.FileName)
-            {
-                Version = version.ToString(),
-                TargetFramework = !string.IsNullOrEmpty(targetFrameworkId) ? targetFrameworkId.Replace("Version=", " ") : null
-            };
+            return null;
         }
 
-        return null;
+        var version = metaDataFile.Metadata.GetAssemblyDefinition().Version;
+        var targetFrameworkId = await loadedAssembly.GetTargetFrameworkIdAsync();
+        return new AssemblyData(loadedAssembly.ShortName, loadedAssembly.FileName)
+        {
+            Version = version.ToString(),
+            TargetFramework = !string.IsNullOrEmpty(targetFrameworkId)
+                ? targetFrameworkId.Replace("Version=", " ")
+                : null
+        };
     }
 
-    public bool RemoveAssembly(string? path)
+    public async Task<bool> RemoveAssemblyAsync(string? path)
     {
-        if (path is not null)
+        if (path is null)
         {
-            var loadedAssembly = assemblyList.FindAssembly(path);
-            if (loadedAssembly is not null)
-            {
-                assemblyList.Unload(loadedAssembly);
-                return true;
-            }
+            return false;
         }
 
-        return false;
+        await assemblyList.RemoveAssembly(path);
+        return true;
     }
 
     public CSharpDecompiler? CreateDecompiler(string assembly, string? outputLanguage = null)

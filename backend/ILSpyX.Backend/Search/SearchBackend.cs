@@ -19,17 +19,9 @@ using System.Threading.Tasks;
 
 namespace ILSpyX.Backend.Search;
 
-public class SearchBackend
+public class SearchBackend(SingleThreadAssemblyList assemblyList, ILSpyBackendSettings ilspyBackendSettings)
 {
     private readonly IComparer<SearchResult> resultsComparer = SearchResult.ComparerByName;
-    private readonly AssemblyList assemblyList;
-    private readonly ILSpyBackendSettings ilspyBackendSettings;
-
-    public SearchBackend(AssemblyList assemblyList, ILSpyBackendSettings ilspyBackendSettings)
-    {
-        this.assemblyList = assemblyList;
-        this.ilspyBackendSettings = ilspyBackendSettings;
-    }
 
     public async Task<IEnumerable<Node>> Search(string searchTerm, CancellationToken cancellationToken)
     {
@@ -44,15 +36,16 @@ public class SearchBackend
 
                 await Task.Factory.StartNew(() => {
                     var searcher = new MemberSearchStrategy(new CSharpLanguage(), ApiVisibility.All, searchRequest, resultQueue);
-                    if (searcher == null)
-                        return;
                     try
                     {
                         foreach (var loadedAssembly in assemblies)
                         {
                             var module = loadedAssembly.GetMetadataFileOrNull();
                             if (module == null)
+                            {
                                 continue;
+                            }
+
                             searcher.Search(module, cancellationToken);
                         }
                     }
@@ -71,7 +64,7 @@ public class SearchBackend
             }
         }
 
-        return Enumerable.Empty<Node>();
+        return [];
     }
 
     bool IsNotAccessor(SearchResult searchResult)
@@ -92,9 +85,12 @@ public class SearchBackend
                 AssemblyPath: result.Assembly,
                 Type: GetNodeType(result),
                 Name: memberSearchResult?.Member?.Name ?? result.Name,
-                SymbolToken: memberSearchResult != null ? MetadataTokens.GetToken(memberSearchResult.Member.MetadataToken) : 0,
+                SymbolToken: memberSearchResult?.Member is not null
+                    ? MetadataTokens.GetToken(memberSearchResult.Member.MetadataToken)
+                    : 0,
                 ParentSymbolToken:
-                    memberSearchResult?.Member.DeclaringTypeDefinition?.MetadataToken != null ?
+                memberSearchResult?.Member?.DeclaringTypeDefinition?.MetadataToken != null
+                    ?
                     MetadataTokens.GetToken(memberSearchResult.Member.DeclaringTypeDefinition.MetadataToken) : 0),
             DisplayName: result.Name,
             Description: result.Location,

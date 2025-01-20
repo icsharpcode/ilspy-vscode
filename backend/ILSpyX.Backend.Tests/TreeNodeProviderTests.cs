@@ -8,7 +8,7 @@ public class TreeNodeProviderTests
     [Fact]
     public async Task GetRootNodes()
     {
-        var application = await TestHelper.CreateTestApplication();
+        var application = await TestHelper.CreateTestApplicationWithAssembly();
         var list = await application.TreeNodeProviders.AssemblyTreeRoot.GetChildrenAsync(null);
         Assert.Collection(list,
                 node => {
@@ -24,7 +24,7 @@ public class TreeNodeProviderTests
     [Fact]
     public async Task GetAssemblyChildren()
     {
-        var application = await TestHelper.CreateTestApplication();
+        var application = await TestHelper.CreateTestApplicationWithAssembly();
         var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Assembly, TestHelper.AssemblyPath, 0, 0);
         var list = await application.TreeNodeProviders.ForNode(nodeMetadata).GetChildrenAsync(nodeMetadata);
         Assert.Collection(list,
@@ -86,7 +86,7 @@ public class TreeNodeProviderTests
     [Fact]
     public async Task GetReferenceChildren()
     {
-        var application = await TestHelper.CreateTestApplication();
+        var application = await TestHelper.CreateTestApplicationWithAssembly();
         var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.ReferencesRoot, "References", 0, 0);
         var list = await application.TreeNodeProviders.ForNode(nodeMetadata).GetChildrenAsync(nodeMetadata);
         Assert.Collection(list,
@@ -102,7 +102,7 @@ public class TreeNodeProviderTests
     [Fact]
     public async Task GetNamespaceChildren()
     {
-        var application = await TestHelper.CreateTestApplication();
+        var application = await TestHelper.CreateTestApplicationWithAssembly();
         var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Namespace, "TestAssembly", 0, 0);
         var list = await application.TreeNodeProviders.ForNode(nodeMetadata).GetChildrenAsync(nodeMetadata);
         Assert.Collection(list,
@@ -156,7 +156,7 @@ public class TreeNodeProviderTests
     [Fact]
     public async Task GetTypeChildren()
     {
-        var application = await TestHelper.CreateTestApplication();
+        var application = await TestHelper.CreateTestApplicationWithAssembly();
         var types = await application.TreeNodeProviders.Namespace.GetChildrenAsync(
             new NodeMetadata(TestHelper.AssemblyPath, NodeType.Namespace, "TestAssembly", 0, 0));
         var typeNode = types.Where(node => node.Metadata?.Name == "SomeClass").First();

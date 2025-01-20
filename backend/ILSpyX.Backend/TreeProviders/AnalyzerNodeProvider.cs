@@ -57,11 +57,16 @@ public class AnalyzerNodeProvider(ILSpyXApplication application) : ITreeNodeProv
             return Task.FromResult(Enumerable.Empty<Node>());
         }
 
+        if (application.SingleThreadAssemblyList.AssemblyList is null)
+        {
+            return Task.FromResult(Enumerable.Empty<Node>());
+        }
+
         var context = new AnalyzerContext()
         {
             CancellationToken = CancellationToken.None,
             Language = new CSharpLanguage(),
-            AssemblyList = application.AssemblyList
+            AssemblyList = application.SingleThreadAssemblyList.AssemblyList
         };
 
         var nodeEntity = application.DecompilerBackend.GetEntityFromHandle(

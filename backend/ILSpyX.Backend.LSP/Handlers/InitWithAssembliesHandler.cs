@@ -18,7 +18,7 @@ public class InitWithAssembliesHandler(ILSpyXApplication application)
     public async Task<InitWithAssembliesResponse> Handle(InitWithAssembliesRequest request, CancellationToken cancellationToken)
     {
         var loadedAssemblyDatas = new List<AssemblyData>();
-        foreach (var assemblyPath in request.AssemblyPaths)
+        foreach (string assemblyPath in request.AssemblyPaths)
         {
             var assemblyData = await application.DecompilerBackend.AddAssemblyAsync(assemblyPath);
             if (assemblyData is not null)

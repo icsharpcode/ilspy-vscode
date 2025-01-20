@@ -14,18 +14,14 @@ public class SingleThreadAssemblyList
         RemoveAssembly,
     }
 
-    private class ModificationAction
+    private class ModificationAction(
+        ModificationType type,
+        string assemblyPath,
+        TaskCompletionSource<LoadedAssembly?> completionSource)
     {
-        public ModificationAction(ModificationType type, string assemblyPath, TaskCompletionSource completionSource)
-        {
-            Type = type;
-            AssemblyPath = assemblyPath;
-            CompletionSource = completionSource;
-        }
-
-        public ModificationType Type { get; }
-        public string AssemblyPath { get; }
-        public TaskCompletionSource CompletionSource { get; }
+        public ModificationType Type { get; } = type;
+        public string AssemblyPath { get; } = assemblyPath;
+        public TaskCompletionSource<LoadedAssembly?> CompletionSource { get; } = completionSource;
     }
 
     private readonly BlockingCollection<ModificationAction> modificationActions = new();
@@ -53,40 +49,48 @@ public class SingleThreadAssemblyList
                 }
                 catch (InvalidOperationException) { }
 
-                if (action is not null && assemblyList is not null)
+                if (action is null || assemblyList is null)
                 {
-                    switch (action.Type)
-                    {
-                        case ModificationType.AddAssembly:
-                            assemblyList.Open(action.AssemblyPath);
-                            assemblyListManager.SaveList(assemblyList);
-                            break;
-
-                        case ModificationType.RemoveAssembly:
-                            var assembly = assemblyList.FindAssembly(action.AssemblyPath);
-                            if (assembly is not null)
-                            {
-                                assemblyList.Unload(assembly);
-                                assemblyListManager.SaveList(assemblyList);
-                            }
-                            break;
-                    }
-                    action.CompletionSource.SetResult();
+                    continue;
                 }
+
+                LoadedAssembly? result = null;
+
+                switch (action.Type)
+                {
+                    case ModificationType.AddAssembly:
+                        var loadedAssembly = assemblyList.Open(action.AssemblyPath);
+                        assemblyListManager.SaveList(assemblyList);
+                        result = loadedAssembly;
+                        break;
+
+                    case ModificationType.RemoveAssembly:
+                        var assembly = assemblyList.FindAssembly(action.AssemblyPath);
+                        if (assembly is not null)
+                        {
+                            assemblyList.Unload(assembly);
+                            assemblyListManager.SaveList(assemblyList);
+                            result = assembly;
+                        }
+
+                        break;
+                }
+
+                action.CompletionSource.SetResult(result);
             }
         });
     }
 
-    public Task AddAssembly(string assemblyPath)
+    public Task<LoadedAssembly?> AddAssembly(string assemblyPath)
     {
-        var completionSource = new TaskCompletionSource();
+        var completionSource = new TaskCompletionSource<LoadedAssembly?>();
         modificationActions.Add(new ModificationAction(ModificationType.AddAssembly, assemblyPath, completionSource));
         return completionSource.Task;
     }
 
-    public Task RemoveAssembly(string assemblyPath)
+    public Task<LoadedAssembly?> RemoveAssembly(string assemblyPath)
     {
-        var completionSource = new TaskCompletionSource();
+        var completionSource = new TaskCompletionSource<LoadedAssembly?>();
         modificationActions.Add(new ModificationAction(ModificationType.RemoveAssembly, assemblyPath, completionSource));
         return completionSource.Task;
     }
@@ -98,6 +102,11 @@ public class SingleThreadAssemblyList
         return assemblyList is not null
             ? await assemblyList.GetAllAssemblies()
             : new List<LoadedAssembly>();
+    }
+
+    public LoadedAssembly? FindAssembly(string file)
+    {
+        return assemblyList?.FindAssembly(file);
     }
 }
 

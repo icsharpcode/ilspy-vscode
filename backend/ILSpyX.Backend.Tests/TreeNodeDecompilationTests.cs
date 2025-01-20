@@ -27,7 +27,7 @@ public class TreeNodeDecompilationTests
     [Fact]
     public async Task Assembly()
     {
-        var application = await TestHelper.CreateTestApplication();
+        var application = await TestHelper.CreateTestApplicationWithAssembly();
         var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Assembly, TestHelper.AssemblyPath, 0, 0);
         Assert.Equal(
 $"// {TestHelper.AssemblyPath}" +
@@ -61,7 +61,7 @@ using System.Runtime.Versioning;
     [Fact]
     public async Task Namespace()
     {
-        var application = await TestHelper.CreateTestApplication();
+        var application = await TestHelper.CreateTestApplicationWithAssembly();
         var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Namespace, "A.B.C.D", 0, 0);
         Assert.Equal(
 @"namespace A.B.C.D { }",
@@ -71,7 +71,7 @@ using System.Runtime.Versioning;
     [Fact]
     public async Task GlobalNamespace()
     {
-        var application = await TestHelper.CreateTestApplication();
+        var application = await TestHelper.CreateTestApplicationWithAssembly();
         var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Namespace, "", 0, 0);
         Assert.Equal(
 @"namespace <global> { }",
@@ -81,7 +81,7 @@ using System.Runtime.Versioning;
     [Fact]
     public async Task Class()
     {
-        var application = await TestHelper.CreateTestApplication();
+        var application = await TestHelper.CreateTestApplicationWithAssembly();
         int typeToken = GetTypeToken(application.DecompilerBackend, "Generics", "AClass");
         var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Class, "", typeToken, 0);
         Assert.Equal(
@@ -112,7 +112,7 @@ public class AClass
     [Fact]
     public async Task Interface()
     {
-        var application = await TestHelper.CreateTestApplication();
+        var application = await TestHelper.CreateTestApplicationWithAssembly();
         int typeToken = GetTypeToken(application.DecompilerBackend, "TestAssembly", "ISomeInterface");
         var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Interface, "", typeToken, 0);
         Assert.Equal(
@@ -129,7 +129,7 @@ public interface ISomeInterface
     [Fact]
     public async Task Struct()
     {
-        var application = await TestHelper.CreateTestApplication();
+        var application = await TestHelper.CreateTestApplicationWithAssembly();
         int typeToken = GetTypeToken(application.DecompilerBackend, "TestAssembly", "SomeStruct");
         var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Struct, "", typeToken, 0);
         Assert.Equal(
@@ -152,7 +152,7 @@ internal struct SomeStruct
     [Fact]
     public async Task Enum()
     {
-        var application = await TestHelper.CreateTestApplication();
+        var application = await TestHelper.CreateTestApplicationWithAssembly();
         int typeToken = GetTypeToken(application.DecompilerBackend, "TestAssembly", "SomeEnum");
         var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Enum, "", typeToken, 0);
         Assert.Equal(
@@ -171,7 +171,7 @@ public enum SomeEnum
     [Fact]
     public async Task Method()
     {
-        var application = await TestHelper.CreateTestApplication();
+        var application = await TestHelper.CreateTestApplicationWithAssembly();
         int typeToken = GetTypeToken(application.DecompilerBackend, "TestAssembly", "SomeClass");
         int memberToken = GetMemberToken(application.DecompilerBackend, typeToken, "ToString() : string");
         var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Method, "", memberToken, typeToken);
@@ -187,7 +187,7 @@ public enum SomeEnum
     [Fact]
     public async Task Field()
     {
-        var application = await TestHelper.CreateTestApplication();
+        var application = await TestHelper.CreateTestApplicationWithAssembly();
         int typeToken = GetTypeToken(application.DecompilerBackend, "TestAssembly", "SomeClass");
         int memberToken = GetMemberToken(application.DecompilerBackend, typeToken, "_ProgId");
         var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Field, "", memberToken, typeToken);
@@ -200,7 +200,7 @@ public enum SomeEnum
     [Fact]
     public async Task Property()
     {
-        var application = await TestHelper.CreateTestApplication();
+        var application = await TestHelper.CreateTestApplicationWithAssembly();
         int typeToken = GetTypeToken(application.DecompilerBackend, "TestAssembly", "SomeClass");
         int memberToken = GetMemberToken(application.DecompilerBackend, typeToken, "ProgId");
         var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Property, "", memberToken, typeToken);
@@ -223,7 +223,7 @@ public enum SomeEnum
     [Fact]
     public async Task Constructor()
     {
-        var application = await TestHelper.CreateTestApplication();
+        var application = await TestHelper.CreateTestApplicationWithAssembly();
         int typeToken = GetTypeToken(application.DecompilerBackend, "TestAssembly", "SomeClass");
         int memberToken = GetMemberToken(application.DecompilerBackend, typeToken, "SomeClass(int)");
         var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Method, "", memberToken, typeToken);
@@ -239,7 +239,7 @@ public enum SomeEnum
     [Fact]
     public async Task ReferencesRoot()
     {
-        var application = await TestHelper.CreateTestApplication();
+        var application = await TestHelper.CreateTestApplicationWithAssembly();
         var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.ReferencesRoot, "References", 0, 0);
         Assert.Equal(
 @"// System.Runtime, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
@@ -249,7 +249,7 @@ public enum SomeEnum
     [Fact]
     public async Task AssemblyReference()
     {
-        var application = await TestHelper.CreateTestApplication();
+        var application = await TestHelper.CreateTestApplicationWithAssembly();
         var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.AssemblyReference,
             "System.Runtime, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", 0, 0);
         Assert.Equal(
@@ -260,7 +260,7 @@ public enum SomeEnum
     [Fact]
     public async Task CSharpVariant_Latest()
     {
-        var application = await TestHelper.CreateTestApplication();
+        var application = await TestHelper.CreateTestApplicationWithAssembly();
         int typeToken = GetTypeToken(application.DecompilerBackend, "CSharpVariants", "CSharpVariants");
         var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Interface, "", typeToken, 0);
         Assert.Equal(
@@ -277,7 +277,7 @@ public class CSharpVariants
     [Fact]
     public async Task CSharpVariant_8()
     {
-        var application = await TestHelper.CreateTestApplication();
+        var application = await TestHelper.CreateTestApplicationWithAssembly();
         int typeToken = GetTypeToken(application.DecompilerBackend, "CSharpVariants", "CSharpVariants");
         var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Interface, "", typeToken, 0);
         Assert.Equal(
@@ -295,7 +295,7 @@ public class CSharpVariants
     [Fact]
     public async Task CSharpVariant_1()
     {
-        var application = await TestHelper.CreateTestApplication();
+        var application = await TestHelper.CreateTestApplicationWithAssembly();
         int typeToken = GetTypeToken(application.DecompilerBackend, "CSharpVariants", "CSharpVariants");
         var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Class, "", typeToken, 0);
         Assert.Equal(

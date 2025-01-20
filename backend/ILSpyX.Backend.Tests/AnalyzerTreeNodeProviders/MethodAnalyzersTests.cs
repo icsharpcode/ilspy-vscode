@@ -7,7 +7,7 @@ public class MethodAnalyzersTests
     [Fact]
     public async Task UsedBy()
     {
-        var application = await TestHelper.CreateTestApplication();
+        var application = await TestHelper.CreateTestApplicationWithAssembly();
         var types = await application.TreeNodeProviders.Namespace.GetChildrenAsync(
             new NodeMetadata(TestHelper.AssemblyPath, NodeType.Namespace, "TestAssembly", 0, 0));
         var typeNode = types.First(node => node.Metadata?.Name == "SomeClass");
@@ -48,7 +48,7 @@ public class MethodAnalyzersTests
     [Fact]
     public async Task UsesDotNetFrameworkSymbol()
     {
-        var application = await TestHelper.CreateTestApplication();
+        var application = await TestHelper.CreateTestApplicationWithAssembly();
         var types = await application.TreeNodeProviders.Namespace.GetChildrenAsync(
             new NodeMetadata(TestHelper.AssemblyPath, NodeType.Namespace, "TestAssembly", 0, 0));
         var typeNode = types.First(node => node.Metadata?.Name == "SomeClass");

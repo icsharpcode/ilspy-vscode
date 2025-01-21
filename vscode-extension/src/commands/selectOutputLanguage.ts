@@ -5,7 +5,10 @@
 
 import * as vscode from "vscode";
 import { DecompilerTextDocumentContentProvider } from "../decompiler/DecompilerTextDocumentContentProvider";
-import { languageInfos } from "../decompiler/languageInfos";
+import {
+  DEFAULT_OUTPUT_LANGUAGE,
+  languageInfos,
+} from "../decompiler/languageInfos";
 import { ILSPY_URI_SCHEME } from "../decompiler/nodeUri";
 import { setDefaultOutputLanguage } from "../decompiler/settings";
 import { LanguageName } from "../protocol/LanguageName";
@@ -56,9 +59,16 @@ export function registerSelectOutputLanguage(
             const isActive =
               contentProvider.getDocumentOutputLanguage(document?.uri) ===
               languageName;
+            const labels = [];
+            if (isActive) {
+              labels.push("active");
+            }
+            if (DEFAULT_OUTPUT_LANGUAGE === languageName) {
+              labels.push("latest");
+            }
             return {
               label: languageInfo.displayName,
-              description: isActive ? "active" : undefined,
+              description: labels.join(" / "),
               languageName,
               isActive,
             } as OutputLanguageQuickPickItem;

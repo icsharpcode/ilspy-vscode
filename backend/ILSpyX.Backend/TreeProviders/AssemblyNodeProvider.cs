@@ -1,6 +1,7 @@
 using ILSpyX.Backend.Application;
 using ILSpyX.Backend.Decompiler;
 using ILSpyX.Backend.Model;
+using Mono.CompilerServices.SymbolWriter;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -31,7 +32,8 @@ public class AssemblyNodeProvider(ILSpyXApplication application) : ITreeNodeProv
                     DisplayName: GetAssemblyDisplayText(assemblyData),
                     Description: assemblyData.FilePath,
                     MayHaveChildren: true,
-                    SymbolModifiers: SymbolModifiers.None
+                    SymbolModifiers: SymbolModifiers.None,
+                    Flags: assemblyData.IsAutoLoaded ? NodeFlags.AutoLoaded : NodeFlags.None
                 ));
     }
 

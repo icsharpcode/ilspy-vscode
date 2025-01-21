@@ -3,6 +3,7 @@
  *  Licensed under the MIT License. See LICENSE.TXT in the project root for license information.
  *-----------------------------------------------------------------------------------------------*/
 
+import { NodeFlags } from "./NodeFlags";
 import NodeMetadata from "./NodeMetadata";
 import { SymbolModifiers } from "./SymbolModifiers";
 
@@ -12,4 +13,5 @@ export default interface Node {
   description: string;
   mayHaveChildren: boolean;
   modifiers: SymbolModifiers;
+  flags: NodeFlags;
 }

@@ -20,6 +20,7 @@ import Node from "../protocol/Node";
 import { NodeType } from "../protocol/NodeType";
 import { getAssemblyList, updateAssemblyListIfNeeded } from "./settings";
 import { getNodeIcon } from "../icons";
+import { NodeFlags } from "../protocol/NodeFlags";
 
 export class DecompiledTreeProvider implements TreeDataProvider<Node> {
   private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
@@ -95,7 +96,11 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
 
   public getTreeItem(node: Node): TreeItem {
     return {
-      label: node.displayName,
+      label:
+        node.metadata?.type === NodeType.Assembly &&
+        node.flags === NodeFlags.AutoLoaded
+          ? `* ${node.displayName}`
+          : node.displayName,
       tooltip: node.description,
       collapsibleState: node.mayHaveChildren
         ? TreeItemCollapsibleState.Collapsed

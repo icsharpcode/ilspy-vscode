@@ -59,7 +59,7 @@ public class DecompilerBackend(
 
         var version = metaDataFile.Metadata.GetAssemblyDefinition().Version;
         var targetFrameworkId = await loadedAssembly.GetTargetFrameworkIdAsync();
-        return new AssemblyData(loadedAssembly.ShortName, loadedAssembly.FileName)
+        return new AssemblyData(loadedAssembly.ShortName, loadedAssembly.FileName, loadedAssembly.IsAutoLoaded)
         {
             Version = version.ToString(),
             TargetFramework = !string.IsNullOrEmpty(targetFrameworkId)

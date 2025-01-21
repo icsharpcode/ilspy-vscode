@@ -5,7 +5,8 @@ namespace ILSpyX.Backend.Model
 {
     public record AssemblyData(
         string Name,
-        string FilePath)
+        string FilePath,
+        bool IsAutoLoaded)
     {
         public string? Version { get; set; }
         public string? TargetFramework { get; set; }

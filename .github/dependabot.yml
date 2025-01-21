@@ -15,9 +15,6 @@ updates:
       - dependency-name: "@types/vscode"
       - dependency-name: "@types/node"
         versions: [">20"]
-      - dependency-name: "eslint"
-        versions:
-          - ">=9"
     groups:
       prod-dependencies:
         dependency-type: "production"
@@ -38,11 +35,6 @@ updates:
       - "/backend/ILSpyX.Backend.Tests/"
     schedule:
       interval: "weekly"
-    ignore:
-      - dependency-name: "xunit"
-        versions: [">=2.7"]
-      - dependency-name: "xunit.runner.visualstudio"
-        versions: [">=2.7"]
     groups:
       major-minor-dependencies:
         update-types:

@@ -1,15 +1,15 @@
 import * as vscode from "vscode";
 import {
-  DEFAULT_OUTPUT_LANGUAGE,
   languageFromDisplayName,
   LanguageInfo,
+  LATEST_OUTPUT_LANGUAGE,
 } from "./languageInfos";
 import { LanguageName } from "../protocol/LanguageName";
 
 export function getDefaultOutputLanguage() {
   return (languageFromDisplayName(
     vscode.workspace.getConfiguration("ilspy").get("defaultOutputLanguage")
-  ) ?? DEFAULT_OUTPUT_LANGUAGE) as LanguageName;
+  ) ?? LATEST_OUTPUT_LANGUAGE) as LanguageName;
 }
 
 export function setDefaultOutputLanguage(languageInfo: LanguageInfo) {
@@ -17,7 +17,9 @@ export function setDefaultOutputLanguage(languageInfo: LanguageInfo) {
     .getConfiguration("ilspy")
     .update(
       "defaultOutputLanguage",
-      languageInfo.displayName,
+      languageInfo.name !== LATEST_OUTPUT_LANGUAGE
+        ? languageInfo.displayName
+        : undefined,
       vscode.ConfigurationTarget.Global
     );
 }

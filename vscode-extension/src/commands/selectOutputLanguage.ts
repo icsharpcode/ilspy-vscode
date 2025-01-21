@@ -6,8 +6,8 @@
 import * as vscode from "vscode";
 import { DecompilerTextDocumentContentProvider } from "../decompiler/DecompilerTextDocumentContentProvider";
 import {
-  DEFAULT_OUTPUT_LANGUAGE,
   languageInfos,
+  LATEST_OUTPUT_LANGUAGE,
 } from "../decompiler/languageInfos";
 import { ILSPY_URI_SCHEME } from "../decompiler/nodeUri";
 import { setDefaultOutputLanguage } from "../decompiler/settings";
@@ -63,7 +63,7 @@ export function registerSelectOutputLanguage(
             if (isActive) {
               labels.push("active");
             }
-            if (DEFAULT_OUTPUT_LANGUAGE === languageName) {
+            if (LATEST_OUTPUT_LANGUAGE === languageName) {
               labels.push("latest");
             }
             return {

@@ -21,6 +21,7 @@ import { NodeType } from "../protocol/NodeType";
 import { getAssemblyList, updateAssemblyListIfNeeded } from "./settings";
 import { getNodeIcon } from "../icons";
 import { NodeFlags } from "../protocol/NodeFlags";
+import { hasNodeFlag } from "./utils";
 
 export class DecompiledTreeProvider implements TreeDataProvider<Node> {
   private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
@@ -138,7 +139,11 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
         updateAssemblyListIfNeeded(
           this.extensionContext,
           result.nodes
-            .filter((node) => node.metadata?.type === NodeType.Assembly)
+            .filter(
+              (node) =>
+                node.metadata?.type === NodeType.Assembly &&
+                !hasNodeFlag(node, NodeFlags.AutoLoaded)
+            )
             .map((node) => node.metadata!.assemblyPath)
         );
       }

@@ -46,12 +46,12 @@ namespace TestAssembly
 
         public override string ToString()
         {
-            return base.ToString();
+            return base.ToString() ?? string.Empty;
         }
 
         public static SomeClass operator &(SomeClass a, SomeClass b)
         {
-            return null;
+            return a;
         }
 
         public string CallsFrameworkMethod()

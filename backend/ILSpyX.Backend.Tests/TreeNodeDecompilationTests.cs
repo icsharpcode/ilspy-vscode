@@ -178,7 +178,7 @@ public enum SomeEnum
         Assert.Equal(
 @"public override string ToString()
 {
-    return base.ToString();
+    return base.ToString() ?? string.Empty;
 }
 ",
             application.TreeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);

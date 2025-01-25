@@ -19,6 +19,7 @@ export interface AnalyzeParams {
 
 export interface AnalyzeResponse {
   results: Node[];
+  shouldUpdateAssemblyList: boolean;
 }
 
 export namespace AnalyzeRequest {

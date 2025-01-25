@@ -79,6 +79,16 @@ public class DecompilerBackend(
         return true;
     }
 
+    public async Task<(T Result, bool NewAutoLoadedAssemblies)> DetectAutoLoadedAssemblies<T>(Func<Task<T>> operation)
+    {
+        var autoLoadedAssembliesBefore = (await GetLoadedAssembliesAsync()).Where(
+            assembly => assembly.IsAutoLoaded);
+        var result = await operation();
+        var autoLoadedAssembliesAfter = (await GetLoadedAssembliesAsync()).Where(
+            assembly => assembly.IsAutoLoaded);
+        return (result, autoLoadedAssembliesBefore.Count() != autoLoadedAssembliesAfter.Count());
+    }
+
     public CSharpDecompiler? CreateDecompiler(string assembly, string? outputLanguage = null)
     {
         var loadedAssembly = assemblyList.FindAssembly(assembly);

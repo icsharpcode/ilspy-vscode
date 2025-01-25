@@ -4,7 +4,11 @@
 
 using ILSpyX.Backend.Application;
 using ILSpyX.Backend.LSP.Protocol;
+using ILSpyX.Backend.Model;
 using OmniSharp.Extensions.JsonRpc;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,8 +19,10 @@ public class GetNodesHandler(ILSpyXApplication application) : IJsonRpcRequestHan
 {
     public async Task<GetNodesResponse> Handle(GetNodesRequest request, CancellationToken cancellationToken)
     {
-        return new GetNodesResponse(
-            await application.TreeNodeProviders.ForNode(request.NodeMetadata).GetChildrenAsync(request.NodeMetadata));
+        (var nodes, bool shouldUpdateAssemblyList) =
+            await application.DecompilerBackend.DetectAutoLoadedAssemblies(() =>
+                application.TreeNodeProviders.ForNode(request.NodeMetadata)
+                    .GetChildrenAsync(request.NodeMetadata));
+        return new GetNodesResponse(nodes, shouldUpdateAssemblyList);
     }
-
 }

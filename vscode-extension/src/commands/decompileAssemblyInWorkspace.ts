@@ -9,7 +9,7 @@ import { DecompiledTreeProvider } from "../decompiler/DecompiledTreeProvider";
 import { addAssemblyToTree } from "./utils";
 import Node from "../protocol/Node";
 
-export function registerDecompileAssemblyInWorkspace(
+export function registerDecompileAssemblyInWorkspaceCommand(
   decompiledTreeProvider: DecompiledTreeProvider,
   decompiledTreeView: vscode.TreeView<Node>
 ) {

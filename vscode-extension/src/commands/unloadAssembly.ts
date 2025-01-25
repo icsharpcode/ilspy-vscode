@@ -7,7 +7,7 @@ import * as vscode from "vscode";
 import { DecompiledTreeProvider } from "../decompiler/DecompiledTreeProvider";
 import Node from "../protocol/Node";
 
-export function registerUnloadAssembly(
+export function registerUnloadAssemblyCommand(
   decompiledTreeProvider: DecompiledTreeProvider
 ) {
   return vscode.commands.registerCommand(

@@ -10,7 +10,7 @@ import {
 } from "../decompiler/analyze/AnalyzeResultTreeProvider";
 import Node from "../protocol/Node";
 
-export function registerAnalyze(
+export function registerAnalyzeCommand(
   analyzeResultTreeProvider: AnalyzeResultTreeProvider,
   analyzeResultTreeView: vscode.TreeView<AnalyzeTreeNode>
 ) {

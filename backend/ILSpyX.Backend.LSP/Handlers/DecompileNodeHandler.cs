@@ -14,12 +14,14 @@ namespace ILSpyX.Backend.LSP.Handlers;
 public class DecompileNodeHandler(ILSpyXApplication application)
     : IJsonRpcRequestHandler<DecompileNodeRequest, DecompileResponse>
 {
-    public Task<DecompileResponse> Handle(DecompileNodeRequest request, CancellationToken cancellationToken)
+    public async Task<DecompileResponse> Handle(DecompileNodeRequest request, CancellationToken cancellationToken)
     {
-        return Task.FromResult(new DecompileResponse(
-            application.TreeNodeProviders
-                .ForNode(request.NodeMetadata)
-                .Decompile(request.NodeMetadata, request.OutputLanguage)));
+        (var result, bool shouldUpdateAssemblyList) =
+            await application.DecompilerBackend.DetectAutoLoadedAssemblies(() =>
+                Task.FromResult(application.TreeNodeProviders
+                    .ForNode(request.NodeMetadata)
+                    .Decompile(request.NodeMetadata, request.OutputLanguage)));
+        return new DecompileResponse(result, shouldUpdateAssemblyList);
     }
 
 }

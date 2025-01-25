@@ -151,6 +151,10 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
       setTreeWithNodes(result?.nodes !== undefined && result.nodes?.length > 0);
     }
 
+    if (result?.shouldUpdateAssemblyList) {
+      this.refresh();
+    }
+
     return result?.nodes ?? [];
   }
 }

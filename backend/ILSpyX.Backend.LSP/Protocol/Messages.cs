@@ -48,11 +48,13 @@ namespace ILSpyX.Backend.LSP.Protocol
     public record DecompileResponse(
         string? DecompiledCode,
         bool IsError,
-        string? ErrorMessage
+        string? ErrorMessage,
+        bool ShouldUpdateAssemblyList
     )
     {
-        public DecompileResponse(DecompileResult decompileResult) :
-            this(decompileResult.DecompiledCode, decompileResult.IsError, decompileResult.ErrorMessage)
+        public DecompileResponse(DecompileResult decompileResult, bool shouldUpdateAssemblyList) :
+            this(decompileResult.DecompiledCode, decompileResult.IsError, decompileResult.ErrorMessage,
+                shouldUpdateAssemblyList)
         { }
     }
 
@@ -64,7 +66,7 @@ namespace ILSpyX.Backend.LSP.Protocol
     public record GetNodesRequest(NodeMetadata? NodeMetadata)
         : IRequest<GetNodesResponse>;
 
-    public record GetNodesResponse(IEnumerable<Node>? Nodes);
+    public record GetNodesResponse(IEnumerable<Node>? Nodes, bool ShouldUpdateAssemblyList);
 
     #endregion
 
@@ -74,7 +76,7 @@ namespace ILSpyX.Backend.LSP.Protocol
     public record SearchRequest(string Term)
         : IRequest<SearchResponse>;
 
-    public record SearchResponse(IEnumerable<Node>? Results);
+    public record SearchResponse(IEnumerable<Node>? Results, bool ShouldUpdateAssemblyList);
 
     #endregion
 
@@ -84,7 +86,7 @@ namespace ILSpyX.Backend.LSP.Protocol
     public record AnalyzeRequest(NodeMetadata? NodeMetadata)
         : IRequest<AnalyzeResponse>;
 
-    public record AnalyzeResponse(IEnumerable<Node>? Results);
+    public record AnalyzeResponse(IEnumerable<Node>? Results, bool ShouldUpdateAssemblyList);
 
     #endregion
 }

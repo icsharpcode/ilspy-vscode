@@ -7,7 +7,7 @@ import * as vscode from "vscode";
 import { SearchResultTreeProvider } from "../decompiler/search/SearchResultTreeProvider";
 import Node from "../protocol/Node";
 
-export function registerSearch(
+export function registerSearchCommand(
   searchResultTreeProvider: SearchResultTreeProvider
 ) {
   return vscode.commands.registerCommand(

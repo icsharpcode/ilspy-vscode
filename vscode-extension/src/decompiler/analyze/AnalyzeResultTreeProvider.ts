@@ -11,6 +11,7 @@ import {
   TreeItemCollapsibleState,
   ProviderResult,
   ThemeIcon,
+  commands,
 } from "vscode";
 import IILSpyBackend from "../IILSpyBackend";
 import Node from "../../protocol/Node";
@@ -45,13 +46,17 @@ export class AnalyzeResultTreeProvider
   }
 
   public async analyze(node: Node) {
+    const analyzeResponse = await this.backend.sendAnalyze({
+      nodeMetadata: node.metadata,
+    });
     this.lastAnalyzes.push({
       symbol: node.displayName,
-      results:
-        (await this.backend.sendAnalyze({ nodeMetadata: node.metadata }))
-          ?.results ?? [],
+      results: analyzeResponse?.results ?? [],
     });
     this.refresh();
+    if (analyzeResponse?.shouldUpdateAssemblyList) {
+      commands.executeCommand("ilspy.refreshAssemblyList");
+    }
   }
 
   public getFirstNode() {

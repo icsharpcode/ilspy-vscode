@@ -17,7 +17,9 @@ public class SearchHandler(ILSpyXApplication application) : IJsonRpcRequestHandl
 
     public async Task<SearchResponse> Handle(SearchRequest request, CancellationToken cancellationToken)
     {
-        var resultNodes = await searchBackend.Search(request.Term, cancellationToken);
-        return new SearchResponse(resultNodes);
+        (var resultNodes, bool shouldUpdateAssemblyList) =
+            await application.DecompilerBackend.DetectAutoLoadedAssemblies(() =>
+                searchBackend.Search(request.Term, cancellationToken));
+        return new SearchResponse(resultNodes, shouldUpdateAssemblyList);
     }
 }

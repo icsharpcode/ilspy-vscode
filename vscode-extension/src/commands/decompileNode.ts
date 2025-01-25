@@ -12,7 +12,7 @@ import Node from "../protocol/Node";
 
 let lastSelectedNode: Node | undefined = undefined;
 
-export function registerDecompileNode(
+export function registerDecompileNodeCommand(
   contentProvider: DecompilerTextDocumentContentProvider
 ) {
   return vscode.commands.registerCommand(

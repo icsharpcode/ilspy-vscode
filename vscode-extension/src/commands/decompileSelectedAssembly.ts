@@ -3,7 +3,7 @@ import { DecompiledTreeProvider } from "../decompiler/DecompiledTreeProvider";
 import { addAssemblyToTree } from "./utils";
 import Node from "../protocol/Node";
 
-export function registerDecompileSelectedAssembly(
+export function registerDecompileSelectedAssemblyCommand(
   decompiledTreeProvider: DecompiledTreeProvider,
   decompiledTreeView: vscode.TreeView<Node>
 ) {

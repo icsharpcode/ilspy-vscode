@@ -12,31 +12,32 @@ import {
 } from "vscode-languageclient/node";
 import ILSpyBackend from "./decompiler/ILSpyBackend";
 import { DecompiledTreeProvider } from "./decompiler/DecompiledTreeProvider";
-import { registerDecompileAssemblyInWorkspace } from "./commands/decompileAssemblyInWorkspace";
-import { registerDecompileAssemblyViaDialog } from "./commands/decompileAssemblyViaDialog";
-import { registerDecompileSelectedAssembly } from "./commands/decompileSelectedAssembly";
-import { registerReloadAssembly } from "./commands/reloadAssembly";
-import { registerUnloadAssembly } from "./commands/unloadAssembly";
+import { registerDecompileAssemblyInWorkspaceCommand } from "./commands/decompileAssemblyInWorkspace";
+import { registerDecompileAssemblyViaDialogCommand } from "./commands/decompileAssemblyViaDialog";
+import { registerDecompileSelectedAssemblyCommand } from "./commands/decompileSelectedAssembly";
+import { registerReloadAssemblyCommand } from "./commands/reloadAssembly";
+import { registerUnloadAssemblyCommand } from "./commands/unloadAssembly";
 import { resolveDotnetRuntime } from "./dotnet-acquire/resolveDotnetRuntime";
 import OutputWindowLogger from "./OutputWindowLogger";
 import { commands, Disposable, ExtensionContext, workspace } from "vscode";
 import { DecompilerTextDocumentContentProvider } from "./decompiler/DecompilerTextDocumentContentProvider";
 import {
-  registerSelectOutputLanguage,
+  registerSelectOutputLanguageCommand,
   registerSelectOutputLanguageStatusBarItem,
 } from "./commands/selectOutputLanguage";
 import { ILSPY_URI_SCHEME } from "./decompiler/nodeUri";
-import { registerSearch } from "./commands/search";
+import { registerSearchCommand } from "./commands/search";
 import { SearchResultTreeProvider } from "./decompiler/search/SearchResultTreeProvider";
-import { registerDecompileNode } from "./commands/decompileNode";
+import { registerDecompileNodeCommand } from "./commands/decompileNode";
 import {
   createAnalyzeResultTreeView,
   createDecompiledTreeView,
   createSearchResultTreeView,
 } from "./view/treeViews";
-import { registerSearchEditorSelection } from "./commands/searchEditorSelection";
+import { registerSearchEditorSelectionCommand } from "./commands/searchEditorSelection";
 import { AnalyzeResultTreeProvider } from "./decompiler/analyze/AnalyzeResultTreeProvider";
-import { registerAnalyze } from "./commands/analyze";
+import { registerAnalyzeCommand } from "./commands/analyze";
+import { registerRefreshAssemblyListCommand } from "./commands/refreshAssemblyList";
 
 let client: LanguageClient;
 
@@ -98,19 +99,19 @@ export async function activate(context: ExtensionContext) {
   decompiledTreeProvider.initWithAssemblies();
 
   disposables.push(
-    registerDecompileAssemblyInWorkspace(
+    registerDecompileAssemblyInWorkspaceCommand(
       decompiledTreeProvider,
       decompiledTreeView
     )
   );
   disposables.push(
-    registerDecompileAssemblyViaDialog(
+    registerDecompileAssemblyViaDialogCommand(
       decompiledTreeProvider,
       decompiledTreeView
     )
   );
   disposables.push(
-    registerDecompileSelectedAssembly(
+    registerDecompileSelectedAssemblyCommand(
       decompiledTreeProvider,
       decompiledTreeView
     )
@@ -124,7 +125,7 @@ export async function activate(context: ExtensionContext) {
     searchResultTreeProvider
   );
   disposables.push(searchResultTreeView);
-  disposables.push(registerSearch(searchResultTreeProvider));
+  disposables.push(registerSearchCommand(searchResultTreeProvider));
 
   const analyzeResultTreeProvider = new AnalyzeResultTreeProvider(ilspyBackend);
   const analyzeResultTreeView = createAnalyzeResultTreeView(
@@ -132,7 +133,7 @@ export async function activate(context: ExtensionContext) {
   );
   disposables.push(analyzeResultTreeView);
   disposables.push(
-    registerAnalyze(analyzeResultTreeProvider, analyzeResultTreeView)
+    registerAnalyzeCommand(analyzeResultTreeProvider, analyzeResultTreeView)
   );
 
   disposables.push(
@@ -143,11 +144,11 @@ export async function activate(context: ExtensionContext) {
   );
 
   disposables.push(
-    registerDecompileNode(decompilerTextDocumentContentProvider)
+    registerDecompileNodeCommand(decompilerTextDocumentContentProvider)
   );
 
   disposables.push(
-    registerSelectOutputLanguage(decompilerTextDocumentContentProvider)
+    registerSelectOutputLanguageCommand(decompilerTextDocumentContentProvider)
   );
   disposables.push(
     ...registerSelectOutputLanguageStatusBarItem(
@@ -155,10 +156,11 @@ export async function activate(context: ExtensionContext) {
     )
   );
 
-  disposables.push(registerReloadAssembly(decompiledTreeProvider));
-  disposables.push(registerUnloadAssembly(decompiledTreeProvider));
+  disposables.push(registerReloadAssemblyCommand(decompiledTreeProvider));
+  disposables.push(registerUnloadAssemblyCommand(decompiledTreeProvider));
+  disposables.push(registerRefreshAssemblyListCommand(decompiledTreeProvider));
 
-  disposables.push(registerSearchEditorSelection());
+  disposables.push(registerSearchEditorSelectionCommand());
 
   context.subscriptions.push(...disposables);
 }

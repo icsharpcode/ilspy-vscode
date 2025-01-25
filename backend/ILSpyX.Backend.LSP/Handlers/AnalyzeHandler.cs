@@ -14,7 +14,9 @@ public class AnalyzeHandler(ILSpyXApplication application) : IJsonRpcRequestHand
 {
     public async Task<AnalyzeResponse> Handle(AnalyzeRequest request, CancellationToken cancellationToken)
     {
-        var resultNodes = await application.TreeNodeProviders.AnalyzersRoot.GetChildrenAsync(request.NodeMetadata);
-        return new AnalyzeResponse(resultNodes);
+        (var resultNodes, bool shouldUpdateAssemblyList) =
+            await application.DecompilerBackend.DetectAutoLoadedAssemblies(() =>
+                application.TreeNodeProviders.AnalyzersRoot.GetChildrenAsync(request.NodeMetadata));
+        return new AnalyzeResponse(resultNodes, shouldUpdateAssemblyList);
     }
 }

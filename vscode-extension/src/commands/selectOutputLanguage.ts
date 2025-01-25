@@ -18,7 +18,7 @@ type OutputLanguageQuickPickItem = vscode.QuickPickItem & {
   isActive: boolean;
 };
 
-export function registerSelectOutputLanguage(
+export function registerSelectOutputLanguageCommand(
   contentProvider: DecompilerTextDocumentContentProvider
 ) {
   return vscode.commands.registerCommand(

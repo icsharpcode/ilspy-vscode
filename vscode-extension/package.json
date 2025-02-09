@@ -270,6 +270,17 @@
 				"label": "Add Assembly",
 				"icon": "$(add)"
 			}
+		],
+		"colors": [
+			{
+				"id": "ilspy.autoLoadedAssemblyTextForeground",
+				"description": "Text color of auto-loaded assemblies",
+				"defaults": {
+					"dark": "#4682B4",
+					"light": "#4682B4",
+					"highContrast": "#4682B4"
+				}
+			}
 		]
 	},
 	"scripts": {

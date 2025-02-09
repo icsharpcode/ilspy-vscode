@@ -19,7 +19,13 @@ import { registerReloadAssemblyCommand } from "./commands/reloadAssembly";
 import { registerUnloadAssemblyCommand } from "./commands/unloadAssembly";
 import { resolveDotnetRuntime } from "./dotnet-acquire/resolveDotnetRuntime";
 import OutputWindowLogger from "./OutputWindowLogger";
-import { commands, Disposable, ExtensionContext, workspace } from "vscode";
+import {
+  commands,
+  Disposable,
+  ExtensionContext,
+  window,
+  workspace,
+} from "vscode";
 import { DecompilerTextDocumentContentProvider } from "./decompiler/DecompilerTextDocumentContentProvider";
 import {
   registerSelectOutputLanguageCommand,
@@ -38,6 +44,7 @@ import { registerSearchEditorSelectionCommand } from "./commands/searchEditorSel
 import { AnalyzeResultTreeProvider } from "./decompiler/analyze/AnalyzeResultTreeProvider";
 import { registerAnalyzeCommand } from "./commands/analyze";
 import { registerRefreshAssemblyListCommand } from "./commands/refreshAssemblyList";
+import { AssemblyNodeDecorationProvider } from "./decompiler/AssemblyNodeDecorationProvider";
 
 let client: LanguageClient;
 
@@ -97,6 +104,11 @@ export async function activate(context: ExtensionContext) {
   const decompiledTreeView = createDecompiledTreeView(decompiledTreeProvider);
   disposables.push(decompiledTreeView);
   decompiledTreeProvider.initWithAssemblies();
+
+  const assemblyNodeDecorationProvider = new AssemblyNodeDecorationProvider();
+  disposables.push(
+    window.registerFileDecorationProvider(assemblyNodeDecorationProvider)
+  );
 
   disposables.push(
     registerDecompileAssemblyInWorkspaceCommand(

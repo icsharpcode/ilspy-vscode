@@ -14,6 +14,7 @@ import {
   ThemeIcon,
   ExtensionContext,
   commands,
+  Uri,
 } from "vscode";
 import IILSpyBackend from "./IILSpyBackend";
 import Node from "../protocol/Node";
@@ -102,11 +103,7 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
 
   public getTreeItem(node: Node): TreeItem {
     return {
-      label:
-        node.metadata?.type === NodeType.Assembly &&
-        node.flags === NodeFlags.AutoLoaded
-          ? `* ${node.displayName}`
-          : node.displayName,
+      label: node.displayName,
       tooltip: node.description,
       collapsibleState: node.mayHaveChildren
         ? TreeItemCollapsibleState.Collapsed
@@ -118,6 +115,13 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
       },
       contextValue: getNodeContextValue(node),
       iconPath: new ThemeIcon(getNodeIcon(node.metadata?.type)),
+      resourceUri: hasNodeFlag(node, NodeFlags.AutoLoaded)
+        ? Uri.parse(
+            `ilspy-autoloaded://${node.metadata?.assemblyPath}/${
+              node.metadata?.name ?? ""
+            }`
+          )
+        : undefined,
     };
   }
 

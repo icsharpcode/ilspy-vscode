@@ -16,6 +16,12 @@ import {
 import IILSpyBackend from "../IILSpyBackend";
 import Node from "../../protocol/Node";
 import { getNodeIcon } from "../../icons";
+import {
+  getAutoLoadDependenciesSetting,
+  getShowCompilerGeneratedSymbolsSetting,
+} from "../settings";
+import { NodeFlags } from "../../protocol/NodeFlags";
+import { hasNodeFlag } from "../utils";
 
 interface PerformedSearch {
   term: string;
@@ -90,7 +96,15 @@ export class SearchResultTreeProvider
     }
 
     if (isPerformedSearchNode(node)) {
-      return node.results;
+      const showCompilerGeneratedSymbols =
+        getShowCompilerGeneratedSymbolsSetting();
+      return (
+        node.results.filter(
+          (node) =>
+            showCompilerGeneratedSymbols ||
+            !hasNodeFlag(node, NodeFlags.CompilerGenerated)
+        ) ?? []
+      );
     }
 
     return [];

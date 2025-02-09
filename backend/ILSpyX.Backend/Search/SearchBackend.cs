@@ -25,43 +25,45 @@ public class SearchBackend(SingleThreadAssemblyList assemblyList, ILSpyBackendSe
 
     public async Task<IEnumerable<Node>> Search(string searchTerm, CancellationToken cancellationToken)
     {
-        if (!string.IsNullOrEmpty(searchTerm))
+        if (string.IsNullOrEmpty(searchTerm))
         {
-            try
-            {
-                var assemblies = (await assemblyList.GetAllAssemblies()).Where(assembly => !assembly.IsAutoLoaded);
+            return [];
+        }
 
-                var resultQueue = new ConcurrentQueue<SearchResult>();
-                var searchRequest = CreateSearchRequest(searchTerm, SearchMode.TypeAndMember);
+        try
+        {
+            var assemblies = (await assemblyList.GetAllAssemblies()).Where(assembly => !assembly.IsAutoLoaded);
 
-                await Task.Factory.StartNew(() => {
-                    var searcher = new MemberSearchStrategy(new CSharpLanguage(), ApiVisibility.All, searchRequest, resultQueue);
-                    try
+            var resultQueue = new ConcurrentQueue<SearchResult>();
+            var searchRequest = CreateSearchRequest(searchTerm, SearchMode.TypeAndMember);
+
+            await Task.Factory.StartNew(() => {
+                var searcher =
+                    new MemberSearchStrategy(new CSharpLanguage(), ApiVisibility.All, searchRequest, resultQueue);
+                try
+                {
+                    foreach (var loadedAssembly in assemblies)
                     {
-                        foreach (var loadedAssembly in assemblies)
+                        var module = loadedAssembly.GetMetadataFileOrNull();
+                        if (module == null)
                         {
-                            var module = loadedAssembly.GetMetadataFileOrNull();
-                            if (module == null)
-                            {
-                                continue;
-                            }
-
-                            searcher.Search(module, cancellationToken);
+                            continue;
                         }
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        // ignore cancellation
-                    }
 
-                }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).ConfigureAwait(false);
+                        searcher.Search(module, cancellationToken);
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    // ignore cancellation
+                }
+            }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).ConfigureAwait(false);
 
-                return resultQueue.Where(IsNotAccessor).OrderBy(r => r, resultsComparer).Select(ConvertResultToNode);
-            }
-            catch (TaskCanceledException)
-            {
-                // ignore cancellation
-            }
+            return resultQueue.Where(IsNotAccessor).OrderBy(r => r, resultsComparer).Select(ConvertResultToNode);
+        }
+        catch (TaskCanceledException)
+        {
+            // ignore cancellation
         }
 
         return [];
@@ -90,12 +92,14 @@ public class SearchBackend(SingleThreadAssemblyList assemblyList, ILSpyBackendSe
                     : 0,
                 ParentSymbolToken:
                 memberSearchResult?.Member?.DeclaringTypeDefinition?.MetadataToken != null
-                    ?
-                    MetadataTokens.GetToken(memberSearchResult.Member.DeclaringTypeDefinition.MetadataToken) : 0),
+                    ? MetadataTokens.GetToken(memberSearchResult.Member.DeclaringTypeDefinition.MetadataToken)
+                    : 0),
             DisplayName: result.Name,
             Description: result.Location,
             MayHaveChildren: memberSearchResult?.Member is ITypeDefinition,
-            SymbolModifiers: GetSymbolModifiers(result));
+            SymbolModifiers: GetSymbolModifiers(result),
+            Flags: NodeFlagsHelper.GetNodeFlags(result)
+        );
     }
 
     NodeType GetNodeType(SearchResult result) => result switch

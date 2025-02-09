@@ -18,7 +18,12 @@ import {
 import IILSpyBackend from "./IILSpyBackend";
 import Node from "../protocol/Node";
 import { NodeType } from "../protocol/NodeType";
-import { getAssemblyList, updateAssemblyListIfNeeded } from "./settings";
+import {
+  getAssemblyList,
+  getAutoLoadDependenciesSetting,
+  getShowCompilerGeneratedSymbolsSetting,
+  updateAssemblyListIfNeeded,
+} from "./settings";
 import { getNodeIcon } from "../icons";
 import { NodeFlags } from "../protocol/NodeFlags";
 import { hasNodeFlag } from "./utils";
@@ -155,7 +160,18 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
       this.refresh();
     }
 
-    return result?.nodes ?? [];
+    const showAutoLoadedAssemblies = getAutoLoadDependenciesSetting();
+    const showCompilerGeneratedSymbols =
+      getShowCompilerGeneratedSymbolsSetting();
+    return (
+      result?.nodes?.filter(
+        (node) =>
+          (showAutoLoadedAssemblies ||
+            !hasNodeFlag(node, NodeFlags.AutoLoaded)) &&
+          (showCompilerGeneratedSymbols ||
+            !hasNodeFlag(node, NodeFlags.CompilerGenerated))
+      ) ?? []
+    );
   }
 }
 

@@ -74,3 +74,41 @@ export function cacheDotnetRuntimePath(
     path,
   });
 }
+
+export function getAutoLoadDependenciesSetting() {
+  return (
+    vscode.workspace
+      .getConfiguration("ilspy")
+      .get<boolean>("autoLoadDependencies") ?? true
+  );
+}
+
+export function setAutoLoadDependenciesSetting(autoLoadDependencies: boolean) {
+  vscode.workspace
+    .getConfiguration("ilspy")
+    .update(
+      "autoLoadDependencies",
+      autoLoadDependencies,
+      vscode.ConfigurationTarget.Global
+    );
+}
+
+export function getShowCompilerGeneratedSymbolsSetting() {
+  return (
+    vscode.workspace
+      .getConfiguration("ilspy")
+      .get<boolean>("showCompilerGeneratedSymbols") ?? true
+  );
+}
+
+export function setShowCompilerGeneratedSymbolsSetting(
+  autoLoadDependencies: boolean
+) {
+  vscode.workspace
+    .getConfiguration("ilspy")
+    .update(
+      "showCompilerGeneratedSymbols",
+      autoLoadDependencies,
+      vscode.ConfigurationTarget.Global
+    );
+}

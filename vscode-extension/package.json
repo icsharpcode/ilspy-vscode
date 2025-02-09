@@ -74,6 +74,16 @@
 						"description": "If activated, the list of loaded assemblies is stored with current workspace and is restored on re-opening.",
 						"type": "boolean",
 						"default": "true"
+					},
+					"ilspy.autoLoadDependencies": {
+						"description": "If activated, dependency assemblies are temporarily added to assembly tree on demand.",
+						"type": "boolean",
+						"default": "true"
+					},
+					"ilspy.showCompilerGeneratedSymbols": {
+						"description": "If activated, shows compiler-generated symbols.",
+						"type": "boolean",
+						"default": "false"
 					}
 				}
 			}

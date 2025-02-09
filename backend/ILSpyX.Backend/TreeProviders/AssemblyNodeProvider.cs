@@ -33,7 +33,7 @@ public class AssemblyNodeProvider(ILSpyXApplication application) : ITreeNodeProv
                     Description: assemblyData.FilePath,
                     MayHaveChildren: true,
                     SymbolModifiers: SymbolModifiers.None,
-                    Flags: assemblyData.IsAutoLoaded ? NodeFlags.AutoLoaded : NodeFlags.None
+                    Flags: NodeFlagsHelper.GetNodeFlags(assemblyData)
                 ));
     }
 

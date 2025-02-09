@@ -159,7 +159,7 @@ public class TreeNodeProviderTests
         var application = await TestHelper.CreateTestApplicationWithAssembly();
         var types = await application.TreeNodeProviders.Namespace.GetChildrenAsync(
             new NodeMetadata(TestHelper.AssemblyPath, NodeType.Namespace, "TestAssembly", 0, 0));
-        var typeNode = types.Where(node => node.Metadata?.Name == "SomeClass").First();
+        var typeNode = types.First(node => node.Metadata?.Name == "SomeClass");
         var list = await application.TreeNodeProviders.ForNode(typeNode.Metadata).GetChildrenAsync(typeNode.Metadata);
         Assert.Collection(list,
                 node => {
@@ -218,6 +218,14 @@ public class TreeNodeProviderTests
                     Assert.Equal(typeNode.Metadata?.SymbolToken, node.Metadata?.ParentSymbolToken);
                     Assert.Equal(SymbolModifiers.Internal, node.SymbolModifiers);
                     Assert.False(node.MayHaveChildren);
+                },
+                node => {
+                    Assert.Equal("SomeCompilerSpecial() : string", node.Metadata?.Name);
+                    Assert.Equal(NodeType.Method, node.Metadata?.Type);
+                    Assert.Equal(typeNode.Metadata?.SymbolToken, node.Metadata?.ParentSymbolToken);
+                    Assert.Equal(SymbolModifiers.Public, node.SymbolModifiers);
+                    Assert.False(node.MayHaveChildren);
+                    Assert.Equal(NodeFlags.CompilerGenerated, node.Flags);
                 },
                 node => {
                     Assert.Equal("ToString() : string", node.Metadata?.Name);

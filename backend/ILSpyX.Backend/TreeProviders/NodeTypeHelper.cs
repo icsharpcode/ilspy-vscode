@@ -33,7 +33,7 @@ public static class NodeTypeHelper
 
     public static SymbolModifiers GetSymbolModifiers(IEntity entity)
     {
-        SymbolModifiers modifiers = SymbolModifiers.None;
+        var modifiers = SymbolModifiers.None;
 
         switch (entity)
         {
@@ -96,8 +96,6 @@ public static class NodeTypeHelper
                 break;
             case Accessibility.Public:
                 modifiers |= SymbolModifiers.Public;
-                break;
-            default:
                 break;
         }
     }

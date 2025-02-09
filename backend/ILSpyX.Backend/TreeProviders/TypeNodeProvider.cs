@@ -45,7 +45,7 @@ public class TypeNodeProvider(ILSpyXApplication application) : ITreeNodeProvider
 
         foreach (var t in currentNamespace.Types.OrderBy(t => t.FullName))
         {
-            var name = t.TypeToString(includeNamespace: false);
+            string name = t.TypeToString(includeNamespace: false);
             yield return new Node(
                     new NodeMetadata(
                         AssemblyPath: assemblyPath,
@@ -56,7 +56,8 @@ public class TypeNodeProvider(ILSpyXApplication application) : ITreeNodeProvider
                     DisplayName: name,
                     Description: "",
                     MayHaveChildren: true,
-                    SymbolModifiers: NodeTypeHelper.GetSymbolModifiers(t)
+                    SymbolModifiers: NodeTypeHelper.GetSymbolModifiers(t),
+                    Flags: NodeFlagsHelper.GetNodeFlags(t)
                 );
         }
     }
@@ -65,7 +66,7 @@ public class TypeNodeProvider(ILSpyXApplication application) : ITreeNodeProvider
     {
         if (nodeMetadata is null || !NodeTypeHelper.IsTypeNode(nodeMetadata.Type))
         {
-            return Enumerable.Empty<Node>();
+            return [];
         }
 
         return await application.TreeNodeProviders.Member.CreateNodesAsync(

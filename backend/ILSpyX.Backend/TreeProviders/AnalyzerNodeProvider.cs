@@ -97,7 +97,9 @@ public class AnalyzerNodeProvider(ILSpyXApplication application) : ITreeNodeProv
                         DisplayName: nodeName,
                         Description: location,
                         MayHaveChildren: false,
-                        SymbolModifiers: NodeTypeHelper.GetSymbolModifiers(entity));
+                        SymbolModifiers: NodeTypeHelper.GetSymbolModifiers(entity),
+                        Flags: NodeFlagsHelper.GetNodeFlags(entity)
+                    );
                 })
         );
 

@@ -11,10 +11,17 @@ import {
   TreeItemCollapsibleState,
   ProviderResult,
   ThemeIcon,
+  commands,
 } from "vscode";
 import IILSpyBackend from "../IILSpyBackend";
 import Node from "../../protocol/Node";
 import { getNodeIcon } from "../../icons";
+import {
+  getAutoLoadDependenciesSetting,
+  getShowCompilerGeneratedSymbolsSetting,
+} from "../settings";
+import { NodeFlags } from "../../protocol/NodeFlags";
+import { hasNodeFlag } from "../utils";
 
 interface PerformedSearch {
   term: string;
@@ -29,7 +36,9 @@ export function isPerformedSearchNode(
   return "term" in node && "results" in node;
 }
 
-export class SearchResultTreeProvider implements TreeDataProvider<SearchTreeNode> {
+export class SearchResultTreeProvider
+  implements TreeDataProvider<SearchTreeNode>
+{
   private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
   readonly onDidChangeTreeData: Event<any> = this._onDidChangeTreeData.event;
   private lastSearches: PerformedSearch[] = [];
@@ -41,11 +50,15 @@ export class SearchResultTreeProvider implements TreeDataProvider<SearchTreeNode
   }
 
   public async performSearch(term: string) {
+    const searchResponse = await this.backend.sendSearch({ term });
     this.lastSearches.push({
       term,
-      results: (await this.backend.sendSearch({ term }))?.results ?? [],
+      results: searchResponse?.results ?? [],
     });
     this.refresh();
+    if (searchResponse?.shouldUpdateAssemblyList) {
+      commands.executeCommand("ilspy.refreshAssemblyList");
+    }
   }
 
   public getTreeItem(node: SearchTreeNode): TreeItem {
@@ -83,7 +96,15 @@ export class SearchResultTreeProvider implements TreeDataProvider<SearchTreeNode
     }
 
     if (isPerformedSearchNode(node)) {
-      return node.results;
+      const showCompilerGeneratedSymbols =
+        getShowCompilerGeneratedSymbolsSetting();
+      return (
+        node.results.filter(
+          (node) =>
+            showCompilerGeneratedSymbols ||
+            !hasNodeFlag(node, NodeFlags.CompilerGenerated)
+        ) ?? []
+      );
     }
 
     return [];

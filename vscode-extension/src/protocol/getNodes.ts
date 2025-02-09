@@ -19,6 +19,7 @@ export interface GetNodesParams {
 
 export interface GetNodesResponse {
   nodes?: Node[];
+  shouldUpdateAssemblyList: boolean;
 }
 
 export namespace GetNodesRequest {

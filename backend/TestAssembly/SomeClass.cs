@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace TestAssembly
 {
@@ -57,6 +58,12 @@ namespace TestAssembly
         public string CallsFrameworkMethod()
         {
             return string.Join("Test1", "Test2", "Test3");
+        }
+
+        [CompilerGenerated]
+        public string SomeCompilerSpecial()
+        {
+            return "<CompilerGenerated>";
         }
     }
 }

@@ -11,12 +11,15 @@ import {
   TreeItemCollapsibleState,
   ProviderResult,
   ThemeIcon,
+  commands,
 } from "vscode";
 import IILSpyBackend from "../IILSpyBackend";
 import Node from "../../protocol/Node";
 import { NodeType } from "../../protocol/NodeType";
 import { getNodeIcon } from "../../icons";
-import { getTreeNodeCollapsibleState } from "../utils";
+import { getTreeNodeCollapsibleState, hasNodeFlag } from "../utils";
+import { getShowCompilerGeneratedSymbolsSetting } from "../settings";
+import { NodeFlags } from "../../protocol/NodeFlags";
 
 export interface PerformedAnalyze {
   symbol: string;
@@ -45,13 +48,17 @@ export class AnalyzeResultTreeProvider
   }
 
   public async analyze(node: Node) {
+    const analyzeResponse = await this.backend.sendAnalyze({
+      nodeMetadata: node.metadata,
+    });
     this.lastAnalyzes.push({
       symbol: node.displayName,
-      results:
-        (await this.backend.sendAnalyze({ nodeMetadata: node.metadata }))
-          ?.results ?? [],
+      results: analyzeResponse?.results ?? [],
     });
     this.refresh();
+    if (analyzeResponse?.shouldUpdateAssemblyList) {
+      commands.executeCommand("ilspy.refreshAssemblyList");
+    }
   }
 
   public getFirstNode() {
@@ -106,8 +113,15 @@ export class AnalyzeResultTreeProvider
       return [...this.lastAnalyzes].reverse();
     }
 
+    const showCompilerGeneratedSymbols =
+      getShowCompilerGeneratedSymbolsSetting();
+
     if (isPerformedAnalyzeNode(node)) {
-      return node.results;
+      return node.results.filter(
+        (node) =>
+          showCompilerGeneratedSymbols ||
+          !hasNodeFlag(node, NodeFlags.CompilerGenerated)
+      );
     }
 
     if (node.metadata?.type !== NodeType.Analyzer) {
@@ -118,7 +132,13 @@ export class AnalyzeResultTreeProvider
       nodeMetadata: node?.metadata,
     });
 
-    return result?.nodes ?? [];
+    return (
+      result?.nodes?.filter(
+        (node) =>
+          showCompilerGeneratedSymbols ||
+          !hasNodeFlag(node, NodeFlags.CompilerGenerated)
+      ) ?? []
+    );
   }
 
   public getParent?(element: AnalyzeTreeNode): ProviderResult<AnalyzeTreeNode> {

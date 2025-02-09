@@ -8,7 +8,7 @@ import { DecompiledTreeProvider } from "../decompiler/DecompiledTreeProvider";
 import { addAssemblyFromFilePath } from "./utils";
 import Node from "../protocol/Node";
 
-export function registerDecompileAssemblyViaDialog(
+export function registerDecompileAssemblyViaDialogCommand(
   decompiledTreeProvider: DecompiledTreeProvider,
   decompiledTreeView: vscode.TreeView<Node>
 ) {
@@ -27,20 +27,16 @@ export function registerDecompileAssemblyViaDialog(
   );
 }
 
-async function promptForAssemblyFilesPathViaDialog(): Promise<
-  string[]
-> {
-  const uris = await vscode.window.showOpenDialog(
-    /* options*/ {
-      openLabel: "Select assemblies",
-      canSelectFiles: true,
-      canSelectFolders: false,
-      canSelectMany: true,
-      filters: {
-        ".NET Assemblies": ["dll", "exe", "winmd", "netmodule"],
-      },
-    }
-  );
+async function promptForAssemblyFilesPathViaDialog(): Promise<string[]> {
+  const uris = await vscode.window.showOpenDialog({
+    openLabel: "Select assemblies",
+    canSelectFiles: true,
+    canSelectFolders: false,
+    canSelectMany: true,
+    filters: {
+      ".NET Assemblies": ["dll", "exe", "winmd", "netmodule"],
+    },
+  });
 
   if (uris === undefined) {
     return [];

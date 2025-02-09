@@ -45,7 +45,8 @@ public class MemberNodeProvider(ILSpyXApplication application) : ITreeNodeProvid
                         DisplayName: typeDefinition.TypeToString(includeNamespace: false),
                         Description: "",
                         MayHaveChildren: true,
-                        SymbolModifiers: NodeTypeHelper.GetSymbolModifiers(typeDefinition)
+                        SymbolModifiers: NodeTypeHelper.GetSymbolModifiers(typeDefinition),
+                        Flags: NodeFlagsHelper.GetNodeFlags(typeDefinition)
                     ))
                     .Union(typeDefinition.Fields.Select(field =>
                         CreateMemberNode(parentTypeSymbolToken, field, assemblyPath, typeDefinition))
@@ -77,7 +78,8 @@ public class MemberNodeProvider(ILSpyXApplication application) : ITreeNodeProvid
             DisplayName: memberName,
             Description: "",
             MayHaveChildren: false,
-            SymbolModifiers: NodeTypeHelper.GetSymbolModifiers(member)
+            SymbolModifiers: NodeTypeHelper.GetSymbolModifiers(member),
+            Flags: NodeFlagsHelper.GetNodeFlags(member)
         );
     }
 }

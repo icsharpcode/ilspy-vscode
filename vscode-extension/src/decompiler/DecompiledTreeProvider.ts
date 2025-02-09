@@ -14,12 +14,20 @@ import {
   ThemeIcon,
   ExtensionContext,
   commands,
+  Uri,
 } from "vscode";
 import IILSpyBackend from "./IILSpyBackend";
 import Node from "../protocol/Node";
 import { NodeType } from "../protocol/NodeType";
-import { getAssemblyList, updateAssemblyListIfNeeded } from "./settings";
+import {
+  getAssemblyList,
+  getAutoLoadDependenciesSetting,
+  getShowCompilerGeneratedSymbolsSetting,
+  updateAssemblyListIfNeeded,
+} from "./settings";
 import { getNodeIcon } from "../icons";
+import { NodeFlags } from "../protocol/NodeFlags";
+import { hasNodeFlag } from "./utils";
 
 export class DecompiledTreeProvider implements TreeDataProvider<Node> {
   private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
@@ -107,6 +115,13 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
       },
       contextValue: getNodeContextValue(node),
       iconPath: new ThemeIcon(getNodeIcon(node.metadata?.type)),
+      resourceUri: hasNodeFlag(node, NodeFlags.AutoLoaded)
+        ? Uri.parse(
+            `ilspy-autoloaded://${node.metadata?.assemblyPath}/${
+              node.metadata?.name ?? ""
+            }`
+          )
+        : undefined,
     };
   }
 
@@ -133,7 +148,11 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
         updateAssemblyListIfNeeded(
           this.extensionContext,
           result.nodes
-            .filter((node) => node.metadata?.type === NodeType.Assembly)
+            .filter(
+              (node) =>
+                node.metadata?.type === NodeType.Assembly &&
+                !hasNodeFlag(node, NodeFlags.AutoLoaded)
+            )
             .map((node) => node.metadata!.assemblyPath)
         );
       }
@@ -141,7 +160,22 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
       setTreeWithNodes(result?.nodes !== undefined && result.nodes?.length > 0);
     }
 
-    return result?.nodes ?? [];
+    if (result?.shouldUpdateAssemblyList) {
+      this.refresh();
+    }
+
+    const showAutoLoadedAssemblies = getAutoLoadDependenciesSetting();
+    const showCompilerGeneratedSymbols =
+      getShowCompilerGeneratedSymbolsSetting();
+    return (
+      result?.nodes?.filter(
+        (node) =>
+          (showAutoLoadedAssemblies ||
+            !hasNodeFlag(node, NodeFlags.AutoLoaded)) &&
+          (showCompilerGeneratedSymbols ||
+            !hasNodeFlag(node, NodeFlags.CompilerGenerated))
+      ) ?? []
+    );
   }
 }
 

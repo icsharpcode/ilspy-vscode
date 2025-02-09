@@ -8,4 +8,5 @@ public record Node(
     string DisplayName,
     string Description,
     bool MayHaveChildren,
-    SymbolModifiers SymbolModifiers);
+    SymbolModifiers SymbolModifiers = SymbolModifiers.None,
+    NodeFlags Flags = NodeFlags.None);

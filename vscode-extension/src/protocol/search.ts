@@ -10,7 +10,6 @@ import {
   RequestHandler,
   RequestType,
 } from "vscode-languageclient";
-import AssemblyRequestParams from "./AssemblyRequestParams";
 import Node from "./Node";
 
 export interface SearchParams {
@@ -19,6 +18,7 @@ export interface SearchParams {
 
 export interface SearchResponse {
   results: Node[];
+  shouldUpdateAssemblyList: boolean;
 }
 
 export namespace SearchRequest {

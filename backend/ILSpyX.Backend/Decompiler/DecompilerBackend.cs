@@ -59,7 +59,7 @@ public class DecompilerBackend(
 
         var version = metaDataFile.Metadata.GetAssemblyDefinition().Version;
         var targetFrameworkId = await loadedAssembly.GetTargetFrameworkIdAsync();
-        return new AssemblyData(loadedAssembly.ShortName, loadedAssembly.FileName)
+        return new AssemblyData(loadedAssembly.ShortName, loadedAssembly.FileName, loadedAssembly.IsAutoLoaded)
         {
             Version = version.ToString(),
             TargetFramework = !string.IsNullOrEmpty(targetFrameworkId)
@@ -77,6 +77,16 @@ public class DecompilerBackend(
 
         await assemblyList.RemoveAssembly(path);
         return true;
+    }
+
+    public async Task<(T Result, bool NewAutoLoadedAssemblies)> DetectAutoLoadedAssemblies<T>(Func<Task<T>> operation)
+    {
+        var autoLoadedAssembliesBefore = (await GetLoadedAssembliesAsync()).Where(
+            assembly => assembly.IsAutoLoaded);
+        var result = await operation();
+        var autoLoadedAssembliesAfter = (await GetLoadedAssembliesAsync()).Where(
+            assembly => assembly.IsAutoLoaded);
+        return (result, autoLoadedAssembliesBefore.Count() != autoLoadedAssembliesAfter.Count());
     }
 
     public CSharpDecompiler? CreateDecompiler(string assembly, string? outputLanguage = null)

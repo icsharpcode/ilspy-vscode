@@ -43,12 +43,16 @@ export class DecompilerTextDocumentContentProvider
     nodeMetadata: NodeMetadata,
     outputLanguage: string
   ): Promise<string | undefined> {
-    return (
-      await this.backend.sendDecompileNode({
-        nodeMetadata,
-        outputLanguage,
-      })
-    )?.decompiledCode;
+    const decompileResponse = await this.backend.sendDecompileNode({
+      nodeMetadata,
+      outputLanguage,
+    });
+
+    if (decompileResponse?.shouldUpdateAssemblyList) {
+      vscode.commands.executeCommand("ilspy.refreshAssemblyList");
+    }
+
+    return decompileResponse?.decompiledCode;
   }
 
   setDocumentOutputLanguage(uri: vscode.Uri, language: LanguageName) {

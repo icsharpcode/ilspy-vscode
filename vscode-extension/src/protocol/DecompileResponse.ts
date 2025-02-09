@@ -7,4 +7,5 @@ export default interface DecompileResponse {
   decompiledCode?: string;
   isError: boolean;
   errorMessage?: string;
+  shouldUpdateAssemblyList: boolean;
 }

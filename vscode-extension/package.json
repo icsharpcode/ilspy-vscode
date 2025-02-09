@@ -74,6 +74,16 @@
 						"description": "If activated, the list of loaded assemblies is stored with current workspace and is restored on re-opening.",
 						"type": "boolean",
 						"default": "true"
+					},
+					"ilspy.autoLoadDependencies": {
+						"description": "If activated, dependency assemblies are temporarily added to assembly tree on demand.",
+						"type": "boolean",
+						"default": "true"
+					},
+					"ilspy.showCompilerGeneratedSymbols": {
+						"description": "If activated, shows compiler-generated symbols.",
+						"type": "boolean",
+						"default": "false"
 					}
 				}
 			}
@@ -259,6 +269,17 @@
 				"id": "ilspy/view/assemblytree/add",
 				"label": "Add Assembly",
 				"icon": "$(add)"
+			}
+		],
+		"colors": [
+			{
+				"id": "ilspy.autoLoadedAssemblyTextForeground",
+				"description": "Text color of auto-loaded assemblies",
+				"defaults": {
+					"dark": "#4682B4",
+					"light": "#4682B4",
+					"highContrast": "#4682B4"
+				}
 			}
 		]
 	},

@@ -6,6 +6,7 @@
 export default interface AssemblyData {
   name: string;
   filePath: string;
+  isAutoLoaded: boolean;
   version?: string;
   targetFramework?: string;
 }

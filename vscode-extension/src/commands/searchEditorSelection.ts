@@ -5,7 +5,7 @@
 
 import * as vscode from "vscode";
 
-export function registerSearchEditorSelection() {
+export function registerSearchEditorSelectionCommand() {
   return vscode.commands.registerCommand(
     "ilspy.searchEditorSelection",
     async () => {

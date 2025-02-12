@@ -6,6 +6,11 @@ You can install the extension in Visual Studio Code via the [marketplace](https:
 
 Please see the [Getting started](https://github.com/icsharpcode/ilspy-vscode/wiki/Getting-started) overview.
 
+## What's New
+
+Please see the [Change Log](./vscode-extension/CHANGELOG.md).
+
+
 ## Troubleshooting
 
 If you have issues during installation of .NET Runtime, please see [here](https://github.com/icsharpcode/ilspy-vscode/wiki/Troubleshooting#download-of-net-runtime-fails-with-slow-internet-connection).

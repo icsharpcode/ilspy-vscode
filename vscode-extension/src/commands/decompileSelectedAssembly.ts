@@ -11,7 +11,7 @@ export function registerDecompileSelectedAssemblyCommand(
     "ilspy.decompileSelectedAssembly",
     async (file) => {
       if (file) {
-        await addAssemblyToTree(
+        return await addAssemblyToTree(
           file.fsPath,
           decompiledTreeProvider,
           decompiledTreeView

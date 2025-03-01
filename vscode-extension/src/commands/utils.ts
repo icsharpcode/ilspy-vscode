@@ -42,5 +42,9 @@ export async function addAssemblyToTree(
     if (newNode) {
       decompiledTreeView.reveal(newNode, { focus: true, select: true });
     }
+
+    return newNode;
   }
+
+  return undefined;
 }

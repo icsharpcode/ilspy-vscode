@@ -71,7 +71,7 @@
 						]
 					},
 					"ilspy.loadPreviousAssemblies": {
-						"description": "If activated, the list of loaded assemblies is stored with current workspace and is restored on re-opening.",
+						"description": "If activated, the list of loaded assemblies is stored with current workspace and is restored on re-opening. This doesn't apply for temporarily auto-loaded dependencies.",
 						"type": "boolean",
 						"default": "true"
 					},

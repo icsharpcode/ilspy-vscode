@@ -22,6 +22,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ILSpyX.Backend.Tests", "ILS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ILSpyX.Backend.LSP", "ILSpyX.Backend.LSP\ILSpyX.Backend.LSP.csproj", "{084378C6-54B5-4279-88E5-2BA3DF5E05B9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ILSpyX.Backend.LSP.Tests", "ILSpyX.Backend.LSP.Tests\ILSpyX.Backend.LSP.Tests.csproj", "{F20F4782-BA8F-40ED-A655-1EE55334CDFA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -80,6 +82,18 @@ Global
 		{084378C6-54B5-4279-88E5-2BA3DF5E05B9}.Release|x64.Build.0 = Release|Any CPU
 		{084378C6-54B5-4279-88E5-2BA3DF5E05B9}.Release|x86.ActiveCfg = Release|Any CPU
 		{084378C6-54B5-4279-88E5-2BA3DF5E05B9}.Release|x86.Build.0 = Release|Any CPU
+		{F20F4782-BA8F-40ED-A655-1EE55334CDFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F20F4782-BA8F-40ED-A655-1EE55334CDFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F20F4782-BA8F-40ED-A655-1EE55334CDFA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F20F4782-BA8F-40ED-A655-1EE55334CDFA}.Debug|x64.Build.0 = Debug|Any CPU
+		{F20F4782-BA8F-40ED-A655-1EE55334CDFA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F20F4782-BA8F-40ED-A655-1EE55334CDFA}.Debug|x86.Build.0 = Debug|Any CPU
+		{F20F4782-BA8F-40ED-A655-1EE55334CDFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F20F4782-BA8F-40ED-A655-1EE55334CDFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F20F4782-BA8F-40ED-A655-1EE55334CDFA}.Release|x64.ActiveCfg = Release|Any CPU
+		{F20F4782-BA8F-40ED-A655-1EE55334CDFA}.Release|x64.Build.0 = Release|Any CPU
+		{F20F4782-BA8F-40ED-A655-1EE55334CDFA}.Release|x86.ActiveCfg = Release|Any CPU
+		{F20F4782-BA8F-40ED-A655-1EE55334CDFA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

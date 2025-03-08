@@ -1,8 +1,9 @@
 using ILSpyX.Backend.LSP.Handlers;
 using ILSpyX.Backend.LSP.Protocol;
 using ILSpyX.Backend.Model;
+using Xunit;
 
-namespace ILSpyX.Backend.Tests;
+namespace ILSpyX.Backend.LSP.Tests;
 
 public class LSPMessageHandlerTests
 {

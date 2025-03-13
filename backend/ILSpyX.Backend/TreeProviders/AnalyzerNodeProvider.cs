@@ -1,7 +1,6 @@
 using ICSharpCode.Decompiler.TypeSystem;
 using ICSharpCode.ILSpyX.Analyzers;
 using ILSpyX.Backend.Analyzers;
-using ILSpyX.Backend.Application;
 using ILSpyX.Backend.Decompiler;
 using ILSpyX.Backend.Model;
 using System.Collections.Generic;
@@ -12,36 +11,14 @@ using System.Threading.Tasks;
 
 namespace ILSpyX.Backend.TreeProviders;
 
-public class AnalyzerNodeProvider(ILSpyXApplication application) : ITreeNodeProvider
+public class AnalyzerNodeProvider(
+    DecompilerBackend decompilerBackend,
+    SingleThreadAssemblyList singleThreadAssemblyList,
+    AnalyzerBackend analyzerBackend) : ITreeNodeProvider
 {
     public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
     {
         return DecompileResult.Empty();
-    }
-
-    public Node? CreateNode(NodeMetadata? nodeMetadata, AnalyzerInstance analyzer)
-    {
-        if (nodeMetadata is null)
-        {
-            return null;
-        }
-
-        var nodeEntity = application.DecompilerBackend.GetEntityFromHandle(
-            nodeMetadata.AssemblyPath, MetadataTokens.EntityHandle(nodeMetadata.SymbolToken));
-        if (nodeEntity is null || !analyzer.Instance.Show(nodeEntity))
-        {
-            return null;
-        }
-
-        string displayName = analyzer.Header;
-        return new Node(
-            Metadata: nodeMetadata with { Type = NodeType.Analyzer, SubType = analyzer.NodeSubType },
-            DisplayName: displayName,
-            Description: displayName,
-            MayHaveChildren: true,
-            SymbolModifiers: SymbolModifiers.None
-        );
-
     }
 
     public Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
@@ -51,25 +28,25 @@ public class AnalyzerNodeProvider(ILSpyXApplication application) : ITreeNodeProv
             return Task.FromResult(Enumerable.Empty<Node>());
         }
 
-        var analyzer = application.AnalyzerBackend.GetAnalyzerForNode(nodeMetadata)?.Instance;
+        var analyzer = analyzerBackend.GetAnalyzerForNode(nodeMetadata)?.Instance;
         if (analyzer is null)
         {
             return Task.FromResult(Enumerable.Empty<Node>());
         }
 
-        if (application.SingleThreadAssemblyList.AssemblyList is null)
+        if (singleThreadAssemblyList.AssemblyList is null)
         {
             return Task.FromResult(Enumerable.Empty<Node>());
         }
 
-        var context = new AnalyzerContext()
+        var context = new AnalyzerContext
         {
             CancellationToken = CancellationToken.None,
             Language = new CSharpLanguage(),
-            AssemblyList = application.SingleThreadAssemblyList.AssemblyList
+            AssemblyList = singleThreadAssemblyList.AssemblyList
         };
 
-        var nodeEntity = application.DecompilerBackend.GetEntityFromHandle(
+        var nodeEntity = decompilerBackend.GetEntityFromHandle(
             nodeMetadata.AssemblyPath, MetadataTokens.EntityHandle(nodeMetadata.SymbolToken));
         if (nodeEntity is null || !analyzer.Show(nodeEntity))
         {
@@ -85,24 +62,45 @@ public class AnalyzerNodeProvider(ILSpyXApplication application) : ITreeNodeProv
                         : entity.Name;
                     string location = (entity as IMember)?.DeclaringType.TypeToString(true) ?? "";
                     return new Node(
-                        Metadata: new NodeMetadata(
-                            AssemblyPath: entity.ParentModule?.MetadataFile?.FileName ?? "",
-                            Type: NodeTypeHelper.GetNodeTypeFromEntity(entity),
-                            Name: nodeName,
-                            SymbolToken: MetadataTokens.GetToken(entity.MetadataToken),
-                            ParentSymbolToken:
+                        new NodeMetadata(
+                            entity.ParentModule?.MetadataFile?.FileName ?? "",
+                            NodeTypeHelper.GetNodeTypeFromEntity(entity),
+                            nodeName,
+                            MetadataTokens.GetToken(entity.MetadataToken),
                             entity.DeclaringTypeDefinition?.MetadataToken is not null
                                 ? MetadataTokens.GetToken(entity.DeclaringTypeDefinition.MetadataToken)
                                 : 0),
-                        DisplayName: nodeName,
-                        Description: location,
-                        MayHaveChildren: false,
-                        SymbolModifiers: NodeTypeHelper.GetSymbolModifiers(entity),
-                        Flags: NodeFlagsHelper.GetNodeFlags(entity)
+                        nodeName,
+                        location,
+                        false,
+                        NodeTypeHelper.GetSymbolModifiers(entity),
+                        NodeFlagsHelper.GetNodeFlags(entity)
                     );
                 })
         );
+    }
 
+    public Node? CreateNode(NodeMetadata? nodeMetadata, AnalyzerInstance analyzer)
+    {
+        if (nodeMetadata is null)
+        {
+            return null;
+        }
+
+        var nodeEntity = decompilerBackend.GetEntityFromHandle(
+            nodeMetadata.AssemblyPath, MetadataTokens.EntityHandle(nodeMetadata.SymbolToken));
+        if (nodeEntity is null || !analyzer.Instance.Show(nodeEntity))
+        {
+            return null;
+        }
+
+        string displayName = analyzer.Header;
+        return new Node(
+            nodeMetadata with { Type = NodeType.Analyzer, SubType = analyzer.NodeSubType },
+            displayName,
+            displayName,
+            true,
+            SymbolModifiers.None
+        );
     }
 }
-

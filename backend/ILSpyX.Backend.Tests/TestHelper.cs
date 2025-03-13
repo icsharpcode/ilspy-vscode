@@ -1,23 +1,26 @@
-﻿using ILSpyX.Backend.Application;
-using Microsoft.Extensions.Logging.Abstractions;
+﻿using ILSpyX.Backend.Decompiler;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ILSpyX.Backend.Tests;
 
 public class TestHelper
 {
-    public static string AssemblyPath => Path.Combine(Path.GetDirectoryName(typeof(TestHelper).Assembly.Location) ?? "", "TestAssembly.dll");
-
-    public static ILSpyXApplication CreateTestApplication()
-    {
-        var application = new ILSpyXApplication(new NullLoggerFactory());
-        return application;
+    public static string AssemblyPath {
+        get {
+            return Path.Combine(Path.GetDirectoryName(typeof(TestHelper).Assembly.Location) ?? "", "TestAssembly.dll");
+        }
     }
 
-    public static async Task<ILSpyXApplication> CreateTestApplicationWithAssembly()
+
+    public static ILSpyXBackendServices CreateTestServices()
     {
-        var application = new ILSpyXApplication(new NullLoggerFactory());
-        await application.DecompilerBackend.AddAssemblyAsync(AssemblyPath);
-        return application;
+        return new ILSpyXBackendServices();
     }
 
+    public static async Task<ILSpyXBackendServices> CreateTestServicesWithAssembly()
+    {
+        var services = new ILSpyXBackendServices();
+        await services.GetRequiredService<DecompilerBackend>().AddAssemblyAsync(AssemblyPath);
+        return services;
+    }
 }

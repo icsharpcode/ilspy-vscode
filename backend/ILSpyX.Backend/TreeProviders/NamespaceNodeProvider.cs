@@ -1,4 +1,3 @@
-using ILSpyX.Backend.Application;
 using ILSpyX.Backend.Decompiler;
 using ILSpyX.Backend.Model;
 using System.Collections.Generic;
@@ -7,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace ILSpyX.Backend.TreeProviders;
 
-public class NamespaceNodeProvider(ILSpyXApplication application) : ITreeNodeProvider
+public class NamespaceNodeProvider(TreeNodeProviders treeNodeProviders, DecompilerBackend decompilerBackend)
+    : ITreeNodeProvider
 {
     public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
     {
@@ -19,9 +19,20 @@ public class NamespaceNodeProvider(ILSpyXApplication application) : ITreeNodePro
         };
     }
 
+    public Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
+    {
+        if (nodeMetadata?.Type != NodeType.Namespace)
+        {
+            return Task.FromResult(Enumerable.Empty<Node>());
+        }
+
+        return Task.FromResult(
+            treeNodeProviders.Type.CreateNodes(nodeMetadata.AssemblyPath, nodeMetadata.Name));
+    }
+
     public IEnumerable<Node> CreateNodes(string assemblyPath)
     {
-        var decompiler = application.DecompilerBackend.CreateDecompiler(assemblyPath);
+        var decompiler = decompilerBackend.CreateDecompiler(assemblyPath);
         if (decompiler is null)
         {
             return Enumerable.Empty<Node>();
@@ -33,31 +44,19 @@ public class NamespaceNodeProvider(ILSpyXApplication application) : ITreeNodePro
         {
             namespaces.Add(type.Namespace);
         }
+
         return namespaces
             .OrderBy(n => n)
             .Select(ns => new Node(
                 new NodeMetadata(
-                    AssemblyPath: assemblyPath,
-                    Type: NodeType.Namespace,
-                    Name: ns,
-                    SymbolToken: 0,
-                    ParentSymbolToken: 0),
-                DisplayName: ns,
-                Description: string.Empty,
-                MayHaveChildren: true,
-                SymbolModifiers: SymbolModifiers.None
+                    assemblyPath,
+                    NodeType.Namespace,
+                    ns,
+                    0,
+                    0),
+                ns,
+                string.Empty,
+                true
             ));
     }
-
-    public Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
-    {
-        if (nodeMetadata?.Type != NodeType.Namespace)
-        {
-            return Task.FromResult(Enumerable.Empty<Node>());
-        }
-
-        return Task.FromResult(
-            application.TreeNodeProviders.Type.CreateNodes(nodeMetadata.AssemblyPath, nodeMetadata.Name));
-    }
 }
-

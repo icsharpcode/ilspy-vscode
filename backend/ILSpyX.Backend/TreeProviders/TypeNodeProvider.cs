@@ -1,4 +1,3 @@
-using ILSpyX.Backend.Application;
 using ILSpyX.Backend.Decompiler;
 using ILSpyX.Backend.Model;
 using System.Collections.Generic;
@@ -8,19 +7,31 @@ using System.Threading.Tasks;
 
 namespace ILSpyX.Backend.TreeProviders;
 
-public class TypeNodeProvider(ILSpyXApplication application) : ITreeNodeProvider
+public class TypeNodeProvider(TreeNodeProviders treeNodeProviders, DecompilerBackend decompilerBackend)
+    : ITreeNodeProvider
 {
     public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
     {
-        return application.DecompilerBackend.GetCode(
+        return decompilerBackend.GetCode(
             nodeMetadata.AssemblyPath,
             MetadataTokens.EntityHandle(nodeMetadata.SymbolToken),
             outputLanguage);
     }
 
+    public async Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
+    {
+        if (nodeMetadata is null || !NodeTypeHelper.IsTypeNode(nodeMetadata.Type))
+        {
+            return [];
+        }
+
+        return await treeNodeProviders.Member.CreateNodesAsync(
+            nodeMetadata.AssemblyPath, nodeMetadata.SymbolToken);
+    }
+
     public IEnumerable<Node> CreateNodes(string assemblyPath, string @namespace)
     {
-        var decompiler = application.DecompilerBackend.CreateDecompiler(assemblyPath);
+        var decompiler = decompilerBackend.CreateDecompiler(assemblyPath);
         if (decompiler is null)
         {
             yield break;
@@ -31,7 +42,7 @@ public class TypeNodeProvider(ILSpyXApplication application) : ITreeNodeProvider
 
         if (!(parts.Length == 1 && string.IsNullOrEmpty(parts[0])))
         {
-            foreach (var part in parts)
+            foreach (string part in parts)
             {
                 var nested = currentNamespace.GetChildNamespace(part);
                 if (nested == null)
@@ -45,31 +56,20 @@ public class TypeNodeProvider(ILSpyXApplication application) : ITreeNodeProvider
 
         foreach (var t in currentNamespace.Types.OrderBy(t => t.FullName))
         {
-            string name = t.TypeToString(includeNamespace: false);
+            string name = t.TypeToString(false);
             yield return new Node(
-                    new NodeMetadata(
-                        AssemblyPath: assemblyPath,
-                        Type: NodeTypeHelper.GetNodeTypeFromTypeKind(t.Kind),
-                        Name: name,
-                        SymbolToken: MetadataTokens.GetToken(t.MetadataToken),
-                        ParentSymbolToken: 0),
-                    DisplayName: name,
-                    Description: "",
-                    MayHaveChildren: true,
-                    SymbolModifiers: NodeTypeHelper.GetSymbolModifiers(t),
-                    Flags: NodeFlagsHelper.GetNodeFlags(t)
-                );
+                new NodeMetadata(
+                    assemblyPath,
+                    NodeTypeHelper.GetNodeTypeFromTypeKind(t.Kind),
+                    name,
+                    MetadataTokens.GetToken(t.MetadataToken),
+                    0),
+                name,
+                "",
+                true,
+                NodeTypeHelper.GetSymbolModifiers(t),
+                NodeFlagsHelper.GetNodeFlags(t)
+            );
         }
-    }
-
-    public async Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
-    {
-        if (nodeMetadata is null || !NodeTypeHelper.IsTypeNode(nodeMetadata.Type))
-        {
-            return [];
-        }
-
-        return await application.TreeNodeProviders.Member.CreateNodesAsync(
-            nodeMetadata.AssemblyPath, nodeMetadata.SymbolToken);
     }
 }

@@ -1,4 +1,3 @@
-using ILSpyX.Backend.Application;
 using ILSpyX.Backend.Decompiler;
 using ILSpyX.Backend.Model;
 using System.Collections.Generic;
@@ -6,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace ILSpyX.Backend.TreeProviders;
 
-public class AssemblyTreeRootNodesProvider(ILSpyXApplication application) : ITreeNodeProvider
+public class AssemblyTreeRootNodesProvider(TreeNodeProviders treeNodeProviders) : ITreeNodeProvider
 {
     public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
     {
@@ -15,7 +14,6 @@ public class AssemblyTreeRootNodesProvider(ILSpyXApplication application) : ITre
 
     public async Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
     {
-        return await application.TreeNodeProviders.Assembly.CreateNodesAsync();
+        return await treeNodeProviders.Assembly.CreateNodesAsync();
     }
 }
-

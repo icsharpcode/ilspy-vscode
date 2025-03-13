@@ -1,4 +1,3 @@
-using ILSpyX.Backend.Application;
 using ILSpyX.Backend.Decompiler;
 using ILSpyX.Backend.Model;
 using System.Collections.Generic;
@@ -7,43 +6,46 @@ using System.Threading.Tasks;
 
 namespace ILSpyX.Backend.TreeProviders;
 
-public class AssemblyReferenceNodeProvider(ILSpyXApplication application) : ITreeNodeProvider
+public class AssemblyReferenceNodeProvider(DecompilerBackend decompilerBackend) : ITreeNodeProvider
 {
     public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
     {
-        var code = $"// {nodeMetadata.Name}";
+        string code = $"// {nodeMetadata.Name}";
         return DecompileResult.WithCode(code);
     }
 
     public Task<IEnumerable<Node>> CreateNodesAsync(string assemblyPath)
     {
-        var decompiler = application.DecompilerBackend.CreateDecompiler(assemblyPath);
+        var decompiler = decompilerBackend.CreateDecompiler(assemblyPath);
         if (decompiler is null)
         {
             return Task.FromResult(Enumerable.Empty<Node>());
         }
 
         HashSet<string> references = new(decompiler.TypeSystem.NameComparer);
-        foreach (var ar in decompiler.TypeSystem.MainModule.MetadataFile.AssemblyReferences)
+        var metadataFile = decompiler.TypeSystem.MainModule.MetadataFile;
+        if (metadataFile != null)
         {
-            references.Add(ar.FullName);
+            foreach (var ar in metadataFile.AssemblyReferences)
+            {
+                references.Add(ar.FullName);
+            }
         }
+
         return Task.FromResult(
             references
                 .OrderBy(n => n)
                 .Select(reference => new Node(
-                        new NodeMetadata(
-                            AssemblyPath: assemblyPath,
-                            Type: NodeType.AssemblyReference,
-                            Name: reference,
-                            SymbolToken: 0,
-                            ParentSymbolToken: 0),
-                        DisplayName: reference,
-                        Description: string.Empty,
-                        MayHaveChildren: false,
-                        SymbolModifiers: SymbolModifiers.None
-                    ))
+                    new NodeMetadata(
+                        assemblyPath,
+                        NodeType.AssemblyReference,
+                        reference,
+                        0,
+                        0),
+                    reference,
+                    string.Empty,
+                    false
+                ))
         );
     }
 }
-

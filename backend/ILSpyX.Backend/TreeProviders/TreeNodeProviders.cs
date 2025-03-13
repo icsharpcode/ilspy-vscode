@@ -1,53 +1,70 @@
 using ICSharpCode.Decompiler.TypeSystem;
-using ILSpyX.Backend.Application;
 using ILSpyX.Backend.Model;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+
+// ReSharper disable ArrangeAccessorOwnerBody
 
 namespace ILSpyX.Backend.TreeProviders;
 
-public class TreeNodeProviders(ILSpyXApplication application)
+public class TreeNodeProviders(IServiceProvider serviceProvider)
 {
-    private readonly ILSpyXApplication application = application;
+    public DummyTreeNodeProvider Dummy => serviceProvider.GetRequiredService<DummyTreeNodeProvider>();
 
-    public ITreeNodeProvider ForNode(NodeMetadata? nodeMetadata) =>
-        FromNodeType(nodeMetadata?.Type);
+    public AssemblyTreeRootNodesProvider AssemblyTreeRoot =>
+        serviceProvider.GetRequiredService<AssemblyTreeRootNodesProvider>();
 
-    public ITreeNodeProvider FromNodeType(NodeType? nodeType) => nodeType switch
+    public AssemblyNodeProvider Assembly =>
+        serviceProvider.GetRequiredService<AssemblyNodeProvider>();
+
+    public ReferencesRootNodeProvider ReferencesRoot =>
+        serviceProvider.GetRequiredService<ReferencesRootNodeProvider>();
+
+    public AssemblyReferenceNodeProvider AssemblyReference =>
+        serviceProvider.GetRequiredService<AssemblyReferenceNodeProvider>();
+
+    public NamespaceNodeProvider Namespace => serviceProvider.GetRequiredService<NamespaceNodeProvider>();
+    public TypeNodeProvider Type => serviceProvider.GetRequiredService<TypeNodeProvider>();
+    public MemberNodeProvider Member => serviceProvider.GetRequiredService<MemberNodeProvider>();
+    public AnalyzersRootNodesProvider AnalyzersRoot => serviceProvider.GetRequiredService<AnalyzersRootNodesProvider>();
+    public AnalyzerNodeProvider Analyzer => serviceProvider.GetRequiredService<AnalyzerNodeProvider>();
+
+    public ITreeNodeProvider ForNode(NodeMetadata? nodeMetadata)
     {
-        null => AssemblyTreeRoot,
-        NodeType.Assembly => Assembly,
-        NodeType.ReferencesRoot => ReferencesRoot,
-        NodeType.AssemblyReference => AssemblyReference,
-        NodeType.Namespace => Namespace,
-        var type when NodeTypeHelper.IsTypeNode(type.Value) => Type,
-        var type when NodeTypeHelper.IsMemberNode(type.Value) => Member,
-        NodeType.Analyzer => Analyzer,
-        _ => Dummy
-    };
+        return FromNodeType(nodeMetadata?.Type);
+    }
 
-    public ITreeNodeProvider FromSymbolKind(SymbolKind symbolKind) => symbolKind switch
+    public ITreeNodeProvider FromNodeType(NodeType? nodeType)
     {
-        SymbolKind.TypeDefinition => Type,
-        SymbolKind.Field => Member,
-        SymbolKind.Property => Member,
-        SymbolKind.Indexer => Member,
-        SymbolKind.Event => Member,
-        SymbolKind.Method => Member,
-        SymbolKind.Operator => Member,
-        SymbolKind.Constructor => Member,
-        SymbolKind.Destructor => Member,
-        SymbolKind.Namespace => Namespace,
-        _ => Dummy,
-    };
+        return nodeType switch
+        {
+            null => AssemblyTreeRoot,
+            NodeType.Assembly => Assembly,
+            NodeType.ReferencesRoot => ReferencesRoot,
+            NodeType.AssemblyReference => AssemblyReference,
+            NodeType.Namespace => Namespace,
+            _ when NodeTypeHelper.IsTypeNode(nodeType.Value) => Type,
+            _ when NodeTypeHelper.IsMemberNode(nodeType.Value) => Member,
+            NodeType.Analyzer => Analyzer,
+            _ => Dummy
+        };
+    }
 
-    public DummyTreeNodeProvider Dummy { get; } = new();
-    public AssemblyTreeRootNodesProvider AssemblyTreeRoot { get; } = new(application);
-    public AssemblyNodeProvider Assembly { get; } = new(application);
-    public ReferencesRootNodeProvider ReferencesRoot { get; } = new(application);
-    public AssemblyReferenceNodeProvider AssemblyReference { get; } = new(application);
-    public NamespaceNodeProvider Namespace { get; } = new(application);
-    public TypeNodeProvider Type { get; } = new(application);
-    public MemberNodeProvider Member { get; } = new(application);
-    public AnalyzersRootNodesProvider AnalyzersRoot { get; } = new(application);
-    public AnalyzerNodeProvider Analyzer { get; } = new(application);
+    public ITreeNodeProvider FromSymbolKind(SymbolKind symbolKind)
+    {
+        return symbolKind switch
+        {
+            SymbolKind.TypeDefinition => Type,
+            SymbolKind.Field => Member,
+            SymbolKind.Property => Member,
+            SymbolKind.Indexer => Member,
+            SymbolKind.Event => Member,
+            SymbolKind.Method => Member,
+            SymbolKind.Operator => Member,
+            SymbolKind.Constructor => Member,
+            SymbolKind.Destructor => Member,
+            SymbolKind.Namespace => Namespace,
+            _ => Dummy
+        };
+    }
 }
-

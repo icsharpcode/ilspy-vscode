@@ -52,8 +52,10 @@ class Program
         await server.WasShutDown;
     }
 
-    static void ConfigureServices(IServiceCollection services)
+    private static void ConfigureServices(IServiceCollection services)
     {
-        services.AddSingleton<ILSpyXApplication>();
+        services
+            .AddILSpyXServices()
+            .AddILSpyXTreeNodeProviders();
     }
 }

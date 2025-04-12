@@ -19,8 +19,8 @@ public class ILSpyXBackendServices : IServiceProvider, ISupportRequiredService
 
     public ILSpyXBackendServices(Action<IServiceCollection>? configureAdditionalServices = null)
     {
-        ConfigureServices();
-        ConfigureTreeNodeProviders();
+        serviceCollection.AddILSpyXServices();
+        serviceCollection.AddILSpyXTreeNodeProviders();
         configureAdditionalServices?.Invoke(serviceCollection);
 
         serviceProvider = serviceCollection.BuildServiceProvider();
@@ -35,10 +35,13 @@ public class ILSpyXBackendServices : IServiceProvider, ISupportRequiredService
     {
         return serviceProvider.GetRequiredService(serviceType);
     }
+}
 
-    private void ConfigureServices()
+public static class ILSpyXServiceCollectionExtensions
+{
+    public static IServiceCollection AddILSpyXServices(this IServiceCollection serviceCollection)
     {
-        serviceCollection
+        return serviceCollection
             .AddSingleton<ILoggerFactory, NullLoggerFactory>()
             .AddSingleton<ILSpyBackendSettings>()
             .AddSingleton<ISettingsProvider, DummySettingsProvider>()
@@ -50,9 +53,9 @@ public class ILSpyXBackendServices : IServiceProvider, ISupportRequiredService
             .AddSingleton<AnalyzerBackend>();
     }
 
-    private void ConfigureTreeNodeProviders()
+    public static IServiceCollection AddILSpyXTreeNodeProviders(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddSingleton<DummyTreeNodeProvider>()
+        return serviceCollection.AddSingleton<DummyTreeNodeProvider>()
             .AddSingleton<AssemblyTreeRootNodesProvider>()
             .AddSingleton<AssemblyNodeProvider>()
             .AddSingleton<ReferencesRootNodeProvider>()

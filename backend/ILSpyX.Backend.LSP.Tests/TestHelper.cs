@@ -8,9 +8,8 @@ public class TestHelper
     public static string AssemblyPath => Path.Combine(Path.GetDirectoryName(typeof(TestHelper).Assembly.Location) ?? "",
         "TestAssembly.dll");
 
-    public static ILSpyXApplication CreateTestApplication()
+    public static ILSpyXBackendServices CreateTestServices()
     {
-        var application = new ILSpyXApplication(new NullLoggerFactory());
-        return application;
+        return new ILSpyXBackendServices();
     }
 }

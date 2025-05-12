@@ -307,8 +307,8 @@
 		"@types/mocha": "^10.0.10",
 		"@types/node": "^20.0.0",
 		"@types/vscode": "^1.74.0",
-		"@typescript-eslint/eslint-plugin": "^8.32.0",
-		"@typescript-eslint/parser": "^8.32.0",
+		"@typescript-eslint/eslint-plugin": "^8.32.1",
+		"@typescript-eslint/parser": "^8.32.1",
 		"@vscode/test-electron": "^2.5.2",
 		"@vscode/vsce": "^3.3.2",
 		"eslint": "^9.26.0",
@@ -318,7 +318,7 @@
 		"terser-webpack-plugin": "^5.3.14",
 		"ts-loader": "^9.5.2",
 		"typescript": "^5.8.3",
-		"webpack": "5.99.7",
+		"webpack": "5.99.8",
 		"webpack-cli": "6.0.1"
 	},
 	"extensionDependencies": [

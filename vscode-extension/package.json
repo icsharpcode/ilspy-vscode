@@ -49,7 +49,8 @@
 							"C# 3.0 / VS 2008",
 							"C# 2.0 / VS 2005",
 							"C# 1.0 / VS .NET",
-							"IL"
+							"IL",
+              "IL with C#"
 						],
 						"enumDescriptions": [
 							"Decompile to C# 12.0 by default",

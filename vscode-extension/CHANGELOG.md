@@ -2,6 +2,10 @@
 
 All notable changes to the "ilspy-vscode" extension will be documented in this file.
 
+## 0.21
+
+- Upgrade to ICSharpCode.Decompiler 9.1 (see release notes for [ILSpy 9.1](https://github.com/icsharpcode/ILSpy/releases/tag/v9.1) to get more details)
+
 ## 0.20
 
 - Introduction of "Analyze" feature similar to ILSpy desktop application: You can analyze where a method is called, a type is used or an interface is implemented. See [Wiki](https://github.com/icsharpcode/ilspy-vscode/wiki/Analyze) for a description.

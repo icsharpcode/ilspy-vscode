@@ -15,7 +15,7 @@
 		"url": "https://github.com/icsharpcode/ilspy-vscode"
 	},
 	"engines": {
-		"vscode": "^1.91.0"
+		"vscode": "^1.101.0"
 	},
 	"categories": [
 		"Other"
@@ -305,7 +305,7 @@
 		"@types/chai": "^5.2.2",
 		"@types/glob": "^8.1.0",
 		"@types/mocha": "^10.0.10",
-		"@types/node": "^20.0.0",
+		"@types/node": "^22.0.0",
 		"@types/vscode": "^1.74.0",
 		"@typescript-eslint/eslint-plugin": "^8.34.0",
 		"@typescript-eslint/parser": "^8.32.1",

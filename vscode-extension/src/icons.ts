@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See LICENSE.TXT in the project root for license information.
  *-----------------------------------------------------------------------------------------------*/
 
-import { ThemeIcon } from "vscode";
+import { ThemeIcon, Uri } from "vscode";
 import { NodeType } from "./protocol/NodeType";
 import * as path from "path";
 
@@ -48,6 +48,9 @@ export function getNodeIcon(nodeType: NodeType | undefined) {
       "tree-icons",
       iconMapping.customIcon
     );
-    return { light: `${basePath}_light.svg`, dark: `${basePath}_dark.svg` };
+    return {
+      light: Uri.file(`${basePath}_light.svg`),
+      dark: Uri.file(`${basePath}_dark.svg`),
+    };
   }
 }

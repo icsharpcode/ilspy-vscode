@@ -315,6 +315,285 @@
 					"highContrast": "#4682B4"
 				}
 			}
+		],
+		"languageModelTools": [
+			{
+				"name": "initialize_loaded_assemblies",
+				"tags": [
+					"ilspy",
+					"assemblies",
+					"load"
+				],
+				"toolReferenceName": "ilspy-init-assemblies",
+				"displayName": "Initialize loaded ILSpy assemblies",
+				"modelDescription": "Loads a specific set of assembly file paths into ILSpy using the backend initialization request that the extension uses to restore a session. Use it when you need ILSpy to start working against a known set of assemblies.",
+				"userDescription": "Initialize ILSpy with a specific set of assembly file paths",
+				"canBeReferencedInPrompt": true,
+				"icon": "$(files)",
+				"inputSchema": {
+					"type": "object",
+					"required": [
+						"assemblyPaths"
+					],
+					"properties": {
+						"assemblyPaths": {
+							"type": "array",
+							"description": "Absolute file system paths of assemblies to load into ILSpy",
+							"items": {
+								"type": "string"
+							}
+						}
+					}
+				}
+			},
+			{
+				"name": "add_loaded_assembly",
+				"tags": [
+					"ilspy",
+					"assemblies",
+					"load"
+				],
+				"toolReferenceName": "ilspy-add-assembly",
+				"displayName": "Add assembly to ILSpy",
+				"modelDescription": "Adds one assembly file to the set of assemblies currently loaded in ILSpy so that it can be searched, analyzed, decompiled, and exported.",
+				"userDescription": "Add one assembly file to ILSpy",
+				"canBeReferencedInPrompt": true,
+				"icon": "$(add)",
+				"inputSchema": {
+					"type": "object",
+					"required": [
+						"assemblyPath"
+					],
+					"properties": {
+						"assemblyPath": {
+							"type": "string",
+							"description": "Absolute file system path of the assembly to add to ILSpy"
+						}
+					}
+				}
+			},
+			{
+				"name": "remove_loaded_assembly",
+				"tags": [
+					"ilspy",
+					"assemblies",
+					"unload"
+				],
+				"toolReferenceName": "ilspy-remove-assembly",
+				"displayName": "Remove assembly from ILSpy",
+				"modelDescription": "Removes one currently loaded assembly from ILSpy. Prefer assemblyPath for exact targeting; assemblyName can be used when it uniquely identifies a loaded assembly.",
+				"userDescription": "Remove one loaded assembly from ILSpy",
+				"canBeReferencedInPrompt": true,
+				"icon": "$(close)",
+				"inputSchema": {
+					"type": "object",
+					"properties": {
+						"assemblyPath": {
+							"type": "string",
+							"description": "Absolute file system path of the loaded assembly to remove"
+						},
+						"assemblyName": {
+							"type": "string",
+							"description": "Assembly file name or simple assembly name to remove when it is unique among loaded assemblies"
+						}
+					}
+				}
+			},
+			{
+				"name": "list_loaded_assemblies",
+				"tags": [
+					"ilspy",
+					"assemblies"
+				],
+				"toolReferenceName": "ilspy-list-assemblies",
+				"displayName": "List loaded ILSpy assemblies",
+				"modelDescription": "Returns the assemblies currently loaded in ILSpy, including their names and full paths. Use this before decompilation or analysis when you need to know what ILSpy can already inspect.",
+				"userDescription": "List the assemblies currently loaded in ILSpy",
+				"canBeReferencedInPrompt": true,
+				"icon": "$(files)",
+				"inputSchema": {
+					"type": "object",
+					"properties": {}
+				}
+			},
+			{
+				"name": "decompile_symbol",
+				"tags": [
+					"ilspy",
+					"decompile"
+				],
+				"toolReferenceName": "ilspy-decompile",
+				"displayName": "Decompile symbol with ILSpy",
+				"modelDescription": "Searches the currently loaded ILSpy assemblies for a .NET symbol such as a type, member, or namespace, then returns the decompiled source code for the matching symbol or symbols. Use assemblyPath or assemblyName to disambiguate when the same symbol exists in multiple assemblies.",
+				"userDescription": "Decompile a .NET symbol from the assemblies currently loaded in ILSpy",
+				"canBeReferencedInPrompt": true,
+				"icon": "$(files)",
+				"inputSchema": {
+					"type": "object",
+					"required": [
+						"symbol"
+					],
+					"properties": {
+						"symbol": {
+							"type": "string",
+							"description": "Name of the .NET symbol to decompile. A fully qualified name is preferred when available"
+						},
+						"assemblyPath": {
+							"type": "string",
+							"description": "Optional absolute assembly path used to narrow the symbol search to one loaded assembly"
+						},
+						"assemblyName": {
+							"type": "string",
+							"description": "Optional assembly file name or simple assembly name used to narrow the symbol search"
+						},
+						"outputLanguage": {
+							"type": "string",
+							"description": "Optional ILSpy output language. When omitted, the extension's current default output language is used"
+						}
+					}
+				}
+			},
+			{
+				"name": "list_decompiler_nodes",
+				"tags": [
+					"ilspy",
+					"tree",
+					"nodes"
+				],
+				"toolReferenceName": "ilspy-list-nodes",
+				"displayName": "List ILSpy decompiler nodes",
+				"modelDescription": "Lists nodes from ILSpy's decompiler tree. With no input it returns the root nodes, which are usually the loaded assemblies. With a symbol or assembly target it returns the direct child nodes of that target.",
+				"userDescription": "List ILSpy decompiler tree nodes",
+				"canBeReferencedInPrompt": true,
+				"icon": "$(list-tree)",
+				"inputSchema": {
+					"type": "object",
+					"properties": {
+						"symbol": {
+							"type": "string",
+							"description": "Optional symbol whose direct children should be listed"
+						},
+						"assemblyPath": {
+							"type": "string",
+							"description": "Optional absolute assembly path whose direct child nodes should be listed, or used to disambiguate a symbol"
+						},
+						"assemblyName": {
+							"type": "string",
+							"description": "Optional assembly file name or simple assembly name whose direct child nodes should be listed, or used to disambiguate a symbol"
+						}
+					}
+				}
+			},
+			{
+				"name": "search_decompiled_symbols",
+				"tags": [
+					"ilspy",
+					"search",
+					"symbols"
+				],
+				"toolReferenceName": "ilspy-search-symbols",
+				"displayName": "Search loaded ILSpy symbols",
+				"modelDescription": "Searches the symbols in assemblies currently loaded in ILSpy and returns matching nodes with type, assembly path, and display information. Use it to discover exact symbol names before decompiling or analyzing them.",
+				"userDescription": "Search the symbols in assemblies currently loaded in ILSpy",
+				"canBeReferencedInPrompt": true,
+				"icon": "$(search-view-icon)",
+				"inputSchema": {
+					"type": "object",
+					"required": [
+						"term"
+					],
+					"properties": {
+						"term": {
+							"type": "string",
+							"description": "Text to search for in loaded assemblies"
+						},
+						"assemblyPath": {
+							"type": "string",
+							"description": "Optional absolute assembly path used to restrict the search to one loaded assembly"
+						},
+						"assemblyName": {
+							"type": "string",
+							"description": "Optional assembly file name or simple assembly name used to restrict the search"
+						}
+					}
+				}
+			},
+			{
+				"name": "analyze_symbol",
+				"tags": [
+					"ilspy",
+					"analyze"
+				],
+				"toolReferenceName": "ilspy-analyze-symbol",
+				"displayName": "Analyze symbol with ILSpy",
+				"modelDescription": "Runs ILSpy's analyze request for a loaded symbol or assembly and returns the resulting analyzer nodes. Use it to inspect usages, derived types, base types, or other analysis views exposed by ILSpy.",
+				"userDescription": "Analyze a loaded symbol or assembly with ILSpy",
+				"canBeReferencedInPrompt": true,
+				"icon": "$(search-view-icon)",
+				"inputSchema": {
+					"type": "object",
+					"properties": {
+						"symbol": {
+							"type": "string",
+							"description": "Optional symbol to analyze. If omitted, assemblyPath or assemblyName must identify a loaded assembly"
+						},
+						"assemblyPath": {
+							"type": "string",
+							"description": "Optional absolute assembly path used to target or disambiguate the analysis request"
+						},
+						"assemblyName": {
+							"type": "string",
+							"description": "Optional assembly file name or simple assembly name used to target or disambiguate the analysis request"
+						}
+					}
+				}
+			},
+			{
+				"name": "export_decompiled_code",
+				"tags": [
+					"ilspy",
+					"export",
+					"decompile"
+				],
+				"toolReferenceName": "ilspy-export-code",
+				"displayName": "Export decompiled ILSpy code",
+				"modelDescription": "Exports the decompiled output of a loaded ILSpy node to a directory on disk. The target can be an assembly or another exportable symbol. Use assemblyPath or assemblyName to target a loaded assembly directly, or provide a symbol and optionally narrow it by assembly.",
+				"userDescription": "Export decompiled ILSpy output to a directory on disk",
+				"canBeReferencedInPrompt": true,
+				"icon": "$(export)",
+				"inputSchema": {
+					"type": "object",
+					"required": [
+						"outputDirectory"
+					],
+					"properties": {
+						"symbol": {
+							"type": "string",
+							"description": "Optional export target symbol. If omitted, assemblyPath or assemblyName must identify a loaded assembly"
+						},
+						"assemblyPath": {
+							"type": "string",
+							"description": "Optional absolute assembly path used to target or disambiguate the export"
+						},
+						"assemblyName": {
+							"type": "string",
+							"description": "Optional assembly file name or simple assembly name used to target or disambiguate the export"
+						},
+						"outputDirectory": {
+							"type": "string",
+							"description": "Absolute path of the directory where ILSpy should write the exported files"
+						},
+						"outputLanguage": {
+							"type": "string",
+							"description": "Optional ILSpy output language. When omitted, the extension's current default output language is used"
+						},
+						"includeCompilerGenerated": {
+							"type": "boolean",
+							"description": "Optional override for whether compiler-generated members should be included in the export"
+						}
+					}
+				}
+			}
 		]
 	},
 	"scripts": {
@@ -342,7 +621,7 @@
 		"@types/chai": "5.2.3",
 		"@types/mocha": "10.0.10",
 		"@types/node": "22.15.31",
-		"@types/vscode": "1.74.0",
+		"@types/vscode": "1.110.0",
 		"@typescript-eslint/eslint-plugin": "8.57.0",
 		"@typescript-eslint/parser": "8.57.0",
 		"@vscode/test-electron": "2.5.2",

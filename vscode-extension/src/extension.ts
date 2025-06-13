@@ -47,6 +47,7 @@ import { registerRefreshAssemblyListCommand } from "./commands/refreshAssemblyLi
 import { AssemblyNodeDecorationProvider } from "./decompiler/AssemblyNodeDecorationProvider";
 import { registerAddAssemblyByPathCommand } from "./commands/addAssemblyByPath";
 import { registerExportDecompiledAssemblyCommand } from "./commands/exportDecompiledAssembly";
+import { registerLMTools } from "./lm-tools/registerLMTools";
 
 let client: LanguageClient;
 
@@ -71,7 +72,7 @@ export async function activate(context: ExtensionContext) {
       "ilspy-backend",
       "ILSpy Backend",
       serverOptions,
-      clientOptions
+      clientOptions,
     );
     await client.setTrace(Trace.Verbose);
 
@@ -102,7 +103,7 @@ export async function activate(context: ExtensionContext) {
   const decompiledTreeProvider = new DecompiledTreeProvider(
     context,
     ilspyBackend,
-    logger
+    logger,
   );
   const decompiledTreeView = createDecompiledTreeView(decompiledTreeProvider);
   disposables.push(decompiledTreeView);
@@ -110,29 +111,32 @@ export async function activate(context: ExtensionContext) {
 
   const assemblyNodeDecorationProvider = new AssemblyNodeDecorationProvider();
   disposables.push(
-    window.registerFileDecorationProvider(assemblyNodeDecorationProvider)
+    window.registerFileDecorationProvider(assemblyNodeDecorationProvider),
   );
 
   disposables.push(
-    registerAddAssemblyByPathCommand(decompiledTreeProvider, decompiledTreeView)
+    registerAddAssemblyByPathCommand(
+      decompiledTreeProvider,
+      decompiledTreeView,
+    ),
   );
   disposables.push(
     registerDecompileAssemblyInWorkspaceCommand(
       decompiledTreeProvider,
-      decompiledTreeView
-    )
+      decompiledTreeView,
+    ),
   );
   disposables.push(
     registerDecompileAssemblyViaDialogCommand(
       decompiledTreeProvider,
-      decompiledTreeView
-    )
+      decompiledTreeView,
+    ),
   );
   disposables.push(
     registerDecompileSelectedAssemblyCommand(
       decompiledTreeProvider,
-      decompiledTreeView
-    )
+      decompiledTreeView,
+    ),
   );
 
   const decompilerTextDocumentContentProvider =
@@ -140,48 +144,53 @@ export async function activate(context: ExtensionContext) {
 
   const searchResultTreeProvider = new SearchResultTreeProvider(ilspyBackend);
   const searchResultTreeView = createSearchResultTreeView(
-    searchResultTreeProvider
+    searchResultTreeProvider,
   );
   disposables.push(searchResultTreeView);
   disposables.push(registerSearchCommand(searchResultTreeProvider));
 
   const analyzeResultTreeProvider = new AnalyzeResultTreeProvider(ilspyBackend);
   const analyzeResultTreeView = createAnalyzeResultTreeView(
-    analyzeResultTreeProvider
+    analyzeResultTreeProvider,
   );
   disposables.push(analyzeResultTreeView);
   disposables.push(
-    registerAnalyzeCommand(analyzeResultTreeProvider, analyzeResultTreeView)
+    registerAnalyzeCommand(analyzeResultTreeProvider, analyzeResultTreeView),
   );
 
   disposables.push(
     workspace.registerTextDocumentContentProvider(
       ILSPY_URI_SCHEME,
-      decompilerTextDocumentContentProvider
-    )
+      decompilerTextDocumentContentProvider,
+    ),
   );
 
   disposables.push(
-    registerDecompileNodeCommand(decompilerTextDocumentContentProvider)
+    registerDecompileNodeCommand(decompilerTextDocumentContentProvider),
   );
 
   disposables.push(
-    registerSelectOutputLanguageCommand(decompilerTextDocumentContentProvider)
+    registerSelectOutputLanguageCommand(decompilerTextDocumentContentProvider),
   );
   disposables.push(
     ...registerSelectOutputLanguageStatusBarItem(
-      decompilerTextDocumentContentProvider
-    )
+      decompilerTextDocumentContentProvider,
+    ),
   );
 
   disposables.push(registerReloadAssemblyCommand(decompiledTreeProvider));
   disposables.push(registerUnloadAssemblyCommand(decompiledTreeProvider));
   disposables.push(registerRefreshAssemblyListCommand(decompiledTreeProvider));
   disposables.push(
-    registerExportDecompiledAssemblyCommand(decompiledTreeProvider, ilspyBackend)
+    registerExportDecompiledAssemblyCommand(
+      decompiledTreeProvider,
+      ilspyBackend,
+    ),
   );
 
   disposables.push(registerSearchEditorSelectionCommand());
+
+  disposables.push(...registerLMTools(ilspyBackend));
 
   context.subscriptions.push(...disposables);
 }

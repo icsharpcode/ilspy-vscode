@@ -1,5 +1,4 @@
 using ICSharpCode.Decompiler.TypeSystem;
-using ILSpyX.Backend.Application;
 using ILSpyX.Backend.Decompiler;
 using ILSpyX.Backend.Model;
 using System.Collections.Generic;
@@ -9,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace ILSpyX.Backend.TreeProviders;
 
-public class MemberNodeProvider(ILSpyXApplication application) : ITreeNodeProvider
+public class MemberNodeProvider(DecompilerBackend decompilerBackend) : ITreeNodeProvider
 {
     public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
     {
-        return application.DecompilerBackend.GetCode(
+        return decompilerBackend.GetCode(
             nodeMetadata.AssemblyPath,
             MetadataTokens.EntityHandle(nodeMetadata.SymbolToken),
             outputLanguage);
@@ -21,7 +20,7 @@ public class MemberNodeProvider(ILSpyXApplication application) : ITreeNodeProvid
 
     public Task<IEnumerable<Node>> CreateNodesAsync(string assemblyPath, int parentTypeSymbolToken)
     {
-        var decompiler = application.DecompilerBackend.CreateDecompiler(assemblyPath);
+        var decompiler = decompilerBackend.CreateDecompiler(assemblyPath);
         if (decompiler is null)
         {
             return Task.FromResult(Enumerable.Empty<Node>());
@@ -33,54 +32,54 @@ public class MemberNodeProvider(ILSpyXApplication application) : ITreeNodeProvid
 
         return Task.FromResult(
             typeDefinition == null
-            ? Enumerable.Empty<Node>()
-            : typeDefinition.NestedTypes
+                ? Enumerable.Empty<Node>()
+                : typeDefinition.NestedTypes
                     .Select(typeDefinition => new Node(
                         new NodeMetadata(
-                            AssemblyPath: assemblyPath,
-                            Type: NodeTypeHelper.GetNodeTypeFromTypeKind(typeDefinition.Kind),
-                            Name: typeDefinition.TypeToString(includeNamespace: false),
-                            SymbolToken: MetadataTokens.GetToken(typeDefinition.MetadataToken),
-                            ParentSymbolToken: parentTypeSymbolToken),
-                        DisplayName: typeDefinition.TypeToString(includeNamespace: false),
-                        Description: "",
-                        MayHaveChildren: true,
-                        SymbolModifiers: NodeTypeHelper.GetSymbolModifiers(typeDefinition),
-                        Flags: NodeFlagsHelper.GetNodeFlags(typeDefinition)
+                            assemblyPath,
+                            NodeTypeHelper.GetNodeTypeFromTypeKind(typeDefinition.Kind),
+                            typeDefinition.TypeToString(false),
+                            MetadataTokens.GetToken(typeDefinition.MetadataToken),
+                            parentTypeSymbolToken),
+                        typeDefinition.TypeToString(false),
+                        "",
+                        true,
+                        NodeTypeHelper.GetSymbolModifiers(typeDefinition),
+                        NodeFlagsHelper.GetNodeFlags(typeDefinition)
                     ))
                     .Union(typeDefinition.Fields.Select(field =>
-                        CreateMemberNode(parentTypeSymbolToken, field, assemblyPath, typeDefinition))
-                            .OrderBy(m => m.Metadata?.Name))
+                            CreateMemberNode(parentTypeSymbolToken, field, assemblyPath, typeDefinition))
+                        .OrderBy(m => m.Metadata?.Name))
                     .Union(typeDefinition.Properties.Select(property =>
-                        CreateMemberNode(parentTypeSymbolToken, property, assemblyPath, typeDefinition))
-                            .OrderBy(m => m.Metadata?.Name))
+                            CreateMemberNode(parentTypeSymbolToken, property, assemblyPath, typeDefinition))
+                        .OrderBy(m => m.Metadata?.Name))
                     .Union(typeDefinition.Events.Select(@event =>
-                        CreateMemberNode(parentTypeSymbolToken, @event, assemblyPath, typeDefinition))
-                            .OrderBy(m => m.Metadata?.Name))
+                            CreateMemberNode(parentTypeSymbolToken, @event, assemblyPath, typeDefinition))
+                        .OrderBy(m => m.Metadata?.Name))
                     .Union(typeDefinition.Methods.Select(method =>
-                        CreateMemberNode(parentTypeSymbolToken, method, assemblyPath, typeDefinition))
-                            .OrderBy(m => m.Metadata?.Name))
+                            CreateMemberNode(parentTypeSymbolToken, method, assemblyPath, typeDefinition))
+                        .OrderBy(m => m.Metadata?.Name))
         );
     }
 
-    private static Node CreateMemberNode(int parentTypeSymbolToken, IMember member, string assemblyPath, ITypeDefinition typeDefinition)
+    private static Node CreateMemberNode(int parentTypeSymbolToken, IMember member, string assemblyPath,
+        ITypeDefinition typeDefinition)
     {
         string memberName = member is IMethod method
             ? method.MethodToString(false, false, false)
             : member.Name;
         return new Node(
             new NodeMetadata(
-                AssemblyPath: assemblyPath,
-                Type: NodeTypeHelper.GetNodeTypeFromEntity(member),
-                Name: memberName,
-                SymbolToken: MetadataTokens.GetToken(member.MetadataToken),
-                ParentSymbolToken: parentTypeSymbolToken),
-            DisplayName: memberName,
-            Description: "",
-            MayHaveChildren: false,
-            SymbolModifiers: NodeTypeHelper.GetSymbolModifiers(member),
-            Flags: NodeFlagsHelper.GetNodeFlags(member)
+                assemblyPath,
+                NodeTypeHelper.GetNodeTypeFromEntity(member),
+                memberName,
+                MetadataTokens.GetToken(member.MetadataToken),
+                parentTypeSymbolToken),
+            memberName,
+            "",
+            false,
+            NodeTypeHelper.GetSymbolModifiers(member),
+            NodeFlagsHelper.GetNodeFlags(member)
         );
     }
 }
-

@@ -6,11 +6,11 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>..\..\vscode-extension\bin\ilspy-backend</OutputPath>
+    <OutputPath>bin\Debug/net8.0/</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <OutputPath>..\..\vscode-extension\bin\ilspy-backend</OutputPath>
+    <OutputPath>bin\Release/net8.0/</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
   <ItemGroup>
@@ -24,7 +24,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-      <ProjectReference Include="..\ILSpyX.Backend.LSP\ILSpyX.Backend.LSP.csproj"/>
     <ProjectReference Include="..\TestAssembly\TestAssembly.csproj" />
     <ProjectReference Include="..\ILSpyX.Backend\ILSpyX.Backend.csproj" />
   </ItemGroup>

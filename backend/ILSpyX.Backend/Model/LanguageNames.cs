@@ -1,6 +1,6 @@
 ﻿namespace ILSpyX.Backend.Model;
 
-public class LanguageName
+public static class LanguageName
 {
     public const string IL = "il";
     public const string CSharp_1 = "cs-1";
@@ -19,5 +19,4 @@ public class LanguageName
     public const string CSharp_11 = "cs-11";
     public const string CSharp_12 = "cs-12";
     public const string CSharpLatest = CSharp_12;
-
 }

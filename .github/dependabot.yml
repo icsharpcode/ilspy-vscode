@@ -14,7 +14,7 @@ updates:
     ignore:
       - dependency-name: "@types/vscode"
       - dependency-name: "@types/node"
-        versions: [">20"]
+        versions: [ ">22" ]
     groups:
       prod-dependencies:
         dependency-type: "production"

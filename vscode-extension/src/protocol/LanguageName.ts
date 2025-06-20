@@ -5,6 +5,7 @@
 
 export enum LanguageName {
   IL = "il",
+  IL_CSharp = "il-csharp",
   CSharp_1 = "cs-1",
   CSharp_2 = "cs-2",
   CSharp_3 = "cs-3",

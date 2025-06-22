@@ -35,18 +35,19 @@ public class AssemblyReferenceNodeProvider(DecompilerBackend decompilerBackend) 
         return Task.FromResult(
             references
                 .OrderBy(n => n)
-                .Select(reference => new Node(
-                    new NodeMetadata(
-                        assemblyPath,
-                        NodeType.AssemblyReference,
-                        reference,
-                        0,
-                        0,
-                        true),
-                    reference,
-                    string.Empty,
-                    false
-                ))
+                .Select(reference => new Node
+                {
+                    Metadata = new NodeMetadata
+                    {
+                        AssemblyPath = assemblyPath,
+                        Type = NodeType.AssemblyReference,
+                        Name = reference,
+                        IsDecompilable = true
+                    },
+                    DisplayName = reference,
+                    Description = string.Empty,
+                    MayHaveChildren = false
+                })
         );
     }
 }

@@ -27,18 +27,21 @@ public class DerivedTypesNodeProvider(SingleThreadAssemblyList assemblyList, Dec
         {
             return null;
         }
-        
-        return new Node(
-            new NodeMetadata(
-                parentNodeMetadata.AssemblyPath,
-                NodeType.DerivedTypes,
-                "Derived Types",
-                parentNodeMetadata.SymbolToken,
-                0),
-            "Derived Types",
-            string.Empty,
-            true
-        );
+
+        return new Node
+        {
+            Metadata = new NodeMetadata
+            {
+                AssemblyPath = parentNodeMetadata.AssemblyPath,
+                Type = NodeType.DerivedTypes,
+                Name = "Derived Types",
+                SymbolToken = parentNodeMetadata.SymbolToken,
+                ParentSymbolToken = 0
+            },
+            DisplayName = "Derived Types",
+            Description = string.Empty,
+            MayHaveChildren = true
+        };
     }
 
     public Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
@@ -84,7 +87,7 @@ public class DerivedTypesNodeProvider(SingleThreadAssemblyList assemblyList, Dec
             foreach (var h in metadata.TypeDefinitions)
             {
                 var td = metadata.GetTypeDefinition(h);
-                foreach (var ifaceImpl in td.GetInterfaceImplementations()
+                foreach (var _ in td.GetInterfaceImplementations()
                              .Select(iface => metadata.GetInterfaceImplementation(iface)).Where(ifaceImpl =>
                                  !ifaceImpl.Interface.IsNil &&
                                  IsSameType(metadata, ifaceImpl.Interface, definitionMetadata, metadataToken)))
@@ -116,13 +119,8 @@ public class DerivedTypesNodeProvider(SingleThreadAssemblyList assemblyList, Dec
         }
 
         var decompiler = decompilerBackend.CreateDecompiler(nodeMetadata.AssemblyPath);
-        if (decompiler is null)
-        {
-            return null;
-        }
-
-        var typeSystem = decompiler.TypeSystem;
-        return typeSystem.MainModule.GetDefinition(
+        var typeSystem = decompiler?.TypeSystem;
+        return typeSystem?.MainModule.GetDefinition(
             MetadataTokens.TypeDefinitionHandle(nodeMetadata.SymbolToken));
     }
 

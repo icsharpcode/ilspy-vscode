@@ -71,19 +71,22 @@ public class TypeNodeProvider(
     public static Node CreateTypeNode(string assemblyPath, ITypeDefinition typeDefinition)
     {
         string name = typeDefinition.TypeToString(false);
-        return new Node(
-            new NodeMetadata(
-                assemblyPath,
-                NodeTypeHelper.GetNodeTypeFromTypeKind(typeDefinition.Kind),
-                name,
-                MetadataTokens.GetToken(typeDefinition.MetadataToken),
-                0,
-                true),
-            name,
-            "",
-            true,
-            NodeTypeHelper.GetSymbolModifiers(typeDefinition),
-            NodeFlagsHelper.GetNodeFlags(typeDefinition)
-        );
+        return new Node
+        {
+            Metadata = new NodeMetadata
+            {
+                AssemblyPath = assemblyPath,
+                Type = NodeTypeHelper.GetNodeTypeFromTypeKind(typeDefinition.Kind),
+                Name = name,
+                SymbolToken = MetadataTokens.GetToken(typeDefinition.MetadataToken),
+                ParentSymbolToken = 0,
+                IsDecompilable = true
+            },
+            DisplayName = name,
+            Description = "",
+            MayHaveChildren = true,
+            SymbolModifiers = NodeTypeHelper.GetSymbolModifiers(typeDefinition),
+            Flags = NodeFlagsHelper.GetNodeFlags(typeDefinition)
+        };
     }
 }

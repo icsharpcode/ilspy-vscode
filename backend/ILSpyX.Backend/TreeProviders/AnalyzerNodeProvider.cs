@@ -61,22 +61,25 @@ public class AnalyzerNodeProvider(
                         ? method.MethodToString(false, false, false)
                         : entity.Name;
                     string location = (entity as IMember)?.DeclaringType.TypeToString(true) ?? "";
-                    return new Node(
-                        new NodeMetadata(
-                            entity.ParentModule?.MetadataFile?.FileName ?? "",
-                            NodeTypeHelper.GetNodeTypeFromEntity(entity),
-                            nodeName,
-                            MetadataTokens.GetToken(entity.MetadataToken),
-                            entity.DeclaringTypeDefinition?.MetadataToken is not null
+                    return new Node
+                    {
+                        Metadata = new NodeMetadata
+                        {
+                            AssemblyPath = entity.ParentModule?.MetadataFile?.FileName ?? "",
+                            Type = NodeTypeHelper.GetNodeTypeFromEntity(entity),
+                            Name = nodeName,
+                            SymbolToken = MetadataTokens.GetToken(entity.MetadataToken),
+                            ParentSymbolToken = entity.DeclaringTypeDefinition?.MetadataToken is not null
                                 ? MetadataTokens.GetToken(entity.DeclaringTypeDefinition.MetadataToken)
                                 : 0,
-                            IsDecompilable: true),
-                        nodeName,
-                        location,
-                        false,
-                        NodeTypeHelper.GetSymbolModifiers(entity),
-                        NodeFlagsHelper.GetNodeFlags(entity)
-                    );
+                            IsDecompilable = true
+                        },
+                        DisplayName = nodeName,
+                        Description = location,
+                        MayHaveChildren = false,
+                        SymbolModifiers = NodeTypeHelper.GetSymbolModifiers(entity),
+                        Flags = NodeFlagsHelper.GetNodeFlags(entity)
+                    };
                 })
         );
     }
@@ -96,12 +99,13 @@ public class AnalyzerNodeProvider(
         }
 
         string displayName = analyzer.Header;
-        return new Node(
-            nodeMetadata with { Type = NodeType.Analyzer, SubType = analyzer.NodeSubType },
-            displayName,
-            displayName,
-            true,
-            SymbolModifiers.None
-        );
+        return new Node
+        {
+            Metadata = nodeMetadata with { Type = NodeType.Analyzer, SubType = analyzer.NodeSubType },
+            DisplayName = displayName,
+            Description = displayName,
+            MayHaveChildren = true,
+            SymbolModifiers = SymbolModifiers.None
+        };
     }
 }

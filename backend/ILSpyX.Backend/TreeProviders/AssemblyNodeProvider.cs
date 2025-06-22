@@ -36,20 +36,21 @@ public class AssemblyNodeProvider(
     {
         return (await decompilerBackend.GetLoadedAssembliesAsync())
             .Select(assemblyData =>
-                new Node(
-                    new NodeMetadata(
-                        assemblyData.FilePath,
-                        NodeType.Assembly,
-                        Path.GetFileName(assemblyData.FilePath),
-                        0,
-                        0,
-                        true),
-                    GetAssemblyDisplayText(assemblyData),
-                    assemblyData.FilePath,
-                    true,
-                    SymbolModifiers.None,
-                    NodeFlagsHelper.GetNodeFlags(assemblyData)
-                ));
+                new Node
+                {
+                    Metadata = new NodeMetadata
+                    {
+                        AssemblyPath = assemblyData.FilePath,
+                        Type = NodeType.Assembly,
+                        Name = Path.GetFileName(assemblyData.FilePath),
+                        IsDecompilable = true
+                    },
+                    DisplayName = GetAssemblyDisplayText(assemblyData),
+                    Description = assemblyData.FilePath,
+                    MayHaveChildren = true,
+                    SymbolModifiers = SymbolModifiers.None,
+                    Flags = NodeFlagsHelper.GetNodeFlags(assemblyData)
+                });
     }
 
     private static string GetAssemblyDisplayText(AssemblyData assemblyData)

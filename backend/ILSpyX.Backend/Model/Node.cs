@@ -3,10 +3,12 @@
 
 namespace ILSpyX.Backend.Model;
 
-public record Node(
-    NodeMetadata? Metadata,
-    string DisplayName,
-    string Description,
-    bool MayHaveChildren,
-    SymbolModifiers SymbolModifiers = SymbolModifiers.None,
-    NodeFlags Flags = NodeFlags.None);
+public record Node()
+{
+    public required NodeMetadata? Metadata { get; init; }
+    public required string DisplayName { get; init; }
+    public required string Description { get; init; }
+    public required bool MayHaveChildren { get; init; }
+    public SymbolModifiers SymbolModifiers { get; init; } = SymbolModifiers.None;
+    public NodeFlags Flags { get; init; } = NodeFlags.None;
+}

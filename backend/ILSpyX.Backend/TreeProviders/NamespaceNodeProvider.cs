@@ -43,17 +43,15 @@ public class NamespaceNodeProvider(TypeNodeProvider typeNodeProvider, Decompiler
 
         return namespaces
             .OrderBy(n => n)
-            .Select(ns => new Node(
-                new NodeMetadata(
-                    assemblyPath,
-                    NodeType.Namespace,
-                    ns,
-                    0,
-                    0,
-                    true),
-                ns,
-                string.Empty,
-                true
-            ));
+            .Select(ns => new Node
+            {
+                Metadata = new NodeMetadata
+                {
+                    AssemblyPath = assemblyPath, Type = NodeType.Namespace, Name = ns, IsDecompilable = true
+                },
+                DisplayName = ns,
+                Description = string.Empty,
+                MayHaveChildren = true,
+            });
     }
 }

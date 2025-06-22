@@ -15,7 +15,10 @@ public class MethodAnalyzersTests
         var analyzersRootNodeProvider = application.GetRequiredService<AnalyzersRootNodesProvider>();
         var analyzerNodeProvider = application.GetRequiredService<AnalyzerNodeProvider>();
         var types = await namespaceNodeProvider.GetChildrenAsync(
-            new NodeMetadata(TestHelper.AssemblyPath, NodeType.Namespace, "TestAssembly", 0, 0, true));
+            new NodeMetadata
+            {
+                AssemblyPath = TestHelper.AssemblyPath, Type = NodeType.Namespace, Name = "TestAssembly"
+            });
         var typeNode = types.First(node => node.Metadata?.Name == "SomeClass");
         var members = await typeNodeProvider.GetChildrenAsync(typeNode.Metadata);
         var methodNode = members.First(node => node.Metadata?.Name?.StartsWith("ToString") ?? false);
@@ -59,7 +62,10 @@ public class MethodAnalyzersTests
         var analyzerNodeProvider = application.GetRequiredService<AnalyzerNodeProvider>();
         var analyzerRootNodeProvider = application.GetRequiredService<AnalyzersRootNodesProvider>();
         var types = await namespaceNodeProvider.GetChildrenAsync(
-            new NodeMetadata(TestHelper.AssemblyPath, NodeType.Namespace, "TestAssembly", 0, 0, true));
+            new NodeMetadata
+            {
+                AssemblyPath = TestHelper.AssemblyPath, Type = NodeType.Namespace, Name = "TestAssembly"
+            });
         var typeNode = types.First(node => node.Metadata?.Name == "SomeClass");
         var members = await typeNodeProvider.GetChildrenAsync(typeNode.Metadata);
         var methodNode = members.First(node => node.Metadata?.Name?.StartsWith("CallsFrameworkMethod") ?? false);

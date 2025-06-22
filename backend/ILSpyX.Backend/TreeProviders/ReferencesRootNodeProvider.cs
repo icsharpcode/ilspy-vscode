@@ -52,16 +52,16 @@ public class ReferencesRootNodeProvider(
 
     public Node CreateNode(string assemblyPath)
     {
-        return new Node(
-            new NodeMetadata(
-                assemblyPath,
-                NodeType.ReferencesRoot,
-                "References",
-                0,
-                0),
-            "References",
-            string.Empty,
-            true
-        );
+        return new Node
+        {
+            Metadata =
+                new NodeMetadata
+                {
+                    AssemblyPath = assemblyPath, Type = NodeType.ReferencesRoot, Name = "References"
+                },
+            DisplayName = "References",
+            Description = string.Empty,
+            MayHaveChildren = true
+        };
     }
 }

@@ -45,17 +45,20 @@ public class BaseTypesNodeProvider(SingleThreadAssemblyList assemblyList)
             return null;
         }
 
-        return new Node(
-            new NodeMetadata(
-                assemblyPath,
-                NodeType.BaseTypes,
-                "Base Types",
-                typeSymbolToken,
-                0),
-            "Base Types",
-            string.Empty,
-            true
-        );
+        return new Node
+        {
+            Metadata = new NodeMetadata
+            {
+                AssemblyPath = assemblyPath,
+                Type = NodeType.BaseTypes,
+                Name = "Base Types",
+                SymbolToken = typeSymbolToken,
+                ParentSymbolToken = 0
+            },
+            DisplayName = "Base Types",
+            Description = string.Empty,
+            MayHaveChildren = true
+        };
     }
 
     private IEnumerable<ITypeDefinition> GetBaseTypes(string assemblyFile, int typeSymbolToken)

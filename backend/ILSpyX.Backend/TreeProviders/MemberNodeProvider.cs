@@ -32,22 +32,25 @@ public class MemberNodeProvider(DecompilerBackend decompilerBackend) : ITreeNode
 
         return Task.FromResult(
             typeDefinition == null
-                ? Enumerable.Empty<Node>()
+                ? []
                 : typeDefinition.NestedTypes
-                    .Select(typeDefinition => new Node(
-                        new NodeMetadata(
-                            assemblyPath,
-                            NodeTypeHelper.GetNodeTypeFromTypeKind(typeDefinition.Kind),
-                            typeDefinition.TypeToString(false),
-                            MetadataTokens.GetToken(typeDefinition.MetadataToken),
-                            parentTypeSymbolToken,
-                            true),
-                        typeDefinition.TypeToString(false),
-                        "",
-                        true,
-                        NodeTypeHelper.GetSymbolModifiers(typeDefinition),
-                        NodeFlagsHelper.GetNodeFlags(typeDefinition)
-                    ))
+                    .Select(nestedTypeDefinition => new Node
+                    {
+                        Metadata = new NodeMetadata
+                        {
+                            AssemblyPath = assemblyPath,
+                            Type = NodeTypeHelper.GetNodeTypeFromTypeKind(nestedTypeDefinition.Kind),
+                            Name = nestedTypeDefinition.TypeToString(false),
+                            SymbolToken = MetadataTokens.GetToken(nestedTypeDefinition.MetadataToken),
+                            ParentSymbolToken = parentTypeSymbolToken,
+                            IsDecompilable = true
+                        },
+                        DisplayName = nestedTypeDefinition.TypeToString(false),
+                        Description = "",
+                        MayHaveChildren = true,
+                        SymbolModifiers = NodeTypeHelper.GetSymbolModifiers(nestedTypeDefinition),
+                        Flags = NodeFlagsHelper.GetNodeFlags(nestedTypeDefinition)
+                    })
                     .Union(typeDefinition.Fields.Select(field =>
                             CreateMemberNode(parentTypeSymbolToken, field, assemblyPath, typeDefinition))
                         .OrderBy(m => m.Metadata?.Name))
@@ -69,19 +72,21 @@ public class MemberNodeProvider(DecompilerBackend decompilerBackend) : ITreeNode
         string memberName = member is IMethod method
             ? method.MethodToString(false, false, false)
             : member.Name;
-        return new Node(
-            new NodeMetadata(
-                assemblyPath,
-                NodeTypeHelper.GetNodeTypeFromEntity(member),
-                memberName,
-                MetadataTokens.GetToken(member.MetadataToken),
-                parentTypeSymbolToken,
-                true),
-            memberName,
-            "",
-            false,
-            NodeTypeHelper.GetSymbolModifiers(member),
-            NodeFlagsHelper.GetNodeFlags(member)
-        );
+        return new Node
+        {
+            Metadata = new NodeMetadata
+            {
+                AssemblyPath = assemblyPath,
+                Type = NodeTypeHelper.GetNodeTypeFromEntity(member),
+                Name = memberName,
+                SymbolToken = MetadataTokens.GetToken(member.MetadataToken),
+                ParentSymbolToken = parentTypeSymbolToken
+            },
+            DisplayName = memberName,
+            Description = "",
+            MayHaveChildren = false,
+            SymbolModifiers = NodeTypeHelper.GetSymbolModifiers(member),
+            Flags = NodeFlagsHelper.GetNodeFlags(member)
+        };
     }
 }

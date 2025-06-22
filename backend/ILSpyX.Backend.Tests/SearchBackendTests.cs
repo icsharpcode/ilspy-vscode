@@ -132,7 +132,10 @@ public class SearchBackendTests
         var namespaceNodeProvider = application.GetRequiredService<NamespaceNodeProvider>();
         var typeNodeProvider = application.GetRequiredService<TypeNodeProvider>();
         var types = await namespaceNodeProvider.GetChildrenAsync(
-            new NodeMetadata(TestHelper.AssemblyPath, NodeType.Namespace, "TestAssembly", 0, 0, true));
+            new NodeMetadata
+            {
+                AssemblyPath = TestHelper.AssemblyPath, Type = NodeType.Namespace, Name = "TestAssembly"
+            });
         var typeNode = types.First(node => node.Metadata?.Name == "SomeClass");
         await typeNodeProvider.GetChildrenAsync(typeNode.Metadata);
 

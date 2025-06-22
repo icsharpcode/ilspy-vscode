@@ -69,7 +69,7 @@ public class SearchBackend(SingleThreadAssemblyList assemblyList, ILSpyBackendSe
         return [];
     }
 
-    bool IsNotAccessor(SearchResult searchResult)
+    private bool IsNotAccessor(SearchResult searchResult)
     {
         if (searchResult is MemberSearchResult memberSearchResult)
         {
@@ -82,44 +82,47 @@ public class SearchBackend(SingleThreadAssemblyList assemblyList, ILSpyBackendSe
     private Node ConvertResultToNode(SearchResult result)
     {
         var memberSearchResult = result as MemberSearchResult;
-        return new Node(
-            Metadata: new NodeMetadata(
-                AssemblyPath: result.Assembly,
-                Type: GetNodeType(result),
-                Name: memberSearchResult?.Member?.Name ?? result.Name,
-                SymbolToken: memberSearchResult?.Member is not null
+        return new Node
+        {
+            Metadata = new NodeMetadata
+            {
+                AssemblyPath = result.Assembly,
+                Type = GetNodeType(result),
+                Name = memberSearchResult?.Member?.Name ?? result.Name,
+                SymbolToken = memberSearchResult?.Member is not null
                     ? MetadataTokens.GetToken(memberSearchResult.Member.MetadataToken)
                     : 0,
-                ParentSymbolToken:
-                memberSearchResult?.Member?.DeclaringTypeDefinition?.MetadataToken != null
+                ParentSymbolToken = memberSearchResult?.Member?.DeclaringTypeDefinition?.MetadataToken != null
                     ? MetadataTokens.GetToken(memberSearchResult.Member.DeclaringTypeDefinition.MetadataToken)
                     : 0,
-                IsDecompilable: true),
-            DisplayName: result.Name,
-            Description: result.Location,
-            MayHaveChildren: memberSearchResult?.Member is ITypeDefinition,
-            SymbolModifiers: GetSymbolModifiers(result),
-            Flags: NodeFlagsHelper.GetNodeFlags(result)
-        );
+                IsDecompilable = true
+            },
+            DisplayName = result.Name,
+            Description = result.Location,
+            MayHaveChildren = memberSearchResult?.Member is ITypeDefinition,
+            SymbolModifiers = GetSymbolModifiers(result),
+            Flags = NodeFlagsHelper.GetNodeFlags(result)
+        };
     }
 
-    NodeType GetNodeType(SearchResult result) => result switch
-    {
-        AssemblySearchResult => NodeType.Assembly,
-        NamespaceSearchResult => NodeType.Namespace,
-        MemberSearchResult msr => msr.Member switch
+    private static NodeType GetNodeType(SearchResult result) =>
+        result switch
         {
-            ITypeDefinition typeDefinition => NodeTypeHelper.GetNodeTypeFromTypeKind(typeDefinition.Kind),
-            IMethod => NodeType.Method,
-            IField => NodeType.Field,
-            IEvent => NodeType.Event,
-            IProperty => NodeType.Property,
+            AssemblySearchResult => NodeType.Assembly,
+            NamespaceSearchResult => NodeType.Namespace,
+            MemberSearchResult msr => msr.Member switch
+            {
+                ITypeDefinition typeDefinition => NodeTypeHelper.GetNodeTypeFromTypeKind(typeDefinition.Kind),
+                IMethod => NodeType.Method,
+                IField => NodeType.Field,
+                IEvent => NodeType.Event,
+                IProperty => NodeType.Property,
+                _ => NodeType.Unknown
+            },
             _ => NodeType.Unknown
-        },
-        _ => NodeType.Unknown
-    };
+        };
 
-    SymbolModifiers GetSymbolModifiers(SearchResult result)
+    private SymbolModifiers GetSymbolModifiers(SearchResult result)
     {
         var modifiers = SymbolModifiers.None;
         switch (result)
@@ -155,7 +158,7 @@ public class SearchBackend(SingleThreadAssemblyList assemblyList, ILSpyBackendSe
         return modifiers;
     }
 
-    SearchRequest CreateSearchRequest(string input, SearchMode searchMode)
+    private SearchRequest CreateSearchRequest(string input, SearchMode searchMode)
     {
         string[] parts = input.Split(' '); // NativeMethods.CommandLineToArgumentArray(input);
 
@@ -168,7 +171,7 @@ public class SearchBackend(SingleThreadAssemblyList assemblyList, ILSpyBackendSe
         {
             // Parse: [prefix:|@]["]searchTerm["]
             // Find quotes used for escaping
-            int prefixLength = part.IndexOfAny(new[] { '"', '/' });
+            int prefixLength = part.IndexOfAny(['"', '/']);
             if (prefixLength < 0)
             {
                 // no quotes
@@ -176,14 +179,7 @@ public class SearchBackend(SingleThreadAssemblyList assemblyList, ILSpyBackendSe
             }
 
             // Find end of prefix
-            if (part.StartsWith("@", StringComparison.Ordinal))
-            {
-                prefixLength = 1;
-            }
-            else
-            {
-                prefixLength = part.IndexOf(':', 0, prefixLength);
-            }
+            prefixLength = part.StartsWith('@') ? 1 : part.IndexOf(':', 0, prefixLength);
             string? prefix;
             if (prefixLength <= 0)
             {
@@ -192,22 +188,22 @@ public class SearchBackend(SingleThreadAssemblyList assemblyList, ILSpyBackendSe
             }
             else
             {
-                prefix = part.Substring(0, prefixLength);
+                prefix = part[..prefixLength];
             }
 
             // unescape quotes
-            string searchTerm = part.Substring(prefixLength + 1).Trim();
+            string searchTerm = part[(prefixLength + 1)..].Trim();
             if (searchTerm.Length > 0)
             {
                 searchTerm = searchTerm.Split(' ').First(); // NativeMethods.CommandLineToArgumentArray(searchTerm)[0];
             }
 
-            if (prefix == null || prefix.Length <= 2)
+            if (prefix is not { Length: > 2 })
             {
-                if (regex == null && searchTerm.StartsWith("/", StringComparison.Ordinal) && searchTerm.Length > 1)
+                if (regex == null && searchTerm.StartsWith('/') && searchTerm.Length > 1)
                 {
                     int searchTermLength = searchTerm.Length - 1;
-                    if (searchTerm.EndsWith("/", StringComparison.Ordinal))
+                    if (searchTerm.EndsWith('/'))
                     {
                         searchTermLength--;
                     }
@@ -218,10 +214,11 @@ public class SearchBackend(SingleThreadAssemblyList assemblyList, ILSpyBackendSe
                 }
                 else
                 {
-                    request.FullNameSearch |= searchTerm.Contains(".");
+                    request.FullNameSearch |= searchTerm.Contains('.');
                     keywords.Add(searchTerm);
                 }
-                request.OmitGenerics |= !(searchTerm.Contains("<") || searchTerm.Contains("`"));
+
+                request.OmitGenerics |= !(searchTerm.Contains('<') || searchTerm.Contains('`'));
             }
 
             switch (prefix?.ToUpperInvariant())

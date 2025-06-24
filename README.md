@@ -1,15 +1,18 @@
 # ILSpy Visual Studio Code Extension [![Visual Studio Marketplace](https://img.shields.io/visual-studio-marketplace/v/icsharpcode.ilspy-vscode)](https://marketplace.visualstudio.com/items?itemName=icsharpcode.ilspy-vscode) [![Join the chat at https://gitter.im/icsharpcode/ILSpy](https://badges.gitter.im/icsharpcode/ILSpy.svg)](https://gitter.im/icsharpcode/ILSpy?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![CI](https://github.com/icsharpcode/ilspy-vscode/actions/workflows/ci.yml/badge.svg)](https://github.com/icsharpcode/ilspy-vscode/actions/workflows/ci.yml)
 
-You can install the extension in Visual Studio Code via the [marketplace](https://marketplace.visualstudio.com/items?itemName=icsharpcode.ilspy-vscode)
+The ILSpy extension for VS Code is an implementation of ILSpy .NET assembly browser and decompiler running inside of Visual Studio Code UI - in contrast to the [ILSpy desktop application](https://github.com/icsharpcode/ILSpy) running standalone on Windows systems.
+
+Please see the [Feature Comparison List](https://github.com/icsharpcode/ilspy-vscode/wiki/Feature-Comparison) for the differences between ILSpy desktop application and the VS Code extension.
 
 ## Getting started
 
-Please see the [Getting started](https://github.com/icsharpcode/ilspy-vscode/wiki/Getting-started) overview.
+You can [install](https://github.com/icsharpcode/ilspy-vscode/wiki/Installation) the extension in Visual Studio Code via the [marketplace](https://marketplace.visualstudio.com/items?itemName=icsharpcode.ilspy-vscode).
+
+Please see the [Feature Tour](https://github.com/icsharpcode/ilspy-vscode/wiki/Feature-Tour) to explore the extension's features.
 
 ## What's New
 
 Please see the [Change Log](./vscode-extension/CHANGELOG.md).
-
 
 ## Troubleshooting
 

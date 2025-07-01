@@ -299,7 +299,8 @@
 		"path": "^0.12.7",
 		"temp-dir": "^3.0.0",
 		"terser": "^5.43.1",
-		"vscode-languageclient": "^9.0.1"
+		"vscode-languageclient": "^9.0.1",
+		"brace-expansion": "2.0.2"
 	},
 	"devDependencies": {
 		"@types/chai": "^5.2.2",

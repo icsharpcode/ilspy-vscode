@@ -194,6 +194,7 @@ function getNodeContextValue(node: Node) {
     case NodeType.Enum:
     case NodeType.Const:
     case NodeType.Property:
+    case NodeType.Field:
       return "analyzableNode";
     default:
       break;

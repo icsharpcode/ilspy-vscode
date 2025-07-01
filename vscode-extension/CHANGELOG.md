@@ -2,6 +2,10 @@
 
 All notable changes to the "ilspy-vscode" extension will be documented in this file.
 
+## (Next Release)
+
+- Fix: "Analyze" command was not available for fields
+
 ## 0.21
 
 - Upgrade to ICSharpCode.Decompiler 9.1 (see release notes for [ILSpy 9.1](https://github.com/icsharpcode/ILSpy/releases/tag/v9.1) to get more details)

@@ -233,7 +233,7 @@
 				},
 				{
 					"command": "ilspy.analyze",
-					"when": "view == ilspyDecompiledMembers && viewItem == analyzableNode",
+					"when": "(view == ilspyDecompiledMembers || view == ilspySearchResultsContainer || view == ilspyAnalyzeResultsContainer) && viewItem == analyzableNode",
 					"group": "inline"
 				}
 			],

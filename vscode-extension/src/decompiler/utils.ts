@@ -24,6 +24,26 @@ export function getTreeNodeCollapsibleState(
     : TreeItemCollapsibleState.None;
 }
 
+export function getNodeContextValue(node: Node) {
+  switch (node.metadata?.type) {
+    case NodeType.Assembly:
+      return "assemblyNode";
+    case NodeType.Class:
+    case NodeType.Interface:
+    case NodeType.Event:
+    case NodeType.Method:
+    case NodeType.Enum:
+    case NodeType.Const:
+    case NodeType.Property:
+    case NodeType.Field:
+      return "analyzableNode";
+    default:
+      break;
+  }
+
+  return undefined;
+}
+
 export function hasNodeFlag(node: Node, flag: NodeFlags) {
   return (node.flags & flag) === flag;
 }

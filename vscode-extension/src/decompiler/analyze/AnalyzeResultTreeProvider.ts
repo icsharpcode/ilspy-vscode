@@ -17,7 +17,11 @@ import IILSpyBackend from "../IILSpyBackend";
 import Node from "../../protocol/Node";
 import { NodeType } from "../../protocol/NodeType";
 import { getNodeIcon } from "../../icons";
-import { getTreeNodeCollapsibleState, hasNodeFlag } from "../utils";
+import {
+  getNodeContextValue,
+  getTreeNodeCollapsibleState,
+  hasNodeFlag,
+} from "../utils";
 import { getShowCompilerGeneratedSymbolsSetting } from "../settings";
 import { NodeFlags } from "../../protocol/NodeFlags";
 
@@ -93,6 +97,7 @@ export class AnalyzeResultTreeProvider
           arguments: [node],
           title: "Decompile",
         },
+        contextValue: getNodeContextValue(node),
         iconPath: new ThemeIcon(getNodeIcon(node.metadata?.type)),
       };
     }

@@ -4,6 +4,7 @@ All notable changes to the "ilspy-vscode" extension will be documented in this f
 
 ## (Next Release)
 
+- Allow to analyze symbols shown in "Search Results" and "Analyze" panels
 - Fix: "Analyze" command was not available for fields
 
 ## 0.21

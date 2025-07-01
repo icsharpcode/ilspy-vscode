@@ -27,7 +27,7 @@ import {
 } from "./settings";
 import { getNodeIcon } from "../icons";
 import { NodeFlags } from "../protocol/NodeFlags";
-import { hasNodeFlag } from "./utils";
+import { getNodeContextValue, hasNodeFlag } from "./utils";
 
 export class DecompiledTreeProvider implements TreeDataProvider<Node> {
   private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
@@ -183,22 +183,4 @@ function setTreeWithNodes(treeWithNodes: boolean) {
   commands.executeCommand("setContext", "ilspy.treeWithNodes", treeWithNodes);
 }
 
-function getNodeContextValue(node: Node) {
-  switch (node.metadata?.type) {
-    case NodeType.Assembly:
-      return "assemblyNode";
-    case NodeType.Class:
-    case NodeType.Interface:
-    case NodeType.Event:
-    case NodeType.Method:
-    case NodeType.Enum:
-    case NodeType.Const:
-    case NodeType.Property:
-    case NodeType.Field:
-      return "analyzableNode";
-    default:
-      break;
-  }
 
-  return undefined;
-}

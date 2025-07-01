@@ -21,7 +21,7 @@ import {
   getShowCompilerGeneratedSymbolsSetting,
 } from "../settings";
 import { NodeFlags } from "../../protocol/NodeFlags";
-import { hasNodeFlag } from "../utils";
+import { getNodeContextValue, hasNodeFlag } from "../utils";
 
 interface PerformedSearch {
   term: string;
@@ -79,6 +79,7 @@ export class SearchResultTreeProvider
           arguments: [node],
           title: "Decompile",
         },
+        contextValue: getNodeContextValue(node),
         iconPath: new ThemeIcon(getNodeIcon(node.metadata?.type)),
       };
     }

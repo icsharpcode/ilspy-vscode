@@ -30,26 +30,28 @@ public class DecompilerBackend(
 
     public async Task<AssemblyData?> AddAssemblyAsync(string? path)
     {
-        if (path is not null)
+        if (path is null)
         {
-            try
+            return null;
+        }
+
+        try
+        {
+            var loadedAssembly = await assemblyList.AddAssembly(path);
+            if (loadedAssembly is not null)
             {
-                var loadedAssembly = await assemblyList.AddAssembly(path);
-                if (loadedAssembly is not null)
-                {
-                    return await CreateAssemblyDataAsync(loadedAssembly);
-                }
+                return await CreateAssemblyDataAsync(loadedAssembly);
             }
-            catch (Exception ex)
-            {
-                logger?.LogError("An exception occurred when reading assembly {assembly}: {exception}", path, ex);
-            }
+        }
+        catch (Exception ex)
+        {
+            logger?.LogError("An exception occurred when reading assembly {assembly}: {exception}", path, ex);
         }
 
         return null;
     }
 
-    public async Task<AssemblyData?> CreateAssemblyDataAsync(LoadedAssembly loadedAssembly)
+    private async Task<AssemblyData?> CreateAssemblyDataAsync(LoadedAssembly loadedAssembly)
     {
         var metaDataFile = await loadedAssembly.GetMetadataFileOrNullAsync();
         if (metaDataFile is null)
@@ -58,7 +60,7 @@ public class DecompilerBackend(
         }
 
         var version = metaDataFile.Metadata.GetAssemblyDefinition().Version;
-        var targetFrameworkId = await loadedAssembly.GetTargetFrameworkIdAsync();
+        string targetFrameworkId = await loadedAssembly.GetTargetFrameworkIdAsync();
         return new AssemblyData(loadedAssembly.ShortName, loadedAssembly.FileName, loadedAssembly.IsAutoLoaded)
         {
             Version = version.ToString(),

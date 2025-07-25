@@ -3,6 +3,7 @@
 
 using ICSharpCode.Decompiler;
 using ICSharpCode.Decompiler.CSharp;
+using ICSharpCode.Decompiler.CSharp.Syntax;
 using ICSharpCode.Decompiler.Disassembler;
 using ICSharpCode.Decompiler.Metadata;
 using ICSharpCode.Decompiler.TypeSystem;
@@ -53,21 +54,40 @@ public class DecompilerBackend(
 
     private async Task<AssemblyData?> CreateAssemblyDataAsync(LoadedAssembly loadedAssembly)
     {
-        var metaDataFile = await loadedAssembly.GetMetadataFileOrNullAsync();
-        if (metaDataFile is null)
+        var loadResult = await loadedAssembly.GetLoadResultAsync();
+        if (loadResult.MetadataFile is not null)
         {
-            return null;
+            var version = loadResult.MetadataFile.Metadata.GetAssemblyDefinition().Version;
+            string targetFrameworkId = await loadedAssembly.GetTargetFrameworkIdAsync();
+            return new AssemblyData
+            {
+                Name = loadedAssembly.ShortName,
+                FilePath = loadedAssembly.FileName,
+                IsAutoLoaded = loadedAssembly.IsAutoLoaded,
+                Version = version.ToString(),
+                TargetFramework = !string.IsNullOrEmpty(targetFrameworkId)
+                    ? targetFrameworkId.Replace("Version=", " ")
+                    : null,
+                PackageType = PackageType.None
+            };
         }
 
-        var version = metaDataFile.Metadata.GetAssemblyDefinition().Version;
-        string targetFrameworkId = await loadedAssembly.GetTargetFrameworkIdAsync();
-        return new AssemblyData(loadedAssembly.ShortName, loadedAssembly.FileName, loadedAssembly.IsAutoLoaded)
+        if (loadResult.Package is not null)
         {
-            Version = version.ToString(),
-            TargetFramework = !string.IsNullOrEmpty(targetFrameworkId)
-                ? targetFrameworkId.Replace("Version=", " ")
-                : null
-        };
+            return new AssemblyData
+            {
+                Name = loadedAssembly.ShortName,
+                FilePath = loadedAssembly.FileName,
+                IsAutoLoaded = loadedAssembly.IsAutoLoaded,
+                PackageType = loadResult.Package.Kind switch
+                {
+                    LoadedPackage.PackageKind.Zip => PackageType.NuGet,
+                    _ => PackageType.Other
+                }
+            };
+        }
+
+        return null;
     }
 
     public async Task<bool> RemoveAssemblyAsync(string? path)
@@ -109,7 +129,8 @@ public class DecompilerBackend(
     public async Task<IEnumerable<AssemblyData>> GetLoadedAssembliesAsync()
     {
         return (await Task.WhenAll(
-            (await assemblyList.GetAllAssemblies()).Select(async loadedAssembly => await CreateAssemblyDataAsync(loadedAssembly))))
+                assemblyList.GetAllAssemblies()
+                    .Select(async loadedAssembly => await CreateAssemblyDataAsync(loadedAssembly))))
             .Where(data => data is not null)
             .Cast<AssemblyData>();
     }
@@ -118,19 +139,19 @@ public class DecompilerBackend(
     {
         if (handle.IsNil || (assemblyPath is null))
         {
-            return Array.Empty<MemberData>();
+            return [];
         }
 
         var loadedAssembly = assemblyList.FindAssembly(assemblyPath);
         if (loadedAssembly is null)
         {
-            return Array.Empty<MemberData>();
+            return [];
         }
 
         var decompiler = CreateDecompiler(assemblyPath);
         if (decompiler is null)
         {
-            return Array.Empty<MemberData>();
+            return [];
         }
 
         var typeSystem = decompiler.TypeSystem;

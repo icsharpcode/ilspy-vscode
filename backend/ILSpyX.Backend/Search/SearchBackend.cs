@@ -32,7 +32,7 @@ public class SearchBackend(SingleThreadAssemblyList assemblyList, ILSpyBackendSe
 
         try
         {
-            var assemblies = (await assemblyList.GetAllAssemblies()).Where(assembly => !assembly.IsAutoLoaded);
+            var assemblies = assemblyList.GetAllAssemblies().Where(assembly => !assembly.IsAutoLoaded);
 
             var resultQueue = new ConcurrentQueue<SearchResult>();
             var searchRequest = CreateSearchRequest(searchTerm, SearchMode.TypeAndMember);

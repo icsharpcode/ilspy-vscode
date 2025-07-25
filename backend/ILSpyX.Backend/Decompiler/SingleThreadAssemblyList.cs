@@ -97,10 +97,10 @@ public class SingleThreadAssemblyList
 
     public AssemblyList? AssemblyList => assemblyList;
 
-    public async Task<IList<LoadedAssembly>> GetAllAssemblies()
+    public IList<LoadedAssembly> GetAllAssemblies()
     {
         return assemblyList is not null
-            ? await assemblyList.GetAllAssemblies()
+            ? assemblyList.GetAssemblies()
             : new List<LoadedAssembly>();
     }
 

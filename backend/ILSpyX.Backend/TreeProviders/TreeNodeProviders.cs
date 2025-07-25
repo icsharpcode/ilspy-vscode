@@ -29,6 +29,7 @@ public class TreeNodeProviders(IServiceProvider serviceProvider)
             NodeType.Analyzer => typeof(AnalyzerNodeProvider),
             NodeType.BaseTypes => typeof(BaseTypesNodeProvider),
             NodeType.DerivedTypes => typeof(DerivedTypesNodeProvider),
+            NodeType.NuGetPackage => typeof(NuGetPackageNodeProvider),
             _ => typeof(DummyTreeNodeProvider)
         };
 

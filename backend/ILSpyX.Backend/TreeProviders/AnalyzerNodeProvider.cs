@@ -29,12 +29,7 @@ public class AnalyzerNodeProvider(
         }
 
         var analyzer = analyzerBackend.GetAnalyzerForNode(nodeMetadata)?.Instance;
-        if (analyzer is null)
-        {
-            return Task.FromResult(Enumerable.Empty<Node>());
-        }
-
-        if (singleThreadAssemblyList.AssemblyList is null)
+        if (analyzer is null || singleThreadAssemblyList.AssemblyList is null)
         {
             return Task.FromResult(Enumerable.Empty<Node>());
         }

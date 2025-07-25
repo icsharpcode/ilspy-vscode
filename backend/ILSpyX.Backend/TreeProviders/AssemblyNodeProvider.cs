@@ -32,25 +32,23 @@ public class AssemblyNodeProvider(
                 .Concat(namespaceNodeProvider.CreateNodes(nodeMetadata.AssemblyPath)));
     }
 
-    public async Task<IEnumerable<Node>> CreateNodesAsync()
+    public static Node CreateNode(AssemblyData assemblyData)
     {
-        return (await decompilerBackend.GetLoadedAssembliesAsync())
-            .Select(assemblyData =>
-                new Node
-                {
-                    Metadata = new NodeMetadata
-                    {
-                        AssemblyPath = assemblyData.FilePath,
-                        Type = NodeType.Assembly,
-                        Name = Path.GetFileName(assemblyData.FilePath),
-                        IsDecompilable = true
-                    },
-                    DisplayName = GetAssemblyDisplayText(assemblyData),
-                    Description = assemblyData.FilePath,
-                    MayHaveChildren = true,
-                    SymbolModifiers = SymbolModifiers.None,
-                    Flags = NodeFlagsHelper.GetNodeFlags(assemblyData)
-                });
+        return new Node
+        {
+            Metadata = new NodeMetadata
+            {
+                AssemblyPath = assemblyData.FilePath,
+                Type = NodeType.Assembly,
+                Name = Path.GetFileName(assemblyData.FilePath),
+                IsDecompilable = true
+            },
+            DisplayName = GetAssemblyDisplayText(assemblyData),
+            Description = assemblyData.FilePath,
+            MayHaveChildren = true,
+            SymbolModifiers = SymbolModifiers.None,
+            Flags = NodeFlagsHelper.GetNodeFlags(assemblyData)
+        };
     }
 
     private static string GetAssemblyDisplayText(AssemblyData assemblyData)

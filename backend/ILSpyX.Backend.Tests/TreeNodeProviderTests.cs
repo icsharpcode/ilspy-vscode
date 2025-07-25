@@ -22,6 +22,20 @@ public class TreeNodeProviderTests
     }
 
     [Fact]
+    public async Task GetRootNodesWithNuGetPackage()
+    {
+        var services = await TestHelper.CreateTestServicesWithNuGetPackage();
+        var list = await services.GetRequiredService<AssemblyTreeRootNodesProvider>().GetChildrenAsync(null);
+        var node = Assert.Single(list);
+        Assert.Equal("TestAssembly.1.0.0", node.DisplayName);
+        Assert.Equal(TestHelper.NuGetPackagePath, node.Description);
+        Assert.True(node.MayHaveChildren);
+        Assert.Equal(TestHelper.NuGetPackagePath, node.Metadata?.AssemblyPath);
+        Assert.Equal(Path.GetFileName(TestHelper.NuGetPackagePath), node.Metadata?.Name);
+        Assert.Equal(NodeType.NuGetPackage, node.Metadata?.Type);
+    }
+
+    [Fact]
     public async Task GetAssemblyChildren()
     {
         var services = await TestHelper.CreateTestServicesWithAssembly();

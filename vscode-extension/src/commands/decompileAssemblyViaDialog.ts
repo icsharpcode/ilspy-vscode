@@ -34,7 +34,14 @@ async function promptForAssemblyFilesPathViaDialog(): Promise<string[]> {
     canSelectFolders: false,
     canSelectMany: true,
     filters: {
-      ".NET Assemblies": ["dll", "exe", "winmd", "netmodule", "wasm"],
+      ".NET Decompilables": [
+        "dll",
+        "exe",
+        "winmd",
+        "netmodule",
+        "wasm",
+        "nupkg",
+      ],
     },
   });
 

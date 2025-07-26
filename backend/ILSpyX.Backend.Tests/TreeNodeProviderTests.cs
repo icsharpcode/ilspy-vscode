@@ -11,7 +11,7 @@ public class TreeNodeProviderTests
     public async Task GetRootNodes()
     {
         var services = await TestHelper.CreateTestServicesWithAssembly();
-        var list = await services.GetRequiredService<TreeNodeProviders>().AssemblyTreeRoot.GetChildrenAsync(null);
+        var list = await services.GetRequiredService<AssemblyTreeRootNodesProvider>().GetChildrenAsync(null);
         var node = Assert.Single(list);
         Assert.Equal("TestAssembly, 1.0.0.0, .NETCoreApp, v8.0", node.DisplayName);
         Assert.Equal(TestHelper.AssemblyPath, node.Description);
@@ -158,7 +158,7 @@ public class TreeNodeProviderTests
     public async Task GetTypeChildren()
     {
         var services = await TestHelper.CreateTestServicesWithAssembly();
-        var types = await services.GetRequiredService<TreeNodeProviders>().Namespace.GetChildrenAsync(
+        var types = await services.GetRequiredService<NamespaceNodeProvider>().GetChildrenAsync(
             new NodeMetadata(TestHelper.AssemblyPath, NodeType.Namespace, "TestAssembly", 0, 0));
         var typeNode = types.First(node => node.Metadata?.Name == "SomeClass");
         var list = await services.GetRequiredService<TreeNodeProviders>().ForNode(typeNode.Metadata)

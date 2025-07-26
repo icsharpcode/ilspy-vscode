@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ILSpyX.Backend.TreeProviders;
 
-public class TypeNodeProvider(TreeNodeProviders treeNodeProviders, DecompilerBackend decompilerBackend)
+public class TypeNodeProvider(MemberNodeProvider memberNodeProvider, DecompilerBackend decompilerBackend)
     : ITreeNodeProvider
 {
     public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
@@ -25,7 +25,7 @@ public class TypeNodeProvider(TreeNodeProviders treeNodeProviders, DecompilerBac
             return [];
         }
 
-        return await treeNodeProviders.Member.CreateNodesAsync(
+        return await memberNodeProvider.CreateNodesAsync(
             nodeMetadata.AssemblyPath, nodeMetadata.SymbolToken);
     }
 

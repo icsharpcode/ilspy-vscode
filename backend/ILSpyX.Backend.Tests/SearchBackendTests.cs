@@ -129,11 +129,12 @@ public class SearchBackendTests
     public async Task SearchOnlyInAddedAssemblies()
     {
         var application = await TestHelper.CreateTestServicesWithAssembly();
-        var treeNodeProviders = application.GetRequiredService<TreeNodeProviders>();
-        var types = await treeNodeProviders.Namespace.GetChildrenAsync(
+        var namespaceNodeProvider = application.GetRequiredService<NamespaceNodeProvider>();
+        var typeNodeProvider = application.GetRequiredService<TypeNodeProvider>();
+        var types = await namespaceNodeProvider.GetChildrenAsync(
             new NodeMetadata(TestHelper.AssemblyPath, NodeType.Namespace, "TestAssembly", 0, 0));
         var typeNode = types.First(node => node.Metadata?.Name == "SomeClass");
-        await treeNodeProviders.Type.GetChildrenAsync(typeNode.Metadata);
+        await typeNodeProvider.GetChildrenAsync(typeNode.Metadata);
 
         var searchBackend = application.GetRequiredService<SearchBackend>();
         var nodeData = await searchBackend.Search("String", CancellationToken.None);

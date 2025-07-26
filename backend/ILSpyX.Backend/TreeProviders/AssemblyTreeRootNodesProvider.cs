@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace ILSpyX.Backend.TreeProviders;
 
-public class AssemblyTreeRootNodesProvider(TreeNodeProviders treeNodeProviders) : ITreeNodeProvider
+public class AssemblyTreeRootNodesProvider(AssemblyNodeProvider assemblyNodeProvider) : ITreeNodeProvider
 {
     public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
     {
@@ -14,6 +14,6 @@ public class AssemblyTreeRootNodesProvider(TreeNodeProviders treeNodeProviders) 
 
     public async Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
     {
-        return await treeNodeProviders.Assembly.CreateNodesAsync();
+        return await assemblyNodeProvider.CreateNodesAsync();
     }
 }

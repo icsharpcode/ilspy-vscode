@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace ILSpyX.Backend.TreeProviders;
 
-public class ReferencesRootNodeProvider(TreeNodeProviders treeNodeProviders, DecompilerBackend decompilerBackend)
+public class ReferencesRootNodeProvider(
+    AssemblyReferenceNodeProvider assemblyReferenceNodeProvider,
+    DecompilerBackend decompilerBackend)
     : ITreeNodeProvider
 {
     public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
@@ -24,7 +26,7 @@ public class ReferencesRootNodeProvider(TreeNodeProviders treeNodeProviders, Dec
             return [];
         }
 
-        return await treeNodeProviders.AssemblyReference.CreateNodesAsync(nodeMetadata.AssemblyPath);
+        return await assemblyReferenceNodeProvider.CreateNodesAsync(nodeMetadata.AssemblyPath);
     }
 
     private IEnumerable<string> GetAssemblyReferences(string assemblyPath)

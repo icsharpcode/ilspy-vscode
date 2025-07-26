@@ -8,7 +8,10 @@ using System.Threading.Tasks;
 
 namespace ILSpyX.Backend.TreeProviders;
 
-public class AssemblyNodeProvider(DecompilerBackend decompilerBackend, TreeNodeProviders treeNodeProviders)
+public class AssemblyNodeProvider(
+    DecompilerBackend decompilerBackend,
+    ReferencesRootNodeProvider referencesRootNodeProvider,
+    NamespaceNodeProvider namespaceNodeProvider)
     : ITreeNodeProvider
 {
     public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
@@ -25,8 +28,8 @@ public class AssemblyNodeProvider(DecompilerBackend decompilerBackend, TreeNodeP
         }
 
         return Task.FromResult(
-            new[] { treeNodeProviders.ReferencesRoot.CreateNode(nodeMetadata.AssemblyPath) }
-                .Concat(treeNodeProviders.Namespace.CreateNodes(nodeMetadata.AssemblyPath)));
+            new[] { referencesRootNodeProvider.CreateNode(nodeMetadata.AssemblyPath) }
+                .Concat(namespaceNodeProvider.CreateNodes(nodeMetadata.AssemblyPath)));
     }
 
     public async Task<IEnumerable<Node>> CreateNodesAsync()

@@ -27,6 +27,8 @@ public class TreeNodeProviders(IServiceProvider serviceProvider)
             _ when NodeTypeHelper.IsTypeNode(nodeType.Value) => typeof(TypeNodeProvider),
             _ when NodeTypeHelper.IsMemberNode(nodeType.Value) => typeof(MemberNodeProvider),
             NodeType.Analyzer => typeof(AnalyzerCollector),
+            NodeType.BaseTypes => typeof(BaseTypesNodeProvider),
+            NodeType.DerivedTypes => typeof(DerivedTypesNodeProvider),
             _ => typeof(DummyTreeNodeProvider)
         };
 

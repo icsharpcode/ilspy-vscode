@@ -143,6 +143,14 @@ public class TreeNodeProviderTests
                 Assert.True(node.MayHaveChildren);
             },
             node => {
+                Assert.Equal("SomeInterfaceImplementor", node.Metadata?.Name);
+                Assert.Equal("SomeInterfaceImplementor", node.DisplayName);
+                Assert.Equal(NodeType.Class, node.Metadata?.Type);
+                Assert.NotEqual(0, node.Metadata?.SymbolToken);
+                Assert.Equal(SymbolModifiers.Public, node.SymbolModifiers);
+                Assert.True(node.MayHaveChildren);
+            },
+            node => {
                 Assert.Equal("SomeStruct", node.Metadata?.Name);
                 Assert.Equal("SomeStruct", node.DisplayName);
                 Assert.Equal(NodeType.Struct, node.Metadata?.Type);
@@ -169,6 +177,20 @@ public class TreeNodeProviderTests
             .GetChildrenAsync(typeNode.Metadata);
         
         Assert.Collection(list,
+            node => {
+                Assert.Equal("Base Types", node.Metadata?.Name);
+                Assert.Equal(NodeType.BaseTypes, node.Metadata?.Type);
+                Assert.Equal(typeNode.Metadata?.SymbolToken, node.Metadata?.ParentSymbolToken);
+                Assert.Equal(SymbolModifiers.None, node.SymbolModifiers);
+                Assert.True(node.MayHaveChildren);
+            },
+            node => {
+                Assert.Equal("Derived Types", node.Metadata?.Name);
+                Assert.Equal(NodeType.DerivedTypes, node.Metadata?.Type);
+                Assert.Equal(typeNode.Metadata?.SymbolToken, node.Metadata?.ParentSymbolToken);
+                Assert.Equal(SymbolModifiers.None, node.SymbolModifiers);
+                Assert.True(node.MayHaveChildren);
+            },
             node => {
                 Assert.Equal("NestedC", node.Metadata?.Name);
                 Assert.Equal(NodeType.Class, node.Metadata?.Type);
@@ -249,5 +271,49 @@ public class TreeNodeProviderTests
                 Assert.False(node.MayHaveChildren);
             }
         );
+    }
+
+    [Fact]
+    public async Task GetBaseTypes()
+    {
+        var services = await TestHelper.CreateTestServicesWithAssembly();
+        var types = await services.GetRequiredService<NamespaceNodeProvider>().GetChildrenAsync(
+            new NodeMetadata(TestHelper.AssemblyPath, NodeType.Namespace, "TestAssembly", 0, 0, true));
+        var typeNode = types.First(node => node.Metadata?.Name == "SomeInterfaceImplementor");
+        var typesList = await services.GetRequiredService<TreeNodeProviders>().ForNode(typeNode.Metadata)
+            .GetChildrenAsync(typeNode.Metadata);
+        var baseTypesNode = typesList.First(node => node.Metadata?.Type == NodeType.BaseTypes);
+        var baseTypesList = await services.GetRequiredService<TreeNodeProviders>().ForNode(baseTypesNode.Metadata)
+            .GetChildrenAsync(baseTypesNode.Metadata);
+
+        Assert.Collection(baseTypesList,
+            node => {
+                Assert.Equal("ISomeInterface", node.Metadata?.Name);
+                Assert.Equal(NodeType.Interface, node.Metadata?.Type);
+                Assert.NotEqual(0, node.Metadata?.SymbolToken);
+                Assert.Equal(SymbolModifiers.Public | SymbolModifiers.Abstract, node.SymbolModifiers);
+                Assert.False(node.Metadata?.IsDecompilable);
+                Assert.False(node.MayHaveChildren);
+            },
+            node => {
+                Assert.Equal("Object", node.Metadata?.Name);
+                Assert.Equal(NodeType.Class, node.Metadata?.Type);
+                Assert.NotEqual(0, node.Metadata?.SymbolToken);
+                Assert.Equal(SymbolModifiers.Public, node.SymbolModifiers);
+                Assert.False(node.Metadata?.IsDecompilable);
+                Assert.False(node.MayHaveChildren);
+            }
+        );
+
+        // Decompilation test verifies validity of NodeMetadata
+        var iSomeInterfaceMetadata = baseTypesList.ElementAt(0).Metadata;
+        string? decompiledCode = services.GetRequiredService<TreeNodeProviders>().ForNode(iSomeInterfaceMetadata)
+            .Decompile(iSomeInterfaceMetadata!, LanguageName.CSharpLatest).DecompiledCode;
+        Assert.Contains("public interface ISomeInterface", decompiledCode);
+
+        var systemObjectMetadata = baseTypesList.ElementAt(1).Metadata;
+        decompiledCode = services.GetRequiredService<TreeNodeProviders>().ForNode(systemObjectMetadata)
+            .Decompile(systemObjectMetadata!, LanguageName.CSharpLatest).DecompiledCode;
+        Assert.Contains("public class Object", decompiledCode);
     }
 }

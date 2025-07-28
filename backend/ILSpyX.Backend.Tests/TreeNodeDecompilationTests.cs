@@ -128,7 +128,7 @@ public class AClass
 
 public interface ISomeInterface
 {
-    int i { get; set; }
+    int I { get; set; }
 }
 ",
             services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)

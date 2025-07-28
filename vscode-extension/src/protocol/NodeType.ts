@@ -20,4 +20,6 @@ export enum NodeType {
   AssemblyReference,
   ReferencesRoot,
   Analyzer,
+  BaseTypes,
+  DerivedTypes,
 }

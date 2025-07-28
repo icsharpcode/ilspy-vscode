@@ -24,6 +24,8 @@ const ProductIconMapping: { [key in NodeType]?: string } = {
   [NodeType.AssemblyReference]: "library",
   [NodeType.Unknown]: UNKNOWN_ICON,
   [NodeType.Analyzer]: "question",
+  [NodeType.BaseTypes]: "arrow-up",
+  [NodeType.DerivedTypes]: "arrow-down",
 };
 
 export function getNodeIcon(nodeType: NodeType | undefined) {

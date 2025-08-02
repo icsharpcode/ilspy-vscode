@@ -23,6 +23,7 @@ export function nodeDataToUri(nodeData: Node): vscode.Uri {
       nodeData.metadata?.symbolToken,
       nodeData.metadata?.type,
       nodeData.metadata?.parentSymbolToken,
+      nodeData.metadata?.isDecompilable ? "1" : "0",
     ].join(":"),
   });
 }
@@ -34,12 +35,14 @@ export function uriToNode(uri: vscode.Uri): NodeMetadata | undefined {
 
   const assembly = path.dirname(uri.fsPath);
   const name = path.basename(uri.fsPath);
-  const [symbolToken, type, parentSymbolToken] = uri.query.split(":");
+  const [symbolToken, type, parentSymbolToken, isDecompilable] =
+    uri.query.split(":");
   return {
     assemblyPath: assembly,
     type: parseInt(type) as NodeType,
     symbolToken: parseInt(symbolToken),
     parentSymbolToken: parseInt(parentSymbolToken),
+    isDecompilable: isDecompilable === "1",
     name,
   };
 }

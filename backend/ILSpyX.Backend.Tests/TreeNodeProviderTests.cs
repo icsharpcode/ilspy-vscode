@@ -25,9 +25,11 @@ public class TreeNodeProviderTests
     public async Task GetAssemblyChildren()
     {
         var services = await TestHelper.CreateTestServicesWithAssembly();
-        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Assembly, TestHelper.AssemblyPath, 0, 0);
+        var nodeMetadata =
+            new NodeMetadata(TestHelper.AssemblyPath, NodeType.Assembly, TestHelper.AssemblyPath, 0, 0, true);
         var list = await services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
             .GetChildrenAsync(nodeMetadata);
+        
         Assert.Collection(list,
             node => {
                 Assert.Equal("References", node.Metadata?.Name);
@@ -88,7 +90,7 @@ public class TreeNodeProviderTests
     public async Task GetReferenceChildren()
     {
         var services = await TestHelper.CreateTestServicesWithAssembly();
-        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.ReferencesRoot, "References", 0, 0);
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.ReferencesRoot, "References", 0, 0, true);
         var list = await services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
             .GetChildrenAsync(nodeMetadata);
         var node = Assert.Single(list);
@@ -103,9 +105,10 @@ public class TreeNodeProviderTests
     public async Task GetNamespaceChildren()
     {
         var services = await TestHelper.CreateTestServicesWithAssembly();
-        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Namespace, "TestAssembly", 0, 0);
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Namespace, "TestAssembly", 0, 0, true);
         var list = await services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
             .GetChildrenAsync(nodeMetadata);
+        
         Assert.Collection(list,
             node => {
                 Assert.Equal("ISomeInterface", node.Metadata?.Name);
@@ -146,7 +149,8 @@ public class TreeNodeProviderTests
                 Assert.NotEqual(0, node.Metadata?.SymbolToken);
                 Assert.Equal(SymbolModifiers.Internal | SymbolModifiers.Sealed, node.SymbolModifiers);
                 Assert.True(node.MayHaveChildren);
-            });
+            }
+        );
     }
 
     private static TokenType GetTokenTypeFromToken(int handle)
@@ -159,10 +163,11 @@ public class TreeNodeProviderTests
     {
         var services = await TestHelper.CreateTestServicesWithAssembly();
         var types = await services.GetRequiredService<NamespaceNodeProvider>().GetChildrenAsync(
-            new NodeMetadata(TestHelper.AssemblyPath, NodeType.Namespace, "TestAssembly", 0, 0));
+            new NodeMetadata(TestHelper.AssemblyPath, NodeType.Namespace, "TestAssembly", 0, 0, true));
         var typeNode = types.First(node => node.Metadata?.Name == "SomeClass");
         var list = await services.GetRequiredService<TreeNodeProviders>().ForNode(typeNode.Metadata)
             .GetChildrenAsync(typeNode.Metadata);
+        
         Assert.Collection(list,
             node => {
                 Assert.Equal("NestedC", node.Metadata?.Name);

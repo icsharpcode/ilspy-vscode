@@ -49,7 +49,8 @@ public class NamespaceNodeProvider(TypeNodeProvider typeNodeProvider, Decompiler
                     NodeType.Namespace,
                     ns,
                     0,
-                    0),
+                    0,
+                    true),
                 ns,
                 string.Empty,
                 true

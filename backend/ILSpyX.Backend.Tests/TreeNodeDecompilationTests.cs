@@ -30,7 +30,8 @@ public class TreeNodeDecompilationTests
     public async Task Assembly()
     {
         var services = await TestHelper.CreateTestServicesWithAssembly();
-        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Assembly, TestHelper.AssemblyPath, 0, 0);
+        var nodeMetadata =
+            new NodeMetadata(TestHelper.AssemblyPath, NodeType.Assembly, TestHelper.AssemblyPath, 0, 0, true);
         Assert.Equal(
             $"// {TestHelper.AssemblyPath}" +
             @"
@@ -65,7 +66,7 @@ using System.Runtime.Versioning;
     public async Task Namespace()
     {
         var services = await TestHelper.CreateTestServicesWithAssembly();
-        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Namespace, "A.B.C.D", 0, 0);
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Namespace, "A.B.C.D", 0, 0, true);
         Assert.Equal(
             @"namespace A.B.C.D { }",
             services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
@@ -76,7 +77,7 @@ using System.Runtime.Versioning;
     public async Task GlobalNamespace()
     {
         var services = await TestHelper.CreateTestServicesWithAssembly();
-        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Namespace, "", 0, 0);
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Namespace, "", 0, 0, true);
         Assert.Equal(
             @"namespace <global> { }",
             services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
@@ -88,7 +89,7 @@ using System.Runtime.Versioning;
     {
         var services = await TestHelper.CreateTestServicesWithAssembly();
         int typeToken = GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "Generics", "AClass");
-        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Class, "", typeToken, 0);
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Class, "", typeToken, 0, true);
         Assert.Equal(
             @"namespace Generics;
 
@@ -121,7 +122,7 @@ public class AClass
         var services = await TestHelper.CreateTestServicesWithAssembly();
         int typeToken = GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "TestAssembly",
             "ISomeInterface");
-        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Interface, "", typeToken, 0);
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Interface, "", typeToken, 0, true);
         Assert.Equal(
             @"namespace TestAssembly;
 
@@ -139,7 +140,7 @@ public interface ISomeInterface
     {
         var services = await TestHelper.CreateTestServicesWithAssembly();
         int typeToken = GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "TestAssembly", "SomeStruct");
-        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Struct, "", typeToken, 0);
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Struct, "", typeToken, 0, true);
         Assert.Equal(
             @"namespace TestAssembly;
 
@@ -163,7 +164,7 @@ internal struct SomeStruct
     {
         var services = await TestHelper.CreateTestServicesWithAssembly();
         int typeToken = GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "TestAssembly", "SomeEnum");
-        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Enum, "", typeToken, 0);
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Enum, "", typeToken, 0, true);
         Assert.Equal(
             @"namespace TestAssembly;
 
@@ -185,7 +186,7 @@ public enum SomeEnum
         int typeToken = GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "TestAssembly", "SomeClass");
         int memberToken = GetMemberToken(services.GetRequiredService<DecompilerBackend>(), typeToken,
             "ToString() : string");
-        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Method, "", memberToken, typeToken);
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Method, "", memberToken, typeToken, true);
         Assert.Equal(
             @"public override string ToString()
 {
@@ -202,7 +203,7 @@ public enum SomeEnum
         var services = await TestHelper.CreateTestServicesWithAssembly();
         int typeToken = GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "TestAssembly", "SomeClass");
         int memberToken = GetMemberToken(services.GetRequiredService<DecompilerBackend>(), typeToken, "_ProgId");
-        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Field, "", memberToken, typeToken);
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Field, "", memberToken, typeToken, true);
         Assert.Equal(
             @"private int _ProgId;
 ",
@@ -216,7 +217,8 @@ public enum SomeEnum
         var services = await TestHelper.CreateTestServicesWithAssembly();
         int typeToken = GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "TestAssembly", "SomeClass");
         int memberToken = GetMemberToken(services.GetRequiredService<DecompilerBackend>(), typeToken, "ProgId");
-        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Property, "", memberToken, typeToken);
+        var nodeMetadata =
+            new NodeMetadata(TestHelper.AssemblyPath, NodeType.Property, "", memberToken, typeToken, true);
         Assert.Equal(
             @"public int ProgId
 {
@@ -241,7 +243,7 @@ public enum SomeEnum
         int typeToken = GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "TestAssembly", "SomeClass");
         int memberToken =
             GetMemberToken(services.GetRequiredService<DecompilerBackend>(), typeToken, "SomeClass(int)");
-        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Method, "", memberToken, typeToken);
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Method, "", memberToken, typeToken, true);
         Assert.Equal(
             @"internal SomeClass(int ProgramId)
 {
@@ -256,7 +258,7 @@ public enum SomeEnum
     public async Task ReferencesRoot()
     {
         var services = await TestHelper.CreateTestServicesWithAssembly();
-        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.ReferencesRoot, "References", 0, 0);
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.ReferencesRoot, "References", 0, 0, true);
         Assert.Equal(
             @"// System.Runtime, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
             services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
@@ -268,7 +270,7 @@ public enum SomeEnum
     {
         var services = await TestHelper.CreateTestServicesWithAssembly();
         var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.AssemblyReference,
-            "System.Runtime, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", 0, 0);
+            "System.Runtime, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", 0, 0, true);
         Assert.Equal(
             @"// System.Runtime, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
             services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
@@ -281,7 +283,7 @@ public enum SomeEnum
         var services = await TestHelper.CreateTestServicesWithAssembly();
         int typeToken = GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "CSharpVariants",
             "CSharpVariants");
-        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Interface, "", typeToken, 0);
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Interface, "", typeToken, 0, true);
         Assert.Equal(
             @"namespace CSharpVariants;
 
@@ -300,7 +302,7 @@ public class CSharpVariants
         var services = await TestHelper.CreateTestServicesWithAssembly();
         int typeToken = GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "CSharpVariants",
             "CSharpVariants");
-        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Interface, "", typeToken, 0);
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Interface, "", typeToken, 0, true);
         Assert.Equal(
             @"namespace CSharpVariants
 {
@@ -320,7 +322,7 @@ public class CSharpVariants
         var services = await TestHelper.CreateTestServicesWithAssembly();
         int typeToken = GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "CSharpVariants",
             "CSharpVariants");
-        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Class, "", typeToken, 0);
+        var nodeMetadata = new NodeMetadata(TestHelper.AssemblyPath, NodeType.Class, "", typeToken, 0, true);
         Assert.Equal(
             @"using System.Runtime.CompilerServices;
 

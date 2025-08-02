@@ -79,7 +79,7 @@ public class SearchBackend(SingleThreadAssemblyList assemblyList, ILSpyBackendSe
         return true;
     }
 
-    Node ConvertResultToNode(SearchResult result)
+    private Node ConvertResultToNode(SearchResult result)
     {
         var memberSearchResult = result as MemberSearchResult;
         return new Node(
@@ -93,7 +93,8 @@ public class SearchBackend(SingleThreadAssemblyList assemblyList, ILSpyBackendSe
                 ParentSymbolToken:
                 memberSearchResult?.Member?.DeclaringTypeDefinition?.MetadataToken != null
                     ? MetadataTokens.GetToken(memberSearchResult.Member.DeclaringTypeDefinition.MetadataToken)
-                    : 0),
+                    : 0,
+                IsDecompilable: true),
             DisplayName: result.Name,
             Description: result.Location,
             MayHaveChildren: memberSearchResult?.Member is ITypeDefinition,

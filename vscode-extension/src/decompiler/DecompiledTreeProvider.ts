@@ -108,11 +108,13 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
       collapsibleState: node.mayHaveChildren
         ? TreeItemCollapsibleState.Collapsed
         : void 0,
-      command: {
-        command: "ilspy.decompileNode",
-        arguments: [node],
-        title: "Decompile",
-      },
+      command: node.metadata?.isDecompilable
+        ? {
+            command: "ilspy.decompileNode",
+            arguments: [node],
+            title: "Decompile",
+          }
+        : undefined,
       contextValue: getNodeContextValue(node),
       iconPath: new ThemeIcon(getNodeIcon(node.metadata?.type)),
       resourceUri: hasNodeFlag(node, NodeFlags.AutoLoaded)

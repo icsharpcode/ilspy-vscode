@@ -32,6 +32,7 @@ public class BaseTypesNodeProvider(SingleThreadAssemblyList assemblyList)
                         baseType);
                 return typeNode with
                 {
+                    DisplayName = baseType.FullName,
                     MayHaveChildren = false,
                     Metadata = typeNode.Metadata is not null
                         ? typeNode.Metadata with { IsDecompilable = false }

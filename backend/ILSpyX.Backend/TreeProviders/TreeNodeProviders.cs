@@ -26,7 +26,7 @@ public class TreeNodeProviders(IServiceProvider serviceProvider)
             NodeType.Namespace => typeof(NamespaceNodeProvider),
             _ when NodeTypeHelper.IsTypeNode(nodeType.Value) => typeof(TypeNodeProvider),
             _ when NodeTypeHelper.IsMemberNode(nodeType.Value) => typeof(MemberNodeProvider),
-            NodeType.Analyzer => typeof(AnalyzerCollector),
+            NodeType.Analyzer => typeof(AnalyzerNodeProvider),
             NodeType.BaseTypes => typeof(BaseTypesNodeProvider),
             NodeType.DerivedTypes => typeof(DerivedTypesNodeProvider),
             _ => typeof(DummyTreeNodeProvider)

@@ -50,11 +50,7 @@ public class DerivedTypesNodeProvider(SingleThreadAssemblyList assemblyList, Dec
                         derivedType);
                 return typeNode with
                 {
-                    DisplayName = derivedType.FullName,
-                    MayHaveChildren = false,
-                    Metadata = typeNode.Metadata is not null
-                        ? typeNode.Metadata with { IsDecompilable = false }
-                        : null
+                    DisplayName = derivedType.FullName, MayHaveChildren = false
                 };
             }));
     }

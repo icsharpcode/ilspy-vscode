@@ -289,6 +289,7 @@ public class TreeNodeProviderTests
         Assert.Collection(baseTypesList,
             node => {
                 Assert.Equal("ISomeInterface", node.Metadata?.Name);
+                Assert.Equal("TestAssembly.ISomeInterface", node.DisplayName);
                 Assert.Equal(NodeType.Interface, node.Metadata?.Type);
                 Assert.NotEqual(0, node.Metadata?.SymbolToken);
                 Assert.Equal(SymbolModifiers.Public | SymbolModifiers.Abstract, node.SymbolModifiers);
@@ -297,6 +298,7 @@ public class TreeNodeProviderTests
             },
             node => {
                 Assert.Equal("Object", node.Metadata?.Name);
+                Assert.Equal("System.Object", node.DisplayName);
                 Assert.Equal(NodeType.Class, node.Metadata?.Type);
                 Assert.NotEqual(0, node.Metadata?.SymbolToken);
                 Assert.Equal(SymbolModifiers.Public, node.SymbolModifiers);

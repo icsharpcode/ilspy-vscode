@@ -25,7 +25,7 @@ public class BaseTypesNodeProvider(SingleThreadAssemblyList assemblyList)
             return Task.FromResult(Enumerable.Empty<Node>());
         }
 
-        return Task.FromResult(GetBaseTypes(nodeMetadata.AssemblyPath, nodeMetadata.ParentSymbolToken)
+        return Task.FromResult(GetBaseTypes(nodeMetadata.AssemblyPath, nodeMetadata.SymbolToken)
             .Select(baseType => {
                 var typeNode =
                     TypeNodeProvider.CreateTypeNode(baseType.ParentModule?.MetadataFile?.FileName ?? string.Empty,
@@ -53,8 +53,8 @@ public class BaseTypesNodeProvider(SingleThreadAssemblyList assemblyList)
                 assemblyPath,
                 NodeType.BaseTypes,
                 "Base Types",
-                0,
-                typeSymbolToken),
+                typeSymbolToken,
+                0),
             "Base Types",
             string.Empty,
             true

@@ -33,7 +33,7 @@ public class TypeNodeProvider(
         IEnumerable<Node?> nodes =
         [
             baseTypesNodeProvider.CreateNode(nodeMetadata.AssemblyPath, nodeMetadata.SymbolToken),
-            derivedTypesNodeProvider.CreateNode(nodeMetadata.AssemblyPath, nodeMetadata.SymbolToken)
+            derivedTypesNodeProvider.CreateNode(nodeMetadata)
         ];
 
         return nodes.OfType<Node>().Concat(await memberNodeProvider.CreateNodesAsync(

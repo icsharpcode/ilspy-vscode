@@ -316,4 +316,51 @@ public class TreeNodeProviderTests
             .Decompile(systemObjectMetadata!, LanguageName.CSharpLatest).DecompiledCode;
         Assert.Contains("public class Object", decompiledCode);
     }
+
+    [Fact]
+    public async Task GetDerivedTypes()
+    {
+        var services = await TestHelper.CreateTestServicesWithAssembly();
+        var types = await services.GetRequiredService<NamespaceNodeProvider>().GetChildrenAsync(
+            new NodeMetadata(TestHelper.AssemblyPath, NodeType.Namespace, "TestAssembly", 0, 0, true));
+        var typeNode = types.First(node => node.Metadata?.Name == "ISomeInterface");
+        var typesList = await services.GetRequiredService<TreeNodeProviders>().ForNode(typeNode.Metadata)
+            .GetChildrenAsync(typeNode.Metadata);
+        var derivedTypesNode = typesList.First(node => node.Metadata?.Type == NodeType.DerivedTypes);
+        var derivedTypesList = await services.GetRequiredService<TreeNodeProviders>().ForNode(derivedTypesNode.Metadata)
+            .GetChildrenAsync(derivedTypesNode.Metadata);
+
+        Assert.Collection(derivedTypesList,
+            node => {
+                Assert.Equal("SomeInterfaceImplementor", node.Metadata?.Name);
+                Assert.Equal("TestAssembly.SomeInterfaceImplementor", node.DisplayName);
+                Assert.Equal(NodeType.Class, node.Metadata?.Type);
+                Assert.NotEqual(0, node.Metadata?.SymbolToken);
+                Assert.Equal(SymbolModifiers.Public, node.SymbolModifiers);
+                Assert.False(node.Metadata?.IsDecompilable);
+                Assert.False(node.MayHaveChildren);
+            },
+            node => {
+                Assert.Equal("IDerivedInterface", node.Metadata?.Name);
+                Assert.Equal("TestAssembly.IDerivedInterface", node.DisplayName);
+                Assert.Equal(NodeType.Interface, node.Metadata?.Type);
+                Assert.NotEqual(0, node.Metadata?.SymbolToken);
+                Assert.Equal(SymbolModifiers.Public | SymbolModifiers.Abstract, node.SymbolModifiers);
+                Assert.False(node.Metadata?.IsDecompilable);
+                Assert.False(node.MayHaveChildren);
+            }
+        );
+
+        // Decompilation test verifies validity of NodeMetadata
+        var someInterfaceImplementorMetadata = derivedTypesList.ElementAt(0).Metadata;
+        string? decompiledCode = services.GetRequiredService<TreeNodeProviders>()
+            .ForNode(someInterfaceImplementorMetadata)
+            .Decompile(someInterfaceImplementorMetadata!, LanguageName.CSharpLatest).DecompiledCode;
+        Assert.Contains("public class SomeInterfaceImplementor", decompiledCode);
+
+        var iDerivedInterfaceMetadata = derivedTypesList.ElementAt(1).Metadata;
+        decompiledCode = services.GetRequiredService<TreeNodeProviders>().ForNode(iDerivedInterfaceMetadata)
+            .Decompile(iDerivedInterfaceMetadata!, LanguageName.CSharpLatest).DecompiledCode;
+        Assert.Contains("public interface IDerivedInterface", decompiledCode);
+    }
 }

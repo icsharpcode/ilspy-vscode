@@ -41,7 +41,8 @@ public class AssemblyReferenceNodeProvider(DecompilerBackend decompilerBackend) 
                         NodeType.AssemblyReference,
                         reference,
                         0,
-                        0),
+                        0,
+                        true),
                     reference,
                     string.Empty,
                     false

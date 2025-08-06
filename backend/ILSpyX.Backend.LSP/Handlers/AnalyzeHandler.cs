@@ -12,14 +12,14 @@ using System.Threading.Tasks;
 namespace ILSpyX.Backend.LSP.Handlers;
 
 [Serial, Method("ilspy/analyze", Direction.ClientToServer)]
-public class AnalyzeHandler(DecompilerBackend decompilerBackend, TreeNodeProviders treeNodeProviders)
+public class AnalyzeHandler(DecompilerBackend decompilerBackend, AnalyzersRootNodesProvider analyzersRootNodesProvider)
     : IJsonRpcRequestHandler<AnalyzeRequest, AnalyzeResponse>
 {
     public async Task<AnalyzeResponse> Handle(AnalyzeRequest request, CancellationToken cancellationToken)
     {
         (var resultNodes, bool shouldUpdateAssemblyList) =
             await decompilerBackend.DetectAutoLoadedAssemblies(() =>
-                treeNodeProviders.AnalyzersRoot.GetChildrenAsync(request.NodeMetadata));
+                analyzersRootNodesProvider.GetChildrenAsync(request.NodeMetadata));
         return new AnalyzeResponse(resultNodes, shouldUpdateAssemblyList);
     }
 }

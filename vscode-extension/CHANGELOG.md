@@ -2,8 +2,10 @@
 
 All notable changes to the "ilspy-vscode" extension will be documented in this file.
 
-## (Next Release)
+## 0.22
 
+- Introduce "Base Types" and "Derived Types" elements for type nodes in tree (works similarly to ILSpy stand-alone
+  application)
 - Allow to analyze symbols shown in "Search Results" and "Analyze" panels
 - Fix: "Analyze" command was not available for fields
 

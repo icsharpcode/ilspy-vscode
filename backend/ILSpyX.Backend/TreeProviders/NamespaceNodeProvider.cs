@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ILSpyX.Backend.TreeProviders;
 
-public class NamespaceNodeProvider(TreeNodeProviders treeNodeProviders, DecompilerBackend decompilerBackend)
+public class NamespaceNodeProvider(TypeNodeProvider typeNodeProvider, DecompilerBackend decompilerBackend)
     : ITreeNodeProvider
 {
     public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
@@ -21,13 +21,9 @@ public class NamespaceNodeProvider(TreeNodeProviders treeNodeProviders, Decompil
 
     public Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
     {
-        if (nodeMetadata?.Type != NodeType.Namespace)
-        {
-            return Task.FromResult(Enumerable.Empty<Node>());
-        }
-
-        return Task.FromResult(
-            treeNodeProviders.Type.CreateNodes(nodeMetadata.AssemblyPath, nodeMetadata.Name));
+        return Task.FromResult(nodeMetadata?.Type != NodeType.Namespace
+            ? []
+            : typeNodeProvider.CreateNodes(nodeMetadata.AssemblyPath, nodeMetadata.Name));
     }
 
     public IEnumerable<Node> CreateNodes(string assemblyPath)
@@ -35,7 +31,7 @@ public class NamespaceNodeProvider(TreeNodeProviders treeNodeProviders, Decompil
         var decompiler = decompilerBackend.CreateDecompiler(assemblyPath);
         if (decompiler is null)
         {
-            return Enumerable.Empty<Node>();
+            return [];
         }
 
         var types = decompiler.TypeSystem.MainModule.TopLevelTypeDefinitions;
@@ -53,7 +49,8 @@ public class NamespaceNodeProvider(TreeNodeProviders treeNodeProviders, Decompil
                     NodeType.Namespace,
                     ns,
                     0,
-                    0),
+                    0,
+                    true),
                 ns,
                 string.Empty,
                 true

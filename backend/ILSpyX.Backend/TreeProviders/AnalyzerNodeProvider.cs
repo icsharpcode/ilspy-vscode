@@ -69,7 +69,8 @@ public class AnalyzerNodeProvider(
                             MetadataTokens.GetToken(entity.MetadataToken),
                             entity.DeclaringTypeDefinition?.MetadataToken is not null
                                 ? MetadataTokens.GetToken(entity.DeclaringTypeDefinition.MetadataToken)
-                                : 0),
+                                : 0,
+                            IsDecompilable: true),
                         nodeName,
                         location,
                         false,

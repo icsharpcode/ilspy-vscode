@@ -2,6 +2,7 @@ using ICSharpCode.Decompiler.TypeSystem;
 using ILSpyX.Backend.Model;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections;
 
 // ReSharper disable ArrangeAccessorOwnerBody
 
@@ -9,62 +10,54 @@ namespace ILSpyX.Backend.TreeProviders;
 
 public class TreeNodeProviders(IServiceProvider serviceProvider)
 {
-    public DummyTreeNodeProvider Dummy => serviceProvider.GetRequiredService<DummyTreeNodeProvider>();
-
-    public AssemblyTreeRootNodesProvider AssemblyTreeRoot =>
-        serviceProvider.GetRequiredService<AssemblyTreeRootNodesProvider>();
-
-    public AssemblyNodeProvider Assembly =>
-        serviceProvider.GetRequiredService<AssemblyNodeProvider>();
-
-    public ReferencesRootNodeProvider ReferencesRoot =>
-        serviceProvider.GetRequiredService<ReferencesRootNodeProvider>();
-
-    public AssemblyReferenceNodeProvider AssemblyReference =>
-        serviceProvider.GetRequiredService<AssemblyReferenceNodeProvider>();
-
-    public NamespaceNodeProvider Namespace => serviceProvider.GetRequiredService<NamespaceNodeProvider>();
-    public TypeNodeProvider Type => serviceProvider.GetRequiredService<TypeNodeProvider>();
-    public MemberNodeProvider Member => serviceProvider.GetRequiredService<MemberNodeProvider>();
-    public AnalyzersRootNodesProvider AnalyzersRoot => serviceProvider.GetRequiredService<AnalyzersRootNodesProvider>();
-    public AnalyzerNodeProvider Analyzer => serviceProvider.GetRequiredService<AnalyzerNodeProvider>();
-
     public ITreeNodeProvider ForNode(NodeMetadata? nodeMetadata)
     {
         return FromNodeType(nodeMetadata?.Type);
     }
 
-    public ITreeNodeProvider FromNodeType(NodeType? nodeType)
+    private ITreeNodeProvider FromNodeType(NodeType? nodeType)
     {
-        return nodeType switch
+        var providerType = nodeType switch
         {
-            null => AssemblyTreeRoot,
-            NodeType.Assembly => Assembly,
-            NodeType.ReferencesRoot => ReferencesRoot,
-            NodeType.AssemblyReference => AssemblyReference,
-            NodeType.Namespace => Namespace,
-            _ when NodeTypeHelper.IsTypeNode(nodeType.Value) => Type,
-            _ when NodeTypeHelper.IsMemberNode(nodeType.Value) => Member,
-            NodeType.Analyzer => Analyzer,
-            _ => Dummy
+            null => typeof(AssemblyTreeRootNodesProvider),
+            NodeType.Assembly => typeof(AssemblyNodeProvider),
+            NodeType.ReferencesRoot => typeof(ReferencesRootNodeProvider),
+            NodeType.AssemblyReference => typeof(AssemblyReferenceNodeProvider),
+            NodeType.Namespace => typeof(NamespaceNodeProvider),
+            _ when NodeTypeHelper.IsTypeNode(nodeType.Value) => typeof(TypeNodeProvider),
+            _ when NodeTypeHelper.IsMemberNode(nodeType.Value) => typeof(MemberNodeProvider),
+            NodeType.Analyzer => typeof(AnalyzerNodeProvider),
+            NodeType.BaseTypes => typeof(BaseTypesNodeProvider),
+            NodeType.DerivedTypes => typeof(DerivedTypesNodeProvider),
+            _ => typeof(DummyTreeNodeProvider)
         };
+
+        return GetProvider(providerType);
     }
 
     public ITreeNodeProvider FromSymbolKind(SymbolKind symbolKind)
     {
-        return symbolKind switch
+        var providerType = symbolKind switch
         {
-            SymbolKind.TypeDefinition => Type,
-            SymbolKind.Field => Member,
-            SymbolKind.Property => Member,
-            SymbolKind.Indexer => Member,
-            SymbolKind.Event => Member,
-            SymbolKind.Method => Member,
-            SymbolKind.Operator => Member,
-            SymbolKind.Constructor => Member,
-            SymbolKind.Destructor => Member,
-            SymbolKind.Namespace => Namespace,
-            _ => Dummy
+            SymbolKind.TypeDefinition => typeof(TypeNodeProvider),
+            SymbolKind.Field => typeof(MemberNodeProvider),
+            SymbolKind.Property => typeof(MemberNodeProvider),
+            SymbolKind.Indexer => typeof(MemberNodeProvider),
+            SymbolKind.Event => typeof(MemberNodeProvider),
+            SymbolKind.Method => typeof(MemberNodeProvider),
+            SymbolKind.Operator => typeof(MemberNodeProvider),
+            SymbolKind.Constructor => typeof(MemberNodeProvider),
+            SymbolKind.Destructor => typeof(MemberNodeProvider),
+            SymbolKind.Namespace => typeof(NamespaceNodeProvider),
+            _ => typeof(DummyTreeNodeProvider)
         };
+
+        return GetProvider(providerType);
+    }
+
+    private ITreeNodeProvider GetProvider(Type providerType)
+    {
+        return (serviceProvider.GetRequiredService(providerType) as ITreeNodeProvider) ??
+               serviceProvider.GetRequiredService<DummyTreeNodeProvider>();
     }
 }

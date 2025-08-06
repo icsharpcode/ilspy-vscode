@@ -10,13 +10,16 @@ public class MethodAnalyzersTests
     public async Task UsedBy()
     {
         var application = await TestHelper.CreateTestServicesWithAssembly();
-        var treeNodeProviders = application.GetRequiredService<TreeNodeProviders>();
-        var types = await treeNodeProviders.Namespace.GetChildrenAsync(
-            new NodeMetadata(TestHelper.AssemblyPath, NodeType.Namespace, "TestAssembly", 0, 0));
+        var namespaceNodeProvider = application.GetRequiredService<NamespaceNodeProvider>();
+        var typeNodeProvider = application.GetRequiredService<TypeNodeProvider>();
+        var analyzersRootNodeProvider = application.GetRequiredService<AnalyzersRootNodesProvider>();
+        var analyzerNodeProvider = application.GetRequiredService<AnalyzerNodeProvider>();
+        var types = await namespaceNodeProvider.GetChildrenAsync(
+            new NodeMetadata(TestHelper.AssemblyPath, NodeType.Namespace, "TestAssembly", 0, 0, true));
         var typeNode = types.First(node => node.Metadata?.Name == "SomeClass");
-        var members = await treeNodeProviders.Type.GetChildrenAsync(typeNode.Metadata);
+        var members = await typeNodeProvider.GetChildrenAsync(typeNode.Metadata);
         var methodNode = members.First(node => node.Metadata?.Name?.StartsWith("ToString") ?? false);
-        var analyzerNodes = await treeNodeProviders.AnalyzersRoot.GetChildrenAsync(methodNode.Metadata);
+        var analyzerNodes = await analyzersRootNodeProvider.GetChildrenAsync(methodNode.Metadata);
         Assert.Collection(analyzerNodes,
             node => { },
             node => {
@@ -33,7 +36,7 @@ public class MethodAnalyzersTests
             node => { });
 
         var methodUsedByNodes =
-            await treeNodeProviders.Analyzer.GetChildrenAsync(
+            await analyzerNodeProvider.GetChildrenAsync(
                 analyzerNodes.First(analyzer => analyzer.Metadata?.SubType == "MethodUsedByAnalyzer")?.Metadata);
         var callerStructTypeNode = types.First(node => node.Metadata?.Name == "SomeStruct");
         var node = Assert.Single(methodUsedByNodes);
@@ -50,13 +53,17 @@ public class MethodAnalyzersTests
     public async Task UsesDotNetFrameworkSymbol()
     {
         var application = await TestHelper.CreateTestServicesWithAssembly();
-        var treeNodeProviders = application.GetRequiredService<TreeNodeProviders>();
-        var types = await treeNodeProviders.Namespace.GetChildrenAsync(
-            new NodeMetadata(TestHelper.AssemblyPath, NodeType.Namespace, "TestAssembly", 0, 0));
+        var namespaceNodeProvider = application.GetRequiredService<NamespaceNodeProvider>();
+        var memberNodeProvider = application.GetRequiredService<MemberNodeProvider>();
+        var typeNodeProvider = application.GetRequiredService<TypeNodeProvider>();
+        var analyzerNodeProvider = application.GetRequiredService<AnalyzerNodeProvider>();
+        var analyzerRootNodeProvider = application.GetRequiredService<AnalyzersRootNodesProvider>();
+        var types = await namespaceNodeProvider.GetChildrenAsync(
+            new NodeMetadata(TestHelper.AssemblyPath, NodeType.Namespace, "TestAssembly", 0, 0, true));
         var typeNode = types.First(node => node.Metadata?.Name == "SomeClass");
-        var members = await treeNodeProviders.Type.GetChildrenAsync(typeNode.Metadata);
+        var members = await typeNodeProvider.GetChildrenAsync(typeNode.Metadata);
         var methodNode = members.First(node => node.Metadata?.Name?.StartsWith("CallsFrameworkMethod") ?? false);
-        var analyzerNodes = await treeNodeProviders.AnalyzersRoot.GetChildrenAsync(methodNode.Metadata);
+        var analyzerNodes = await analyzerRootNodeProvider.GetChildrenAsync(methodNode.Metadata);
         Assert.Collection(analyzerNodes,
             node => {
                 Assert.Equal("Uses", node.DisplayName);
@@ -72,7 +79,7 @@ public class MethodAnalyzersTests
             node => { });
 
         var methodUsesNodes =
-            await treeNodeProviders.Analyzer.GetChildrenAsync(
+            await analyzerNodeProvider.GetChildrenAsync(
                 analyzerNodes.First(analyzer => analyzer.Metadata?.SubType == "MethodUsesAnalyzer")?.Metadata);
         var node = Assert.Single(methodUsesNodes);
         Assert.Equal("Join(string?, string?[]) : string", node.DisplayName);

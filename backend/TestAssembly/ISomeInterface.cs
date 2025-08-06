@@ -1,7 +1,16 @@
-﻿namespace TestAssembly
+﻿namespace TestAssembly;
+
+public interface ISomeInterface
 {
-    public interface ISomeInterface
-    {
-        int i { get; set; }
-    }
+    int I { get; set; }
+}
+
+public class SomeInterfaceImplementor : ISomeInterface
+{
+    public int I { get; set; }
+}
+
+public interface IDerivedInterface : ISomeInterface
+{
+    int J { get; set; }
 }

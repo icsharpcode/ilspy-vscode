@@ -12,4 +12,5 @@ export default interface NodeMetadata {
   symbolToken: number;
   parentSymbolToken: number;
   subType?: string;
+  isDecompilable: boolean;
 }

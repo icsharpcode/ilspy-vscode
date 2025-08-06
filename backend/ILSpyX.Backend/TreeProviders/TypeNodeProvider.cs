@@ -1,3 +1,4 @@
+using ICSharpCode.Decompiler.TypeSystem;
 using ILSpyX.Backend.Decompiler;
 using ILSpyX.Backend.Model;
 using System.Collections.Generic;
@@ -7,7 +8,11 @@ using System.Threading.Tasks;
 
 namespace ILSpyX.Backend.TreeProviders;
 
-public class TypeNodeProvider(TreeNodeProviders treeNodeProviders, DecompilerBackend decompilerBackend)
+public class TypeNodeProvider(
+    MemberNodeProvider memberNodeProvider,
+    BaseTypesNodeProvider baseTypesNodeProvider,
+    DerivedTypesNodeProvider derivedTypesNodeProvider,
+    DecompilerBackend decompilerBackend)
     : ITreeNodeProvider
 {
     public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
@@ -25,8 +30,14 @@ public class TypeNodeProvider(TreeNodeProviders treeNodeProviders, DecompilerBac
             return [];
         }
 
-        return await treeNodeProviders.Member.CreateNodesAsync(
-            nodeMetadata.AssemblyPath, nodeMetadata.SymbolToken);
+        IEnumerable<Node?> nodes =
+        [
+            baseTypesNodeProvider.CreateNode(nodeMetadata.AssemblyPath, nodeMetadata.SymbolToken),
+            derivedTypesNodeProvider.CreateNode(nodeMetadata)
+        ];
+
+        return nodes.OfType<Node>().Concat(await memberNodeProvider.CreateNodesAsync(
+            nodeMetadata.AssemblyPath, nodeMetadata.SymbolToken));
     }
 
     public IEnumerable<Node> CreateNodes(string assemblyPath, string @namespace)
@@ -34,7 +45,7 @@ public class TypeNodeProvider(TreeNodeProviders treeNodeProviders, DecompilerBac
         var decompiler = decompilerBackend.CreateDecompiler(assemblyPath);
         if (decompiler is null)
         {
-            yield break;
+            return [];
         }
 
         var currentNamespace = decompiler.TypeSystem.MainModule.RootNamespace;
@@ -47,29 +58,32 @@ public class TypeNodeProvider(TreeNodeProviders treeNodeProviders, DecompilerBac
                 var nested = currentNamespace.GetChildNamespace(part);
                 if (nested == null)
                 {
-                    yield break;
+                    return [];
                 }
 
                 currentNamespace = nested;
             }
         }
 
-        foreach (var t in currentNamespace.Types.OrderBy(t => t.FullName))
-        {
-            string name = t.TypeToString(false);
-            yield return new Node(
-                new NodeMetadata(
-                    assemblyPath,
-                    NodeTypeHelper.GetNodeTypeFromTypeKind(t.Kind),
-                    name,
-                    MetadataTokens.GetToken(t.MetadataToken),
-                    0),
+        return currentNamespace.Types.OrderBy(t => t.FullName).Select(t => CreateTypeNode(assemblyPath, t));
+    }
+
+    public static Node CreateTypeNode(string assemblyPath, ITypeDefinition typeDefinition)
+    {
+        string name = typeDefinition.TypeToString(false);
+        return new Node(
+            new NodeMetadata(
+                assemblyPath,
+                NodeTypeHelper.GetNodeTypeFromTypeKind(typeDefinition.Kind),
                 name,
-                "",
-                true,
-                NodeTypeHelper.GetSymbolModifiers(t),
-                NodeFlagsHelper.GetNodeFlags(t)
-            );
-        }
+                MetadataTokens.GetToken(typeDefinition.MetadataToken),
+                0,
+                true),
+            name,
+            "",
+            true,
+            NodeTypeHelper.GetSymbolModifiers(typeDefinition),
+            NodeFlagsHelper.GetNodeFlags(typeDefinition)
+        );
     }
 }

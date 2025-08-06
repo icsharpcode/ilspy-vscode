@@ -64,6 +64,8 @@ public static class ILSpyXServiceCollectionExtensions
             .AddSingleton<TypeNodeProvider>()
             .AddSingleton<MemberNodeProvider>()
             .AddSingleton<AnalyzersRootNodesProvider>()
-            .AddSingleton<AnalyzerNodeProvider>();
+            .AddSingleton<AnalyzerNodeProvider>()
+            .AddSingleton<BaseTypesNodeProvider>()
+            .AddSingleton<DerivedTypesNodeProvider>();
     }
 }

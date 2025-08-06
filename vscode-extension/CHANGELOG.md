@@ -4,6 +4,7 @@ All notable changes to the "ilspy-vscode" extension will be documented in this f
 
 ## 0.22
 
+- Support decompilation of .NET-compiled .wasm files
 - Introduce "Base Types" and "Derived Types" elements for type nodes in tree (works similarly to ILSpy stand-alone
   application)
 - Allow to analyze symbols shown in "Search Results" and "Analyze" panels

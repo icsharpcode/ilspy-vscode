@@ -68,7 +68,7 @@ async function findAssemblies(): Promise<string[]> {
   }
 
   const resources = await vscode.workspace.findFiles(
-    /*include*/ "{**/*.dll,**/*.exe,**/*.winmd,**/*.netmodule}",
+    /*include*/ "{**/*.dll,**/*.exe,**/*.winmd,**/*.netmodule,**/*.wasm}",
     /*exclude*/ "{**/node_modules/**,**/.git/**,**/bower_components/**}"
   );
   return resources
@@ -94,6 +94,7 @@ function createAssemblyQuickPickItem(
       case ".netmodule":
         return "library";
       case ".exe":
+      case ".wasm":
         return "file-binary";
       default:
         return "file";

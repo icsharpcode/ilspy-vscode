@@ -111,6 +111,13 @@ public class TreeNodeProviderTests
         
         Assert.Collection(list,
             node => {
+                Assert.Equal("IDerivedInterface", node.Metadata?.Name);
+                Assert.Equal("IDerivedInterface", node.DisplayName);
+                Assert.Equal(NodeType.Interface, node.Metadata?.Type);
+                Assert.NotEqual(0, node.Metadata?.SymbolToken);
+                Assert.Equal(SymbolModifiers.Public | SymbolModifiers.Abstract, node.SymbolModifiers);
+                Assert.True(node.MayHaveChildren);
+            }, node => {
                 Assert.Equal("ISomeInterface", node.Metadata?.Name);
                 Assert.Equal("ISomeInterface", node.DisplayName);
                 Assert.Equal(NodeType.Interface, node.Metadata?.Type);
@@ -180,14 +187,7 @@ public class TreeNodeProviderTests
             node => {
                 Assert.Equal("Base Types", node.Metadata?.Name);
                 Assert.Equal(NodeType.BaseTypes, node.Metadata?.Type);
-                Assert.Equal(typeNode.Metadata?.SymbolToken, node.Metadata?.ParentSymbolToken);
-                Assert.Equal(SymbolModifiers.None, node.SymbolModifiers);
-                Assert.True(node.MayHaveChildren);
-            },
-            node => {
-                Assert.Equal("Derived Types", node.Metadata?.Name);
-                Assert.Equal(NodeType.DerivedTypes, node.Metadata?.Type);
-                Assert.Equal(typeNode.Metadata?.SymbolToken, node.Metadata?.ParentSymbolToken);
+                Assert.Equal(typeNode.Metadata?.SymbolToken, node.Metadata?.SymbolToken);
                 Assert.Equal(SymbolModifiers.None, node.SymbolModifiers);
                 Assert.True(node.MayHaveChildren);
             },
@@ -293,7 +293,7 @@ public class TreeNodeProviderTests
                 Assert.Equal(NodeType.Interface, node.Metadata?.Type);
                 Assert.NotEqual(0, node.Metadata?.SymbolToken);
                 Assert.Equal(SymbolModifiers.Public | SymbolModifiers.Abstract, node.SymbolModifiers);
-                Assert.False(node.Metadata?.IsDecompilable);
+                Assert.True(node.Metadata?.IsDecompilable);
                 Assert.False(node.MayHaveChildren);
             },
             node => {
@@ -302,7 +302,7 @@ public class TreeNodeProviderTests
                 Assert.Equal(NodeType.Class, node.Metadata?.Type);
                 Assert.NotEqual(0, node.Metadata?.SymbolToken);
                 Assert.Equal(SymbolModifiers.Public, node.SymbolModifiers);
-                Assert.False(node.Metadata?.IsDecompilable);
+                Assert.True(node.Metadata?.IsDecompilable);
                 Assert.False(node.MayHaveChildren);
             }
         );
@@ -339,7 +339,7 @@ public class TreeNodeProviderTests
                 Assert.Equal(NodeType.Class, node.Metadata?.Type);
                 Assert.NotEqual(0, node.Metadata?.SymbolToken);
                 Assert.Equal(SymbolModifiers.Public, node.SymbolModifiers);
-                Assert.False(node.Metadata?.IsDecompilable);
+                Assert.True(node.Metadata?.IsDecompilable);
                 Assert.False(node.MayHaveChildren);
             },
             node => {
@@ -348,7 +348,7 @@ public class TreeNodeProviderTests
                 Assert.Equal(NodeType.Interface, node.Metadata?.Type);
                 Assert.NotEqual(0, node.Metadata?.SymbolToken);
                 Assert.Equal(SymbolModifiers.Public | SymbolModifiers.Abstract, node.SymbolModifiers);
-                Assert.False(node.Metadata?.IsDecompilable);
+                Assert.True(node.Metadata?.IsDecompilable);
                 Assert.False(node.MayHaveChildren);
             }
         );

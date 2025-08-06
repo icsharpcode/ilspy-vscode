@@ -104,7 +104,10 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
   public getTreeItem(node: Node): TreeItem {
     return {
       label: node.displayName,
-      tooltip: node.description,
+      tooltip:
+        node.description.trim().length > 0
+          ? node.description
+          : node.displayName,
       collapsibleState: node.mayHaveChildren
         ? TreeItemCollapsibleState.Collapsed
         : void 0,

@@ -189,7 +189,7 @@
 				{
 					"command": "ilspy.decompileSelectedAssembly",
 					"group": "navigation",
-					"when": "resourceExtname == .dll || resourceExtname == .exe || resourceExtname == .winmd || resourceExtname == .netmodule"
+					"when": "resourceExtname == .dll || resourceExtname == .exe || resourceExtname == .winmd || resourceExtname == .netmodule || resourceExtname == .wasm"
 				}
 			],
 			"editor/context": [

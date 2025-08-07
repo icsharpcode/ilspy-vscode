@@ -103,8 +103,6 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
   }
 
   public getTreeItem(node: Node): TreeItem {
-    const tooltip = new MarkdownString();
-
     return {
       label: node.displayName,
       tooltip: createNodeTooltip(node),

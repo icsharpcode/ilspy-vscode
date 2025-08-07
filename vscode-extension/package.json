@@ -162,7 +162,7 @@
 			},
 			{
 				"command": "ilspy.selectOutputLanguage",
-				"title": "Output language",
+				"title": "Select output language",
 				"category": "ILSpy"
 			},
 			{

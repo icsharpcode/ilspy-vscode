@@ -15,6 +15,7 @@ import {
   ExtensionContext,
   commands,
   Uri,
+  MarkdownString,
 } from "vscode";
 import IILSpyBackend from "./IILSpyBackend";
 import Node from "../protocol/Node";
@@ -27,7 +28,7 @@ import {
 } from "./settings";
 import { getNodeIcon } from "../icons";
 import { NodeFlags } from "../protocol/NodeFlags";
-import { getNodeContextValue, hasNodeFlag } from "./utils";
+import { createNodeTooltip, getNodeContextValue, hasNodeFlag } from "./utils";
 
 export class DecompiledTreeProvider implements TreeDataProvider<Node> {
   private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
@@ -102,12 +103,11 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
   }
 
   public getTreeItem(node: Node): TreeItem {
+    const tooltip = new MarkdownString();
+
     return {
       label: node.displayName,
-      tooltip:
-        node.description.trim().length > 0
-          ? node.description
-          : node.displayName,
+      tooltip: createNodeTooltip(node),
       collapsibleState: node.mayHaveChildren
         ? TreeItemCollapsibleState.Collapsed
         : void 0,

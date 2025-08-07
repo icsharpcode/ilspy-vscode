@@ -21,7 +21,7 @@ import {
   getShowCompilerGeneratedSymbolsSetting,
 } from "../settings";
 import { NodeFlags } from "../../protocol/NodeFlags";
-import { getNodeContextValue, hasNodeFlag } from "../utils";
+import { createNodeTooltip, getNodeContextValue, hasNodeFlag } from "../utils";
 
 interface PerformedSearch {
   term: string;
@@ -72,7 +72,7 @@ export class SearchResultTreeProvider
       return {
         label: node.displayName,
         description: node.description,
-        tooltip: node.description,
+        tooltip: createNodeTooltip(node),
         collapsibleState: TreeItemCollapsibleState.None,
         command: {
           command: "ilspy.decompileNode",

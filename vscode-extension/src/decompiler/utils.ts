@@ -1,4 +1,4 @@
-import { TreeItemCollapsibleState } from "vscode";
+import { MarkdownString, TreeItemCollapsibleState } from "vscode";
 import Node from "../protocol/Node";
 import { NodeType } from "../protocol/NodeType";
 import { NodeFlags } from "../protocol/NodeFlags";
@@ -42,6 +42,21 @@ export function getNodeContextValue(node: Node) {
   }
 
   return undefined;
+}
+
+export function createNodeTooltip(node: Node) {
+  const tooltip = new MarkdownString();
+  const description = node.description.trim();
+  if (description.length > 0) {
+    tooltip.appendMarkdown("**");
+    tooltip.appendText(node.displayName);
+    tooltip.appendMarkdown("**\n\n");
+    tooltip.appendText(description);
+  } else {
+    tooltip.appendText(node.displayName);
+  }
+
+  return tooltip;
 }
 
 export function hasNodeFlag(node: Node, flag: NodeFlags) {

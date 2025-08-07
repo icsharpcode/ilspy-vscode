@@ -18,6 +18,7 @@ import Node from "../../protocol/Node";
 import { NodeType } from "../../protocol/NodeType";
 import { getNodeIcon } from "../../icons";
 import {
+  createNodeTooltip,
   getNodeContextValue,
   getTreeNodeCollapsibleState,
   hasNodeFlag,
@@ -90,7 +91,7 @@ export class AnalyzeResultTreeProvider
       return {
         label: node.displayName,
         description: node.description,
-        tooltip: node.description,
+        tooltip: createNodeTooltip(node),
         collapsibleState: getTreeNodeCollapsibleState(node),
         command: {
           command: "ilspy.decompileNode",

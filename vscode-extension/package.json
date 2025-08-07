@@ -247,20 +247,32 @@
 					"when": "ilspy.backendAvailable"
 				},
 				{
-					"command": "ilspy.unloadAssembly",
-					"when": "ilspy.backendAvailable"
-				},
-				{
-					"command": "ilspy.reloadAssembly",
-					"when": "ilspy.backendAvailable"
-				},
-				{
 					"command": "ilspy.selectOutputLanguage",
 					"when": "resourceScheme == ilspy"
 				},
 				{
 					"command": "ilspy.search",
 					"when": "ilspy.backendAvailable && ilspy.treeWithNodes"
+				},
+				{
+					"command": "ilspy.decompileSelectedAssembly",
+					"when": "false"
+				},
+				{
+					"command": "ilspy.searchEditorSelection",
+					"when": "false"
+				},
+				{
+					"command": "ilspy.analyze",
+					"when": "false"
+				},
+				{
+					"command": "ilspy.reloadAssembly",
+					"when": "false"
+				},
+				{
+					"command": "ilspy.unloadAssembly",
+					"when": "false"
 				}
 			]
 		},

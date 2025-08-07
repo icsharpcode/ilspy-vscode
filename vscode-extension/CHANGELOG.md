@@ -9,6 +9,7 @@ All notable changes to the "ilspy-vscode" extension will be documented in this f
   application)
 - Allow to analyze symbols shown in "Search Results" and "Analyze" panels
 - Fix: "Analyze" command was not available for fields
+- Fix: Remove context menu commands from general command palette, since they were not functional there
 
 ## 0.21
 

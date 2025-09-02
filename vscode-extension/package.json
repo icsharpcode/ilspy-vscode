@@ -327,7 +327,7 @@
 		"eslint": "^9.34.0",
 		"glob": "^11.0.3",
 		"minimist": "^1.2.8",
-		"mocha": "^11.7.1",
+		"mocha": "^11.7.2",
 		"terser-webpack-plugin": "^5.3.14",
 		"ts-loader": "^9.5.4",
 		"typescript": "^5.9.2",

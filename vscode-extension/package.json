@@ -305,7 +305,7 @@
 		"test": "node ./out/test/runTest.js"
 	},
 	"dependencies": {
-		"ansi-regex": "^6.2.0",
+		"ansi-regex": "^6.2.2",
 		"chai": "^6.0.1",
 		"os": "^0.1.2",
 		"path": "^0.12.7",

@@ -310,7 +310,7 @@
 		"os": "^0.1.2",
 		"path": "^0.12.7",
 		"temp-dir": "^3.0.0",
-		"terser": "^5.43.1",
+		"terser": "^5.44.0",
 		"vscode-languageclient": "^9.0.1",
 		"brace-expansion": "4.0.1"
 	},

@@ -2,6 +2,10 @@
 
 All notable changes to the "ilspy-vscode" extension will be documented in this file.
 
+## 0.23
+
+- New ILSpy activity bar icon for our view containers (thanks to @banditoth for the icon!)
+
 ## 0.22
 
 - Support decompilation of .NET-compiled .wasm files

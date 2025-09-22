@@ -93,12 +93,12 @@
 				{
 					"id": "ilspySearchResultsContainer",
 					"title": "ILSpy: Search Results",
-					"icon": ""
+					"icon": "resources/il-spy-modern-icon.svg"
 				},
 				{
 					"id": "ilspyAnalyzeResultsContainer",
 					"title": "ILSpy: Analyze",
-					"icon": ""
+					"icon": "resources/il-spy-modern-icon.svg"
 				}
 			]
 		},
@@ -107,21 +107,24 @@
 				{
 					"id": "ilspyDecompiledMembers",
 					"name": "ILSpy: Assemblies",
-					"when": "ilspy.backendAvailable"
+					"when": "ilspy.backendAvailable",
+					"icon": "resources/il-spy-modern-icon.svg"
 				}
 			],
 			"ilspySearchResultsContainer": [
 				{
 					"id": "ilspySearchResultsContainer",
 					"name": "ILSpy: Search Results",
-					"when": "ilspy.searchResultsToShow"
+					"when": "ilspy.searchResultsToShow",
+					"icon": "resources/il-spy-modern-icon.svg"
 				}
 			],
 			"ilspyAnalyzeResultsContainer": [
 				{
 					"id": "ilspyAnalyzeResultsContainer",
 					"name": "ILSpy: Analyze",
-					"when": "ilspy.analyzeResultsToShow"
+					"when": "ilspy.analyzeResultsToShow",
+					"icon": "resources/il-spy-modern-icon.svg"
 				}
 			]
 		},

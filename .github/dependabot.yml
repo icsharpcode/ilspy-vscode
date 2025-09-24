@@ -11,6 +11,8 @@ updates:
     directory: "/vscode-extension/"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 3
     ignore:
       - dependency-name: "@types/vscode"
       - dependency-name: "@types/node"
@@ -33,6 +35,8 @@ updates:
       - "/backend/"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 5
     groups:
       major-minor-dependencies:
         update-types:

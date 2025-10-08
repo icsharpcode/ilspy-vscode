@@ -85,7 +85,7 @@ export class AnalyzeResultTreeProvider
       return {
         label: node.displayName,
         collapsibleState: getTreeNodeCollapsibleState(node),
-        iconPath: new ThemeIcon(getNodeIcon(node.metadata?.type)),
+        iconPath: getNodeIcon(node.metadata?.type),
       };
     } else {
       return {
@@ -99,7 +99,7 @@ export class AnalyzeResultTreeProvider
           title: "Decompile",
         },
         contextValue: getNodeContextValue(node),
-        iconPath: new ThemeIcon(getNodeIcon(node.metadata?.type)),
+        iconPath: getNodeIcon(node.metadata?.type),
       };
     }
   }

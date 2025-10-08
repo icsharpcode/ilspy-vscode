@@ -22,4 +22,7 @@ export enum NodeType {
   Analyzer = 15,
   BaseTypes = 16,
   DerivedTypes = 17,
+  NuGetPackage = 18,
+  PackageFolder = 19,
+  Resource = 20,
 }

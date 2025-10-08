@@ -16,10 +16,7 @@ import {
 import IILSpyBackend from "../IILSpyBackend";
 import Node from "../../protocol/Node";
 import { getNodeIcon } from "../../icons";
-import {
-  getAutoLoadDependenciesSetting,
-  getShowCompilerGeneratedSymbolsSetting,
-} from "../settings";
+import { getShowCompilerGeneratedSymbolsSetting } from "../settings";
 import { NodeFlags } from "../../protocol/NodeFlags";
 import { createNodeTooltip, getNodeContextValue, hasNodeFlag } from "../utils";
 
@@ -80,7 +77,7 @@ export class SearchResultTreeProvider
           title: "Decompile",
         },
         contextValue: getNodeContextValue(node),
-        iconPath: new ThemeIcon(getNodeIcon(node.metadata?.type)),
+        iconPath: getNodeIcon(node.metadata?.type),
       };
     }
   }

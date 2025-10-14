@@ -31,6 +31,8 @@ const ProductIconMapping: {
   [NodeType.BaseTypes]: { id: "arrow-up" },
   [NodeType.DerivedTypes]: { id: "arrow-down" },
   [NodeType.NuGetPackage]: { customIcon: "nuget" },
+  [NodeType.PackageFolder]: { id: "folder" },
+  [NodeType.Resource]: { id: "file" },
 };
 
 export function getNodeIcon(nodeType: NodeType | undefined) {

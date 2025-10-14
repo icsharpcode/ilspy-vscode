@@ -7,7 +7,9 @@ using System.Threading.Tasks;
 
 namespace ILSpyX.Backend.TreeProviders;
 
-public class NuGetPackageNodeProvider : ITreeNodeProvider
+public class NuGetPackageNodeProvider(
+    SingleThreadAssemblyList assemblyList,
+    PackageFolderNodeProvider packageFolderNodeProvider) : ITreeNodeProvider
 {
     public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
     {
@@ -33,8 +35,26 @@ public class NuGetPackageNodeProvider : ITreeNodeProvider
         };
     }
 
-    public Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
+    public async Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
     {
-        return Task.FromResult(Enumerable.Empty<Node>());
+        if (nodeMetadata is null)
+        {
+            return [];
+        }
+
+        var assembly = assemblyList.FindAssembly(nodeMetadata.AssemblyPath);
+        if (assembly is null)
+        {
+            return [];
+        }
+
+        var package = (await assembly.GetLoadResultAsync()).Package;
+        if (package is null)
+        {
+            return [];
+        }
+
+        return await packageFolderNodeProvider.GetPackageFolderChildrenAsync(nodeMetadata.AssemblyPath,
+            package.RootFolder);
     }
 }

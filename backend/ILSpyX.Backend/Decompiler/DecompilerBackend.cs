@@ -41,50 +41,12 @@ public class DecompilerBackend(
             var loadedAssembly = await assemblyList.AddAssembly(path);
             if (loadedAssembly is not null)
             {
-                return await CreateAssemblyDataAsync(loadedAssembly);
+                return await AssemblyUtility.CreateAssemblyDataAsync(loadedAssembly);
             }
         }
         catch (Exception ex)
         {
             logger?.LogError("An exception occurred when reading assembly {assembly}: {exception}", path, ex);
-        }
-
-        return null;
-    }
-
-    private async Task<AssemblyData?> CreateAssemblyDataAsync(LoadedAssembly loadedAssembly)
-    {
-        var loadResult = await loadedAssembly.GetLoadResultAsync();
-        if (loadResult.MetadataFile is not null)
-        {
-            var version = loadResult.MetadataFile.Metadata.GetAssemblyDefinition().Version;
-            string targetFrameworkId = await loadedAssembly.GetTargetFrameworkIdAsync();
-            return new AssemblyData
-            {
-                Name = loadedAssembly.ShortName,
-                FilePath = loadedAssembly.FileName,
-                IsAutoLoaded = loadedAssembly.IsAutoLoaded,
-                Version = version.ToString(),
-                TargetFramework = !string.IsNullOrEmpty(targetFrameworkId)
-                    ? targetFrameworkId.Replace("Version=", " ")
-                    : null,
-                PackageType = PackageType.None
-            };
-        }
-
-        if (loadResult.Package is not null)
-        {
-            return new AssemblyData
-            {
-                Name = loadedAssembly.ShortName,
-                FilePath = loadedAssembly.FileName,
-                IsAutoLoaded = loadedAssembly.IsAutoLoaded,
-                PackageType = loadResult.Package.Kind switch
-                {
-                    LoadedPackage.PackageKind.Zip => PackageType.NuGet,
-                    _ => PackageType.Other
-                }
-            };
         }
 
         return null;
@@ -130,7 +92,7 @@ public class DecompilerBackend(
     {
         return (await Task.WhenAll(
                 assemblyList.GetAllAssemblies()
-                    .Select(async loadedAssembly => await CreateAssemblyDataAsync(loadedAssembly))))
+                    .Select(async loadedAssembly => await AssemblyUtility.CreateAssemblyDataAsync(loadedAssembly))))
             .Where(data => data is not null)
             .Cast<AssemblyData>();
     }

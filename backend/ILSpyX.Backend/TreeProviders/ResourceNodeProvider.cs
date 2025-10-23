@@ -16,13 +16,14 @@ public class ResourceNodeProvider : ITreeNodeProvider
         return DecompileResult.WithCode($"// {nodeMetadata.Name}");
     }
 
-    public Node CreateNode(string assemblyPath, Resource entry, string relativePath = "")
+    public Node CreateNode(AssemblyFileIdentifier assemblyFile, Resource entry, string relativePath = "")
     {
         return new Node
         {
             Metadata = new NodeMetadata
             {
-                AssemblyPath = assemblyPath,
+                AssemblyPath = assemblyFile.File,
+                BundleSubPath = assemblyFile.BundleSubPath,
                 Name = $"{relativePath}/{entry.Name}",
                 Type = NodeType.Resource,
                 IsDecompilable = true,

@@ -14,9 +14,9 @@ public class AssemblyReferenceNodeProvider(DecompilerBackend decompilerBackend) 
         return DecompileResult.WithCode(code);
     }
 
-    public Task<IEnumerable<Node>> CreateNodesAsync(string assemblyPath)
+    public Task<IEnumerable<Node>> CreateNodesAsync(AssemblyFileIdentifier assemblyFile)
     {
-        var decompiler = decompilerBackend.CreateDecompiler(assemblyPath);
+        var decompiler = decompilerBackend.CreateDecompiler(assemblyFile);
         if (decompiler is null)
         {
             return Task.FromResult(Enumerable.Empty<Node>());
@@ -39,7 +39,8 @@ public class AssemblyReferenceNodeProvider(DecompilerBackend decompilerBackend) 
                 {
                     Metadata = new NodeMetadata
                     {
-                        AssemblyPath = assemblyPath,
+                        AssemblyPath = assemblyFile.File,
+                        BundleSubPath = assemblyFile.BundleSubPath,
                         Type = NodeType.AssemblyReference,
                         Name = reference,
                         IsDecompilable = true

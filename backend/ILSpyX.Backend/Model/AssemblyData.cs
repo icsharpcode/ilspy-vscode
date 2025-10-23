@@ -17,5 +17,6 @@ public record AssemblyData()
     public required bool IsAutoLoaded { get; init; }
     public string? Version { get; init; }
     public string? TargetFramework { get; init; }
+    public string? ParentBundleFilePath { get; init; }
     public PackageType PackageType { get; init; } = PackageType.None;
 }

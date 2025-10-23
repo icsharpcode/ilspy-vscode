@@ -14,7 +14,7 @@ public class ReferencesRootNodeProvider(
     public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
     {
         string code = string.Join('\n',
-            GetAssemblyReferences(nodeMetadata.AssemblyPath)
+            GetAssemblyReferences(nodeMetadata.GetAssemblyFileIdentifier())
                 .Select(reference => $"// {reference}"));
         return DecompileResult.WithCode(code);
     }
@@ -26,12 +26,12 @@ public class ReferencesRootNodeProvider(
             return [];
         }
 
-        return await assemblyReferenceNodeProvider.CreateNodesAsync(nodeMetadata.AssemblyPath);
+        return await assemblyReferenceNodeProvider.CreateNodesAsync(nodeMetadata.GetAssemblyFileIdentifier());
     }
 
-    private IEnumerable<string> GetAssemblyReferences(string assemblyPath)
+    private IEnumerable<string> GetAssemblyReferences(AssemblyFileIdentifier assemblyFile)
     {
-        var decompiler = decompilerBackend.CreateDecompiler(assemblyPath);
+        var decompiler = decompilerBackend.CreateDecompiler(assemblyFile);
         if (decompiler is null)
         {
             return [];
@@ -50,14 +50,17 @@ public class ReferencesRootNodeProvider(
         return references.OrderBy(n => n);
     }
 
-    public Node CreateNode(string assemblyPath)
+    public Node CreateNode(AssemblyFileIdentifier assemblyFile)
     {
         return new Node
         {
             Metadata =
                 new NodeMetadata
                 {
-                    AssemblyPath = assemblyPath, Type = NodeType.ReferencesRoot, Name = "References"
+                    AssemblyPath = assemblyFile.File,
+                    BundleSubPath = assemblyFile.BundleSubPath,
+                    Type = NodeType.ReferencesRoot,
+                    Name = "References"
                 },
             DisplayName = "References",
             Description = string.Empty,

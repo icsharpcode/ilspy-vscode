@@ -33,6 +33,7 @@ public class DerivedTypesNodeProvider(SingleThreadAssemblyList assemblyList, Dec
             Metadata = new NodeMetadata
             {
                 AssemblyPath = parentNodeMetadata.AssemblyPath,
+                BundleSubPath = parentNodeMetadata.BundleSubPath,
                 Type = NodeType.DerivedTypes,
                 Name = "Derived Types",
                 SymbolToken = parentNodeMetadata.SymbolToken,
@@ -49,7 +50,8 @@ public class DerivedTypesNodeProvider(SingleThreadAssemblyList assemblyList, Dec
         return Task.FromResult(FindDerivedTypes(nodeMetadata)
             .ToBlockingEnumerable().Select(derivedType => {
                 var typeNode =
-                    TypeNodeProvider.CreateTypeNode(derivedType.ParentModule?.MetadataFile?.FileName ?? string.Empty,
+                    TypeNodeProvider.CreateTypeNode(
+                        new AssemblyFileIdentifier(derivedType.ParentModule?.MetadataFile?.FileName ?? string.Empty),
                         derivedType);
                 return typeNode with
                 {
@@ -118,7 +120,7 @@ public class DerivedTypesNodeProvider(SingleThreadAssemblyList assemblyList, Dec
             return null;
         }
 
-        var decompiler = decompilerBackend.CreateDecompiler(nodeMetadata.AssemblyPath);
+        var decompiler = decompilerBackend.CreateDecompiler(nodeMetadata.GetAssemblyFileIdentifier());
         var typeSystem = decompiler?.TypeSystem;
         return typeSystem?.MainModule.GetDefinition(
             MetadataTokens.TypeDefinitionHandle(nodeMetadata.SymbolToken));

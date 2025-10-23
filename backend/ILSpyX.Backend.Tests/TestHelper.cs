@@ -11,15 +11,12 @@ public class TestHelper
         }
     }
 
-    public static string NuGetPackagePath {
-        get {
-            return Path.Combine(
-                (Path.GetDirectoryName(Path.GetDirectoryName(typeof(TestHelper).Assembly.Location)) ?? "").Replace(
-                    "ILSpyX.Backend.Tests/", "TestAssembly/"),
-                "TestAssembly.1.0.0.nupkg");
-        }
-    }
+    public static string NuGetPackagePath { get; } = Path.Combine(
+        (Path.GetDirectoryName(Path.GetDirectoryName(typeof(TestHelper).Assembly.Location)) ?? "").Replace(
+            "ILSpyX.Backend.Tests/", "TestAssembly/"),
+        "TestAssembly.1.0.0.nupkg");
 
+    public static string TestAssemblyNuGetBundlePath { get; } = "lib/net8.0/TestAssembly.dll";
 
     public static ILSpyXBackendServices CreateTestServices()
     {

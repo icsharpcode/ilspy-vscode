@@ -73,9 +73,9 @@ public class DecompilerBackend(
         return (result, autoLoadedAssembliesBefore.Count() != autoLoadedAssembliesAfter.Count());
     }
 
-    public CSharpDecompiler? CreateDecompiler(string assembly, string? outputLanguage = null)
+    public CSharpDecompiler? CreateDecompiler(AssemblyFileIdentifier assemblyFile, string? outputLanguage = null)
     {
-        var loadedAssembly = assemblyList.FindAssembly(assembly);
+        var loadedAssembly = assemblyList.FindAssembly(assemblyFile.File);
         var metadataFile = loadedAssembly?.GetMetadataFileOrNull();
         if (loadedAssembly is not null && metadataFile is not null)
         {
@@ -97,20 +97,20 @@ public class DecompilerBackend(
             .Cast<AssemblyData>();
     }
 
-    public IEnumerable<MemberData> GetMembers(string? assemblyPath, TypeDefinitionHandle handle)
+    public IEnumerable<MemberData> GetMembers(AssemblyFileIdentifier assemblyFile, TypeDefinitionHandle handle)
     {
-        if (handle.IsNil || (assemblyPath is null))
+        if (handle.IsNil)
         {
             return [];
         }
 
-        var loadedAssembly = assemblyList.FindAssembly(assemblyPath);
+        var loadedAssembly = assemblyList.FindAssembly(assemblyFile.File);
         if (loadedAssembly is null)
         {
             return [];
         }
 
-        var decompiler = CreateDecompiler(assemblyPath);
+        var decompiler = CreateDecompiler(assemblyFile);
         if (decompiler is null)
         {
             return [];
@@ -143,25 +143,20 @@ public class DecompilerBackend(
         }
     }
 
-    public DecompileResult GetCode(string? assemblyPath, EntityHandle handle, string outputLanguage)
+    public DecompileResult GetCode(AssemblyFileIdentifier assemblyFile, EntityHandle handle, string outputLanguage)
     {
-        if (assemblyPath is not null)
+        return outputLanguage switch
         {
-            return outputLanguage switch
-            {
-                LanguageName.IL => DecompileResult.WithCode(GetILCode(assemblyPath, handle)),
-                _ => DecompileResult.WithCode(GetCSharpCode(assemblyPath, handle, outputLanguage))
-            };
-        }
-
-        return DecompileResult.WithError("No assembly given");
+            LanguageName.IL => DecompileResult.WithCode(GetILCode(assemblyFile, handle)),
+            _ => DecompileResult.WithCode(GetCSharpCode(assemblyFile, handle, outputLanguage))
+        };
     }
 
-    public IEntity? GetEntityFromHandle(string assemblyPath, EntityHandle handle)
+    public IEntity? GetEntityFromHandle(AssemblyFileIdentifier assemblyFile, EntityHandle handle)
     {
         if (!handle.IsNil)
         {
-            var decompiler = CreateDecompiler(assemblyPath);
+            var decompiler = CreateDecompiler(assemblyFile);
             if (decompiler is not null)
             {
                 var module = decompiler.TypeSystem.MainModule;
@@ -180,14 +175,14 @@ public class DecompilerBackend(
         return null;
     }
 
-    private string GetCSharpCode(string assemblyPath, EntityHandle handle, string outputLanguage)
+    private string GetCSharpCode(AssemblyFileIdentifier assemblyFile, EntityHandle handle, string outputLanguage)
     {
         if (handle.IsNil)
         {
             return string.Empty;
         }
 
-        var decompiler = CreateDecompiler(assemblyPath, outputLanguage);
+        var decompiler = CreateDecompiler(assemblyFile, outputLanguage);
         if (decompiler is null)
         {
             return string.Empty;
@@ -198,7 +193,7 @@ public class DecompilerBackend(
         switch (handle.Kind)
         {
             case HandleKind.AssemblyDefinition:
-                return GetAssemblyCode(assemblyPath, decompiler);
+                return GetAssemblyCode(assemblyFile.File, decompiler);
             case HandleKind.TypeDefinition:
                 var typeDefinition = module.GetDefinition((TypeDefinitionHandle) handle);
                 if (typeDefinition.DeclaringType == null)
@@ -214,14 +209,14 @@ public class DecompilerBackend(
         return string.Empty;
     }
 
-    private string GetILCode(string assemblyPath, EntityHandle handle)
+    private string GetILCode(AssemblyFileIdentifier assemblyFile, EntityHandle handle)
     {
         if (handle.IsNil)
         {
             return string.Empty;
         }
 
-        var decompiler = CreateDecompiler(assemblyPath);
+        var decompiler = CreateDecompiler(assemblyFile);
         if (decompiler is null)
         {
             return string.Empty;
@@ -229,12 +224,12 @@ public class DecompilerBackend(
 
         var module = decompiler.TypeSystem.MainModule;
         var textOutput = new PlainTextOutput();
-        var disassembler = CreateDisassembler(assemblyPath, module, textOutput);
+        var disassembler = CreateDisassembler(assemblyFile.File, module, textOutput);
 
         switch (handle.Kind)
         {
             case HandleKind.AssemblyDefinition:
-                GetAssemblyILCode(disassembler, assemblyPath, module, textOutput);
+                GetAssemblyILCode(disassembler, assemblyFile.File, module, textOutput);
                 return textOutput.ToString();
             case HandleKind.TypeDefinition:
                 disassembler.DisassembleType(module.MetadataFile, (TypeDefinitionHandle) handle);
@@ -366,20 +361,20 @@ public class DecompilerBackend(
         output.WriteLine($"// {s}");
     }
 
-    public IEnumerable<MemberData> ListTypes(string? assemblyPath, string? @namespace)
+    public IEnumerable<MemberData> ListTypes(AssemblyFileIdentifier assemblyFile, string? @namespace)
     {
-        if ((assemblyPath == null) || (@namespace == null))
+        if (@namespace == null)
         {
             yield break;
         }
 
-        var loadedAssembly = assemblyList.FindAssembly(assemblyPath);
+        var loadedAssembly = assemblyList.FindAssembly(assemblyFile.File);
         if (loadedAssembly is null)
         {
             yield break;
         }
 
-        var decompiler = CreateDecompiler(assemblyPath);
+        var decompiler = CreateDecompiler(assemblyFile);
         if (decompiler is null)
         {
             yield break;

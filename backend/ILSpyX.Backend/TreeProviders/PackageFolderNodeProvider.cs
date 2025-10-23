@@ -46,7 +46,7 @@ public class PackageFolderNodeProvider(ResourceNodeProvider resourceNodeProvider
             }
 
             folder = nextFolder;
-            path += $"/{pathPart}";
+            path += $"{pathPart}/";
         }
 
         return await GetPackageFolderChildrenAsync(nodeMetadata.AssemblyPath, folder, path);
@@ -73,6 +73,7 @@ public class PackageFolderNodeProvider(ResourceNodeProvider resourceNodeProvider
                 Metadata = new NodeMetadata
                 {
                     AssemblyPath = packagePath,
+                    BundleSubPath = $"{rootPath}/{newName}",
                     Type = NodeType.PackageFolder,
                     Name = $"{rootPath}/{newName}",
                     IsDecompilable = false
@@ -92,7 +93,7 @@ public class PackageFolderNodeProvider(ResourceNodeProvider resourceNodeProvider
                 var asm = root.ResolveFileName(entry.Name);
                 if (asm is not null)
                 {
-                    var assemblyNode = await AssemblyUtility.CreateAssemblyDataAsync(asm);
+                    var assemblyNode = await AssemblyUtility.CreateAssemblyDataAsync(asm, rootPath);
                     if (assemblyNode is not null)
                     {
                         children.Add(AssemblyNodeProvider.CreateNode(assemblyNode));
@@ -100,12 +101,15 @@ public class PackageFolderNodeProvider(ResourceNodeProvider resourceNodeProvider
                 }
                 else
                 {
-                    children.Add(resourceNodeProvider.CreateNode(packagePath, entry, rootPath));
+                    children.Add(
+                        resourceNodeProvider.CreateNode(new AssemblyFileIdentifier(packagePath, entry.FullName), entry,
+                            rootPath));
                 }
             }
             else
             {
-                children.Add(resourceNodeProvider.CreateNode(packagePath, entry, rootPath));
+                children.Add(resourceNodeProvider.CreateNode(new AssemblyFileIdentifier(packagePath, entry.FullName),
+                    entry, rootPath));
             }
         }
 

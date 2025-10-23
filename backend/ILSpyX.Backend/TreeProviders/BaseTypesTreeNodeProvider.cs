@@ -28,7 +28,8 @@ public class BaseTypesNodeProvider(SingleThreadAssemblyList assemblyList)
         return Task.FromResult(GetBaseTypes(nodeMetadata.AssemblyPath, nodeMetadata.SymbolToken)
             .Select(baseType => {
                 var typeNode =
-                    TypeNodeProvider.CreateTypeNode(baseType.ParentModule?.MetadataFile?.FileName ?? string.Empty,
+                    TypeNodeProvider.CreateTypeNode(
+                        new AssemblyFileIdentifier(baseType.ParentModule?.MetadataFile?.FileName ?? string.Empty),
                         baseType);
                 return typeNode with
                 {
@@ -38,9 +39,9 @@ public class BaseTypesNodeProvider(SingleThreadAssemblyList assemblyList)
             }));
     }
 
-    public Node? CreateNode(string assemblyPath, int typeSymbolToken)
+    public Node? CreateNode(AssemblyFileIdentifier assemblyFile, int typeSymbolToken)
     {
-        if (!GetBaseTypes(assemblyPath, typeSymbolToken).Any())
+        if (!GetBaseTypes(assemblyFile.File, typeSymbolToken).Any())
         {
             return null;
         }
@@ -49,7 +50,8 @@ public class BaseTypesNodeProvider(SingleThreadAssemblyList assemblyList)
         {
             Metadata = new NodeMetadata
             {
-                AssemblyPath = assemblyPath,
+                AssemblyPath = assemblyFile.File,
+                BundleSubPath = assemblyFile.BundleSubPath,
                 Type = NodeType.BaseTypes,
                 Name = "Base Types",
                 SymbolToken = typeSymbolToken,

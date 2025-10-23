@@ -1,12 +1,15 @@
 using ICSharpCode.ILSpyX;
 using ILSpyX.Backend.Model;
+using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace ILSpyX.Backend.Decompiler;
 
 public static class AssemblyUtility
 {
-    public static async Task<AssemblyData?> CreateAssemblyDataAsync(LoadedAssembly loadedAssembly)
+    public static async Task<AssemblyData?> CreateAssemblyDataAsync(LoadedAssembly loadedAssembly,
+        string? rootPath = null)
     {
         var loadResult = await loadedAssembly.GetLoadResultAsync();
         if (loadResult.MetadataFile is not null)
@@ -16,7 +19,8 @@ public static class AssemblyUtility
             return new AssemblyData
             {
                 Name = loadedAssembly.ShortName,
-                FilePath = loadedAssembly.FileName,
+                FilePath = Path.Combine(rootPath ?? "", loadedAssembly.FileName),
+                ParentBundleFilePath = loadedAssembly.ParentBundle?.FileName,
                 IsAutoLoaded = loadedAssembly.IsAutoLoaded,
                 Version = version.ToString(),
                 TargetFramework = !string.IsNullOrEmpty(targetFrameworkId)

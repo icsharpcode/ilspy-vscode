@@ -11,7 +11,7 @@ public class TreeNodeDecompilationTests
     private static int GetTypeToken(DecompilerBackend decompilerBackend, string @namespace, string name)
     {
         return decompilerBackend
-            .ListTypes(TestHelper.AssemblyPath, @namespace)
+            .ListTypes(new AssemblyFileIdentifier(TestHelper.AssemblyPath), @namespace)
             .Where(memberData => memberData.Name == name)
             .Select(memberData => memberData.Token)
             .FirstOrDefault();
@@ -20,7 +20,8 @@ public class TreeNodeDecompilationTests
     private static int GetMemberToken(DecompilerBackend decompilerBackend, int parentTypeToken, string name)
     {
         return decompilerBackend
-            .GetMembers(TestHelper.AssemblyPath, MetadataTokens.TypeDefinitionHandle(parentTypeToken))
+            .GetMembers(new AssemblyFileIdentifier(TestHelper.AssemblyPath),
+                MetadataTokens.TypeDefinitionHandle(parentTypeToken))
             .Where(memberData => memberData.Name == name)
             .Select(memberData => memberData.Token)
             .FirstOrDefault();

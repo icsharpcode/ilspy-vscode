@@ -42,7 +42,7 @@ public class AnalyzerNodeProvider(
         };
 
         var nodeEntity = decompilerBackend.GetEntityFromHandle(
-            nodeMetadata.AssemblyPath, MetadataTokens.EntityHandle(nodeMetadata.SymbolToken));
+            nodeMetadata.GetAssemblyFileIdentifier(), MetadataTokens.EntityHandle(nodeMetadata.SymbolToken));
         if (nodeEntity is null || !analyzer.Show(nodeEntity))
         {
             return Task.FromResult(Enumerable.Empty<Node>());
@@ -87,7 +87,7 @@ public class AnalyzerNodeProvider(
         }
 
         var nodeEntity = decompilerBackend.GetEntityFromHandle(
-            nodeMetadata.AssemblyPath, MetadataTokens.EntityHandle(nodeMetadata.SymbolToken));
+            nodeMetadata.GetAssemblyFileIdentifier(), MetadataTokens.EntityHandle(nodeMetadata.SymbolToken));
         if (nodeEntity is null || !analyzer.Instance.Show(nodeEntity))
         {
             return null;

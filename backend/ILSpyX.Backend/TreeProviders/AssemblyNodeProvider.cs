@@ -17,7 +17,7 @@ public class AssemblyNodeProvider(
     public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
     {
         return decompilerBackend.GetCode(
-            nodeMetadata.AssemblyPath, EntityHandle.AssemblyDefinition, outputLanguage);
+            nodeMetadata.GetAssemblyFileIdentifier(), EntityHandle.AssemblyDefinition, outputLanguage);
     }
 
     public Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
@@ -27,9 +27,10 @@ public class AssemblyNodeProvider(
             return Task.FromResult(Enumerable.Empty<Node>());
         }
 
+        var assemblyFile = nodeMetadata.GetAssemblyFileIdentifier();
         return Task.FromResult(
-            new[] { referencesRootNodeProvider.CreateNode(nodeMetadata.AssemblyPath) }
-                .Concat(namespaceNodeProvider.CreateNodes(nodeMetadata.AssemblyPath)));
+            new[] { referencesRootNodeProvider.CreateNode(assemblyFile) }
+                .Concat(namespaceNodeProvider.CreateNodes(assemblyFile)));
     }
 
     public static Node CreateNode(AssemblyData assemblyData)
@@ -38,13 +39,14 @@ public class AssemblyNodeProvider(
         {
             Metadata = new NodeMetadata
             {
-                AssemblyPath = assemblyData.FilePath,
+                AssemblyPath = assemblyData.ParentBundleFilePath ?? assemblyData.FilePath,
+                BundleSubPath = assemblyData.ParentBundleFilePath is not null ? assemblyData.FilePath : null,
                 Type = NodeType.Assembly,
                 Name = Path.GetFileName(assemblyData.FilePath),
                 IsDecompilable = true
             },
             DisplayName = GetAssemblyDisplayText(assemblyData),
-            Description = assemblyData.FilePath,
+            Description = Path.GetFileName(assemblyData.FilePath),
             MayHaveChildren = true,
             SymbolModifiers = SymbolModifiers.None,
             Flags = NodeFlagsHelper.GetNodeFlags(assemblyData)

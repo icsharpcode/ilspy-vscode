@@ -23,12 +23,12 @@ public class NamespaceNodeProvider(TypeNodeProvider typeNodeProvider, Decompiler
     {
         return Task.FromResult(nodeMetadata?.Type != NodeType.Namespace
             ? []
-            : typeNodeProvider.CreateNodes(nodeMetadata.AssemblyPath, nodeMetadata.Name));
+            : typeNodeProvider.CreateNodes(nodeMetadata.GetAssemblyFileIdentifier(), nodeMetadata.Name));
     }
 
-    public IEnumerable<Node> CreateNodes(string assemblyPath)
+    public IEnumerable<Node> CreateNodes(AssemblyFileIdentifier assemblyFile)
     {
-        var decompiler = decompilerBackend.CreateDecompiler(assemblyPath);
+        var decompiler = decompilerBackend.CreateDecompiler(assemblyFile);
         if (decompiler is null)
         {
             return [];
@@ -47,7 +47,11 @@ public class NamespaceNodeProvider(TypeNodeProvider typeNodeProvider, Decompiler
             {
                 Metadata = new NodeMetadata
                 {
-                    AssemblyPath = assemblyPath, Type = NodeType.Namespace, Name = ns, IsDecompilable = true
+                    AssemblyPath = assemblyFile.File,
+                    BundleSubPath = assemblyFile.BundleSubPath,
+                    Type = NodeType.Namespace,
+                    Name = ns,
+                    IsDecompilable = true
                 },
                 DisplayName = ns,
                 Description = string.Empty,

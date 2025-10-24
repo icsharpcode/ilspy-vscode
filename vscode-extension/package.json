@@ -2,7 +2,7 @@
 	"name": "ilspy-vscode",
 	"displayName": "ilspy-vscode",
 	"description": "Decompile MSIL assemblies - support for full framework, .NET Core and .NET Standard",
-	"version": "0.16.1",
+	"version": "0.17.0-model-tools.1",
 	"icon": "resources/ILSpy-vscode-marketplace-icon.png",
 	"publisher": "icsharpcode",
 	"preview": true,
@@ -133,6 +133,241 @@
 				"view": "ilspyDecompiledMembers",
 				"contents": "No assemblies selected yet\n[Add assembly from workspace](command:ilspy.decompileAssemblyInWorkspace)\n[Pick assembly from file system](command:ilspy.decompileAssemblyViaDialog)\n\nGet [more help](https://github.com/icsharpcode/ilspy-vscode/wiki/Getting-started#usage)",
 				"when": "ilspy.backendAvailable"
+			}
+		],
+		"languageModelTools": [
+			{
+				"name": "ilspy_addAssembly",
+				"displayName": "Load Assembly for Decompilation",
+				"canBeReferencedInPrompt": true,
+				"toolReferenceName": "load-assembly",
+				"icon": "$(package)",
+				"tags": [
+					"decompilation",
+					"dotnet",
+					"csharp",
+					"assembly"
+				],
+				"userDescription": "Load a .NET assembly (.dll, .exe) for decompilation and exploration",
+				"modelDescription": "Loads a .NET assembly file for decompilation. Once loaded, symbols can be searched and decompiled. Required before searching or decompiling.",
+				"inputSchema": {
+					"type": "object",
+					"properties": {
+						"assemblyPath": {
+							"type": "string",
+							"description": "Absolute path to the assembly file (.dll, .exe, .winmd, .netmodule)"
+						}
+					},
+					"required": [
+						"assemblyPath"
+					]
+				}
+			},
+			{
+				"name": "ilspy_searchAssemblies",
+				"displayName": "Search Loaded Assemblies",
+				"canBeReferencedInPrompt": true,
+				"toolReferenceName": "search-assemblies",
+				"icon": "$(search)",
+				"tags": [
+					"decompilation",
+					"dotnet",
+					"csharp",
+					"search"
+				],
+				"userDescription": "Search for types, methods, properties, etc. across all loaded assemblies",
+				"modelDescription": "Searches for symbols across loaded assemblies. Returns results with URIs for decompilation. Assemblies must be loaded first with ilspy_addAssembly.",
+				"inputSchema": {
+					"type": "object",
+					"properties": {
+						"searchTerm": {
+							"type": "string",
+							"description": "Search term (e.g., 'Http', 'Parse', 'System.String')"
+						}
+					},
+					"required": [
+						"searchTerm"
+					]
+				}
+			},
+			{
+				"name": "ilspy_decompileNode",
+				"displayName": "Decompile Symbol to Source Code",
+				"canBeReferencedInPrompt": true,
+				"toolReferenceName": "decompile-symbol",
+				"icon": "$(file-code)",
+				"tags": [
+					"decompilation",
+					"dotnet",
+					"csharp",
+					"source-code"
+				],
+				"userDescription": "Decompile a specific type, method, property, etc. to readable C# source code",
+				"modelDescription": "Decompiles a symbol to C# source code. Takes ILSpy URI from search results. Returns decompiled code. Referenced symbols can be recursively decompiled.",
+				"inputSchema": {
+					"type": "object",
+					"properties": {
+						"uri": {
+							"type": "string",
+							"description": "ILSpy URI of the symbol to decompile (obtained from search results, format: ilspy://...)"
+						},
+						"outputLanguage": {
+							"type": "string",
+							"description": "Output language version (default: 'C# 12.0 / VS 2022.8')",
+							"enum": [
+								"C# 12.0 / VS 2022.8",
+								"C# 11.0 / VS 2022.4",
+								"C# 10.0 / VS 2022",
+								"C# 9.0 / VS 2019.8",
+								"C# 8.0 / VS 2019",
+								"IL"
+							]
+						}
+					},
+					"required": [
+						"uri"
+					]
+				}
+			},
+			{
+				"name": "ilspy_getLoadedAssemblies",
+				"displayName": "List Loaded Assemblies",
+				"canBeReferencedInPrompt": true,
+				"toolReferenceName": "list-assemblies",
+				"icon": "$(library)",
+				"tags": [
+					"decompilation",
+					"dotnet",
+					"csharp",
+					"assembly"
+				],
+				"userDescription": "Get a list of all currently loaded assemblies available for decompilation",
+				"modelDescription": "Returns list of loaded assemblies with names, paths, and URIs.",
+				"inputSchema": {
+					"type": "object",
+					"properties": {}
+				}
+			},
+			{
+				"name": "ilspy_navigateDefinition",
+				"displayName": "Navigate to Symbol Definition",
+				"canBeReferencedInPrompt": true,
+				"toolReferenceName": "navigate-definition",
+				"icon": "$(go-to-file)",
+				"tags": [
+					"decompilation",
+					"dotnet",
+					"csharp",
+					"navigation"
+				],
+				"userDescription": "Navigate from a code position to its definition, automatically decompiling if needed",
+				"modelDescription": "Go to definition from a document position. Automatically decompiles if definition is in an external assembly. Enables deep code navigation.",
+				"inputSchema": {
+					"type": "object",
+					"properties": {
+						"documentUri": {
+							"type": "string",
+							"description": "URI of the document containing the symbol reference (can be file://, ilspy://, or other schemes)"
+						},
+						"line": {
+							"type": "number",
+							"description": "Line number (0-based) where the symbol is referenced"
+						},
+						"character": {
+							"type": "number",
+							"description": "Character position (0-based) on the line where the symbol starts"
+						}
+					},
+					"required": [
+						"documentUri",
+						"line",
+						"character"
+					]
+				}
+			},
+			{
+				"name": "ilspy_openDecompiledSource",
+				"displayName": "Open Decompiled Source in Editor",
+				"canBeReferencedInPrompt": true,
+				"toolReferenceName": "open-source",
+				"icon": "$(file-code)",
+				"tags": [
+					"decompilation",
+					"dotnet",
+					"csharp",
+					"ui",
+					"editor"
+				],
+				"userDescription": "Opens the decompiled source code for a symbol in the VS Code editor",
+				"modelDescription": "Opens decompiled source in editor tab. Use when user wants to view/explore code themselves. Prefer over ilspy_decompileNode for viewing intent.",
+				"inputSchema": {
+					"type": "object",
+					"properties": {
+						"uri": {
+							"type": "string",
+							"description": "ILSpy URI of the symbol to open (obtained from search results, format: ilspy://...)"
+						}
+					},
+					"required": [
+						"uri"
+					]
+				}
+			},
+			{
+				"name": "ilspy_openAnalyzePanel",
+				"displayName": "Open Symbol Analysis Panel",
+				"canBeReferencedInPrompt": true,
+				"toolReferenceName": "analyze-symbol",
+				"icon": "$(graph)",
+				"tags": [
+					"decompilation",
+					"dotnet",
+					"csharp",
+					"ui",
+					"analysis"
+				],
+				"userDescription": "Opens the ILSpy Analyze panel showing where and how a symbol is used",
+				"modelDescription": "Opens ILSpy Analyze panel showing: Used By, Instantiated By, Overridden By, and other relationships. Use for understanding usage patterns.",
+				"inputSchema": {
+					"type": "object",
+					"properties": {
+						"uri": {
+							"type": "string",
+							"description": "ILSpy URI of the symbol to analyze (obtained from search results, format: ilspy://...)"
+						}
+					},
+					"required": [
+						"uri"
+					]
+				}
+			},
+			{
+				"name": "ilspy_searchAndOpen",
+				"displayName": "Search and Open Best Match",
+				"canBeReferencedInPrompt": true,
+				"toolReferenceName": "quick-open",
+				"icon": "$(search-view-icon)",
+				"tags": [
+					"decompilation",
+					"dotnet",
+					"csharp",
+					"ui",
+					"search"
+				],
+				"userDescription": "Searches for a symbol and immediately opens the most relevant match in the editor",
+				"modelDescription": "Searches and opens best match in one step. Prefers exact names and top-level types. Use for 'show me X' queries.",
+				"inputSchema": {
+					"type": "object",
+					"properties": {
+						"searchTerm": {
+							"type": "string",
+							"description": "Name of the symbol to search for and open (e.g., 'Stopwatch', 'HttpClient', 'Task')"
+						}
+					},
+					"required": [
+						"searchTerm"
+					]
+				}
 			}
 		],
 		"commands": [
@@ -309,20 +544,19 @@
 	},
 	"dependencies": {
 		"ansi-regex": "6.2.2",
+		"brace-expansion": "4.0.1",
 		"chai": "6.2.0",
 		"os": "0.1.2",
 		"path": "0.12.7",
 		"temp-dir": "3.0.0",
-		"terser": "5.44.0",
-		"vscode-languageclient": "9.0.1",
-		"brace-expansion": "4.0.1"
+		"terser": "5.44.0"
 	},
 	"devDependencies": {
 		"@types/chai": "5.2.2",
 		"@types/glob": "9.0.0",
 		"@types/mocha": "10.0.10",
 		"@types/node": "22.15.31",
-		"@types/vscode": "1.74.0",
+		"@types/vscode": "1.101.0",
 		"@typescript-eslint/eslint-plugin": "8.46.1",
 		"@typescript-eslint/parser": "8.46.1",
 		"@vscode/test-electron": "2.5.2",
@@ -335,7 +569,8 @@
 		"ts-loader": "9.5.4",
 		"typescript": "5.9.3",
 		"webpack": "5.102.1",
-		"webpack-cli": "6.0.1"
+		"webpack-cli": "6.0.1",
+		"vscode-languageclient": "9.0.1"
 	},
 	"extensionDependencies": [
 		"ms-dotnettools.vscode-dotnet-runtime"

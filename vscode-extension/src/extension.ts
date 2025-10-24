@@ -25,6 +25,7 @@ import {
   ExtensionContext,
   window,
   workspace,
+  lm
 } from "vscode";
 import { DecompilerTextDocumentContentProvider } from "./decompiler/DecompilerTextDocumentContentProvider";
 import {
@@ -45,6 +46,15 @@ import { AnalyzeResultTreeProvider } from "./decompiler/analyze/AnalyzeResultTre
 import { registerAnalyzeCommand } from "./commands/analyze";
 import { registerRefreshAssemblyListCommand } from "./commands/refreshAssemblyList";
 import { AssemblyNodeDecorationProvider } from "./decompiler/AssemblyNodeDecorationProvider";
+
+import { registerAddAssemblyTool } from "./tools/addAssembly";
+import { registerDecompileNodeTool } from "./tools/decompileNode";
+import { registerLoadedAssembliesTool } from "./tools/getLoadedAssemblies";
+import { registerNavigateDefinitionTool } from "./tools/navigateDefinition";
+import { registerOpenAnalyzePanelTool } from "./tools/openAnalyzePanel";
+import { registerOpenDecompiledSourceTool } from "./tools/openDecompiledSource";
+import { registerSearchAndOpenTool } from "./tools/searchAndOpen";
+import { registerSearchAssembliesTool } from "./tools/searchAssemblies";
 
 let client: LanguageClient;
 
@@ -173,6 +183,18 @@ export async function activate(context: ExtensionContext) {
   disposables.push(registerRefreshAssemblyListCommand(decompiledTreeProvider));
 
   disposables.push(registerSearchEditorSelectionCommand());
+
+  // Register Language Model Tools for AI Agents
+  disposables.push(
+    registerAddAssemblyTool(decompiledTreeProvider),
+    registerSearchAssembliesTool(ilspyBackend),
+    registerDecompileNodeTool(ilspyBackend),
+    registerLoadedAssembliesTool(decompiledTreeProvider),
+    registerNavigateDefinitionTool(ilspyBackend),
+    registerOpenDecompiledSourceTool(decompilerTextDocumentContentProvider),
+    registerOpenAnalyzePanelTool(analyzeResultTreeProvider),
+    registerSearchAndOpenTool(ilspyBackend, decompilerTextDocumentContentProvider)
+  );
 
   context.subscriptions.push(...disposables);
 }

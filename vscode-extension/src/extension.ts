@@ -24,8 +24,7 @@ import {
   Disposable,
   ExtensionContext,
   window,
-  workspace,
-  lm
+  workspace
 } from "vscode";
 import { DecompilerTextDocumentContentProvider } from "./decompiler/DecompilerTextDocumentContentProvider";
 import {

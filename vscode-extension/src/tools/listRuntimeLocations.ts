@@ -2,8 +2,6 @@ import * as vscode from "vscode";
 import * as fs from "fs";
 import * as path from "path";
 
-export interface ListRuntimeLocationsToolInput {}
-
 export interface RuntimeLocation {
   path: string;
   version: string;
@@ -89,7 +87,7 @@ export function detectDotNetRuntimeLocations(): RuntimeLocation[] {
  * Returns available .NET runtime installations with paths and versions
  */
 export function registerListRuntimeLocationsTool(): vscode.Disposable {
-  return vscode.lm.registerTool<ListRuntimeLocationsToolInput>("ilspy_list_runtime_locations", {
+  return vscode.lm.registerTool("ilspy_list_runtime_locations", {
     async prepareInvocation(
       _options,
       _token

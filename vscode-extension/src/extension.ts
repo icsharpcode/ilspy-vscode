@@ -49,7 +49,7 @@ import { AssemblyNodeDecorationProvider } from "./decompiler/AssemblyNodeDecorat
 
 import { registerLoadAssemblyTool } from "./tools/addAssembly";
 import { registerDecompileTool } from "./tools/decompileNode";
-import { registerListLoadedAssembliesTool } from "./tools/getLoadedAssemblies";
+import { registerListLoadedAssembliesTool } from "./tools/listLoadedAssemblies";
 import { registerGetDefinitionTool } from "./tools/navigateDefinition";
 import { registerAnalyzeTool } from "./tools/openAnalyzePanel";
 import { registerOpenTool } from "./tools/openDecompiledSource";

@@ -1,19 +1,21 @@
 import * as vscode from "vscode";
 import IILSpyBackend from "../decompiler/IILSpyBackend";
 import { nodeDataToUri } from "../decompiler/nodeUri";
+import { filterNodesBySymbolType } from "./utils";
 
-export interface SearchAssembliesToolInput {
+export interface SearchToolInput {
   searchTerm: string;
+  symbolType?: "type" | "method" | "field" | "property" | "event" | "all";
 }
 
 /**
- * Tool: Search Assemblies
+ * Tool: Search
  * Search for types, methods, properties, etc. across loaded assemblies
  */
-export function registerSearchAssembliesTool(
+export function registerSearchTool(
   backend: IILSpyBackend
 ): vscode.Disposable {
-  return vscode.lm.registerTool<SearchAssembliesToolInput>("ilspy_searchAssemblies", {
+  return vscode.lm.registerTool<SearchToolInput>("ilspy_search", {
     async prepareInvocation(
       options,
       _token
@@ -28,7 +30,7 @@ export function registerSearchAssembliesTool(
       options,
       _token
     ) {
-      const { searchTerm } = options.input;
+      const { searchTerm, symbolType } = options.input;
 
       try {
         const response = await backend.sendSearch({ term: searchTerm });
@@ -36,13 +38,24 @@ export function registerSearchAssembliesTool(
         if (!response || !response.results || response.results.length === 0) {
           return new vscode.LanguageModelToolResult([
             new vscode.LanguageModelTextPart(
-              `No results found for: "${searchTerm}". Ensure assemblies are loaded with ilspy_addAssembly.`
+              `No results found for: "${searchTerm}". Ensure assemblies are loaded with ilspy_load_assembly.`
+            ),
+          ]);
+        }
+
+        // Filter by symbol type if specified
+        const filteredResults = filterNodesBySymbolType(response.results, symbolType);
+
+        if (filteredResults.length === 0) {
+          return new vscode.LanguageModelToolResult([
+            new vscode.LanguageModelTextPart(
+              `No ${symbolType || "symbol"} results found for: "${searchTerm}".`
             ),
           ]);
         }
 
         // Return structured data - let the LLM format it
-        const results = response.results
+        const results = filteredResults
           .filter((node) => node.metadata)
           .slice(0, 20)
           .map((node, index) => ({
@@ -58,7 +71,7 @@ export function registerSearchAssembliesTool(
             JSON.stringify(
               {
                 searchTerm,
-                totalResults: response.results.length,
+                totalResults: filteredResults.length,
                 results,
               },
               null,

@@ -4,19 +4,19 @@ import { languageInfos } from "../decompiler/languageInfos";
 import { getDefaultOutputLanguage } from "../decompiler/settings";
 import { parseILSpyUri } from "./utils";
 
-export interface OpenDecompiledSourceToolInput {
+export interface OpenToolInput {
   uri: string;
 }
 
 /**
- * Tool: Open Decompiled Source
+ * Tool: Open
  * Opens a decompiled symbol in a VS Code editor tab
  * This is a UI action tool - it directly opens the editor, not just returning text
  */
-export function registerOpenDecompiledSourceTool(
+export function registerOpenTool(
   contentProvider: DecompilerTextDocumentContentProvider
 ): vscode.Disposable {
-  return vscode.lm.registerTool<OpenDecompiledSourceToolInput>("ilspy_openDecompiledSource", {
+  return vscode.lm.registerTool<OpenToolInput>("ilspy_open", {
     async prepareInvocation(
       options,
       _token

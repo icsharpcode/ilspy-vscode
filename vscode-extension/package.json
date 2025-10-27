@@ -137,7 +137,45 @@
 		],
 		"languageModelTools": [
 			{
-				"name": "ilspy_addAssembly",
+				"name": "ilspy_list_runtime_locations",
+				"displayName": "Discover .NET Runtime Installations",
+				"canBeReferencedInPrompt": true,
+				"toolReferenceName": "discover-runtimes",
+				"icon": "$(server-environment)",
+				"tags": [
+					"decompilation",
+					"dotnet",
+					"runtime",
+					"discovery"
+				],
+				"userDescription": "Discover available .NET runtime installations on the system",
+				"modelDescription": "Returns available .NET runtime installations with paths and versions. Use to discover BCL assemblies before loading them.",
+				"inputSchema": {
+					"type": "object",
+					"properties": {}
+				}
+			},
+			{
+				"name": "ilspy_list_loaded_assemblies",
+				"displayName": "List Loaded Assemblies",
+				"canBeReferencedInPrompt": true,
+				"toolReferenceName": "list-assemblies",
+				"icon": "$(library)",
+				"tags": [
+					"decompilation",
+					"dotnet",
+					"csharp",
+					"assembly"
+				],
+				"userDescription": "Get a list of all currently loaded assemblies available for decompilation",
+				"modelDescription": "Returns list of loaded assemblies with names, paths, and URIs.",
+				"inputSchema": {
+					"type": "object",
+					"properties": {}
+				}
+			},
+			{
+				"name": "ilspy_load_assembly",
 				"displayName": "Load Assembly for Decompilation",
 				"canBeReferencedInPrompt": true,
 				"toolReferenceName": "load-assembly",
@@ -149,7 +187,7 @@
 					"assembly"
 				],
 				"userDescription": "Load a .NET assembly (.dll, .exe) for decompilation and exploration",
-				"modelDescription": "Loads a .NET assembly file for decompilation. Once loaded, symbols can be searched and decompiled. Required before searching or decompiling.",
+				"modelDescription": "Loads a .NET assembly file for decompilation. Once loaded, symbols can be searched and decompiled. Use ilspy_list_runtime_locations to discover .NET BCL assemblies.",
 				"inputSchema": {
 					"type": "object",
 					"properties": {
@@ -164,7 +202,7 @@
 				}
 			},
 			{
-				"name": "ilspy_searchAssemblies",
+				"name": "ilspy_search",
 				"displayName": "Search Loaded Assemblies",
 				"canBeReferencedInPrompt": true,
 				"toolReferenceName": "search-assemblies",
@@ -176,13 +214,25 @@
 					"search"
 				],
 				"userDescription": "Search for types, methods, properties, etc. across all loaded assemblies",
-				"modelDescription": "Searches for symbols across loaded assemblies. Returns results with URIs for decompilation. Assemblies must be loaded first with ilspy_addAssembly.",
+				"modelDescription": "Searches for symbols across loaded assemblies. Returns results with URIs for decompilation. Assemblies must be loaded first with ilspy_load_assembly.",
 				"inputSchema": {
 					"type": "object",
 					"properties": {
 						"searchTerm": {
 							"type": "string",
 							"description": "Search term (e.g., 'Http', 'Parse', 'System.String')"
+						},
+						"symbolType": {
+							"type": "string",
+							"description": "Optional: Filter by symbol type (default: all)",
+							"enum": [
+								"type",
+								"method",
+								"field",
+								"property",
+								"event",
+								"all"
+							]
 						}
 					},
 					"required": [
@@ -191,7 +241,7 @@
 				}
 			},
 			{
-				"name": "ilspy_decompileNode",
+				"name": "ilspy_decompile",
 				"displayName": "Decompile Symbol to Source Code",
 				"canBeReferencedInPrompt": true,
 				"toolReferenceName": "decompile-symbol",
@@ -230,63 +280,7 @@
 				}
 			},
 			{
-				"name": "ilspy_getLoadedAssemblies",
-				"displayName": "List Loaded Assemblies",
-				"canBeReferencedInPrompt": true,
-				"toolReferenceName": "list-assemblies",
-				"icon": "$(library)",
-				"tags": [
-					"decompilation",
-					"dotnet",
-					"csharp",
-					"assembly"
-				],
-				"userDescription": "Get a list of all currently loaded assemblies available for decompilation",
-				"modelDescription": "Returns list of loaded assemblies with names, paths, and URIs.",
-				"inputSchema": {
-					"type": "object",
-					"properties": {}
-				}
-			},
-			{
-				"name": "ilspy_navigateDefinition",
-				"displayName": "Navigate to Symbol Definition",
-				"canBeReferencedInPrompt": true,
-				"toolReferenceName": "navigate-definition",
-				"icon": "$(go-to-file)",
-				"tags": [
-					"decompilation",
-					"dotnet",
-					"csharp",
-					"navigation"
-				],
-				"userDescription": "Navigate from a code position to its definition, automatically decompiling if needed",
-				"modelDescription": "Go to definition from a document position. Automatically decompiles if definition is in an external assembly. Enables deep code navigation.",
-				"inputSchema": {
-					"type": "object",
-					"properties": {
-						"documentUri": {
-							"type": "string",
-							"description": "URI of the document containing the symbol reference (can be file://, ilspy://, or other schemes)"
-						},
-						"line": {
-							"type": "number",
-							"description": "Line number (0-based) where the symbol is referenced"
-						},
-						"character": {
-							"type": "number",
-							"description": "Character position (0-based) on the line where the symbol starts"
-						}
-					},
-					"required": [
-						"documentUri",
-						"line",
-						"character"
-					]
-				}
-			},
-			{
-				"name": "ilspy_openDecompiledSource",
+				"name": "ilspy_open",
 				"displayName": "Open Decompiled Source in Editor",
 				"canBeReferencedInPrompt": true,
 				"toolReferenceName": "open-source",
@@ -299,7 +293,7 @@
 					"editor"
 				],
 				"userDescription": "Opens the decompiled source code for a symbol in the VS Code editor",
-				"modelDescription": "Opens decompiled source in editor tab. Use when user wants to view/explore code themselves. Prefer over ilspy_decompileNode for viewing intent.",
+				"modelDescription": "Opens decompiled source in editor tab. Use when user wants to view/explore code themselves. Prefer over ilspy_decompile for viewing intent.",
 				"inputSchema": {
 					"type": "object",
 					"properties": {
@@ -314,7 +308,47 @@
 				}
 			},
 			{
-				"name": "ilspy_openAnalyzePanel",
+				"name": "ilspy_search_and_open",
+				"displayName": "Search and Open Best Match",
+				"canBeReferencedInPrompt": true,
+				"toolReferenceName": "quick-open",
+				"icon": "$(search-view-icon)",
+				"tags": [
+					"decompilation",
+					"dotnet",
+					"csharp",
+					"ui",
+					"search"
+				],
+				"userDescription": "Searches for a symbol and immediately opens the most relevant match in the editor",
+				"modelDescription": "Searches and opens best match in one step. Prefers exact names and top-level types. Use for 'show me X' queries.",
+				"inputSchema": {
+					"type": "object",
+					"properties": {
+						"searchTerm": {
+							"type": "string",
+							"description": "Name of the symbol to search for and open (e.g., 'Stopwatch', 'HttpClient', 'Task')"
+						},
+						"symbolType": {
+							"type": "string",
+							"description": "Optional: Filter by symbol type (default: all)",
+							"enum": [
+								"type",
+								"method",
+								"field",
+								"property",
+								"event",
+								"all"
+							]
+						}
+					},
+					"required": [
+						"searchTerm"
+					]
+				}
+			},
+			{
+				"name": "ilspy_analyze",
 				"displayName": "Open Symbol Analysis Panel",
 				"canBeReferencedInPrompt": true,
 				"toolReferenceName": "analyze-symbol",
@@ -338,34 +372,6 @@
 					},
 					"required": [
 						"uri"
-					]
-				}
-			},
-			{
-				"name": "ilspy_searchAndOpen",
-				"displayName": "Search and Open Best Match",
-				"canBeReferencedInPrompt": true,
-				"toolReferenceName": "quick-open",
-				"icon": "$(search-view-icon)",
-				"tags": [
-					"decompilation",
-					"dotnet",
-					"csharp",
-					"ui",
-					"search"
-				],
-				"userDescription": "Searches for a symbol and immediately opens the most relevant match in the editor",
-				"modelDescription": "Searches and opens best match in one step. Prefers exact names and top-level types. Use for 'show me X' queries.",
-				"inputSchema": {
-					"type": "object",
-					"properties": {
-						"searchTerm": {
-							"type": "string",
-							"description": "Name of the symbol to search for and open (e.g., 'Stopwatch', 'HttpClient', 'Task')"
-						}
-					},
-					"required": [
-						"searchTerm"
 					]
 				}
 			}

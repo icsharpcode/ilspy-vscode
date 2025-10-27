@@ -2,19 +2,19 @@ import * as vscode from "vscode";
 import IILSpyBackend from "../decompiler/IILSpyBackend";
 import { parseILSpyUri } from "./utils";
 
-export interface DecompileNodeToolInput {
+export interface DecompileToolInput {
   uri: string;
   outputLanguage?: string;
 }
 
 /**
- * Tool: Decompile Node
+ * Tool: Decompile
  * Decompile a specific type, method, property, etc. by URI
  */
-export function registerDecompileNodeTool(
+export function registerDecompileTool(
   backend: IILSpyBackend
 ): vscode.Disposable {
-  return vscode.lm.registerTool<DecompileNodeToolInput>("ilspy_decompileNode", {
+  return vscode.lm.registerTool<DecompileToolInput>("ilspy_decompile", {
     async prepareInvocation(
       options,
       _token

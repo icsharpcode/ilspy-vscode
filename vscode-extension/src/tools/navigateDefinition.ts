@@ -3,28 +3,27 @@ import IILSpyBackend from "../decompiler/IILSpyBackend";
 import NodeMetadata from "../protocol/NodeMetadata";
 import { parseILSpyUri } from "./utils";
 
-export interface NavigateDefinitionToolInput {
+export interface GetDefinitionToolInput {
   documentUri: string;
   line: number;
   character: number;
 }
 
 /**
- * Tool: Navigate Definition
- * Navigate from a position in code to its definition using VS Code's built-in provider
- * Then decompile if the target is from an assembly
+ * Tool: Get Definition
+ * Get the definition source code from a position in code
  */
-export function registerNavigateDefinitionTool(
+export function registerGetDefinitionTool(
   backend: IILSpyBackend
 ): vscode.Disposable {
-  return vscode.lm.registerTool<NavigateDefinitionToolInput>("ilspy_navigateDefinition", {
+  return vscode.lm.registerTool<GetDefinitionToolInput>("ilspy_getDefinition", {
     async prepareInvocation(
       options,
       _token
     ) {
       const { documentUri, line, character } = options.input;
       return {
-        invocationMessage: new vscode.MarkdownString(`$(arrow-right) Navigating to definition at \`${documentUri}:${line}:${character}\``),
+        invocationMessage: new vscode.MarkdownString(`$(search-view-icon) Getting definition at \`${documentUri}:${line}:${character}\``),
       };
     },
 
@@ -84,7 +83,7 @@ export function registerNavigateDefinitionTool(
         ]);
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
-        throw new Error(`Navigation failed: ${errorMessage}`);
+        throw new Error(`Get definition failed: ${errorMessage}`);
       }
     }
   });

@@ -47,14 +47,15 @@ import { registerAnalyzeCommand } from "./commands/analyze";
 import { registerRefreshAssemblyListCommand } from "./commands/refreshAssemblyList";
 import { AssemblyNodeDecorationProvider } from "./decompiler/AssemblyNodeDecorationProvider";
 
-import { registerAddAssemblyTool } from "./tools/addAssembly";
-import { registerDecompileNodeTool } from "./tools/decompileNode";
-import { registerLoadedAssembliesTool } from "./tools/getLoadedAssemblies";
-import { registerNavigateDefinitionTool } from "./tools/navigateDefinition";
-import { registerOpenAnalyzePanelTool } from "./tools/openAnalyzePanel";
-import { registerOpenDecompiledSourceTool } from "./tools/openDecompiledSource";
+import { registerLoadAssemblyTool } from "./tools/addAssembly";
+import { registerDecompileTool } from "./tools/decompileNode";
+import { registerListLoadedAssembliesTool } from "./tools/getLoadedAssemblies";
+import { registerGetDefinitionTool } from "./tools/navigateDefinition";
+import { registerAnalyzeTool } from "./tools/openAnalyzePanel";
+import { registerOpenTool } from "./tools/openDecompiledSource";
 import { registerSearchAndOpenTool } from "./tools/searchAndOpen";
-import { registerSearchAssembliesTool } from "./tools/searchAssemblies";
+import { registerSearchTool } from "./tools/searchAssemblies";
+import { registerListRuntimeLocationsTool } from "./tools/listRuntimeLocations";
 
 let client: LanguageClient;
 
@@ -186,14 +187,15 @@ export async function activate(context: ExtensionContext) {
 
   // Register Language Model Tools for AI Agents
   disposables.push(
-    registerAddAssemblyTool(decompiledTreeProvider),
-    registerSearchAssembliesTool(ilspyBackend),
-    registerDecompileNodeTool(ilspyBackend),
-    registerLoadedAssembliesTool(decompiledTreeProvider),
-    registerNavigateDefinitionTool(ilspyBackend),
-    registerOpenDecompiledSourceTool(decompilerTextDocumentContentProvider),
-    registerOpenAnalyzePanelTool(analyzeResultTreeProvider),
-    registerSearchAndOpenTool(ilspyBackend, decompilerTextDocumentContentProvider)
+    registerListRuntimeLocationsTool(),
+    registerListLoadedAssembliesTool(decompiledTreeProvider),
+    registerLoadAssemblyTool(decompiledTreeProvider),
+    registerSearchTool(ilspyBackend),
+    registerDecompileTool(ilspyBackend),
+    registerOpenTool(decompilerTextDocumentContentProvider),
+    registerSearchAndOpenTool(ilspyBackend, decompilerTextDocumentContentProvider),
+    registerAnalyzeTool(analyzeResultTreeProvider),
+    registerGetDefinitionTool(ilspyBackend)
   );
 
   context.subscriptions.push(...disposables);

@@ -3,16 +3,16 @@ import { DecompiledTreeProvider } from "../decompiler/DecompiledTreeProvider";
 import { nodeDataToUri } from "../decompiler/nodeUri";
 import Node from "../protocol/Node";
 
-export interface GetLoadedAssembliesToolInput {}
+export interface ListLoadedAssembliesToolInput {}
 
 /**
- * Tool: Get Loaded Assemblies
+ * Tool: List Loaded Assemblies
  * List all currently loaded assemblies
  */
-export function registerLoadedAssembliesTool(
+export function registerListLoadedAssembliesTool(
 	treeProvider: DecompiledTreeProvider
 ): vscode.Disposable {
-	return vscode.lm.registerTool<GetLoadedAssembliesToolInput>("ilspy_getLoadedAssemblies", {
+	return vscode.lm.registerTool<ListLoadedAssembliesToolInput>("ilspy_list_loaded_assemblies", {
 		async prepareInvocation(
 			_options,
 			_token

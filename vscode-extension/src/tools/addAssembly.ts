@@ -1,61 +1,18 @@
-import * as path from "path";
 import * as vscode from "vscode";
-import * as fs from "fs";
 import { DecompiledTreeProvider } from "../decompiler/DecompiledTreeProvider";
 
-export interface AddAssemblyToolInput {
+export interface LoadAssemblyToolInput {
   assemblyPath: string;
 }
 
 /**
- * Detects common .NET BCL installation paths
- */
-function detectDotNetPaths(): string {
-  const platform = process.platform;
-  const paths: string[] = [];
-
-  if (platform === "win32") {
-    // Check common Windows .NET locations
-    const commonPaths = [
-      "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App",
-      "C:\\Program Files (x86)\\dotnet\\shared\\Microsoft.NETCore.App",
-      "C:\\Windows\\Microsoft.NET\\Framework64",
-      "C:\\Windows\\Microsoft.NET\\Framework",
-    ];
-
-    for (const p of commonPaths) {
-      if (fs.existsSync(p)) {
-        paths.push(p);
-      }
-    }
-  } else {
-    // Check common Unix .NET locations
-    const commonPaths = platform === "darwin"
-      ? ["/usr/local/share/dotnet/shared/Microsoft.NETCore.App", "/opt/homebrew/share/dotnet/shared/Microsoft.NETCore.App"]
-      : ["/usr/share/dotnet/shared/Microsoft.NETCore.App", "/usr/lib/dotnet/shared/Microsoft.NETCore.App"];
-
-    for (const p of commonPaths) {
-      if (fs.existsSync(p)) {
-        paths.push(p);
-      }
-    }
-  }
-
-  return paths.length > 0
-    ? `\n\n.NET BCL locations:\n${paths.map(p => `- \`${p}\``).join('\n')}`
-    : "";
-}
-
-/**
- * Tool: Add Assembly
+ * Tool: Load Assembly
  * Loads an assembly file for decompilation
  */
-export function registerAddAssemblyTool(
+export function registerLoadAssemblyTool(
   treeProvider: DecompiledTreeProvider
 ): vscode.Disposable {
-  const dotnetPathsHint = detectDotNetPaths();
-
-  return vscode.lm.registerTool<AddAssemblyToolInput>("ilspy_addAssembly", {
+  return vscode.lm.registerTool<LoadAssemblyToolInput>("ilspy_load_assembly", {
     async prepareInvocation(
       options,
       _token
@@ -85,8 +42,7 @@ export function registerAddAssemblyTool(
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
         throw new Error(
-          `Failed to load assembly: ${errorMessage}` +
-          (dotnetPathsHint ? `\n${dotnetPathsHint}` : "")
+          `Failed to load assembly: ${errorMessage}. Use ilspy_list_runtime_locations to discover .NET BCL assemblies.`
         );
       }
     }

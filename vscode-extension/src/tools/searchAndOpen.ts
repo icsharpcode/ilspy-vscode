@@ -4,9 +4,13 @@ import { DecompilerTextDocumentContentProvider } from "../decompiler/DecompilerT
 import { languageInfos } from "../decompiler/languageInfos";
 import { nodeDataToUri } from "../decompiler/nodeUri";
 import { getDefaultOutputLanguage } from "../decompiler/settings";
+import { filterNodesBySymbolType } from "./utils";
+import { NodeType } from "../protocol/NodeType";
+import Node from "../protocol/Node";
 
 export interface SearchAndOpenToolInput {
   searchTerm: string;
+  symbolType?: "type" | "method" | "field" | "property" | "event" | "all";
 }
 
 /**
@@ -18,7 +22,7 @@ export function registerSearchAndOpenTool(
   backend: IILSpyBackend,
   contentProvider: DecompilerTextDocumentContentProvider
 ): vscode.Disposable {
-  return vscode.lm.registerTool<SearchAndOpenToolInput>("ilspy_searchAndOpen", {
+  return vscode.lm.registerTool<SearchAndOpenToolInput>("ilspy_search_and_open", {
     async prepareInvocation(
       options,
       _token
@@ -39,7 +43,7 @@ export function registerSearchAndOpenTool(
       options,
       _token
     ) {
-      const { searchTerm } = options.input;
+      const { searchTerm, symbolType } = options.input;
 
       try {
         const response = await backend.sendSearch({ term: searchTerm });
@@ -47,31 +51,64 @@ export function registerSearchAndOpenTool(
         if (!response || !response.results || response.results.length === 0) {
           return new vscode.LanguageModelToolResult([
             new vscode.LanguageModelTextPart(
-              `No results found for: "${searchTerm}". Ensure assemblies are loaded with ilspy_addAssembly.`
+              `No results found for: "${searchTerm}". Ensure assemblies are loaded with ilspy_load_assembly.`
             ),
           ]);
         }
 
-        // Find most relevant match (prefer types over nested members)
-        const sortedResults = response.results
-          .filter((node) => node.metadata)
-          .sort((a, b) => {
-            // Prefer exact matches
+        // Filter by symbol type if specified
+        const filteredResults = filterNodesBySymbolType(response.results, symbolType);
+
+        if (filteredResults.length === 0) {
+          return new vscode.LanguageModelToolResult([
+            new vscode.LanguageModelTextPart(
+              `No ${symbolType || 'symbol'} results found for: "${searchTerm}".`
+            ),
+          ]);
+        }
+
+        /**
+         * Determines if a node is a type definition (class, interface, struct, enum, delegate)
+         */
+        function isTypeNode(node: Node): boolean {
+          if (!node.metadata) {
+            return false;
+          }
+
+          return [
+            NodeType.Class,
+            NodeType.Interface,
+            NodeType.Struct,
+            NodeType.Enum,
+            NodeType.Delegate,
+          ].includes(node.metadata.type);
+        }
+
+        /**
+         * Sorts nodes by relevance: exact matches first, then types, then members
+         */
+        function sortByRelevance(searchTerm: string) {
+          return (a: Node, b: Node): number => {
             const aExact = a.displayName.toLowerCase() === searchTerm.toLowerCase();
             const bExact = b.displayName.toLowerCase() === searchTerm.toLowerCase();
-            if (aExact && !bExact) return -1;
-            if (!aExact && bExact) return 1;
+            if (aExact !== bExact) {
+              return aExact ? -1 : 1;
+            }
 
-            // Prefer types (classes, interfaces, structs, enums) over members
-            const aIsType = a.description?.includes("class") || a.description?.includes("interface") ||
-              a.description?.includes("struct") || a.description?.includes("enum");
-            const bIsType = b.description?.includes("class") || b.description?.includes("interface") ||
-              b.description?.includes("struct") || b.description?.includes("enum");
-            if (aIsType && !bIsType) return -1;
-            if (!aIsType && bIsType) return 1;
+            const aIsType = isTypeNode(a);
+            const bIsType = isTypeNode(b);
+            if (aIsType !== bIsType) {
+              return aIsType ? -1 : 1;
+            }
 
             return 0;
-          });
+          };
+        }
+
+        // Find most relevant match (prefer types over nested members)
+        const sortedResults = filteredResults
+          .filter((node) => node.metadata)
+          .sort(sortByRelevance(searchTerm));
 
         const bestMatch = sortedResults[0];
         const uri = nodeDataToUri(bestMatch);
@@ -87,8 +124,8 @@ export function registerSearchAndOpenTool(
         );
         await vscode.window.showTextDocument(doc, { preview: false });
 
-        const otherMatchesNote = response.results.length > 1
-          ? ` (${response.results.length - 1} other matches available)`
+        const otherMatchesNote = filteredResults.length > 1
+          ? ` (${filteredResults.length - 1} other matches available)`
           : "";
 
         return new vscode.LanguageModelToolResult([

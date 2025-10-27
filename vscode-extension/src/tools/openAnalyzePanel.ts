@@ -3,19 +3,19 @@ import { AnalyzeResultTreeProvider } from "../decompiler/analyze/AnalyzeResultTr
 import Node from "../protocol/Node";
 import { parseILSpyUri } from "./utils";
 
-export interface OpenAnalyzePanelToolInput {
+export interface AnalyzeToolInput {
   uri: string;
 }
 
 /**
- * Tool: Open Analyze Panel
+ * Tool: Analyze
  * Opens the ILSpy Analyze panel for a given symbol
  * This shows "Used By", "Instantiated By", etc. for the symbol
  */
-export function registerOpenAnalyzePanelTool(
+export function registerAnalyzeTool(
   analyzeResultTreeProvider: AnalyzeResultTreeProvider
 ): vscode.Disposable {
-  return vscode.lm.registerTool<OpenAnalyzePanelToolInput>("ilspy_openAnalyzePanel", {
+  return vscode.lm.registerTool<AnalyzeToolInput>("ilspy_analyze", {
     async prepareInvocation(
       options,
       _token

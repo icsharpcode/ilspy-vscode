@@ -9,8 +9,8 @@ export interface ListLoadedAssembliesToolInput {}
  * Tool: List Loaded Assemblies
  * List all currently loaded assemblies
  */
-export function registerListLoadedAssembliesTool(
-	treeProvider: DecompiledTreeProvider
+export function registerLoadedAssembliesTool(
+  treeProvider: DecompiledTreeProvider
 ): vscode.Disposable {
 	return vscode.lm.registerTool<ListLoadedAssembliesToolInput>("ilspy_list_loaded_assemblies", {
 		async prepareInvocation(

@@ -13,6 +13,7 @@ using ILSpyX.Backend.Model;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection.Metadata;
@@ -73,9 +74,38 @@ public class DecompilerBackend(
         return (result, autoLoadedAssembliesBefore.Count() != autoLoadedAssembliesAfter.Count());
     }
 
+    [SuppressMessage("Usage", "VSTHRD002:Avoid problematic synchronous waits")]
     public CSharpDecompiler? CreateDecompiler(AssemblyFileIdentifier assemblyFile, string? outputLanguage = null)
     {
-        var loadedAssembly = assemblyList.FindAssembly(assemblyFile.File);
+        LoadedAssembly? loadedAssembly = null;
+
+        if (assemblyFile.BundleSubPath is not null)
+        {
+            var package = assemblyList.FindAssembly(assemblyFile.File)?.GetLoadResultAsync().GetAwaiter()
+                .GetResult().Package;
+            if (package is not null)
+            {
+                var folder = package.RootFolder;
+                string[] pathParts = Path.GetDirectoryName(assemblyFile.BundleSubPath)?.Split('/') ?? [];
+                foreach (string folderName in pathParts)
+                {
+                    var nextFolder = folder.Folders.FirstOrDefault(f => f.Name == folderName);
+                    if (nextFolder is null)
+                    {
+                        break;
+                    }
+
+                    folder = nextFolder;
+                }
+
+                loadedAssembly = folder.ResolveFileName(Path.GetFileName(assemblyFile.BundleSubPath));
+            }
+        }
+        else
+        {
+            loadedAssembly = assemblyList.FindAssembly(assemblyFile.File);
+        }
+
         var metadataFile = loadedAssembly?.GetMetadataFileOrNull();
         if (loadedAssembly is not null && metadataFile is not null)
         {

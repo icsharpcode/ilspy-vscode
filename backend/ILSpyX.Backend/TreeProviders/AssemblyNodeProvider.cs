@@ -35,18 +35,37 @@ public class AssemblyNodeProvider(
 
     public static Node CreateNode(AssemblyData assemblyData)
     {
+        if (assemblyData.ParentBundleFilePath is not null)
+        {
+            return new Node
+            {
+                Metadata = new NodeMetadata
+                {
+                    AssemblyPath = assemblyData.ParentBundleFilePath,
+                    BundleSubPath = assemblyData.FilePath,
+                    Type = NodeType.Assembly,
+                    Name = Path.GetFileName(assemblyData.FilePath),
+                    IsDecompilable = true
+                },
+                DisplayName = GetAssemblyDisplayText(assemblyData),
+                Description = Path.GetFileName(assemblyData.FilePath),
+                MayHaveChildren = true,
+                SymbolModifiers = SymbolModifiers.None,
+                Flags = NodeFlagsHelper.GetNodeFlags(assemblyData)
+            };
+        }
+
         return new Node
         {
             Metadata = new NodeMetadata
             {
-                AssemblyPath = assemblyData.ParentBundleFilePath ?? assemblyData.FilePath,
-                BundleSubPath = assemblyData.ParentBundleFilePath is not null ? assemblyData.FilePath : null,
+                AssemblyPath = assemblyData.FilePath,
                 Type = NodeType.Assembly,
                 Name = Path.GetFileName(assemblyData.FilePath),
                 IsDecompilable = true
             },
             DisplayName = GetAssemblyDisplayText(assemblyData),
-            Description = Path.GetFileName(assemblyData.FilePath),
+            Description = assemblyData.FilePath,
             MayHaveChildren = true,
             SymbolModifiers = SymbolModifiers.None,
             Flags = NodeFlagsHelper.GetNodeFlags(assemblyData)

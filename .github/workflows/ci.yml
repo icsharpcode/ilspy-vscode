@@ -16,19 +16,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 #v5.0.0
         with:
           fetch-depth: 0
 
       - name: Setup .NET Core SDK
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d #v5.0.0
         with:
           dotnet-version: 8.0.x
 
       - name: Check .NET Core version
         run: dotnet --version
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 #v6.0.0
         with:
           node-version: "22"
 
@@ -46,7 +46,7 @@ jobs:
 
       - name: Archive artifacts
         if: github.ref == 'refs/heads/master'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 #v5.0.0
         with:
           name: Artifacts
           path: artifacts/*

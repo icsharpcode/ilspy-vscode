@@ -6,6 +6,7 @@ using ICSharpCode.Decompiler.CSharp;
 using ICSharpCode.Decompiler.Disassembler;
 using ICSharpCode.Decompiler.Metadata;
 using ICSharpCode.Decompiler.TypeSystem;
+using ICSharpCode.Decompiler.Util;
 using ICSharpCode.ILSpyX;
 using ILSpyX.Backend.Application;
 using ILSpyX.Backend.Model;
@@ -14,12 +15,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace ILSpyX.Backend.Decompiler;
+
+using ICSharpCode.ILSpyX.Extensions;
+using System.Reflection.Metadata;
 
 public class DecompilerBackend(
     ILoggerFactory loggerFactory,
@@ -165,6 +168,7 @@ public class DecompilerBackend(
             return outputLanguage switch
             {
                 LanguageName.IL => DecompileResult.WithCode(GetILCode(assemblyPath, handle)),
+                LanguageName.ILCharp => DecompileResult.WithCode(GetIlWithCSharpCode(assemblyPath, handle, LanguageName.CSharpLatest)),
                 _ => DecompileResult.WithCode(GetCSharpCode(assemblyPath, handle, outputLanguage))
             };
         }
@@ -226,6 +230,54 @@ public class DecompilerBackend(
                 return decompiler.DecompileAsString(handle);
         }
 
+        return string.Empty;
+    }
+
+    private string GetIlWithCSharpCode(string assemblyPath, EntityHandle handle, string outputLanguage)
+    {
+        if (handle.IsNil)
+        {
+            return string.Empty;
+        }
+
+        var decompiler = CreateDecompiler(assemblyPath, outputLanguage);
+        if (decompiler is null)
+        {
+            return string.Empty;
+        }
+
+        var module = decompiler.TypeSystem.MainModule;
+        var textOutput = new PlainTextOutput();
+        var disassembler = CreateDisassembler(assemblyPath, module, textOutput);
+        string code;
+
+        switch (handle.Kind)
+        {
+            case HandleKind.AssemblyDefinition:
+                code = GetAssemblyCode(assemblyPath, decompiler);
+                GetAssemblyILCode(disassembler, assemblyPath, module, textOutput);
+                return textOutput.ToString() + code;
+            case HandleKind.TypeDefinition:
+                var typeDefinition = module.GetDefinition((TypeDefinitionHandle) handle);
+                disassembler.DisassembleType(module.MetadataFile, (TypeDefinitionHandle) handle);
+                if (typeDefinition.DeclaringType == null)
+                    code = decompiler.DecompileTypesAsString(new[] { (TypeDefinitionHandle) handle });
+                else
+                    code = decompiler.DecompileAsString(handle);
+                return textOutput.ToString() + code;
+            case HandleKind.FieldDefinition:
+                disassembler.DisassembleField(module.MetadataFile, (FieldDefinitionHandle) handle);
+                return textOutput.ToString() + decompiler.DecompileAsString(handle);
+            case HandleKind.MethodDefinition:
+                disassembler.DisassembleMethod(module.MetadataFile, (MethodDefinitionHandle) handle);
+                return textOutput.ToString() + decompiler.DecompileAsString(handle);
+            case HandleKind.PropertyDefinition:
+                disassembler.DisassembleProperty(module.MetadataFile, (PropertyDefinitionHandle) handle);
+                return textOutput.ToString() + decompiler.DecompileAsString(handle);
+            case HandleKind.EventDefinition:
+                disassembler.DisassembleEvent(module.MetadataFile, (EventDefinitionHandle) handle);
+                return textOutput.ToString() + decompiler.DecompileAsString(handle);
+        }
         return string.Empty;
     }
 

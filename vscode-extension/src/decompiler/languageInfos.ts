@@ -8,6 +8,7 @@ export interface LanguageInfo {
 
 export const languageInfos = createLanguageMap([
   { name: LanguageName.IL, displayName: "IL", vsLanguageMode: "il" },
+  { name: LanguageName.IL_CSharp, displayName: "IL With C#", vsLanguageMode: "il" },
   {
     name: LanguageName.CSharp_1,
     displayName: "C# 1.0 / VS .NET",

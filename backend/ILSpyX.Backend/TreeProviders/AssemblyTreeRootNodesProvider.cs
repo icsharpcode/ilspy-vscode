@@ -8,9 +8,9 @@ namespace ILSpyX.Backend.TreeProviders;
 
 public class AssemblyTreeRootNodesProvider(DecompilerBackend decompilerBackend) : ITreeNodeProvider
 {
-    public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
+    public Task<DecompileResult> Decompile(NodeMetadata nodeMetadata, string outputLanguage)
     {
-        return DecompileResult.Empty();
+        return Task.FromResult(DecompileResult.Empty());
     }
 
     public async Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)

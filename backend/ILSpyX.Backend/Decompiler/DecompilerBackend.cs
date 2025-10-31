@@ -66,48 +66,23 @@ public class DecompilerBackend(
 
     public async Task<(T Result, bool NewAutoLoadedAssemblies)> DetectAutoLoadedAssemblies<T>(Func<Task<T>> operation)
     {
-        var autoLoadedAssembliesBefore = (await GetLoadedAssembliesAsync()).Where(
-            assembly => assembly.IsAutoLoaded);
+        var autoLoadedAssembliesBefore = (await GetLoadedAssembliesAsync()).Where(assembly => assembly.IsAutoLoaded);
         var result = await operation();
-        var autoLoadedAssembliesAfter = (await GetLoadedAssembliesAsync()).Where(
-            assembly => assembly.IsAutoLoaded);
+        var autoLoadedAssembliesAfter = (await GetLoadedAssembliesAsync()).Where(assembly => assembly.IsAutoLoaded);
         return (result, autoLoadedAssembliesBefore.Count() != autoLoadedAssembliesAfter.Count());
     }
 
-    [SuppressMessage("Usage", "VSTHRD002:Avoid problematic synchronous waits")]
-    public CSharpDecompiler? CreateDecompiler(AssemblyFileIdentifier assemblyFile, string? outputLanguage = null)
+    public async Task<CSharpDecompiler?> CreateDecompiler(AssemblyFileIdentifier assemblyFile,
+        string? outputLanguage = null)
     {
-        LoadedAssembly? loadedAssembly = null;
-
-        if (assemblyFile.BundleSubPath is not null)
+        var loadedAssembly = await assemblyList.FindAssembly(assemblyFile);
+        if (loadedAssembly is null)
         {
-            var package = assemblyList.FindAssembly(assemblyFile.File)?.GetLoadResultAsync().GetAwaiter()
-                .GetResult().Package;
-            if (package is not null)
-            {
-                var folder = package.RootFolder;
-                string[] pathParts = Path.GetDirectoryName(assemblyFile.BundleSubPath)?.Split('/') ?? [];
-                foreach (string folderName in pathParts)
-                {
-                    var nextFolder = folder.Folders.FirstOrDefault(f => f.Name == folderName);
-                    if (nextFolder is null)
-                    {
-                        break;
-                    }
-
-                    folder = nextFolder;
-                }
-
-                loadedAssembly = folder.ResolveFileName(Path.GetFileName(assemblyFile.BundleSubPath));
-            }
-        }
-        else
-        {
-            loadedAssembly = assemblyList.FindAssembly(assemblyFile.File);
+            return null;
         }
 
-        var metadataFile = loadedAssembly?.GetMetadataFileOrNull();
-        if (loadedAssembly is not null && metadataFile is not null)
+        var metadataFile = await loadedAssembly.GetMetadataFileOrNullAsync();
+        if (metadataFile is not null)
         {
             return new CSharpDecompiler(
                 metadataFile,
@@ -127,7 +102,8 @@ public class DecompilerBackend(
             .Cast<AssemblyData>();
     }
 
-    public IEnumerable<MemberData> GetMembers(AssemblyFileIdentifier assemblyFile, TypeDefinitionHandle handle)
+    public async Task<IEnumerable<MemberData>> GetMembers(AssemblyFileIdentifier assemblyFile,
+        TypeDefinitionHandle handle)
     {
         if (handle.IsNil)
         {
@@ -140,7 +116,7 @@ public class DecompilerBackend(
             return [];
         }
 
-        var decompiler = CreateDecompiler(assemblyFile);
+        var decompiler = await CreateDecompiler(assemblyFile);
         if (decompiler is null)
         {
             return [];
@@ -173,20 +149,21 @@ public class DecompilerBackend(
         }
     }
 
-    public DecompileResult GetCode(AssemblyFileIdentifier assemblyFile, EntityHandle handle, string outputLanguage)
+    public async Task<DecompileResult> GetCode(AssemblyFileIdentifier assemblyFile, EntityHandle handle,
+        string outputLanguage)
     {
         return outputLanguage switch
         {
-            LanguageName.IL => DecompileResult.WithCode(GetILCode(assemblyFile, handle)),
-            _ => DecompileResult.WithCode(GetCSharpCode(assemblyFile, handle, outputLanguage))
+            LanguageName.IL => DecompileResult.WithCode(await GetILCode(assemblyFile, handle)),
+            _ => DecompileResult.WithCode(await GetCSharpCode(assemblyFile, handle, outputLanguage))
         };
     }
 
-    public IEntity? GetEntityFromHandle(AssemblyFileIdentifier assemblyFile, EntityHandle handle)
+    public async Task<IEntity?> GetEntityFromHandle(AssemblyFileIdentifier assemblyFile, EntityHandle handle)
     {
         if (!handle.IsNil)
         {
-            var decompiler = CreateDecompiler(assemblyFile);
+            var decompiler = await CreateDecompiler(assemblyFile);
             if (decompiler is not null)
             {
                 var module = decompiler.TypeSystem.MainModule;
@@ -205,14 +182,15 @@ public class DecompilerBackend(
         return null;
     }
 
-    private string GetCSharpCode(AssemblyFileIdentifier assemblyFile, EntityHandle handle, string outputLanguage)
+    private async Task<string> GetCSharpCode(AssemblyFileIdentifier assemblyFile, EntityHandle handle,
+        string outputLanguage)
     {
         if (handle.IsNil)
         {
             return string.Empty;
         }
 
-        var decompiler = CreateDecompiler(assemblyFile, outputLanguage);
+        var decompiler = await CreateDecompiler(assemblyFile, outputLanguage);
         if (decompiler is null)
         {
             return string.Empty;
@@ -223,7 +201,7 @@ public class DecompilerBackend(
         switch (handle.Kind)
         {
             case HandleKind.AssemblyDefinition:
-                return GetAssemblyCode(assemblyFile.File, decompiler);
+                return GetAssemblyCode(assemblyFile, decompiler);
             case HandleKind.TypeDefinition:
                 var typeDefinition = module.GetDefinition((TypeDefinitionHandle) handle);
                 if (typeDefinition.DeclaringType == null)
@@ -239,14 +217,14 @@ public class DecompilerBackend(
         return string.Empty;
     }
 
-    private string GetILCode(AssemblyFileIdentifier assemblyFile, EntityHandle handle)
+    private async Task<string> GetILCode(AssemblyFileIdentifier assemblyFile, EntityHandle handle)
     {
         if (handle.IsNil)
         {
             return string.Empty;
         }
 
-        var decompiler = CreateDecompiler(assemblyFile);
+        var decompiler = await CreateDecompiler(assemblyFile);
         if (decompiler is null)
         {
             return string.Empty;
@@ -281,7 +259,8 @@ public class DecompilerBackend(
         return string.Empty;
     }
 
-    private static ReflectionDisassembler CreateDisassembler(string assemblyPath, MetadataModule module, ITextOutput textOutput)
+    private static ReflectionDisassembler CreateDisassembler(string assemblyPath, MetadataModule module,
+        ITextOutput textOutput)
     {
         var dis = new ReflectionDisassembler(textOutput, CancellationToken.None)
         {
@@ -299,7 +278,8 @@ public class DecompilerBackend(
         return dis;
     }
 
-    private static void GetAssemblyILCode(ReflectionDisassembler disassembler, string assemblyPath, MetadataModule module, ITextOutput output)
+    private static void GetAssemblyILCode(ReflectionDisassembler disassembler, string assemblyPath,
+        MetadataModule module, ITextOutput output)
     {
         output.WriteLine("// " + assemblyPath);
         output.WriteLine();
@@ -311,15 +291,21 @@ public class DecompilerBackend(
         {
             disassembler.WriteAssemblyHeader(peFile);
         }
+
         output.WriteLine();
         disassembler.WriteModuleHeader(peFile);
     }
 
-    private string GetAssemblyCode(string assemblyPath, CSharpDecompiler decompiler)
+    private string GetAssemblyCode(AssemblyFileIdentifier assemblyFile, CSharpDecompiler decompiler)
     {
         using var output = new StringWriter();
-        WriteCommentLine(output, assemblyPath);
+        WriteCommentLine(output, assemblyFile.BundleSubPath ?? assemblyFile.File);
         var module = decompiler.TypeSystem.MainModule.MetadataFile;
+        if (module is null)
+        {
+            return string.Empty;
+        }
+        
         var metadata = module.Metadata;
         if (metadata.IsAssembly)
         {
@@ -346,13 +332,16 @@ public class DecompilerBackend(
             output.Write(globalType.FullName);
             output.WriteLine();
         }
+
         var corHeader = module.CorHeader;
         if (corHeader != null)
         {
-            var entrypointHandle = MetadataTokenHelpers.EntityHandleOrNil(corHeader.EntryPointTokenOrRelativeVirtualAddress);
+            var entrypointHandle =
+                MetadataTokenHelpers.EntityHandleOrNil(corHeader.EntryPointTokenOrRelativeVirtualAddress);
             if (!entrypointHandle.IsNil && entrypointHandle.Kind == HandleKind.MethodDefinition)
             {
-                var entrypoint = mainModule.ResolveMethod(entrypointHandle, new ICSharpCode.Decompiler.TypeSystem.GenericContext());
+                var entrypoint = mainModule.ResolveMethod(entrypointHandle,
+                    new ICSharpCode.Decompiler.TypeSystem.GenericContext());
                 if (entrypoint != null)
                 {
                     output.Write("// Entry point: ");
@@ -360,23 +349,24 @@ public class DecompilerBackend(
                     output.WriteLine();
                 }
             }
+
             if (module is PEFile peFileModule)
             {
                 output.WriteLine("// Architecture: " + peFileModule.GetPlatformDisplayName());
             }
+
             if ((corHeader.Flags & System.Reflection.PortableExecutable.CorFlags.ILOnly) == 0)
             {
                 output.WriteLine("// This assembly contains unmanaged code.");
             }
         }
+
         if (module is PEFile peFile)
         {
             string runtimeName = peFile.GetRuntimeDisplayName();
-            if (runtimeName != null)
-            {
-                output.WriteLine("// Runtime: " + runtimeName);
-            }
+            output.WriteLine("// Runtime: " + runtimeName);
         }
+
         output.WriteLine();
 
         output.Write(decompiler.DecompileModuleAndAssemblyAttributesToString());
@@ -391,23 +381,23 @@ public class DecompilerBackend(
         output.WriteLine($"// {s}");
     }
 
-    public IEnumerable<MemberData> ListTypes(AssemblyFileIdentifier assemblyFile, string? @namespace)
+    public async Task<IEnumerable<MemberData>> ListTypes(AssemblyFileIdentifier assemblyFile, string? @namespace)
     {
         if (@namespace == null)
         {
-            yield break;
+            return [];
         }
 
-        var loadedAssembly = assemblyList.FindAssembly(assemblyFile.File);
+        var loadedAssembly = await assemblyList.FindAssembly(assemblyFile);
         if (loadedAssembly is null)
         {
-            yield break;
+            return [];
         }
 
-        var decompiler = CreateDecompiler(assemblyFile);
+        var decompiler = await CreateDecompiler(assemblyFile);
         if (decompiler is null)
         {
-            yield break;
+            return [];
         }
 
         var currentNamespace = decompiler.TypeSystem.MainModule.RootNamespace;
@@ -416,21 +406,20 @@ public class DecompilerBackend(
         if (!(parts.Length == 1 && string.IsNullOrEmpty(parts[0])))
         {
             // not the global namespace
-            foreach (var part in parts)
+            foreach (string part in parts)
             {
                 var nested = currentNamespace.GetChildNamespace(part);
                 if (nested == null)
-                    yield break;
+                {
+                    break;
+                }
+
                 currentNamespace = nested;
             }
         }
 
-        foreach (var t in currentNamespace.Types.OrderBy(t => t.FullName))
-        {
-            yield return new MemberData(
-                Name: t.TypeToString(includeNamespace: false),
-                Token: MetadataTokens.GetToken(t.MetadataToken),
-                SubKind: t.Kind);
-        }
+        return currentNamespace.Types.OrderBy(t => t.FullName).Select(t =>
+            new MemberData(Name: t.TypeToString(includeNamespace: false),
+                Token: MetadataTokens.GetToken(t.MetadataToken), SubKind: t.Kind));
     }
 }

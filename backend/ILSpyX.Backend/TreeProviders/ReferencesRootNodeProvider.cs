@@ -11,11 +11,11 @@ public class ReferencesRootNodeProvider(
     DecompilerBackend decompilerBackend)
     : ITreeNodeProvider
 {
-    public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
+    public async Task<DecompileResult> Decompile(NodeMetadata nodeMetadata, string outputLanguage)
     {
         string code = string.Join('\n',
-            GetAssemblyReferences(nodeMetadata.GetAssemblyFileIdentifier())
-                .Select(reference => $"// {reference}"));
+            (await GetAssemblyReferences(nodeMetadata.GetAssemblyFileIdentifier()))
+            .Select(reference => $"// {reference}"));
         return DecompileResult.WithCode(code);
     }
 
@@ -29,9 +29,9 @@ public class ReferencesRootNodeProvider(
         return await assemblyReferenceNodeProvider.CreateNodesAsync(nodeMetadata.GetAssemblyFileIdentifier());
     }
 
-    private IEnumerable<string> GetAssemblyReferences(AssemblyFileIdentifier assemblyFile)
+    private async Task<IEnumerable<string>> GetAssemblyReferences(AssemblyFileIdentifier assemblyFile)
     {
-        var decompiler = decompilerBackend.CreateDecompiler(assemblyFile);
+        var decompiler = await decompilerBackend.CreateDecompiler(assemblyFile);
         if (decompiler is null)
         {
             return [];

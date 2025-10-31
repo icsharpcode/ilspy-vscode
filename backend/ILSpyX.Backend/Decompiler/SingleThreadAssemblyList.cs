@@ -1,7 +1,10 @@
 using ICSharpCode.ILSpyX;
+using ILSpyX.Backend.Model;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ILSpyX.Backend.Decompiler;
@@ -107,6 +110,39 @@ public class SingleThreadAssemblyList
     public LoadedAssembly? FindAssembly(string file)
     {
         return assemblyList?.FindAssembly(file);
+    }
+
+    public async Task<LoadedAssembly?> FindAssembly(AssemblyFileIdentifier assemblyFile)
+    {
+        if (assemblyFile.BundleSubPath is not null)
+        {
+            var assembly = FindAssembly(assemblyFile.File);
+            var loadResult = assembly is not null ? await assembly.GetLoadResultAsync() : null;
+            var package = loadResult?.Package;
+            if (package is not null)
+            {
+                var folder = package.RootFolder;
+                string[] pathParts = Path.GetDirectoryName(assemblyFile.BundleSubPath)?.Split('/') ?? [];
+                foreach (string folderName in pathParts)
+                {
+                    var nextFolder = folder.Folders.FirstOrDefault(f => f.Name == folderName);
+                    if (nextFolder is null)
+                    {
+                        break;
+                    }
+
+                    folder = nextFolder;
+                }
+
+                return folder.ResolveFileName(Path.GetFileName(assemblyFile.BundleSubPath));
+            }
+        }
+        else
+        {
+            return FindAssembly(assemblyFile.File);
+        }
+
+        return null;
     }
 }
 

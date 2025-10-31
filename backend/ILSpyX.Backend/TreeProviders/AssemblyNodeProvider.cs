@@ -14,23 +14,23 @@ public class AssemblyNodeProvider(
     NamespaceNodeProvider namespaceNodeProvider)
     : ITreeNodeProvider
 {
-    public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
+    public Task<DecompileResult> Decompile(NodeMetadata nodeMetadata, string outputLanguage)
     {
         return decompilerBackend.GetCode(
             nodeMetadata.GetAssemblyFileIdentifier(), EntityHandle.AssemblyDefinition, outputLanguage);
     }
 
-    public Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
+    public async Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
     {
         if (nodeMetadata?.Type != NodeType.Assembly)
         {
-            return Task.FromResult(Enumerable.Empty<Node>());
+            return [];
         }
 
         var assemblyFile = nodeMetadata.GetAssemblyFileIdentifier();
-        return Task.FromResult(
+        return
             new[] { referencesRootNodeProvider.CreateNode(assemblyFile) }
-                .Concat(namespaceNodeProvider.CreateNodes(assemblyFile)));
+                .Concat(await namespaceNodeProvider.CreateNodes(assemblyFile));
     }
 
     public static Node CreateNode(AssemblyData assemblyData)

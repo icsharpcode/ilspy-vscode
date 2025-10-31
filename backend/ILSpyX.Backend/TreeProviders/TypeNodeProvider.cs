@@ -15,7 +15,7 @@ public class TypeNodeProvider(
     DecompilerBackend decompilerBackend)
     : ITreeNodeProvider
 {
-    public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
+    public Task<DecompileResult> Decompile(NodeMetadata nodeMetadata, string outputLanguage)
     {
         return decompilerBackend.GetCode(
             nodeMetadata.GetAssemblyFileIdentifier(),
@@ -32,7 +32,7 @@ public class TypeNodeProvider(
 
         IEnumerable<Node?> nodes =
         [
-            baseTypesNodeProvider.CreateNode(nodeMetadata.GetAssemblyFileIdentifier(), nodeMetadata.SymbolToken),
+            await baseTypesNodeProvider.CreateNode(nodeMetadata.GetAssemblyFileIdentifier(), nodeMetadata.SymbolToken),
             derivedTypesNodeProvider.CreateNode(nodeMetadata)
         ];
 
@@ -40,9 +40,9 @@ public class TypeNodeProvider(
             nodeMetadata.GetAssemblyFileIdentifier(), nodeMetadata.SymbolToken));
     }
 
-    public IEnumerable<Node> CreateNodes(AssemblyFileIdentifier assemblyFile, string @namespace)
+    public async Task<IEnumerable<Node>> CreateNodes(AssemblyFileIdentifier assemblyFile, string @namespace)
     {
-        var decompiler = decompilerBackend.CreateDecompiler(assemblyFile);
+        var decompiler = await decompilerBackend.CreateDecompiler(assemblyFile);
         if (decompiler is null)
         {
             return [];
@@ -76,6 +76,7 @@ public class TypeNodeProvider(
             Metadata = new NodeMetadata
             {
                 AssemblyPath = assemblyFile.File,
+                BundleSubPath = assemblyFile.BundleSubPath,
                 Type = NodeTypeHelper.GetNodeTypeFromTypeKind(typeDefinition.Kind),
                 Name = name,
                 SymbolToken = MetadataTokens.GetToken(typeDefinition.MetadataToken),

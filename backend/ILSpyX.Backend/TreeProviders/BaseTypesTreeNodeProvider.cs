@@ -1,9 +1,11 @@
+using ICSharpCode.Decompiler.Metadata;
 using ICSharpCode.Decompiler.TypeSystem;
 using ICSharpCode.ILSpyX;
 using ILSpyX.Backend.Decompiler;
 using ILSpyX.Backend.Model;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
@@ -13,35 +15,46 @@ namespace ILSpyX.Backend.TreeProviders;
 public class BaseTypesNodeProvider(SingleThreadAssemblyList assemblyList)
     : ITreeNodeProvider
 {
-    public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
+    public Task<DecompileResult> Decompile(NodeMetadata nodeMetadata, string outputLanguage)
     {
-        return DecompileResult.Empty();
+        return Task.FromResult(DecompileResult.Empty());
     }
 
-    public Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
+    public async Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
     {
         if (nodeMetadata is null)
         {
-            return Task.FromResult(Enumerable.Empty<Node>());
+            return [];
         }
 
-        return Task.FromResult(GetBaseTypes(nodeMetadata.AssemblyPath, nodeMetadata.SymbolToken)
+        var baseTypes = await GetBaseTypes(nodeMetadata.GetAssemblyFileIdentifier(), nodeMetadata.SymbolToken);
+        return baseTypes
             .Select(baseType => {
-                var typeNode =
-                    TypeNodeProvider.CreateTypeNode(
-                        new AssemblyFileIdentifier(baseType.ParentModule?.MetadataFile?.FileName ?? string.Empty),
-                        baseType);
-                return typeNode with
+                var metadataFile = baseType.ParentModule?.MetadataFile;
+                LoadedAssembly? loadedAssembly;
+                try
                 {
-                    DisplayName = baseType.FullName,
-                    MayHaveChildren = false,
-                };
-            }));
+                    loadedAssembly = metadataFile?.GetLoadedAssembly();
+                }
+                catch (Exception)
+                {
+                    loadedAssembly = null;
+                }
+
+                if (loadedAssembly is null)
+                {
+                    return null;
+                }
+
+                var typeNode = TypeNodeProvider.CreateTypeNode(loadedAssembly.GetAssembilyFileIdentifier(), baseType);
+                return typeNode with { DisplayName = baseType.FullName, MayHaveChildren = false };
+            }).OfType<Node>();
     }
 
-    public Node? CreateNode(AssemblyFileIdentifier assemblyFile, int typeSymbolToken)
+    public async Task<Node?> CreateNode(AssemblyFileIdentifier assemblyFile, int typeSymbolToken)
     {
-        if (!GetBaseTypes(assemblyFile.File, typeSymbolToken).Any())
+        var baseTypes = await GetBaseTypes(assemblyFile, typeSymbolToken);
+        if (!baseTypes.Any())
         {
             return null;
         }
@@ -63,9 +76,16 @@ public class BaseTypesNodeProvider(SingleThreadAssemblyList assemblyList)
         };
     }
 
-    private IEnumerable<ITypeDefinition> GetBaseTypes(string assemblyFile, int typeSymbolToken)
+    private async Task<IEnumerable<ITypeDefinition>> GetBaseTypes(AssemblyFileIdentifier assemblyFile,
+        int typeSymbolToken)
     {
-        var module = assemblyList.FindAssembly(assemblyFile)?.GetMetadataFileOrNull();
+        var assembly = await assemblyList.FindAssembly(assemblyFile);
+        if (assembly is null)
+        {
+            return [];
+        }
+
+        var module = await assembly.GetMetadataFileOrNullAsync();
         if (module is null)
         {
             return [];

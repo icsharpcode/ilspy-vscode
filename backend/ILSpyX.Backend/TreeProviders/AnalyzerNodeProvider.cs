@@ -16,22 +16,22 @@ public class AnalyzerNodeProvider(
     SingleThreadAssemblyList singleThreadAssemblyList,
     AnalyzerBackend analyzerBackend) : ITreeNodeProvider
 {
-    public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
+    public Task<DecompileResult> Decompile(NodeMetadata nodeMetadata, string outputLanguage)
     {
-        return DecompileResult.Empty();
+        return Task.FromResult(DecompileResult.Empty());
     }
 
-    public Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
+    public async Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
     {
         if (nodeMetadata is null || nodeMetadata.Type != NodeType.Analyzer)
         {
-            return Task.FromResult(Enumerable.Empty<Node>());
+            return [];
         }
 
         var analyzer = analyzerBackend.GetAnalyzerForNode(nodeMetadata)?.Instance;
         if (analyzer is null || singleThreadAssemblyList.AssemblyList is null)
         {
-            return Task.FromResult(Enumerable.Empty<Node>());
+            return [];
         }
 
         var context = new AnalyzerContext
@@ -41,14 +41,14 @@ public class AnalyzerNodeProvider(
             AssemblyList = singleThreadAssemblyList.AssemblyList
         };
 
-        var nodeEntity = decompilerBackend.GetEntityFromHandle(
+        var nodeEntity = await decompilerBackend.GetEntityFromHandle(
             nodeMetadata.GetAssemblyFileIdentifier(), MetadataTokens.EntityHandle(nodeMetadata.SymbolToken));
         if (nodeEntity is null || !analyzer.Show(nodeEntity))
         {
-            return Task.FromResult(Enumerable.Empty<Node>());
+            return [];
         }
 
-        return Task.FromResult(
+        return
             analyzer.Analyze(nodeEntity, context)
                 .OfType<IEntity>()
                 .Select(entity => {
@@ -75,18 +75,17 @@ public class AnalyzerNodeProvider(
                         SymbolModifiers = NodeTypeHelper.GetSymbolModifiers(entity),
                         Flags = NodeFlagsHelper.GetNodeFlags(entity)
                     };
-                })
-        );
+                });
     }
 
-    public Node? CreateNode(NodeMetadata? nodeMetadata, AnalyzerInstance analyzer)
+    public async Task<Node?> CreateNode(NodeMetadata? nodeMetadata, AnalyzerInstance analyzer)
     {
         if (nodeMetadata is null)
         {
             return null;
         }
 
-        var nodeEntity = decompilerBackend.GetEntityFromHandle(
+        var nodeEntity = await decompilerBackend.GetEntityFromHandle(
             nodeMetadata.GetAssemblyFileIdentifier(), MetadataTokens.EntityHandle(nodeMetadata.SymbolToken));
         if (nodeEntity is null || !analyzer.Instance.Show(nodeEntity))
         {

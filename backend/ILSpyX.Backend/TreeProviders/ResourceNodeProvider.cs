@@ -11,9 +11,9 @@ namespace ILSpyX.Backend.TreeProviders;
 
 public class ResourceNodeProvider : ITreeNodeProvider
 {
-    public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
+    public Task<DecompileResult> Decompile(NodeMetadata nodeMetadata, string outputLanguage)
     {
-        return DecompileResult.WithCode($"// {nodeMetadata.Name}");
+        return Task.FromResult(DecompileResult.WithCode($"// {nodeMetadata.Name}"));
     }
 
     public Node CreateNode(AssemblyFileIdentifier assemblyFile, Resource entry, string relativePath = "")

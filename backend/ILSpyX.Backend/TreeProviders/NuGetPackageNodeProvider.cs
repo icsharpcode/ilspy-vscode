@@ -11,9 +11,9 @@ public class NuGetPackageNodeProvider(
     SingleThreadAssemblyList assemblyList,
     PackageFolderNodeProvider packageFolderNodeProvider) : ITreeNodeProvider
 {
-    public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
+    public Task<DecompileResult> Decompile(NodeMetadata nodeMetadata, string outputLanguage)
     {
-        return DecompileResult.Empty();
+        return Task.FromResult(DecompileResult.Empty());
     }
 
     public static Node CreateNode(AssemblyData assemblyData)

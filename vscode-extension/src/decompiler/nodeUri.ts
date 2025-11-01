@@ -12,9 +12,11 @@ import { NodeType } from "../protocol/NodeType";
 export const ILSPY_URI_SCHEME = "ilspy";
 
 export function nodeDataToUri(nodeData: Node): vscode.Uri {
+  const assemblyFile = nodeData.metadata?.assemblyPath ?? "";
+  const bundleSubPath = nodeData.metadata?.bundleSubPath;
   return vscode.Uri.file(
     path.join(
-      nodeData.metadata?.assemblyPath ?? "",
+      bundleSubPath ? `${assemblyFile}$${bundleSubPath}` : assemblyFile,
       nodeData.metadata?.name ?? ""
     )
   ).with({
@@ -33,12 +35,16 @@ export function uriToNode(uri: vscode.Uri): NodeMetadata | undefined {
     return undefined;
   }
 
-  const assembly = path.dirname(uri.fsPath);
+  const assemblyPathParts = path.dirname(uri.fsPath).split("$");
+  const assembly = assemblyPathParts[0];
+  const bundleSubPath =
+    assemblyPathParts.length > 1 ? assemblyPathParts[1] : undefined;
   const name = path.basename(uri.fsPath);
   const [symbolToken, type, parentSymbolToken, isDecompilable] =
     uri.query.split(":");
   return {
     assemblyPath: assembly,
+    bundleSubPath,
     type: parseInt(type) as NodeType,
     symbolToken: parseInt(symbolToken),
     parentSymbolToken: parseInt(parentSymbolToken),

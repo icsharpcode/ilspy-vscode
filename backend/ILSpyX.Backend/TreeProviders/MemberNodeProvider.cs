@@ -82,7 +82,8 @@ public class MemberNodeProvider(DecompilerBackend decompilerBackend) : ITreeNode
                 Type = NodeTypeHelper.GetNodeTypeFromEntity(member),
                 Name = memberName,
                 SymbolToken = MetadataTokens.GetToken(member.MetadataToken),
-                ParentSymbolToken = parentTypeSymbolToken
+                ParentSymbolToken = parentTypeSymbolToken,
+                IsDecompilable = true
             },
             DisplayName = memberName,
             Description = "",

@@ -38,53 +38,62 @@ public class TreeNodeProviderTests
                 Assert.Equal("References", node.DisplayName);
                 Assert.Equal(NodeType.ReferencesRoot, node.Metadata?.Type);
                 Assert.True(node.MayHaveChildren);
+                Assert.False(node.Metadata?.IsDecompilable);
             },
             node => {
                 Assert.Equal("", node.DisplayName);
                 Assert.Equal(NodeType.Namespace, node.Metadata?.Type);
                 Assert.True(node.MayHaveChildren);
+                Assert.True(node.Metadata?.IsDecompilable);
             },
             node => {
                 Assert.Equal("A", node.Metadata?.Name);
                 Assert.Equal("A", node.DisplayName);
                 Assert.Equal(NodeType.Namespace, node.Metadata?.Type);
                 Assert.True(node.MayHaveChildren);
+                Assert.True(node.Metadata?.IsDecompilable);
             },
             node => {
                 Assert.Equal("A.B", node.Metadata?.Name);
                 Assert.Equal("A.B", node.DisplayName);
                 Assert.Equal(NodeType.Namespace, node.Metadata?.Type);
                 Assert.True(node.MayHaveChildren);
+                Assert.True(node.Metadata?.IsDecompilable);
             },
             node => {
                 Assert.Equal("A.B.C", node.Metadata?.Name);
                 Assert.Equal("A.B.C", node.DisplayName);
                 Assert.Equal(NodeType.Namespace, node.Metadata?.Type);
                 Assert.True(node.MayHaveChildren);
+                Assert.True(node.Metadata?.IsDecompilable);
             },
             node => {
                 Assert.Equal("A.B.C.D", node.Metadata?.Name);
                 Assert.Equal("A.B.C.D", node.DisplayName);
                 Assert.Equal(NodeType.Namespace, node.Metadata?.Type);
                 Assert.True(node.MayHaveChildren);
+                Assert.True(node.Metadata?.IsDecompilable);
             },
             node => {
                 Assert.Equal("CSharpVariants", node.Metadata?.Name);
                 Assert.Equal("CSharpVariants", node.DisplayName);
                 Assert.Equal(NodeType.Namespace, node.Metadata?.Type);
                 Assert.True(node.MayHaveChildren);
+                Assert.True(node.Metadata?.IsDecompilable);
             },
             node => {
                 Assert.Equal("Generics", node.Metadata?.Name);
                 Assert.Equal("Generics", node.DisplayName);
                 Assert.Equal(NodeType.Namespace, node.Metadata?.Type);
                 Assert.True(node.MayHaveChildren);
+                Assert.True(node.Metadata?.IsDecompilable);
             },
             node => {
                 Assert.Equal("TestAssembly", node.Metadata?.Name);
                 Assert.Equal("TestAssembly", node.DisplayName);
                 Assert.Equal(NodeType.Namespace, node.Metadata?.Type);
                 Assert.True(node.MayHaveChildren);
+                Assert.True(node.Metadata?.IsDecompilable);
             });
     }
 
@@ -104,6 +113,7 @@ public class TreeNodeProviderTests
         Assert.False(node.MayHaveChildren);
         Assert.Equal(TestHelper.AssemblyPath, node.Metadata?.AssemblyPath);
         Assert.Equal(NodeType.AssemblyReference, node.Metadata?.Type);
+        Assert.True(node.Metadata?.IsDecompilable);
     }
 
     [Fact]
@@ -125,6 +135,7 @@ public class TreeNodeProviderTests
                 Assert.NotEqual(0, node.Metadata?.SymbolToken);
                 Assert.Equal(SymbolModifiers.Public | SymbolModifiers.Abstract, node.SymbolModifiers);
                 Assert.True(node.MayHaveChildren);
+                Assert.True(node.Metadata?.IsDecompilable);
             }, node => {
                 Assert.Equal("ISomeInterface", node.Metadata?.Name);
                 Assert.Equal("ISomeInterface", node.DisplayName);
@@ -132,6 +143,7 @@ public class TreeNodeProviderTests
                 Assert.NotEqual(0, node.Metadata?.SymbolToken);
                 Assert.Equal(SymbolModifiers.Public | SymbolModifiers.Abstract, node.SymbolModifiers);
                 Assert.True(node.MayHaveChildren);
+                Assert.True(node.Metadata?.IsDecompilable);
             },
             node => {
                 Assert.Equal("SomeClass", node.Metadata?.Name);
@@ -140,6 +152,7 @@ public class TreeNodeProviderTests
                 Assert.NotEqual(0, node.Metadata?.SymbolToken);
                 Assert.Equal(SymbolModifiers.Public, node.SymbolModifiers);
                 Assert.True(node.MayHaveChildren);
+                Assert.True(node.Metadata?.IsDecompilable);
             },
             node => {
                 Assert.Equal("SomeDelegate", node.Metadata?.Name);
@@ -148,6 +161,7 @@ public class TreeNodeProviderTests
                 Assert.NotEqual(0, node.Metadata?.SymbolToken);
                 Assert.Equal(SymbolModifiers.Public | SymbolModifiers.Sealed, node.SymbolModifiers);
                 Assert.True(node.MayHaveChildren);
+                Assert.True(node.Metadata?.IsDecompilable);
             },
             node => {
                 Assert.Equal("SomeEnum", node.Metadata?.Name);
@@ -156,6 +170,7 @@ public class TreeNodeProviderTests
                 Assert.NotEqual(0, node.Metadata?.SymbolToken);
                 Assert.Equal(SymbolModifiers.Public | SymbolModifiers.Sealed, node.SymbolModifiers);
                 Assert.True(node.MayHaveChildren);
+                Assert.True(node.Metadata?.IsDecompilable);
             },
             node => {
                 Assert.Equal("SomeInterfaceImplementor", node.Metadata?.Name);
@@ -164,6 +179,7 @@ public class TreeNodeProviderTests
                 Assert.NotEqual(0, node.Metadata?.SymbolToken);
                 Assert.Equal(SymbolModifiers.Public, node.SymbolModifiers);
                 Assert.True(node.MayHaveChildren);
+                Assert.True(node.Metadata?.IsDecompilable);
             },
             node => {
                 Assert.Equal("SomeStruct", node.Metadata?.Name);
@@ -172,6 +188,7 @@ public class TreeNodeProviderTests
                 Assert.NotEqual(0, node.Metadata?.SymbolToken);
                 Assert.Equal(SymbolModifiers.Internal | SymbolModifiers.Sealed, node.SymbolModifiers);
                 Assert.True(node.MayHaveChildren);
+                Assert.True(node.Metadata?.IsDecompilable);
             }
         );
     }
@@ -201,6 +218,7 @@ public class TreeNodeProviderTests
                 Assert.Equal(typeNode.Metadata?.SymbolToken, node.Metadata?.SymbolToken);
                 Assert.Equal(SymbolModifiers.None, node.SymbolModifiers);
                 Assert.True(node.MayHaveChildren);
+                Assert.False(node.Metadata?.IsDecompilable);
             },
             node => {
                 Assert.Equal("NestedC", node.Metadata?.Name);
@@ -209,6 +227,7 @@ public class TreeNodeProviderTests
                 Assert.Equal(typeNode.Metadata?.SymbolToken, node.Metadata?.ParentSymbolToken);
                 Assert.Equal(SymbolModifiers.Public, node.SymbolModifiers);
                 Assert.True(node.MayHaveChildren);
+                Assert.True(node.Metadata?.IsDecompilable);
             },
             node => {
                 Assert.Equal("_ProgId", node.Metadata?.Name);
@@ -216,6 +235,7 @@ public class TreeNodeProviderTests
                 Assert.Equal(typeNode.Metadata?.SymbolToken, node.Metadata?.ParentSymbolToken);
                 Assert.Equal(SymbolModifiers.Private, node.SymbolModifiers);
                 Assert.False(node.MayHaveChildren);
+                Assert.True(node.Metadata?.IsDecompilable);
             },
             node => {
                 Assert.Equal("ProgId", node.Metadata?.Name);
@@ -223,6 +243,7 @@ public class TreeNodeProviderTests
                 Assert.Equal(typeNode.Metadata?.SymbolToken, node.Metadata?.ParentSymbolToken);
                 Assert.Equal(SymbolModifiers.Public, node.SymbolModifiers);
                 Assert.False(node.MayHaveChildren);
+                Assert.True(node.Metadata?.IsDecompilable);
             },
             node => {
                 Assert.Equal("CallsFrameworkMethod() : string", node.Metadata?.Name);
@@ -230,6 +251,7 @@ public class TreeNodeProviderTests
                 Assert.Equal(typeNode.Metadata?.SymbolToken, node.Metadata?.ParentSymbolToken);
                 Assert.Equal(SymbolModifiers.Public, node.SymbolModifiers);
                 Assert.False(node.MayHaveChildren);
+                Assert.True(node.Metadata?.IsDecompilable);
             },
             node => {
                 Assert.Equal("op_BitwiseAnd(SomeClass, SomeClass) : SomeClass", node.Metadata?.Name);
@@ -237,6 +259,7 @@ public class TreeNodeProviderTests
                 Assert.Equal(typeNode.Metadata?.SymbolToken, node.Metadata?.ParentSymbolToken);
                 Assert.Equal(SymbolModifiers.Public | SymbolModifiers.Static, node.SymbolModifiers);
                 Assert.False(node.MayHaveChildren);
+                Assert.True(node.Metadata?.IsDecompilable);
             },
             node => {
                 Assert.Equal("SomeClass()", node.Metadata?.Name);
@@ -244,6 +267,7 @@ public class TreeNodeProviderTests
                 Assert.Equal(typeNode.Metadata?.SymbolToken, node.Metadata?.ParentSymbolToken);
                 Assert.Equal(SymbolModifiers.Private | SymbolModifiers.Static, node.SymbolModifiers);
                 Assert.False(node.MayHaveChildren);
+                Assert.True(node.Metadata?.IsDecompilable);
             },
             node => {
                 Assert.Equal("SomeClass()", node.Metadata?.Name);
@@ -251,6 +275,7 @@ public class TreeNodeProviderTests
                 Assert.Equal(typeNode.Metadata?.SymbolToken, node.Metadata?.ParentSymbolToken);
                 Assert.Equal(SymbolModifiers.Public, node.SymbolModifiers);
                 Assert.False(node.MayHaveChildren);
+                Assert.True(node.Metadata?.IsDecompilable);
             },
             node => {
                 Assert.Equal("SomeClass(int)", node.Metadata?.Name);
@@ -258,6 +283,7 @@ public class TreeNodeProviderTests
                 Assert.Equal(typeNode.Metadata?.SymbolToken, node.Metadata?.ParentSymbolToken);
                 Assert.Equal(SymbolModifiers.Internal, node.SymbolModifiers);
                 Assert.False(node.MayHaveChildren);
+                Assert.True(node.Metadata?.IsDecompilable);
             },
             node => {
                 Assert.Equal("SomeCompilerSpecial() : string", node.Metadata?.Name);
@@ -266,6 +292,7 @@ public class TreeNodeProviderTests
                 Assert.Equal(SymbolModifiers.Public, node.SymbolModifiers);
                 Assert.False(node.MayHaveChildren);
                 Assert.Equal(NodeFlags.CompilerGenerated, node.Flags);
+                Assert.True(node.Metadata?.IsDecompilable);
             },
             node => {
                 Assert.Equal("ToString() : string", node.Metadata?.Name);
@@ -273,6 +300,7 @@ public class TreeNodeProviderTests
                 Assert.Equal(typeNode.Metadata?.SymbolToken, node.Metadata?.ParentSymbolToken);
                 Assert.Equal(SymbolModifiers.Public | SymbolModifiers.Override, node.SymbolModifiers);
                 Assert.False(node.MayHaveChildren);
+                Assert.True(node.Metadata?.IsDecompilable);
             },
             node => {
                 Assert.Equal("VirtualMethod() : void", node.Metadata?.Name);
@@ -280,6 +308,7 @@ public class TreeNodeProviderTests
                 Assert.Equal(typeNode.Metadata?.SymbolToken, node.Metadata?.ParentSymbolToken);
                 Assert.Equal(SymbolModifiers.Public | SymbolModifiers.Virtual, node.SymbolModifiers);
                 Assert.False(node.MayHaveChildren);
+                Assert.True(node.Metadata?.IsDecompilable);
             }
         );
     }

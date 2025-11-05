@@ -4,45 +4,44 @@ using ILSpyX.Backend.TreeProviders;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection.Metadata.Ecma335;
 
-namespace ILSpyX.Backend.Tests;
+namespace ILSpyX.Backend.Tests.DecompilerBackendTests;
 
-public class NuGetPackageTreeNodeDecompilationTests
+public class TreeNodeDecompilationTests
 {
-    private static async Task<int> GetTypeToken(DecompilerBackend decompilerBackend, string @namespace, string name)
+    private static async Task<int> GetTypeToken(DecompilerBackend decompilerBackend, string @namespace,
+        string name)
     {
         return (await decompilerBackend
                 .ListTypes(
-                    new AssemblyFileIdentifier(TestHelper.NuGetPackagePath, TestHelper.TestAssemblyNuGetBundlePath),
+                    new AssemblyFileIdentifier(TestHelper.AssemblyPath),
                     @namespace))
             .Where(memberData => memberData.Name == name)
             .Select(memberData => memberData.Token)
             .FirstOrDefault();
     }
 
-    private static async Task<int> GetMemberToken(DecompilerBackend decompilerBackend, int parentTypeToken, string name)
+    private static async Task<int> GetMemberToken(DecompilerBackend decompilerBackend, int parentTypeToken,
+        string name)
     {
         return (await decompilerBackend
                 .GetMembers(
-                    new AssemblyFileIdentifier(TestHelper.NuGetPackagePath, TestHelper.TestAssemblyNuGetBundlePath),
+                    new AssemblyFileIdentifier(TestHelper.AssemblyPath),
                     MetadataTokens.TypeDefinitionHandle(parentTypeToken)))
             .Where(memberData => memberData.Name == name)
             .Select(memberData => memberData.Token)
             .FirstOrDefault();
     }
-
+    
     [Fact]
     public async Task Assembly()
     {
-        var services = await TestHelper.CreateTestServicesWithNuGetPackage();
+        var services = await TestHelper.CreateTestServicesWithAssembly();
         var nodeMetadata = new NodeMetadata
         {
-            AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
-            Type = NodeType.Assembly,
-            Name = TestHelper.AssemblyPath
+            AssemblyPath = TestHelper.AssemblyPath, Type = NodeType.Assembly, Name = TestHelper.AssemblyPath
         };
         Assert.Equal(
-            $"// {TestHelper.TestAssemblyNuGetBundlePath}" +
+            $"// {TestHelper.AssemblyPath}" +
             @"
 // TestAssembly, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
 // Global type: <Module>
@@ -74,13 +73,10 @@ using System.Runtime.Versioning;
     [Fact]
     public async Task Namespace()
     {
-        var services = await TestHelper.CreateTestServicesWithNuGetPackage();
+        var services = await TestHelper.CreateTestServicesWithAssembly();
         var nodeMetadata = new NodeMetadata
         {
-            AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
-            Type = NodeType.Namespace,
-            Name = "A.B.C.D"
+            AssemblyPath = TestHelper.AssemblyPath, Type = NodeType.Namespace, Name = "A.B.C.D"
         };
         Assert.Equal(
             @"namespace A.B.C.D { }",
@@ -91,13 +87,10 @@ using System.Runtime.Versioning;
     [Fact]
     public async Task GlobalNamespace()
     {
-        var services = await TestHelper.CreateTestServicesWithNuGetPackage();
+        var services = await TestHelper.CreateTestServicesWithAssembly();
         var nodeMetadata = new NodeMetadata
         {
-            AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
-            Type = NodeType.Namespace,
-            Name = ""
+            AssemblyPath = TestHelper.AssemblyPath, Type = NodeType.Namespace, Name = ""
         };
         Assert.Equal(
             @"namespace <global> { }",
@@ -108,16 +101,12 @@ using System.Runtime.Versioning;
     [Fact]
     public async Task Class()
     {
-        var services = await TestHelper.CreateTestServicesWithNuGetPackage();
+        var services = await TestHelper.CreateTestServicesWithAssembly();
         int typeToken =
             await GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "Generics", "AClass");
         var nodeMetadata = new NodeMetadata
         {
-            AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
-            Type = NodeType.Class,
-            Name = "",
-            SymbolToken = typeToken
+            AssemblyPath = TestHelper.AssemblyPath, Type = NodeType.Class, Name = "", SymbolToken = typeToken
         };
         Assert.Equal(
             @"namespace Generics;
@@ -148,16 +137,12 @@ public class AClass
     [Fact]
     public async Task Interface()
     {
-        var services = await TestHelper.CreateTestServicesWithNuGetPackage();
+        var services = await TestHelper.CreateTestServicesWithAssembly();
         int typeToken = await GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "TestAssembly",
             "ISomeInterface");
         var nodeMetadata = new NodeMetadata
         {
-            AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
-            Type = NodeType.Interface,
-            Name = "",
-            SymbolToken = typeToken
+            AssemblyPath = TestHelper.AssemblyPath, Type = NodeType.Interface, Name = "", SymbolToken = typeToken
         };
         Assert.Equal(
             @"namespace TestAssembly;
@@ -174,17 +159,12 @@ public interface ISomeInterface
     [Fact]
     public async Task Struct()
     {
-        var services = await TestHelper.CreateTestServicesWithNuGetPackage();
-        int typeToken =
-            await GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "TestAssembly",
-                "SomeStruct");
+        var services = await TestHelper.CreateTestServicesWithAssembly();
+        int typeToken = await GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "TestAssembly",
+            "SomeStruct");
         var nodeMetadata = new NodeMetadata
         {
-            AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
-            Type = NodeType.Struct,
-            Name = "",
-            SymbolToken = typeToken
+            AssemblyPath = TestHelper.AssemblyPath, Type = NodeType.Struct, Name = "", SymbolToken = typeToken
         };
         Assert.Equal(
             @"namespace TestAssembly;
@@ -207,16 +187,12 @@ internal struct SomeStruct
     [Fact]
     public async Task Enum()
     {
-        var services = await TestHelper.CreateTestServicesWithNuGetPackage();
+        var services = await TestHelper.CreateTestServicesWithAssembly();
         int typeToken =
             await GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "TestAssembly", "SomeEnum");
         var nodeMetadata = new NodeMetadata
         {
-            AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
-            Type = NodeType.Enum,
-            Name = "",
-            SymbolToken = typeToken
+            AssemblyPath = TestHelper.AssemblyPath, Type = NodeType.Enum, Name = "", SymbolToken = typeToken
         };
         Assert.Equal(
             @"namespace TestAssembly;
@@ -235,16 +211,14 @@ public enum SomeEnum
     [Fact]
     public async Task Method()
     {
-        var services = await TestHelper.CreateTestServicesWithNuGetPackage();
-        int typeToken =
-            await GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "TestAssembly",
-                "SomeClass");
+        var services = await TestHelper.CreateTestServicesWithAssembly();
+        int typeToken = await GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "TestAssembly",
+            "SomeClass");
         int memberToken = await GetMemberToken(services.GetRequiredService<DecompilerBackend>(), typeToken,
             "ToString() : string");
         var nodeMetadata = new NodeMetadata
         {
-            AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
+            AssemblyPath = TestHelper.AssemblyPath,
             Type = NodeType.Method,
             Name = "",
             SymbolToken = memberToken,
@@ -263,16 +237,14 @@ public enum SomeEnum
     [Fact]
     public async Task Field()
     {
-        var services = await TestHelper.CreateTestServicesWithNuGetPackage();
-        int typeToken =
-            await GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "TestAssembly",
-                "SomeClass");
-        int memberToken =
-            await GetMemberToken(services.GetRequiredService<DecompilerBackend>(), typeToken, "_ProgId");
+        var services = await TestHelper.CreateTestServicesWithAssembly();
+        int typeToken = await GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "TestAssembly",
+            "SomeClass");
+        int memberToken = await
+            GetMemberToken(services.GetRequiredService<DecompilerBackend>(), typeToken, "_ProgId");
         var nodeMetadata = new NodeMetadata
         {
-            AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
+            AssemblyPath = TestHelper.AssemblyPath,
             Type = NodeType.Field,
             Name = "",
             SymbolToken = memberToken,
@@ -288,16 +260,14 @@ public enum SomeEnum
     [Fact]
     public async Task Property()
     {
-        var services = await TestHelper.CreateTestServicesWithNuGetPackage();
-        int typeToken =
-            await GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "TestAssembly",
-                "SomeClass");
-        int memberToken =
-            await GetMemberToken(services.GetRequiredService<DecompilerBackend>(), typeToken, "ProgId");
+        var services = await TestHelper.CreateTestServicesWithAssembly();
+        int typeToken = await GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "TestAssembly",
+            "SomeClass");
+        int memberToken = await
+            GetMemberToken(services.GetRequiredService<DecompilerBackend>(), typeToken, "ProgId");
         var nodeMetadata = new NodeMetadata
         {
-            AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
+            AssemblyPath = TestHelper.AssemblyPath,
             Type = NodeType.Property,
             Name = "",
             SymbolToken = memberToken,
@@ -323,17 +293,14 @@ public enum SomeEnum
     [Fact]
     public async Task Constructor()
     {
-        var services = await TestHelper.CreateTestServicesWithNuGetPackage();
-        int typeToken =
-            await GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "TestAssembly",
-                "SomeClass");
-        int memberToken =
-            await GetMemberToken(services.GetRequiredService<DecompilerBackend>(), typeToken,
-                "SomeClass(int)");
+        var services = await TestHelper.CreateTestServicesWithAssembly();
+        int typeToken = await GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "TestAssembly",
+            "SomeClass");
+        int memberToken = await
+            GetMemberToken(services.GetRequiredService<DecompilerBackend>(), typeToken, "SomeClass(int)");
         var nodeMetadata = new NodeMetadata
         {
-            AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
+            AssemblyPath = TestHelper.AssemblyPath,
             Type = NodeType.Method,
             Name = "",
             SymbolToken = memberToken,
@@ -352,13 +319,10 @@ public enum SomeEnum
     [Fact]
     public async Task ReferencesRoot()
     {
-        var services = await TestHelper.CreateTestServicesWithNuGetPackage();
+        var services = await TestHelper.CreateTestServicesWithAssembly();
         var nodeMetadata = new NodeMetadata
         {
-            AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
-            Type = NodeType.ReferencesRoot,
-            Name = "References",
+            AssemblyPath = TestHelper.AssemblyPath, Type = NodeType.ReferencesRoot, Name = "References",
         };
         Assert.Equal(
             @"// System.Runtime, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
@@ -369,11 +333,10 @@ public enum SomeEnum
     [Fact]
     public async Task AssemblyReference()
     {
-        var services = await TestHelper.CreateTestServicesWithNuGetPackage();
+        var services = await TestHelper.CreateTestServicesWithAssembly();
         var nodeMetadata = new NodeMetadata
         {
-            AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
+            AssemblyPath = TestHelper.AssemblyPath,
             Type = NodeType.AssemblyReference,
             Name = "System.Runtime, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
         };
@@ -386,17 +349,13 @@ public enum SomeEnum
     [Fact]
     public async Task CSharpVariant_Latest()
     {
-        var services = await TestHelper.CreateTestServicesWithNuGetPackage();
+        var services = await TestHelper.CreateTestServicesWithAssembly();
         int typeToken = await GetTypeToken(services.GetRequiredService<DecompilerBackend>(),
             "CSharpVariants",
             "CSharpVariants");
         var nodeMetadata = new NodeMetadata
         {
-            AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
-            Type = NodeType.Interface,
-            Name = "",
-            SymbolToken = typeToken,
+            AssemblyPath = TestHelper.AssemblyPath, Type = NodeType.Interface, Name = "", SymbolToken = typeToken,
         };
         Assert.Equal(
             @"namespace CSharpVariants;
@@ -413,17 +372,13 @@ public class CSharpVariants
     [Fact]
     public async Task CSharpVariant_8()
     {
-        var services = await TestHelper.CreateTestServicesWithNuGetPackage();
+        var services = await TestHelper.CreateTestServicesWithAssembly();
         int typeToken = await GetTypeToken(services.GetRequiredService<DecompilerBackend>(),
             "CSharpVariants",
             "CSharpVariants");
         var nodeMetadata = new NodeMetadata
         {
-            AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
-            Type = NodeType.Interface,
-            Name = "",
-            SymbolToken = typeToken,
+            AssemblyPath = TestHelper.AssemblyPath, Type = NodeType.Interface, Name = "", SymbolToken = typeToken,
         };
         Assert.Equal(
             @"namespace CSharpVariants
@@ -441,17 +396,13 @@ public class CSharpVariants
     [Fact]
     public async Task CSharpVariant_1()
     {
-        var services = await TestHelper.CreateTestServicesWithNuGetPackage();
+        var services = await TestHelper.CreateTestServicesWithAssembly();
         int typeToken = await GetTypeToken(services.GetRequiredService<DecompilerBackend>(),
             "CSharpVariants",
             "CSharpVariants");
         var nodeMetadata = new NodeMetadata
         {
-            AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
-            Type = NodeType.Class,
-            Name = "",
-            SymbolToken = typeToken,
+            AssemblyPath = TestHelper.AssemblyPath, Type = NodeType.Class, Name = "", SymbolToken = typeToken,
         };
         Assert.Equal(
             @"using System.Runtime.CompilerServices;

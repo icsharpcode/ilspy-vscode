@@ -1,10 +1,8 @@
-using ILSpyX.Backend.Decompiler;
 using ILSpyX.Backend.Model;
 using ILSpyX.Backend.TreeProviders;
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection.Metadata.Ecma335;
 
-namespace ILSpyX.Backend.Tests;
+namespace ILSpyX.Backend.Tests.DecompilerBackendTests;
 
 public class NuGetPackageResourceFileDecompilationTests
 {
@@ -21,4 +19,4 @@ public class NuGetPackageResourceFileDecompilationTests
             (await services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
                 .Decompile(nodeMetadata, LanguageName.CSharpLatest)).DecompiledCode);
     }
-}
+}   

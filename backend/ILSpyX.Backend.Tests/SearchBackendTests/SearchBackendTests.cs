@@ -3,7 +3,7 @@ using ILSpyX.Backend.Search;
 using ILSpyX.Backend.TreeProviders;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace ILSpyX.Backend.Tests;
+namespace ILSpyX.Backend.Tests.SearchBackendTests;
 
 public class SearchBackendTests
 {

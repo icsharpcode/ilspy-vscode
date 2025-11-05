@@ -1,6 +1,7 @@
 using ICSharpCode.ILSpyX;
+using ILSpyX.Backend.Model;
 
-namespace ILSpyX.Backend.Model;
+namespace ILSpyX.Backend.Decompiler;
 
 public record AssemblyFileIdentifier(string File, string? BundleSubPath = null);
 

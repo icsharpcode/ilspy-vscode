@@ -3,17 +3,14 @@
 
 using ICSharpCode.Decompiler;
 using ICSharpCode.Decompiler.CSharp;
-using ICSharpCode.Decompiler.CSharp.Syntax;
 using ICSharpCode.Decompiler.Disassembler;
 using ICSharpCode.Decompiler.Metadata;
 using ICSharpCode.Decompiler.TypeSystem;
-using ICSharpCode.ILSpyX;
 using ILSpyX.Backend.Application;
 using ILSpyX.Backend.Model;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection.Metadata;
@@ -299,7 +296,7 @@ public class DecompilerBackend(
     private string GetAssemblyCode(AssemblyFileIdentifier assemblyFile, CSharpDecompiler decompiler)
     {
         using var output = new StringWriter();
-        WriteCommentLine(output, assemblyFile.BundleSubPath ?? assemblyFile.File);
+        WriteCommentLine(output, assemblyFile.BundledAssemblyFile ?? assemblyFile.File);
         var module = decompiler.TypeSystem.MainModule.MetadataFile;
         if (module is null)
         {

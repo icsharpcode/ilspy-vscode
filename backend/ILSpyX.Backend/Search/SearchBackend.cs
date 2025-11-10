@@ -102,7 +102,7 @@ public class SearchBackend(SingleThreadAssemblyList assemblyList, ILSpyBackendSe
             Metadata = new NodeMetadata
             {
                 AssemblyPath = assemblyFileIdentifier.File,
-                BundleSubPath = assemblyFileIdentifier.BundleSubPath,
+                BundledAssemblyName = assemblyFileIdentifier.BundledAssemblyFile,
                 Type = GetNodeType(memberSearchResult),
                 Name = memberSearchResult.Member?.Name ?? memberSearchResult.Name,
                 SymbolToken = memberSearchResult.Member is not null

@@ -5,24 +5,20 @@ using System;
 
 namespace ILSpyX.Backend.Decompiler;
 
-public record AssemblyFileIdentifier(string File, string? BundleSubPath = null);
+public record AssemblyFileIdentifier(string File, string? BundledAssemblyFile = null);
 
 public static class AssemblyFileIdentifierNodeMetadataExtensions
 {
     public static AssemblyFileIdentifier GetAssemblyFileIdentifier(this NodeMetadata nodeMetadata)
     {
-        return new AssemblyFileIdentifier(nodeMetadata.AssemblyPath, nodeMetadata.BundleSubPath);
+        return new AssemblyFileIdentifier(nodeMetadata.AssemblyPath, nodeMetadata.BundledAssemblyName);
     }
 
     public static AssemblyFileIdentifier GetAssemblyFileIdentifier(this LoadedAssembly loadedAssembly)
     {
-        if (loadedAssembly.ParentBundle is not null)
-        {
-            // TODO Here BundleSubPath will miss the relative path inside of bundle!
-            return new AssemblyFileIdentifier(loadedAssembly.ParentBundle.FileName, loadedAssembly.FileName);
-        }
-
-        return new AssemblyFileIdentifier(loadedAssembly.FileName);
+        return loadedAssembly.ParentBundle is not null
+            ? new AssemblyFileIdentifier(loadedAssembly.ParentBundle.FileName, loadedAssembly.FileName)
+            : new AssemblyFileIdentifier(loadedAssembly.FileName);
     }
 
     public static AssemblyFileIdentifier? GetAssemblyFileIdentifier(this MetadataFile metadataFile)

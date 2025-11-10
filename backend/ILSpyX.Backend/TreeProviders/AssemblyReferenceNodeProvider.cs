@@ -40,7 +40,7 @@ public class AssemblyReferenceNodeProvider(DecompilerBackend decompilerBackend) 
                     Metadata = new NodeMetadata
                     {
                         AssemblyPath = assemblyFile.File,
-                        BundleSubPath = assemblyFile.BundleSubPath,
+                        BundledAssemblyName = assemblyFile.BundledAssemblyFile,
                         Type = NodeType.AssemblyReference,
                         Name = reference,
                         IsDecompilable = true

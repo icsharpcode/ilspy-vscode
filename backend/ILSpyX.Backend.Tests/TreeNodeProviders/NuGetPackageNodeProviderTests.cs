@@ -75,18 +75,18 @@ public class NuGetPackageNodeProviderTests
         {
             AssemblyPath = TestHelper.NuGetPackagePath,
             Type = NodeType.PackageFolder,
-            Name = Path.GetDirectoryName(TestHelper.TestAssemblyNuGetBundlePath) ?? "",
+            Name = TestHelper.NuGetBundledAssemblyPath,
         };
         var list = await services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
             .GetChildrenAsync(nodeMetadata);
 
         var node = Assert.Single(list);
         Assert.Equal("TestAssembly, 1.0.0.0, .NETCoreApp, v8.0", node.DisplayName);
-        Assert.Equal(Path.GetFileName(TestHelper.TestAssemblyNuGetBundlePath), node.Description);
+        Assert.Equal(Path.GetFileName(TestHelper.NuGetBundledAssemblyName), node.Description);
         Assert.True(node.MayHaveChildren);
         Assert.Equal(TestHelper.NuGetPackagePath, node.Metadata?.AssemblyPath);
-        Assert.Equal(Path.GetFileName(TestHelper.TestAssemblyNuGetBundlePath), node.Metadata?.Name);
-        Assert.Equal(TestHelper.TestAssemblyNuGetBundlePath, node.Metadata?.BundleSubPath);
+        Assert.Equal(Path.GetFileName(TestHelper.NuGetBundledAssemblyName), node.Metadata?.Name);
+        Assert.Equal(TestHelper.NuGetBundledAssemblyName, node.Metadata?.BundledAssemblyName);
         Assert.Equal(NodeType.Assembly, node.Metadata?.Type);
     }
 
@@ -98,7 +98,7 @@ public class NuGetPackageNodeProviderTests
         var nodeMetadata = new NodeMetadata
         {
             AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
+            BundledAssemblyName = TestHelper.NuGetBundledAssemblyName,
             Type = NodeType.Assembly,
             Name = TestHelper.AssemblyPath,
         };
@@ -168,7 +168,7 @@ public class NuGetPackageNodeProviderTests
         var nodeMetadata = new NodeMetadata
         {
             AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
+            BundledAssemblyName = TestHelper.NuGetBundledAssemblyName,
             Type = NodeType.ReferencesRoot,
             Name = "References",
         };
@@ -179,7 +179,7 @@ public class NuGetPackageNodeProviderTests
         Assert.StartsWith("System.Runtime, Version=", node.DisplayName);
         Assert.False(node.MayHaveChildren);
         Assert.Equal(TestHelper.NuGetPackagePath, node.Metadata?.AssemblyPath);
-        Assert.Equal(TestHelper.TestAssemblyNuGetBundlePath, node.Metadata?.BundleSubPath);
+        Assert.Equal(TestHelper.NuGetBundledAssemblyName, node.Metadata?.BundledAssemblyName);
         Assert.Equal(NodeType.AssemblyReference, node.Metadata?.Type);
     }
 
@@ -190,7 +190,7 @@ public class NuGetPackageNodeProviderTests
         var nodeMetadata = new NodeMetadata
         {
             AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
+            BundledAssemblyName = TestHelper.NuGetBundledAssemblyName,
             Type = NodeType.Namespace,
             Name = "TestAssembly",
         };
@@ -269,7 +269,7 @@ public class NuGetPackageNodeProviderTests
             new NodeMetadata
             {
                 AssemblyPath = TestHelper.NuGetPackagePath,
-                BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
+                BundledAssemblyName = TestHelper.NuGetBundledAssemblyName,
                 Type = NodeType.Namespace,
                 Name = "TestAssembly",
             });
@@ -375,7 +375,7 @@ public class NuGetPackageNodeProviderTests
             new NodeMetadata
             {
                 AssemblyPath = TestHelper.NuGetPackagePath,
-                BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
+                BundledAssemblyName = TestHelper.NuGetBundledAssemblyName,
                 Type = NodeType.Namespace,
                 Name = "TestAssembly",
                 SymbolToken = 0,
@@ -413,9 +413,7 @@ public class NuGetPackageNodeProviderTests
         var iSomeInterfaceMetadata = baseTypesList.ElementAt(0).Metadata;
         string? decompiledCode = (await services.GetRequiredService<TreeNodeProviders>().ForNode(iSomeInterfaceMetadata)
             .Decompile(iSomeInterfaceMetadata!, LanguageName.CSharpLatest)).DecompiledCode;
-        // TODO Currently decompilation of base types in bundled assemblies is not supported...
-        // Assert.Contains("public interface ISomeInterface", decompiledCode);
-        Assert.True(string.IsNullOrEmpty(decompiledCode));
+        Assert.Contains("public interface ISomeInterface", decompiledCode);
 
         var systemObjectMetadata = baseTypesList.ElementAt(1).Metadata;
         decompiledCode = (await services.GetRequiredService<TreeNodeProviders>().ForNode(systemObjectMetadata)
@@ -431,7 +429,7 @@ public class NuGetPackageNodeProviderTests
             new NodeMetadata
             {
                 AssemblyPath = TestHelper.NuGetPackagePath,
-                BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
+                BundledAssemblyName = TestHelper.NuGetBundledAssemblyName,
                 Type = NodeType.Namespace,
                 Name = "TestAssembly",
                 SymbolToken = 0,
@@ -470,15 +468,11 @@ public class NuGetPackageNodeProviderTests
         string? decompiledCode = (await services.GetRequiredService<TreeNodeProviders>()
             .ForNode(someInterfaceImplementorMetadata)
             .Decompile(someInterfaceImplementorMetadata!, LanguageName.CSharpLatest)).DecompiledCode;
-        // TODO Currently decompilation of base types in bundled assemblies is not supported...
-        // Assert.Contains("public class SomeInterfaceImplementor", decompiledCode);
-        Assert.True(string.IsNullOrEmpty(decompiledCode));
+        Assert.Contains("public class SomeInterfaceImplementor", decompiledCode);
 
         var iDerivedInterfaceMetadata = derivedTypesList.ElementAt(1).Metadata;
         decompiledCode = (await services.GetRequiredService<TreeNodeProviders>().ForNode(iDerivedInterfaceMetadata)
             .Decompile(iDerivedInterfaceMetadata!, LanguageName.CSharpLatest)).DecompiledCode;
-        // TODO Currently decompilation of base types in bundled assemblies is not supported...
-        // Assert.Contains("public interface IDerivedInterface", decompiledCode);
-        Assert.True(string.IsNullOrEmpty(decompiledCode));
+        Assert.Contains("public interface IDerivedInterface", decompiledCode);
     }
 }

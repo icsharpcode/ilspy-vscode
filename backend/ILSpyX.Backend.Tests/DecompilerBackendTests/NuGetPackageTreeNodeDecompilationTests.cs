@@ -13,7 +13,7 @@ public class NuGetPackageTreeNodeDecompilationTests
     {
         return (await decompilerBackend
                 .ListTypes(
-                    new AssemblyFileIdentifier(TestHelper.NuGetPackagePath, TestHelper.TestAssemblyNuGetBundlePath),
+                    new AssemblyFileIdentifier(TestHelper.NuGetPackagePath, TestHelper.NuGetBundledAssemblyName),
                     @namespace))
             .Where(memberData => memberData.Name == name)
             .Select(memberData => memberData.Token)
@@ -24,7 +24,7 @@ public class NuGetPackageTreeNodeDecompilationTests
     {
         return (await decompilerBackend
                 .GetMembers(
-                    new AssemblyFileIdentifier(TestHelper.NuGetPackagePath, TestHelper.TestAssemblyNuGetBundlePath),
+                    new AssemblyFileIdentifier(TestHelper.NuGetPackagePath, TestHelper.NuGetBundledAssemblyName),
                     MetadataTokens.TypeDefinitionHandle(parentTypeToken)))
             .Where(memberData => memberData.Name == name)
             .Select(memberData => memberData.Token)
@@ -38,12 +38,12 @@ public class NuGetPackageTreeNodeDecompilationTests
         var nodeMetadata = new NodeMetadata
         {
             AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
+            BundledAssemblyName = TestHelper.NuGetBundledAssemblyName,
             Type = NodeType.Assembly,
             Name = TestHelper.AssemblyPath
         };
         Assert.Equal(
-            $"// {TestHelper.TestAssemblyNuGetBundlePath}" +
+            $"// {TestHelper.NuGetBundledAssemblyName}" +
             @"
 // TestAssembly, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
 // Global type: <Module>
@@ -79,7 +79,7 @@ using System.Runtime.Versioning;
         var nodeMetadata = new NodeMetadata
         {
             AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
+            BundledAssemblyName = TestHelper.NuGetBundledAssemblyName,
             Type = NodeType.Namespace,
             Name = "A.B.C.D"
         };
@@ -96,7 +96,7 @@ using System.Runtime.Versioning;
         var nodeMetadata = new NodeMetadata
         {
             AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
+            BundledAssemblyName = TestHelper.NuGetBundledAssemblyName,
             Type = NodeType.Namespace,
             Name = ""
         };
@@ -115,7 +115,7 @@ using System.Runtime.Versioning;
         var nodeMetadata = new NodeMetadata
         {
             AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
+            BundledAssemblyName = TestHelper.NuGetBundledAssemblyName,
             Type = NodeType.Class,
             Name = "",
             SymbolToken = typeToken
@@ -155,7 +155,7 @@ public class AClass
         var nodeMetadata = new NodeMetadata
         {
             AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
+            BundledAssemblyName = TestHelper.NuGetBundledAssemblyName,
             Type = NodeType.Interface,
             Name = "",
             SymbolToken = typeToken
@@ -182,7 +182,7 @@ public interface ISomeInterface
         var nodeMetadata = new NodeMetadata
         {
             AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
+            BundledAssemblyName = TestHelper.NuGetBundledAssemblyName,
             Type = NodeType.Struct,
             Name = "",
             SymbolToken = typeToken
@@ -214,7 +214,7 @@ internal struct SomeStruct
         var nodeMetadata = new NodeMetadata
         {
             AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
+            BundledAssemblyName = TestHelper.NuGetBundledAssemblyName,
             Type = NodeType.Enum,
             Name = "",
             SymbolToken = typeToken
@@ -245,7 +245,7 @@ public enum SomeEnum
         var nodeMetadata = new NodeMetadata
         {
             AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
+            BundledAssemblyName = TestHelper.NuGetBundledAssemblyName,
             Type = NodeType.Method,
             Name = "",
             SymbolToken = memberToken,
@@ -273,7 +273,7 @@ public enum SomeEnum
         var nodeMetadata = new NodeMetadata
         {
             AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
+            BundledAssemblyName = TestHelper.NuGetBundledAssemblyName,
             Type = NodeType.Field,
             Name = "",
             SymbolToken = memberToken,
@@ -298,7 +298,7 @@ public enum SomeEnum
         var nodeMetadata = new NodeMetadata
         {
             AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
+            BundledAssemblyName = TestHelper.NuGetBundledAssemblyName,
             Type = NodeType.Property,
             Name = "",
             SymbolToken = memberToken,
@@ -334,7 +334,7 @@ public enum SomeEnum
         var nodeMetadata = new NodeMetadata
         {
             AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
+            BundledAssemblyName = TestHelper.NuGetBundledAssemblyName,
             Type = NodeType.Method,
             Name = "",
             SymbolToken = memberToken,
@@ -357,7 +357,7 @@ public enum SomeEnum
         var nodeMetadata = new NodeMetadata
         {
             AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
+            BundledAssemblyName = TestHelper.NuGetBundledAssemblyName,
             Type = NodeType.ReferencesRoot,
             Name = "References",
         };
@@ -374,7 +374,7 @@ public enum SomeEnum
         var nodeMetadata = new NodeMetadata
         {
             AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
+            BundledAssemblyName = TestHelper.NuGetBundledAssemblyName,
             Type = NodeType.AssemblyReference,
             Name = "System.Runtime, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
         };
@@ -394,7 +394,7 @@ public enum SomeEnum
         var nodeMetadata = new NodeMetadata
         {
             AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
+            BundledAssemblyName = TestHelper.NuGetBundledAssemblyName,
             Type = NodeType.Interface,
             Name = "",
             SymbolToken = typeToken,
@@ -421,7 +421,7 @@ public class CSharpVariants
         var nodeMetadata = new NodeMetadata
         {
             AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
+            BundledAssemblyName = TestHelper.NuGetBundledAssemblyName,
             Type = NodeType.Interface,
             Name = "",
             SymbolToken = typeToken,
@@ -449,7 +449,7 @@ public class CSharpVariants
         var nodeMetadata = new NodeMetadata
         {
             AssemblyPath = TestHelper.NuGetPackagePath,
-            BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
+            BundledAssemblyName = TestHelper.NuGetBundledAssemblyName,
             Type = NodeType.Class,
             Name = "",
             SymbolToken = typeToken,

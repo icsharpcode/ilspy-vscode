@@ -58,7 +58,7 @@ public class ReferencesRootNodeProvider(
                 new NodeMetadata
                 {
                     AssemblyPath = assemblyFile.File,
-                    BundleSubPath = assemblyFile.BundleSubPath,
+                    BundledAssemblyName = assemblyFile.BundledAssemblyFile,
                     Type = NodeType.ReferencesRoot,
                     Name = "References"
                 },

@@ -54,7 +54,7 @@ public class BaseTypesNodeProvider(SingleThreadAssemblyList assemblyList)
             Metadata = new NodeMetadata
             {
                 AssemblyPath = assemblyFile.File,
-                BundleSubPath = assemblyFile.BundleSubPath,
+                BundledAssemblyName = assemblyFile.BundledAssemblyFile,
                 Type = NodeType.BaseTypes,
                 Name = "Base Types",
                 SymbolToken = typeSymbolToken,

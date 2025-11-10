@@ -48,7 +48,7 @@ public class NamespaceNodeProvider(TypeNodeProvider typeNodeProvider, Decompiler
                 Metadata = new NodeMetadata
                 {
                     AssemblyPath = assemblyFile.File,
-                    BundleSubPath = assemblyFile.BundleSubPath,
+                    BundledAssemblyName = assemblyFile.BundledAssemblyFile,
                     Type = NodeType.Namespace,
                     Name = ns,
                     IsDecompilable = true

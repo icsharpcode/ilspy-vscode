@@ -121,32 +121,37 @@ public class SingleThreadAssemblyList
 
     public async Task<LoadedAssembly?> FindAssembly(AssemblyFileIdentifier assemblyFile)
     {
-        if (assemblyFile.BundleSubPath is not null)
+        if (assemblyFile.BundledAssemblyFile is not null)
         {
             var assembly = FindAssembly(assemblyFile.File);
             var loadResult = assembly is not null ? await assembly.GetLoadResultAsync() : null;
-            var package = loadResult?.Package;
-            if (package is not null)
+            if (loadResult?.Package is { } package)
             {
-                var folder = package.RootFolder;
-                string[] pathParts = Path.GetDirectoryName(assemblyFile.BundleSubPath)?.Split('/') ?? [];
-                foreach (string folderName in pathParts)
-                {
-                    var nextFolder = folder.Folders.FirstOrDefault(f => f.Name == folderName);
-                    if (nextFolder is null)
-                    {
-                        break;
-                    }
-
-                    folder = nextFolder;
-                }
-
-                return folder.ResolveFileName(Path.GetFileName(assemblyFile.BundleSubPath));
+                return ResolveInDescendants(assemblyFile, package.RootFolder);
             }
         }
         else
         {
             return FindAssembly(assemblyFile.File);
+        }
+
+        return null;
+    }
+
+    private static LoadedAssembly? ResolveInDescendants(AssemblyFileIdentifier assemblyFile, PackageFolder folder)
+    {
+        if (folder.Entries.FirstOrDefault(entry => entry.Name == assemblyFile.BundledAssemblyFile) is
+            { } assemblyEntry)
+        {
+            return folder.ResolveFileName(assemblyEntry.Name);
+        }
+
+        foreach (var subFolder in folder.Folders)
+        {
+            if (ResolveInDescendants(assemblyFile, subFolder) is { } asm)
+            {
+                return asm;
+            }
         }
 
         return null;

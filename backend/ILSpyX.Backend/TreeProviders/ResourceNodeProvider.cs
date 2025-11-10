@@ -23,7 +23,7 @@ public class ResourceNodeProvider : ITreeNodeProvider
             Metadata = new NodeMetadata
             {
                 AssemblyPath = assemblyFile.File,
-                BundleSubPath = assemblyFile.BundleSubPath,
+                BundledAssemblyName = assemblyFile.BundledAssemblyFile,
                 Name = $"{relativePath}/{entry.Name}",
                 Type = NodeType.Resource,
                 IsDecompilable = true,

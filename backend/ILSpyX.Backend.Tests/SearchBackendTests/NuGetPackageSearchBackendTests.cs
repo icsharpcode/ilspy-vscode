@@ -24,7 +24,7 @@ public class NuGetPackageSearchBackendTests
                 Assert.Equal("TestAssembly", node.Description);
                 Assert.Equal(NodeType.Class, node.Metadata?.Type);
                 Assert.Equal(TestHelper.NuGetPackagePath, node.Metadata?.AssemblyPath);
-                Assert.Equal(TestHelper.TestAssemblyNuGetBundlePath, node.Metadata?.BundleSubPath);
+                Assert.Equal(TestHelper.NuGetBundledAssemblyName, node.Metadata?.BundledAssemblyName);
                 Assert.True(node.MayHaveChildren);
                 Assert.Equal(SymbolModifiers.Public, node.SymbolModifiers);
             },
@@ -33,7 +33,7 @@ public class NuGetPackageSearchBackendTests
                 Assert.Equal("TestAssembly.SomeClass", node.Description);
                 Assert.Equal(NodeType.Method, node.Metadata?.Type);
                 Assert.Equal(TestHelper.NuGetPackagePath, node.Metadata?.AssemblyPath);
-                Assert.Equal(TestHelper.TestAssemblyNuGetBundlePath, node.Metadata?.BundleSubPath);
+                Assert.Equal(TestHelper.NuGetBundledAssemblyName, node.Metadata?.BundledAssemblyName);
                 Assert.False(node.MayHaveChildren);
                 Assert.Equal(SymbolModifiers.Static | SymbolModifiers.Private, node.SymbolModifiers);
             },
@@ -42,7 +42,7 @@ public class NuGetPackageSearchBackendTests
                 Assert.Equal("TestAssembly.SomeClass", node.Description);
                 Assert.Equal(NodeType.Method, node.Metadata?.Type);
                 Assert.Equal(TestHelper.NuGetPackagePath, node.Metadata?.AssemblyPath);
-                Assert.Equal(TestHelper.TestAssemblyNuGetBundlePath, node.Metadata?.BundleSubPath);
+                Assert.Equal(TestHelper.NuGetBundledAssemblyName, node.Metadata?.BundledAssemblyName);
                 Assert.False(node.MayHaveChildren);
                 Assert.Equal(SymbolModifiers.Public, node.SymbolModifiers);
             },
@@ -51,7 +51,7 @@ public class NuGetPackageSearchBackendTests
                 Assert.Equal("TestAssembly.SomeClass", node.Description);
                 Assert.Equal(NodeType.Method, node.Metadata?.Type);
                 Assert.Equal(TestHelper.NuGetPackagePath, node.Metadata?.AssemblyPath);
-                Assert.Equal(TestHelper.TestAssemblyNuGetBundlePath, node.Metadata?.BundleSubPath);
+                Assert.Equal(TestHelper.NuGetBundledAssemblyName, node.Metadata?.BundledAssemblyName);
                 Assert.False(node.MayHaveChildren);
                 Assert.Equal(SymbolModifiers.Internal, node.SymbolModifiers);
             }
@@ -68,7 +68,7 @@ public class NuGetPackageSearchBackendTests
         Assert.Equal("TestAssembly", node.Description);
         Assert.Equal(NodeType.Interface, node.Metadata?.Type);
         Assert.Equal(TestHelper.NuGetPackagePath, node.Metadata?.AssemblyPath);
-        Assert.Equal(TestHelper.TestAssemblyNuGetBundlePath, node.Metadata?.BundleSubPath);
+        Assert.Equal(TestHelper.NuGetBundledAssemblyName, node.Metadata?.BundledAssemblyName);
         Assert.True(node.MayHaveChildren);
         Assert.Equal(SymbolModifiers.Abstract | SymbolModifiers.Public, node.SymbolModifiers);
     }
@@ -83,7 +83,7 @@ public class NuGetPackageSearchBackendTests
         Assert.Equal("TestAssembly.SomeEnum", node.Description);
         Assert.Equal(NodeType.Field, node.Metadata?.Type);
         Assert.Equal(TestHelper.NuGetPackagePath, node.Metadata?.AssemblyPath);
-        Assert.Equal(TestHelper.TestAssemblyNuGetBundlePath, node.Metadata?.BundleSubPath);
+        Assert.Equal(TestHelper.NuGetBundledAssemblyName, node.Metadata?.BundledAssemblyName);
         Assert.False(node.MayHaveChildren);
         Assert.Equal(SymbolModifiers.Static | SymbolModifiers.Public, node.SymbolModifiers);
     }
@@ -98,7 +98,7 @@ public class NuGetPackageSearchBackendTests
         Assert.Equal("TestAssembly.SomeClass", node.Description);
         Assert.Equal(NodeType.Method, node.Metadata?.Type);
         Assert.Equal(TestHelper.NuGetPackagePath, node.Metadata?.AssemblyPath);
-        Assert.Equal(TestHelper.TestAssemblyNuGetBundlePath, node.Metadata?.BundleSubPath);
+        Assert.Equal(TestHelper.NuGetBundledAssemblyName, node.Metadata?.BundledAssemblyName);
         Assert.False(node.MayHaveChildren);
         Assert.Equal(SymbolModifiers.Virtual | SymbolModifiers.Public, node.SymbolModifiers);
     }
@@ -113,7 +113,7 @@ public class NuGetPackageSearchBackendTests
         Assert.Equal("TestAssembly.SomeClass", node.Description);
         Assert.Equal(NodeType.Method, node.Metadata?.Type);
         Assert.Equal(TestHelper.NuGetPackagePath, node.Metadata?.AssemblyPath);
-        Assert.Equal(TestHelper.TestAssemblyNuGetBundlePath, node.Metadata?.BundleSubPath);
+        Assert.Equal(TestHelper.NuGetBundledAssemblyName, node.Metadata?.BundledAssemblyName);
         Assert.False(node.MayHaveChildren);
         Assert.Equal(SymbolModifiers.Override | SymbolModifiers.Public, node.SymbolModifiers);
     }
@@ -129,7 +129,7 @@ public class NuGetPackageSearchBackendTests
                 Assert.Equal("TestAssembly", node.Description);
                 Assert.Equal(NodeType.Delegate, node.Metadata?.Type);
                 Assert.Equal(TestHelper.NuGetPackagePath, node.Metadata?.AssemblyPath);
-                Assert.Equal(TestHelper.TestAssemblyNuGetBundlePath, node.Metadata?.BundleSubPath);
+                Assert.Equal(TestHelper.NuGetBundledAssemblyName, node.Metadata?.BundledAssemblyName);
                 Assert.True(node.MayHaveChildren);
                 Assert.Equal(SymbolModifiers.Public | SymbolModifiers.Sealed, node.SymbolModifiers);
             },
@@ -138,7 +138,7 @@ public class NuGetPackageSearchBackendTests
                 Assert.Equal("TestAssembly.SomeDelegate", node.Description);
                 Assert.Equal(NodeType.Method, node.Metadata?.Type);
                 Assert.Equal(TestHelper.NuGetPackagePath, node.Metadata?.AssemblyPath);
-                Assert.Equal(TestHelper.TestAssemblyNuGetBundlePath, node.Metadata?.BundleSubPath);
+                Assert.Equal(TestHelper.NuGetBundledAssemblyName, node.Metadata?.BundledAssemblyName);
                 Assert.False(node.MayHaveChildren);
                 Assert.Equal(SymbolModifiers.Public, node.SymbolModifiers);
             }
@@ -148,14 +148,14 @@ public class NuGetPackageSearchBackendTests
     [Fact]
     public async Task SearchOnlyInAddedAssemblies()
     {
-        var application = await TestHelper.CreateTestServicesWithAssembly();
+        var application = await TestHelper.CreateTestServicesWithNuGetPackage();
         var namespaceNodeProvider = application.GetRequiredService<NamespaceNodeProvider>();
         var typeNodeProvider = application.GetRequiredService<TypeNodeProvider>();
         var types = await namespaceNodeProvider.GetChildrenAsync(
             new NodeMetadata
             {
                 AssemblyPath = TestHelper.NuGetPackagePath,
-                BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
+                BundledAssemblyName = TestHelper.NuGetBundledAssemblyName,
                 Type = NodeType.Namespace,
                 Name = "TestAssembly"
             });
@@ -169,6 +169,6 @@ public class NuGetPackageSearchBackendTests
         Assert.Equal("TestAssembly.SomeClass", node.Description);
         Assert.Equal(NodeType.Method, node.Metadata?.Type);
         Assert.Equal(TestHelper.NuGetPackagePath, node.Metadata?.AssemblyPath);
-        Assert.Equal(TestHelper.TestAssemblyNuGetBundlePath, node.Metadata?.BundleSubPath);
+        Assert.Equal(TestHelper.NuGetBundledAssemblyName, node.Metadata?.BundledAssemblyName);
     }
 }

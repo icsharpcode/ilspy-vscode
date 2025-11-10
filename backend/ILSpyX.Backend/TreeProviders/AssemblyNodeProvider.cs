@@ -42,7 +42,7 @@ public class AssemblyNodeProvider(
                 Metadata = new NodeMetadata
                 {
                     AssemblyPath = assemblyData.ParentBundleFilePath,
-                    BundleSubPath = assemblyData.FilePath,
+                    BundledAssemblyName = assemblyData.FilePath,
                     Type = NodeType.Assembly,
                     Name = Path.GetFileName(assemblyData.FilePath),
                     IsDecompilable = true

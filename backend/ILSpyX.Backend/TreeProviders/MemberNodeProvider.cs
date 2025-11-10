@@ -40,7 +40,7 @@ public class MemberNodeProvider(DecompilerBackend decompilerBackend) : ITreeNode
                         Metadata = new NodeMetadata
                         {
                             AssemblyPath = assemblyFile.File,
-                            BundleSubPath = assemblyFile.BundleSubPath,
+                            BundledAssemblyName = assemblyFile.BundledAssemblyFile,
                             Type = NodeTypeHelper.GetNodeTypeFromTypeKind(nestedTypeDefinition.Kind),
                             Name = nestedTypeDefinition.TypeToString(false),
                             SymbolToken = MetadataTokens.GetToken(nestedTypeDefinition.MetadataToken),
@@ -78,7 +78,7 @@ public class MemberNodeProvider(DecompilerBackend decompilerBackend) : ITreeNode
             Metadata = new NodeMetadata
             {
                 AssemblyPath = assemblyFile.File,
-                BundleSubPath = assemblyFile.BundleSubPath,
+                BundledAssemblyName = assemblyFile.BundledAssemblyFile,
                 Type = NodeTypeHelper.GetNodeTypeFromEntity(member),
                 Name = memberName,
                 SymbolToken = MetadataTokens.GetToken(member.MetadataToken),

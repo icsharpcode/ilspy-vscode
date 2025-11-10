@@ -76,7 +76,7 @@ public class TypeNodeProvider(
             Metadata = new NodeMetadata
             {
                 AssemblyPath = assemblyFile.File,
-                BundleSubPath = assemblyFile.BundleSubPath,
+                BundledAssemblyName = assemblyFile.BundledAssemblyFile,
                 Type = NodeTypeHelper.GetNodeTypeFromTypeKind(typeDefinition.Kind),
                 Name = name,
                 SymbolToken = MetadataTokens.GetToken(typeDefinition.MetadataToken),

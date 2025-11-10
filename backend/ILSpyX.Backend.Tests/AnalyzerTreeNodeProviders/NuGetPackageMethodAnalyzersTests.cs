@@ -18,7 +18,7 @@ public class NuGetPackageMethodAnalyzersTests
             new NodeMetadata
             {
                 AssemblyPath = TestHelper.NuGetPackagePath,
-                BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
+                BundledAssemblyName = TestHelper.NuGetBundledAssemblyName,
                 Type = NodeType.Namespace,
                 Name = "TestAssembly"
             });
@@ -33,7 +33,7 @@ public class NuGetPackageMethodAnalyzersTests
                 Assert.Equal("Used By", node.Description);
                 Assert.True(node.MayHaveChildren);
                 Assert.Equal(TestHelper.NuGetPackagePath, node.Metadata?.AssemblyPath);
-                Assert.Equal(TestHelper.TestAssemblyNuGetBundlePath, node.Metadata?.BundleSubPath);
+                Assert.Equal(TestHelper.NuGetBundledAssemblyName, node.Metadata?.BundledAssemblyName);
                 Assert.Equal(NodeType.Analyzer, node.Metadata?.Type);
                 Assert.Equal("MethodUsedByAnalyzer", node.Metadata?.SubType);
                 Assert.Equal(methodNode.Metadata?.SymbolToken, node.Metadata?.SymbolToken);
@@ -50,7 +50,7 @@ public class NuGetPackageMethodAnalyzersTests
         Assert.Equal("StructMethod() : string", node.DisplayName);
         Assert.Equal("TestAssembly.SomeStruct", node.Description);
         Assert.Equal(TestHelper.NuGetPackagePath, node.Metadata?.AssemblyPath);
-        Assert.Equal(TestHelper.TestAssemblyNuGetBundlePath, node.Metadata?.BundleSubPath);
+        Assert.Equal(TestHelper.NuGetBundledAssemblyName, node.Metadata?.BundledAssemblyName);
         Assert.Equal(NodeType.Method, node.Metadata?.Type);
         Assert.Equal(callerStructTypeNode.Metadata?.SymbolToken, node.Metadata?.ParentSymbolToken);
         Assert.Equal(SymbolModifiers.Public, node.SymbolModifiers);
@@ -70,7 +70,7 @@ public class NuGetPackageMethodAnalyzersTests
             new NodeMetadata
             {
                 AssemblyPath = TestHelper.NuGetPackagePath,
-                BundleSubPath = TestHelper.TestAssemblyNuGetBundlePath,
+                BundledAssemblyName = TestHelper.NuGetBundledAssemblyName,
                 Type = NodeType.Namespace,
                 Name = "TestAssembly"
             });
@@ -83,7 +83,7 @@ public class NuGetPackageMethodAnalyzersTests
                 Assert.Equal("Uses", node.DisplayName);
                 Assert.Equal("Uses", node.Description);
                 Assert.Equal(TestHelper.NuGetPackagePath, node.Metadata?.AssemblyPath);
-                Assert.Equal(TestHelper.TestAssemblyNuGetBundlePath, node.Metadata?.BundleSubPath);
+                Assert.Equal(TestHelper.NuGetBundledAssemblyName, node.Metadata?.BundledAssemblyName);
                 Assert.Equal(NodeType.Analyzer, node.Metadata?.Type);
                 Assert.Equal("MethodUsesAnalyzer", node.Metadata?.SubType);
                 Assert.Equal(methodNode.Metadata?.SymbolToken, node.Metadata?.SymbolToken);

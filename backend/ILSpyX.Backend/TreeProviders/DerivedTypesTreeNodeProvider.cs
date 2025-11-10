@@ -34,7 +34,7 @@ public class DerivedTypesNodeProvider(SingleThreadAssemblyList assemblyList, Dec
             Metadata = new NodeMetadata
             {
                 AssemblyPath = parentNodeMetadata.AssemblyPath,
-                BundleSubPath = parentNodeMetadata.BundleSubPath,
+                BundledAssemblyName = parentNodeMetadata.BundledAssemblyName,
                 Type = NodeType.DerivedTypes,
                 Name = "Derived Types",
                 SymbolToken = parentNodeMetadata.SymbolToken,

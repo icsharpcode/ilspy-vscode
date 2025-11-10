@@ -70,7 +70,7 @@ public class AnalyzerNodeProvider(
                         Metadata = new NodeMetadata
                         {
                             AssemblyPath = assemblyFileIdentifier.File,
-                            BundleSubPath = assemblyFileIdentifier.BundleSubPath,
+                            BundledAssemblyName = assemblyFileIdentifier.BundledAssemblyFile,
                             Type = NodeTypeHelper.GetNodeTypeFromEntity(entity),
                             Name = nodeName,
                             SymbolToken = MetadataTokens.GetToken(entity.MetadataToken),

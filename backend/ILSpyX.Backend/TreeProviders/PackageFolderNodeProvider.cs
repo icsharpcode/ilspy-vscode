@@ -73,7 +73,7 @@ public class PackageFolderNodeProvider(ResourceNodeProvider resourceNodeProvider
                 Metadata = new NodeMetadata
                 {
                     AssemblyPath = packagePath,
-                    BundleSubPath = $"{rootPath}/{newName}",
+                    BundledAssemblyName = $"{rootPath}/{newName}",
                     Type = NodeType.PackageFolder,
                     Name = $"{rootPath}/{newName}",
                     IsDecompilable = false
@@ -93,7 +93,7 @@ public class PackageFolderNodeProvider(ResourceNodeProvider resourceNodeProvider
                 var asm = root.ResolveFileName(entry.Name);
                 if (asm is not null)
                 {
-                    var assemblyNode = await AssemblyUtility.CreateAssemblyDataAsync(asm, rootPath);
+                    var assemblyNode = await AssemblyUtility.CreateAssemblyDataAsync(asm);
                     if (assemblyNode is not null)
                     {
                         children.Add(AssemblyNodeProvider.CreateNode(assemblyNode));

@@ -9,7 +9,7 @@ export default interface NodeMetadata {
   assemblyPath: string;
   type: NodeType;
   name: string;
-  bundleSubPath?: string;
+  bundledAssemblyName?: string;
   symbolToken: number;
   parentSymbolToken: number;
   subType?: string;

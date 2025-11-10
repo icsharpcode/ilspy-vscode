@@ -3,7 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-public class AnalyzerCollector
+namespace ILSpyX.Backend.Analyzers;
+
+public static class AnalyzerCollector
 {
     public static IEnumerable<(ExportAnalyzerAttribute AttributeData, Type AnalyzerType)> GetAnnotatedAnalyzers()
     {

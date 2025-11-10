@@ -30,23 +30,13 @@ public class BaseTypesNodeProvider(SingleThreadAssemblyList assemblyList)
         var baseTypes = await GetBaseTypes(nodeMetadata.GetAssemblyFileIdentifier(), nodeMetadata.SymbolToken);
         return baseTypes
             .Select(baseType => {
-                var metadataFile = baseType.ParentModule?.MetadataFile;
-                LoadedAssembly? loadedAssembly;
-                try
-                {
-                    loadedAssembly = metadataFile?.GetLoadedAssembly();
-                }
-                catch (Exception)
-                {
-                    loadedAssembly = null;
-                }
-
-                if (loadedAssembly is null)
+                var assemblyFileIdentifier = baseType.ParentModule?.MetadataFile?.GetAssemblyFileIdentifier();
+                if (assemblyFileIdentifier is null)
                 {
                     return null;
                 }
 
-                var typeNode = TypeNodeProvider.CreateTypeNode(loadedAssembly.GetAssembilyFileIdentifier(), baseType);
+                var typeNode = TypeNodeProvider.CreateTypeNode(assemblyFileIdentifier, baseType);
                 return typeNode with { DisplayName = baseType.FullName, MayHaveChildren = false };
             }).OfType<Node>();
     }

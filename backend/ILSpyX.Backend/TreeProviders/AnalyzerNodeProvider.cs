@@ -1,8 +1,10 @@
 using ICSharpCode.Decompiler.TypeSystem;
+using ICSharpCode.ILSpyX;
 using ICSharpCode.ILSpyX.Analyzers;
 using ILSpyX.Backend.Analyzers;
 using ILSpyX.Backend.Decompiler;
 using ILSpyX.Backend.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
@@ -56,11 +58,19 @@ public class AnalyzerNodeProvider(
                         ? method.MethodToString(false, false, false)
                         : entity.Name;
                     string location = (entity as IMember)?.DeclaringType.TypeToString(true) ?? "";
+
+                    var assemblyFileIdentifier = entity.ParentModule?.MetadataFile?.GetAssemblyFileIdentifier();
+                    if (assemblyFileIdentifier is null)
+                    {
+                        return null;
+                    }
+                    
                     return new Node
                     {
                         Metadata = new NodeMetadata
                         {
-                            AssemblyPath = entity.ParentModule?.MetadataFile?.FileName ?? "",
+                            AssemblyPath = assemblyFileIdentifier.File,
+                            BundleSubPath = assemblyFileIdentifier.BundleSubPath,
                             Type = NodeTypeHelper.GetNodeTypeFromEntity(entity),
                             Name = nodeName,
                             SymbolToken = MetadataTokens.GetToken(entity.MetadataToken),
@@ -75,7 +85,7 @@ public class AnalyzerNodeProvider(
                         SymbolModifiers = NodeTypeHelper.GetSymbolModifiers(entity),
                         Flags = NodeFlagsHelper.GetNodeFlags(entity)
                     };
-                });
+                }).OfType<Node>();
     }
 
     public async Task<Node?> CreateNode(NodeMetadata? nodeMetadata, AnalyzerInstance analyzer)

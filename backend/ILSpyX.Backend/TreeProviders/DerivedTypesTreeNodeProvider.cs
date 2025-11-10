@@ -51,23 +51,13 @@ public class DerivedTypesNodeProvider(SingleThreadAssemblyList assemblyList, Dec
         return Task.FromResult(FindDerivedTypes(nodeMetadata)
             .ToBlockingEnumerable().Select(derivedType => {
                 var metadataFile = derivedType.ParentModule?.MetadataFile;
-                LoadedAssembly? loadedAssembly;
-                try
-                {
-                    loadedAssembly = metadataFile?.GetLoadedAssembly();
-                }
-                catch (Exception)
-                {
-                    loadedAssembly = null;
-                }
-
-                if (loadedAssembly is null)
+                var assemblyFileIdentifier = derivedType.ParentModule?.MetadataFile?.GetAssemblyFileIdentifier();
+                if (assemblyFileIdentifier is null)
                 {
                     return null;
                 }
-
                 var typeNode =
-                    TypeNodeProvider.CreateTypeNode(loadedAssembly.GetAssembilyFileIdentifier(), derivedType);
+                    TypeNodeProvider.CreateTypeNode(assemblyFileIdentifier, derivedType);
                 return typeNode with
                 {
                     DisplayName = derivedType.FullName, MayHaveChildren = false

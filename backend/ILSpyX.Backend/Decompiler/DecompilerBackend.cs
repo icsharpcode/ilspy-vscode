@@ -96,7 +96,7 @@ public class DecompilerBackend(
     public async Task<IEnumerable<AssemblyData>> GetLoadedAssembliesAsync()
     {
         return (await Task.WhenAll(
-                assemblyList.GetAllAssemblies()
+                assemblyList.GetLoadedAssemblies()
                     .Select(async loadedAssembly => await AssemblyUtility.CreateAssemblyDataAsync(loadedAssembly))))
             .Where(data => data is not null)
             .Cast<AssemblyData>();

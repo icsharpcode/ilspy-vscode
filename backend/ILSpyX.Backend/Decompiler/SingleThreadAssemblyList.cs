@@ -100,10 +100,17 @@ public class SingleThreadAssemblyList
 
     public AssemblyList? AssemblyList => assemblyList;
 
-    public IList<LoadedAssembly> GetAllAssemblies()
+    public IList<LoadedAssembly> GetLoadedAssemblies()
     {
         return assemblyList is not null
             ? assemblyList.GetAssemblies()
+            : new List<LoadedAssembly>();
+    }
+
+    public async Task<IList<LoadedAssembly>> GetMetadataFileAssemblies()
+    {
+        return assemblyList is not null
+            ? await assemblyList.GetAllAssemblies()
             : new List<LoadedAssembly>();
     }
 

@@ -309,7 +309,7 @@
 	},
 	"dependencies": {
 		"ansi-regex": "6.2.2",
-		"chai": "6.2.0",
+		"chai": "6.2.1",
 		"os": "0.1.2",
 		"path": "0.12.7",
 		"temp-dir": "3.0.0",

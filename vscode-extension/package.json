@@ -328,7 +328,7 @@
 		"@vscode/test-electron": "2.5.2",
 		"@vscode/vsce": "3.6.2",
 		"eslint": "9.39.0",
-		"glob": "11.0.3",
+		"glob": "11.1.0",
 		"minimist": "1.2.8",
 		"mocha": "11.7.4",
 		"terser-webpack-plugin": "5.3.14",

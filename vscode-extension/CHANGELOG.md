@@ -4,6 +4,7 @@ All notable changes to the "ilspy-vscode" extension will be documented in this f
 
 ## 0.23
 
+- Support for analyzing NuGet packages (add to assembly tree, browse contents and bundled assemblies)
 - New ILSpy activity bar icon for our view containers (thanks to @banditoth for the icon!)
 
 ## 0.22

@@ -35,36 +35,64 @@ public class NuGetPackageNodeProviderTests
 
         Assert.Collection(list,
             node => {
-                Assert.Equal("/_rels", node.Metadata?.Name);
+                Assert.Equal("_rels", node.Metadata?.Name);
+                Assert.Equal(TestHelper.NuGetPackagePath, node.Metadata?.AssemblyPath);
                 Assert.Equal("_rels", node.DisplayName);
                 Assert.Equal(NodeType.PackageFolder, node.Metadata?.Type);
                 Assert.True(node.MayHaveChildren);
             },
             node => {
-                Assert.Equal("/lib/net8.0", node.Metadata?.Name);
+                Assert.Equal("lib/net8.0", node.Metadata?.Name);
+                Assert.Equal(TestHelper.NuGetPackagePath, node.Metadata?.AssemblyPath);
                 Assert.Equal("lib/net8.0", node.DisplayName);
                 Assert.Equal(NodeType.PackageFolder, node.Metadata?.Type);
                 Assert.True(node.MayHaveChildren);
             },
             node => {
-                Assert.Equal("/package/services/metadata/core-properties", node.Metadata?.Name);
+                Assert.Equal("package/services/metadata/core-properties", node.Metadata?.Name);
+                Assert.Equal(TestHelper.NuGetPackagePath, node.Metadata?.AssemblyPath);
                 Assert.Equal("package/services/metadata/core-properties", node.DisplayName);
                 Assert.Equal(NodeType.PackageFolder, node.Metadata?.Type);
                 Assert.True(node.MayHaveChildren);
             },
             node => {
-                Assert.Equal("/[Content_Types].xml", node.Metadata?.Name);
+                Assert.Equal("[Content_Types].xml", node.Metadata?.Name);
+                Assert.Equal(TestHelper.NuGetPackagePath, node.Metadata?.AssemblyPath);
                 Assert.Equal("[Content_Types].xml", node.DisplayName);
                 Assert.Equal(NodeType.Resource, node.Metadata?.Type);
                 Assert.False(node.MayHaveChildren);
             },
             node => {
-                Assert.Equal("/TestAssembly.nuspec", node.Metadata?.Name);
+                Assert.Equal("TestAssembly.nuspec", node.Metadata?.Name);
                 Assert.Equal("TestAssembly.nuspec", node.DisplayName);
+                Assert.Equal(TestHelper.NuGetPackagePath, node.Metadata?.AssemblyPath);
                 Assert.Equal(NodeType.Resource, node.Metadata?.Type);
                 Assert.False(node.MayHaveChildren);
             }
         );
+    }
+
+    [Fact]
+    public async Task GetPackageSubFolderFolderItems()
+    {
+        var services = await TestHelper.CreateTestServicesWithNuGetPackage();
+        var nodeMetadata = new NodeMetadata
+        {
+            AssemblyPath = TestHelper.NuGetPackagePath,
+            Type = NodeType.PackageFolder,
+            Name = "package/services/metadata/core-properties",
+        };
+        var list = await services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
+            .GetChildrenAsync(nodeMetadata);
+
+        var node = Assert.Single(list);
+        Assert.Equal(TestHelper.NuGetPackagePath, node.Metadata?.AssemblyPath);
+        Assert.Equal("package/services/metadata/core-properties/642d0c151d7148ffae976d3e0e067231.psmdcp",
+            node.Metadata?.Name);
+        Assert.Equal("642d0c151d7148ffae976d3e0e067231.psmdcp",
+            node.DisplayName);
+        Assert.Equal(NodeType.Resource, node.Metadata?.Type);
+        Assert.False(node.MayHaveChildren);
     }
 
     [Fact]

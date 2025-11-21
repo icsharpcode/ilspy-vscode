@@ -73,9 +73,9 @@ public class PackageFolderNodeProvider(ResourceNodeProvider resourceNodeProvider
                 Metadata = new NodeMetadata
                 {
                     AssemblyPath = packagePath,
-                    BundledAssemblyName = $"{rootPath}/{newName}",
+                    BundledAssemblyName = $"{rootPath}{newName}",
                     Type = NodeType.PackageFolder,
-                    Name = $"{rootPath}/{newName}",
+                    Name = $"{rootPath}{newName}",
                     IsDecompilable = false
                 },
                 DisplayName = newName,
@@ -102,13 +102,13 @@ public class PackageFolderNodeProvider(ResourceNodeProvider resourceNodeProvider
                 else
                 {
                     children.Add(
-                        resourceNodeProvider.CreateNode(new AssemblyFileIdentifier(packagePath, entry.FullName), entry,
+                        resourceNodeProvider.CreateNode(new AssemblyFileIdentifier(packagePath), entry,
                             rootPath));
                 }
             }
             else
             {
-                children.Add(resourceNodeProvider.CreateNode(new AssemblyFileIdentifier(packagePath, entry.FullName),
+                children.Add(resourceNodeProvider.CreateNode(new AssemblyFileIdentifier(packagePath),
                     entry, rootPath));
             }
         }

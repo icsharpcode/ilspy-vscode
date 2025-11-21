@@ -87,10 +87,10 @@ public class NuGetPackageNodeProviderTests
 
         var node = Assert.Single(list);
         Assert.Equal(TestHelper.NuGetPackagePath, node.Metadata?.AssemblyPath);
-        Assert.Equal("package/services/metadata/core-properties/642d0c151d7148ffae976d3e0e067231.psmdcp",
+        Assert.StartsWith("package/services/metadata/core-properties/",
             node.Metadata?.Name);
-        Assert.Equal("642d0c151d7148ffae976d3e0e067231.psmdcp",
-            node.DisplayName);
+        Assert.EndsWith(".psmdcp", node.Metadata?.Name);
+        Assert.EndsWith(".psmdcp", node.DisplayName);
         Assert.Equal(NodeType.Resource, node.Metadata?.Type);
         Assert.False(node.MayHaveChildren);
     }

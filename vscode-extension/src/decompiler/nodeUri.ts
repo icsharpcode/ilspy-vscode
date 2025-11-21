@@ -19,6 +19,7 @@ export function nodeDataToUri(nodeData: Node): vscode.Uri {
       bundledAssemblyName
         ? `${assemblyFile};${bundledAssemblyName}`
         : assemblyFile,
+      ":",
       nodeData.metadata?.name ?? ""
     )
   ).with({
@@ -37,20 +38,42 @@ export function uriToNode(uri: vscode.Uri): NodeMetadata | undefined {
     return undefined;
   }
 
-  const assemblyPathParts = path.dirname(uri.fsPath).split(";");
+  const assemblyPathAndNameParts = uri.fsPath.split(":");
+  const name =
+    assemblyPathAndNameParts.length > 1 ? assemblyPathAndNameParts[1] : "";
+
+  const assemblyPathParts = assemblyPathAndNameParts[0].split(";");
   const assembly = assemblyPathParts[0];
   const bundledAssemblyName =
     assemblyPathParts.length > 1 ? assemblyPathParts[1] : undefined;
-  const name = path.basename(uri.fsPath);
+
   const [symbolToken, type, parentSymbolToken, isDecompilable] =
     uri.query.split(":");
   return {
-    assemblyPath: assembly,
-    bundledAssemblyName,
+    assemblyPath: trimTrailingSlashes(assembly),
+    bundledAssemblyName: bundledAssemblyName
+      ? trimTrailingSlashes(bundledAssemblyName)
+      : undefined,
     type: parseInt(type) as NodeType,
     symbolToken: parseInt(symbolToken),
     parentSymbolToken: parseInt(parentSymbolToken),
     isDecompilable: isDecompilable === "1",
-    name,
+    name: trimLeadingSlashes(name),
   };
+}
+
+function trimLeadingSlashes(input: string) {
+  let result = input;
+  if (result.startsWith("/")) {
+    result = result.substring(1);
+  }
+  return result;
+}
+
+function trimTrailingSlashes(input: string) {
+  let result = input;
+  if (result.endsWith("/")) {
+    result = result.slice(0, -1);
+  }
+  return result;
 }

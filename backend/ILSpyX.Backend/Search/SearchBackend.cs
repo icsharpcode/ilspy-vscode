@@ -32,7 +32,7 @@ public class SearchBackend(SingleThreadAssemblyList assemblyList, ILSpyBackendSe
 
         try
         {
-            var assemblies = (await assemblyList.GetAllAssemblies()).Where(assembly => !assembly.IsAutoLoaded);
+            var assemblies = (await assemblyList.GetMetadataFileAssemblies()).Where(assembly => !assembly.IsAutoLoaded);
 
             var resultQueue = new ConcurrentQueue<SearchResult>();
             var searchRequest = CreateSearchRequest(searchTerm, SearchMode.TypeAndMember);
@@ -59,7 +59,8 @@ public class SearchBackend(SingleThreadAssemblyList assemblyList, ILSpyBackendSe
                 }
             }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).ConfigureAwait(false);
 
-            return resultQueue.Where(IsNotAccessor).OrderBy(r => r, resultsComparer).Select(ConvertResultToNode);
+            return resultQueue.Where(IsNotAccessor).OrderBy(r => r, resultsComparer).Select(ConvertResultToNode)
+                .OfType<Node>();
         }
         catch (TaskCanceledException)
         {
@@ -79,29 +80,44 @@ public class SearchBackend(SingleThreadAssemblyList assemblyList, ILSpyBackendSe
         return true;
     }
 
-    private Node ConvertResultToNode(SearchResult result)
+    private Node? ConvertResultToNode(SearchResult result)
     {
-        var memberSearchResult = result as MemberSearchResult;
+        return result switch
+        {
+            MemberSearchResult memberSearchResult => ConvertMemberSearchResultToNode(memberSearchResult),
+            _ => null
+        };
+    }
+
+    private Node? ConvertMemberSearchResultToNode(MemberSearchResult memberSearchResult)
+    {
+        var assemblyFileIdentifier = memberSearchResult.Member.ParentModule?.MetadataFile?.GetAssemblyFileIdentifier();
+        if (assemblyFileIdentifier is null)
+        {
+            return null;
+        }
+
         return new Node
         {
             Metadata = new NodeMetadata
             {
-                AssemblyPath = result.Assembly,
-                Type = GetNodeType(result),
-                Name = memberSearchResult?.Member?.Name ?? result.Name,
-                SymbolToken = memberSearchResult?.Member is not null
+                AssemblyPath = assemblyFileIdentifier.File,
+                BundledAssemblyName = assemblyFileIdentifier.BundledAssemblyFile,
+                Type = GetNodeType(memberSearchResult),
+                Name = memberSearchResult.Member?.Name ?? memberSearchResult.Name,
+                SymbolToken = memberSearchResult.Member is not null
                     ? MetadataTokens.GetToken(memberSearchResult.Member.MetadataToken)
                     : 0,
-                ParentSymbolToken = memberSearchResult?.Member?.DeclaringTypeDefinition?.MetadataToken != null
+                ParentSymbolToken = memberSearchResult.Member?.DeclaringTypeDefinition?.MetadataToken != null
                     ? MetadataTokens.GetToken(memberSearchResult.Member.DeclaringTypeDefinition.MetadataToken)
                     : 0,
                 IsDecompilable = true
             },
-            DisplayName = result.Name,
-            Description = result.Location,
-            MayHaveChildren = memberSearchResult?.Member is ITypeDefinition,
-            SymbolModifiers = GetSymbolModifiers(result),
-            Flags = NodeFlagsHelper.GetNodeFlags(result)
+            DisplayName = memberSearchResult.Name,
+            Description = memberSearchResult.Location,
+            MayHaveChildren = memberSearchResult.Member is ITypeDefinition,
+            SymbolModifiers = GetSymbolModifiers(memberSearchResult),
+            Flags = NodeFlagsHelper.GetNodeFlags(memberSearchResult)
         };
     }
 

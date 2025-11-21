@@ -58,6 +58,7 @@ public static class ILSpyXServiceCollectionExtensions
         return serviceCollection.AddSingleton<DummyTreeNodeProvider>()
             .AddSingleton<AssemblyTreeRootNodesProvider>()
             .AddSingleton<AssemblyNodeProvider>()
+            .AddSingleton<NuGetPackageNodeProvider>()
             .AddSingleton<ReferencesRootNodeProvider>()
             .AddSingleton<AssemblyReferenceNodeProvider>()
             .AddSingleton<NamespaceNodeProvider>()
@@ -66,6 +67,8 @@ public static class ILSpyXServiceCollectionExtensions
             .AddSingleton<AnalyzersRootNodesProvider>()
             .AddSingleton<AnalyzerNodeProvider>()
             .AddSingleton<BaseTypesNodeProvider>()
-            .AddSingleton<DerivedTypesNodeProvider>();
+            .AddSingleton<DerivedTypesNodeProvider>()
+            .AddSingleton<PackageFolderNodeProvider>()
+            .AddSingleton<ResourceNodeProvider>();
     }
 }

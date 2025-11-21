@@ -1,8 +1,10 @@
 using ICSharpCode.Decompiler.TypeSystem;
+using ICSharpCode.ILSpyX;
 using ICSharpCode.ILSpyX.Analyzers;
 using ILSpyX.Backend.Analyzers;
 using ILSpyX.Backend.Decompiler;
 using ILSpyX.Backend.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
@@ -16,27 +18,22 @@ public class AnalyzerNodeProvider(
     SingleThreadAssemblyList singleThreadAssemblyList,
     AnalyzerBackend analyzerBackend) : ITreeNodeProvider
 {
-    public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
+    public Task<DecompileResult> Decompile(NodeMetadata nodeMetadata, string outputLanguage)
     {
-        return DecompileResult.Empty();
+        return Task.FromResult(DecompileResult.Empty());
     }
 
-    public Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
+    public async Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
     {
         if (nodeMetadata is null || nodeMetadata.Type != NodeType.Analyzer)
         {
-            return Task.FromResult(Enumerable.Empty<Node>());
+            return [];
         }
 
         var analyzer = analyzerBackend.GetAnalyzerForNode(nodeMetadata)?.Instance;
-        if (analyzer is null)
+        if (analyzer is null || singleThreadAssemblyList.AssemblyList is null)
         {
-            return Task.FromResult(Enumerable.Empty<Node>());
-        }
-
-        if (singleThreadAssemblyList.AssemblyList is null)
-        {
-            return Task.FromResult(Enumerable.Empty<Node>());
+            return [];
         }
 
         var context = new AnalyzerContext
@@ -46,14 +43,14 @@ public class AnalyzerNodeProvider(
             AssemblyList = singleThreadAssemblyList.AssemblyList
         };
 
-        var nodeEntity = decompilerBackend.GetEntityFromHandle(
-            nodeMetadata.AssemblyPath, MetadataTokens.EntityHandle(nodeMetadata.SymbolToken));
+        var nodeEntity = await decompilerBackend.GetEntityFromHandle(
+            nodeMetadata.GetAssemblyFileIdentifier(), MetadataTokens.EntityHandle(nodeMetadata.SymbolToken));
         if (nodeEntity is null || !analyzer.Show(nodeEntity))
         {
-            return Task.FromResult(Enumerable.Empty<Node>());
+            return [];
         }
 
-        return Task.FromResult(
+        return
             analyzer.Analyze(nodeEntity, context)
                 .OfType<IEntity>()
                 .Select(entity => {
@@ -61,11 +58,19 @@ public class AnalyzerNodeProvider(
                         ? method.MethodToString(false, false, false)
                         : entity.Name;
                     string location = (entity as IMember)?.DeclaringType.TypeToString(true) ?? "";
+
+                    var assemblyFileIdentifier = entity.ParentModule?.MetadataFile?.GetAssemblyFileIdentifier();
+                    if (assemblyFileIdentifier is null)
+                    {
+                        return null;
+                    }
+                    
                     return new Node
                     {
                         Metadata = new NodeMetadata
                         {
-                            AssemblyPath = entity.ParentModule?.MetadataFile?.FileName ?? "",
+                            AssemblyPath = assemblyFileIdentifier.File,
+                            BundledAssemblyName = assemblyFileIdentifier.BundledAssemblyFile,
                             Type = NodeTypeHelper.GetNodeTypeFromEntity(entity),
                             Name = nodeName,
                             SymbolToken = MetadataTokens.GetToken(entity.MetadataToken),
@@ -80,19 +85,18 @@ public class AnalyzerNodeProvider(
                         SymbolModifiers = NodeTypeHelper.GetSymbolModifiers(entity),
                         Flags = NodeFlagsHelper.GetNodeFlags(entity)
                     };
-                })
-        );
+                }).OfType<Node>();
     }
 
-    public Node? CreateNode(NodeMetadata? nodeMetadata, AnalyzerInstance analyzer)
+    public async Task<Node?> CreateNode(NodeMetadata? nodeMetadata, AnalyzerInstance analyzer)
     {
         if (nodeMetadata is null)
         {
             return null;
         }
 
-        var nodeEntity = decompilerBackend.GetEntityFromHandle(
-            nodeMetadata.AssemblyPath, MetadataTokens.EntityHandle(nodeMetadata.SymbolToken));
+        var nodeEntity = await decompilerBackend.GetEntityFromHandle(
+            nodeMetadata.GetAssemblyFileIdentifier(), MetadataTokens.EntityHandle(nodeMetadata.SymbolToken));
         if (nodeEntity is null || !analyzer.Instance.Show(nodeEntity))
         {
             return null;

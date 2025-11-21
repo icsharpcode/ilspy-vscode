@@ -9,13 +9,13 @@ namespace ILSpyX.Backend.TreeProviders;
 public interface ITreeNodeProvider
 {
     public Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata) => Task.FromResult(Enumerable.Empty<Node>());
-    DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage);
+    Task<DecompileResult> Decompile(NodeMetadata nodeMetadata, string outputLanguage);
 }
 
 public class DummyTreeNodeProvider : ITreeNodeProvider
 {
-    public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
+    public Task<DecompileResult> Decompile(NodeMetadata nodeMetadata, string outputLanguage)
     {
-        return DecompileResult.Empty();
+        return Task.FromResult(DecompileResult.Empty());
     }
 }

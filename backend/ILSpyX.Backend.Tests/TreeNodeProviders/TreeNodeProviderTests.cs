@@ -356,13 +356,13 @@ public class TreeNodeProviderTests
 
         // Decompilation test verifies validity of NodeMetadata
         var iSomeInterfaceMetadata = baseTypesList.ElementAt(0).Metadata;
-        string? decompiledCode = services.GetRequiredService<TreeNodeProviders>().ForNode(iSomeInterfaceMetadata)
-            .Decompile(iSomeInterfaceMetadata!, LanguageName.CSharpLatest).DecompiledCode;
+        string? decompiledCode = (await services.GetRequiredService<TreeNodeProviders>().ForNode(iSomeInterfaceMetadata)
+            .Decompile(iSomeInterfaceMetadata!, LanguageName.CSharpLatest)).DecompiledCode;
         Assert.Contains("public interface ISomeInterface", decompiledCode);
 
         var systemObjectMetadata = baseTypesList.ElementAt(1).Metadata;
-        decompiledCode = services.GetRequiredService<TreeNodeProviders>().ForNode(systemObjectMetadata)
-            .Decompile(systemObjectMetadata!, LanguageName.CSharpLatest).DecompiledCode;
+        decompiledCode = (await services.GetRequiredService<TreeNodeProviders>().ForNode(systemObjectMetadata)
+            .Decompile(systemObjectMetadata!, LanguageName.CSharpLatest)).DecompiledCode;
         Assert.Contains("public class Object", decompiledCode);
     }
 
@@ -409,14 +409,14 @@ public class TreeNodeProviderTests
 
         // Decompilation test verifies validity of NodeMetadata
         var someInterfaceImplementorMetadata = derivedTypesList.ElementAt(0).Metadata;
-        string? decompiledCode = services.GetRequiredService<TreeNodeProviders>()
+        string? decompiledCode = (await services.GetRequiredService<TreeNodeProviders>()
             .ForNode(someInterfaceImplementorMetadata)
-            .Decompile(someInterfaceImplementorMetadata!, LanguageName.CSharpLatest).DecompiledCode;
+            .Decompile(someInterfaceImplementorMetadata!, LanguageName.CSharpLatest)).DecompiledCode;
         Assert.Contains("public class SomeInterfaceImplementor", decompiledCode);
 
         var iDerivedInterfaceMetadata = derivedTypesList.ElementAt(1).Metadata;
-        decompiledCode = services.GetRequiredService<TreeNodeProviders>().ForNode(iDerivedInterfaceMetadata)
-            .Decompile(iDerivedInterfaceMetadata!, LanguageName.CSharpLatest).DecompiledCode;
+        decompiledCode = (await services.GetRequiredService<TreeNodeProviders>().ForNode(iDerivedInterfaceMetadata)
+            .Decompile(iDerivedInterfaceMetadata!, LanguageName.CSharpLatest)).DecompiledCode;
         Assert.Contains("public interface IDerivedInterface", decompiledCode);
     }
 }

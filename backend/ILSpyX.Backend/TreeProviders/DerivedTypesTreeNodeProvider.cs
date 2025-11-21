@@ -3,6 +3,7 @@ using ICSharpCode.Decompiler.TypeSystem;
 using ICSharpCode.ILSpyX;
 using ILSpyX.Backend.Decompiler;
 using ILSpyX.Backend.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata;
@@ -15,9 +16,9 @@ namespace ILSpyX.Backend.TreeProviders;
 public class DerivedTypesNodeProvider(SingleThreadAssemblyList assemblyList, DecompilerBackend decompilerBackend)
     : ITreeNodeProvider
 {
-    public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
+    public Task<DecompileResult> Decompile(NodeMetadata nodeMetadata, string outputLanguage)
     {
-        return DecompileResult.Empty();
+        return Task.FromResult(DecompileResult.Empty());
     }
 
     public Node? CreateNode(NodeMetadata parentNodeMetadata)
@@ -33,6 +34,7 @@ public class DerivedTypesNodeProvider(SingleThreadAssemblyList assemblyList, Dec
             Metadata = new NodeMetadata
             {
                 AssemblyPath = parentNodeMetadata.AssemblyPath,
+                BundledAssemblyName = parentNodeMetadata.BundledAssemblyName,
                 Type = NodeType.DerivedTypes,
                 Name = "Derived Types",
                 SymbolToken = parentNodeMetadata.SymbolToken,
@@ -48,14 +50,19 @@ public class DerivedTypesNodeProvider(SingleThreadAssemblyList assemblyList, Dec
     {
         return Task.FromResult(FindDerivedTypes(nodeMetadata)
             .ToBlockingEnumerable().Select(derivedType => {
+                var metadataFile = derivedType.ParentModule?.MetadataFile;
+                var assemblyFileIdentifier = derivedType.ParentModule?.MetadataFile?.GetAssemblyFileIdentifier();
+                if (assemblyFileIdentifier is null)
+                {
+                    return null;
+                }
                 var typeNode =
-                    TypeNodeProvider.CreateTypeNode(derivedType.ParentModule?.MetadataFile?.FileName ?? string.Empty,
-                        derivedType);
+                    TypeNodeProvider.CreateTypeNode(assemblyFileIdentifier, derivedType);
                 return typeNode with
                 {
                     DisplayName = derivedType.FullName, MayHaveChildren = false
                 };
-            }));
+            }).OfType<Node>());
     }
 
     private async IAsyncEnumerable<ITypeDefinition> FindDerivedTypes(NodeMetadata? nodeMetadata)
@@ -65,7 +72,7 @@ public class DerivedTypesNodeProvider(SingleThreadAssemblyList assemblyList, Dec
             yield break;
         }
 
-        var typeDefinition = GetTypeDefinition(nodeMetadata);
+        var typeDefinition = await GetTypeDefinition(nodeMetadata);
         var definitionMetadata = typeDefinition?.ParentModule?.MetadataFile?.Metadata;
         if (typeDefinition is null || definitionMetadata is null)
         {
@@ -111,14 +118,14 @@ public class DerivedTypesNodeProvider(SingleThreadAssemblyList assemblyList, Dec
     }
 
 
-    private ITypeDefinition? GetTypeDefinition(NodeMetadata? nodeMetadata)
+    private async Task<ITypeDefinition?> GetTypeDefinition(NodeMetadata? nodeMetadata)
     {
         if (nodeMetadata is null || assemblyList.AssemblyList is null)
         {
             return null;
         }
 
-        var decompiler = decompilerBackend.CreateDecompiler(nodeMetadata.AssemblyPath);
+        var decompiler = await decompilerBackend.CreateDecompiler(nodeMetadata.GetAssemblyFileIdentifier());
         var typeSystem = decompiler?.TypeSystem;
         return typeSystem?.MainModule.GetDefinition(
             MetadataTokens.TypeDefinitionHandle(nodeMetadata.SymbolToken));

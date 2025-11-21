@@ -23,7 +23,7 @@ public class DecompileNodeHandler(DecompilerBackend decompilerBackend, TreeNodeP
                 Task.FromResult(treeNodeProviders
                     .ForNode(request.NodeMetadata)
                     .Decompile(request.NodeMetadata, request.OutputLanguage)));
-        return new DecompileResponse(result, shouldUpdateAssemblyList);
+        return new DecompileResponse(await result, shouldUpdateAssemblyList);
     }
 
 }

@@ -15,10 +15,10 @@ public class TypeNodeProvider(
     DecompilerBackend decompilerBackend)
     : ITreeNodeProvider
 {
-    public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
+    public Task<DecompileResult> Decompile(NodeMetadata nodeMetadata, string outputLanguage)
     {
         return decompilerBackend.GetCode(
-            nodeMetadata.AssemblyPath,
+            nodeMetadata.GetAssemblyFileIdentifier(),
             MetadataTokens.EntityHandle(nodeMetadata.SymbolToken),
             outputLanguage);
     }
@@ -32,17 +32,17 @@ public class TypeNodeProvider(
 
         IEnumerable<Node?> nodes =
         [
-            baseTypesNodeProvider.CreateNode(nodeMetadata.AssemblyPath, nodeMetadata.SymbolToken),
+            await baseTypesNodeProvider.CreateNode(nodeMetadata.GetAssemblyFileIdentifier(), nodeMetadata.SymbolToken),
             derivedTypesNodeProvider.CreateNode(nodeMetadata)
         ];
 
         return nodes.OfType<Node>().Concat(await memberNodeProvider.CreateNodesAsync(
-            nodeMetadata.AssemblyPath, nodeMetadata.SymbolToken));
+            nodeMetadata.GetAssemblyFileIdentifier(), nodeMetadata.SymbolToken));
     }
 
-    public IEnumerable<Node> CreateNodes(string assemblyPath, string @namespace)
+    public async Task<IEnumerable<Node>> CreateNodes(AssemblyFileIdentifier assemblyFile, string @namespace)
     {
-        var decompiler = decompilerBackend.CreateDecompiler(assemblyPath);
+        var decompiler = await decompilerBackend.CreateDecompiler(assemblyFile);
         if (decompiler is null)
         {
             return [];
@@ -65,17 +65,18 @@ public class TypeNodeProvider(
             }
         }
 
-        return currentNamespace.Types.OrderBy(t => t.FullName).Select(t => CreateTypeNode(assemblyPath, t));
+        return currentNamespace.Types.OrderBy(t => t.FullName).Select(t => CreateTypeNode(assemblyFile, t));
     }
 
-    public static Node CreateTypeNode(string assemblyPath, ITypeDefinition typeDefinition)
+    public static Node CreateTypeNode(AssemblyFileIdentifier assemblyFile, ITypeDefinition typeDefinition)
     {
         string name = typeDefinition.TypeToString(false);
         return new Node
         {
             Metadata = new NodeMetadata
             {
-                AssemblyPath = assemblyPath,
+                AssemblyPath = assemblyFile.File,
+                BundledAssemblyName = assemblyFile.BundledAssemblyFile,
                 Type = NodeTypeHelper.GetNodeTypeFromTypeKind(typeDefinition.Kind),
                 Name = name,
                 SymbolToken = MetadataTokens.GetToken(typeDefinition.MetadataToken),

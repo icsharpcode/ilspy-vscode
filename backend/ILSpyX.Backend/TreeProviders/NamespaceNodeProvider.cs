@@ -9,26 +9,26 @@ namespace ILSpyX.Backend.TreeProviders;
 public class NamespaceNodeProvider(TypeNodeProvider typeNodeProvider, DecompilerBackend decompilerBackend)
     : ITreeNodeProvider
 {
-    public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
+    public Task<DecompileResult> Decompile(NodeMetadata nodeMetadata, string outputLanguage)
     {
         string namespaceName = string.IsNullOrEmpty(nodeMetadata.Name) ? "<global>" : nodeMetadata.Name;
-        return outputLanguage switch
+        return Task.FromResult(outputLanguage switch
         {
             LanguageName.IL => DecompileResult.WithCode($"namespace {namespaceName}"),
             _ => DecompileResult.WithCode($"namespace {namespaceName} {{ }}")
-        };
+        });
     }
 
-    public Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
+    public async Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
     {
-        return Task.FromResult(nodeMetadata?.Type != NodeType.Namespace
+        return nodeMetadata?.Type != NodeType.Namespace
             ? []
-            : typeNodeProvider.CreateNodes(nodeMetadata.AssemblyPath, nodeMetadata.Name));
+            : await typeNodeProvider.CreateNodes(nodeMetadata.GetAssemblyFileIdentifier(), nodeMetadata.Name);
     }
 
-    public IEnumerable<Node> CreateNodes(string assemblyPath)
+    public async Task<IEnumerable<Node>> CreateNodes(AssemblyFileIdentifier assemblyFile)
     {
-        var decompiler = decompilerBackend.CreateDecompiler(assemblyPath);
+        var decompiler = await decompilerBackend.CreateDecompiler(assemblyFile);
         if (decompiler is null)
         {
             return [];
@@ -47,7 +47,11 @@ public class NamespaceNodeProvider(TypeNodeProvider typeNodeProvider, Decompiler
             {
                 Metadata = new NodeMetadata
                 {
-                    AssemblyPath = assemblyPath, Type = NodeType.Namespace, Name = ns, IsDecompilable = true
+                    AssemblyPath = assemblyFile.File,
+                    BundledAssemblyName = assemblyFile.BundledAssemblyFile,
+                    Type = NodeType.Namespace,
+                    Name = ns,
+                    IsDecompilable = true
                 },
                 DisplayName = ns,
                 Description = string.Empty,

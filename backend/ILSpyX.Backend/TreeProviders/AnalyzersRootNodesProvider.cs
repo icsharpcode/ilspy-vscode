@@ -10,15 +10,16 @@ namespace ILSpyX.Backend.TreeProviders;
 public class AnalyzersRootNodesProvider(AnalyzerNodeProvider analyzerNodeProvider, AnalyzerBackend analyzerBackend)
     : ITreeNodeProvider
 {
-    public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
+    public Task<DecompileResult> Decompile(NodeMetadata nodeMetadata, string outputLanguage)
     {
-        return DecompileResult.Empty();
+        return Task.FromResult(DecompileResult.Empty());
     }
 
-    public Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
+    public async Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
     {
-        return Task.FromResult(
-            analyzerBackend.Analyzers.Select(analyzer => analyzerNodeProvider.CreateNode(nodeMetadata, analyzer))
-                .OfType<Node>());
+        return
+            (await Task.WhenAll(analyzerBackend.Analyzers.Select(analyzer =>
+                analyzerNodeProvider.CreateNode(nodeMetadata, analyzer))))
+            .OfType<Node>();
     }
 }

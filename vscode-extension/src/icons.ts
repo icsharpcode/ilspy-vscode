@@ -3,31 +3,51 @@
  *  Licensed under the MIT License. See LICENSE.TXT in the project root for license information.
  *-----------------------------------------------------------------------------------------------*/
 
+import { ThemeIcon } from "vscode";
 import { NodeType } from "./protocol/NodeType";
+import path = require("path");
 
-const UNKNOWN_ICON = "question";
+const UNKNOWN_ICON = { id: "question" };
 
-const ProductIconMapping: { [key in NodeType]?: string } = {
-  [NodeType.Assembly]: "library",
-  [NodeType.Namespace]: "symbol-namespace",
-  [NodeType.Event]: "symbol-event",
-  [NodeType.Field]: "symbol-field",
-  [NodeType.Method]: "symbol-method",
-  [NodeType.Enum]: "symbol-enum",
-  [NodeType.Class]: "symbol-class",
-  [NodeType.Interface]: "symbol-interface",
-  [NodeType.Struct]: "symbol-struct",
-  [NodeType.Delegate]: "symbol-class",
-  [NodeType.Const]: "symbol-constant",
-  [NodeType.Property]: "symbol-property",
-  [NodeType.ReferencesRoot]: "folder-library",
-  [NodeType.AssemblyReference]: "library",
+const ProductIconMapping: {
+  [key in NodeType]?: { id: string } | { customIcon: string };
+} = {
+  [NodeType.Assembly]: { id: "library" },
+  [NodeType.Namespace]: { id: "symbol-namespace" },
+  [NodeType.Event]: { id: "symbol-event" },
+  [NodeType.Field]: { id: "symbol-field" },
+  [NodeType.Method]: { id: "symbol-method" },
+  [NodeType.Enum]: { id: "symbol-enum" },
+  [NodeType.Class]: { id: "symbol-class" },
+  [NodeType.Interface]: { id: "symbol-interface" },
+  [NodeType.Struct]: { id: "symbol-struct" },
+  [NodeType.Delegate]: { id: "symbol-class" },
+  [NodeType.Const]: { id: "symbol-constant" },
+  [NodeType.Property]: { id: "symbol-property" },
+  [NodeType.ReferencesRoot]: { id: "folder-library" },
+  [NodeType.AssemblyReference]: { id: "library" },
   [NodeType.Unknown]: UNKNOWN_ICON,
-  [NodeType.Analyzer]: "question",
-  [NodeType.BaseTypes]: "arrow-up",
-  [NodeType.DerivedTypes]: "arrow-down",
+  [NodeType.Analyzer]: { id: "question" },
+  [NodeType.BaseTypes]: { id: "arrow-up" },
+  [NodeType.DerivedTypes]: { id: "arrow-down" },
+  [NodeType.NuGetPackage]: { customIcon: "nuget" },
+  [NodeType.PackageFolder]: { id: "folder" },
+  [NodeType.Resource]: { id: "file" },
 };
 
 export function getNodeIcon(nodeType: NodeType | undefined) {
-  return ProductIconMapping[nodeType ?? NodeType.Unknown] ?? UNKNOWN_ICON;
+  const iconMapping =
+    ProductIconMapping[nodeType ?? NodeType.Unknown] ?? UNKNOWN_ICON;
+  if ("id" in iconMapping) {
+    return new ThemeIcon(iconMapping.id);
+  } else {
+    const basePath = path.join(
+      __dirname,
+      "..",
+      "resources",
+      "tree-icons",
+      iconMapping.customIcon
+    );
+    return { light: `${basePath}_light.svg`, dark: `${basePath}_dark.svg` };
+  }
 }

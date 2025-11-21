@@ -103,6 +103,8 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
   }
 
   public getTreeItem(node: Node): TreeItem {
+    const test = getNodeIcon(node.metadata?.type);
+
     return {
       label: node.displayName,
       tooltip: createNodeTooltip(node),
@@ -117,7 +119,7 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
           }
         : undefined,
       contextValue: getNodeContextValue(node),
-      iconPath: new ThemeIcon(getNodeIcon(node.metadata?.type)),
+      iconPath: getNodeIcon(node.metadata?.type),
       resourceUri: hasNodeFlag(node, NodeFlags.AutoLoaded)
         ? Uri.parse(
             `ilspy-autoloaded://${node.metadata?.assemblyPath}/${
@@ -153,7 +155,8 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
           result.nodes
             .filter(
               (node) =>
-                node.metadata?.type === NodeType.Assembly &&
+                (node.metadata?.type === NodeType.Assembly ||
+                  node.metadata?.type === NodeType.NuGetPackage) &&
                 !hasNodeFlag(node, NodeFlags.AutoLoaded)
             )
             .map((node) => node.metadata!.assemblyPath)

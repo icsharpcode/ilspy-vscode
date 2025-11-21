@@ -4,28 +4,34 @@ using ILSpyX.Backend.TreeProviders;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection.Metadata.Ecma335;
 
-namespace ILSpyX.Backend.Tests;
+namespace ILSpyX.Backend.Tests.DecompilerBackendTests;
 
 public class TreeNodeDecompilationTests
 {
-    private static int GetTypeToken(DecompilerBackend decompilerBackend, string @namespace, string name)
+    private static async Task<int> GetTypeToken(DecompilerBackend decompilerBackend, string @namespace,
+        string name)
     {
-        return decompilerBackend
-            .ListTypes(TestHelper.AssemblyPath, @namespace)
+        return (await decompilerBackend
+                .ListTypes(
+                    new AssemblyFileIdentifier(TestHelper.AssemblyPath),
+                    @namespace))
             .Where(memberData => memberData.Name == name)
             .Select(memberData => memberData.Token)
             .FirstOrDefault();
     }
 
-    private static int GetMemberToken(DecompilerBackend decompilerBackend, int parentTypeToken, string name)
+    private static async Task<int> GetMemberToken(DecompilerBackend decompilerBackend, int parentTypeToken,
+        string name)
     {
-        return decompilerBackend
-            .GetMembers(TestHelper.AssemblyPath, MetadataTokens.TypeDefinitionHandle(parentTypeToken))
+        return (await decompilerBackend
+                .GetMembers(
+                    new AssemblyFileIdentifier(TestHelper.AssemblyPath),
+                    MetadataTokens.TypeDefinitionHandle(parentTypeToken)))
             .Where(memberData => memberData.Name == name)
             .Select(memberData => memberData.Token)
             .FirstOrDefault();
     }
-
+    
     [Fact]
     public async Task Assembly()
     {
@@ -60,8 +66,8 @@ using System.Runtime.Versioning;
 [module: RefSafetyRules(11)]
 
 ",
-            services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
-                .Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);
+            (await services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
+                .Decompile(nodeMetadata, LanguageName.CSharpLatest)).DecompiledCode);
     }
 
     [Fact]
@@ -74,8 +80,8 @@ using System.Runtime.Versioning;
         };
         Assert.Equal(
             @"namespace A.B.C.D { }",
-            services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
-                .Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);
+            (await services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
+                .Decompile(nodeMetadata, LanguageName.CSharpLatest)).DecompiledCode);
     }
 
     [Fact]
@@ -88,15 +94,16 @@ using System.Runtime.Versioning;
         };
         Assert.Equal(
             @"namespace <global> { }",
-            services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
-                .Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);
+            (await services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
+                .Decompile(nodeMetadata, LanguageName.CSharpLatest)).DecompiledCode);
     }
 
     [Fact]
     public async Task Class()
     {
         var services = await TestHelper.CreateTestServicesWithAssembly();
-        int typeToken = GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "Generics", "AClass");
+        int typeToken =
+            await GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "Generics", "AClass");
         var nodeMetadata = new NodeMetadata
         {
             AssemblyPath = TestHelper.AssemblyPath, Type = NodeType.Class, Name = "", SymbolToken = typeToken
@@ -123,15 +130,15 @@ public class AClass
     }
 }
 ",
-            services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
-                .Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);
+            (await services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
+                .Decompile(nodeMetadata, LanguageName.CSharpLatest)).DecompiledCode);
     }
 
     [Fact]
     public async Task Interface()
     {
         var services = await TestHelper.CreateTestServicesWithAssembly();
-        int typeToken = GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "TestAssembly",
+        int typeToken = await GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "TestAssembly",
             "ISomeInterface");
         var nodeMetadata = new NodeMetadata
         {
@@ -145,15 +152,16 @@ public interface ISomeInterface
     int I { get; set; }
 }
 ",
-            services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
-                .Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);
+            (await services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
+                .Decompile(nodeMetadata, LanguageName.CSharpLatest)).DecompiledCode);
     }
 
     [Fact]
     public async Task Struct()
     {
         var services = await TestHelper.CreateTestServicesWithAssembly();
-        int typeToken = GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "TestAssembly", "SomeStruct");
+        int typeToken = await GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "TestAssembly",
+            "SomeStruct");
         var nodeMetadata = new NodeMetadata
         {
             AssemblyPath = TestHelper.AssemblyPath, Type = NodeType.Struct, Name = "", SymbolToken = typeToken
@@ -172,15 +180,16 @@ internal struct SomeStruct
     }
 }
 ",
-            services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
-                .Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);
+            (await services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
+                .Decompile(nodeMetadata, LanguageName.CSharpLatest)).DecompiledCode);
     }
 
     [Fact]
     public async Task Enum()
     {
         var services = await TestHelper.CreateTestServicesWithAssembly();
-        int typeToken = GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "TestAssembly", "SomeEnum");
+        int typeToken =
+            await GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "TestAssembly", "SomeEnum");
         var nodeMetadata = new NodeMetadata
         {
             AssemblyPath = TestHelper.AssemblyPath, Type = NodeType.Enum, Name = "", SymbolToken = typeToken
@@ -195,16 +204,17 @@ public enum SomeEnum
     E3
 }
 ",
-            services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
-                .Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);
+            (await services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
+                .Decompile(nodeMetadata, LanguageName.CSharpLatest)).DecompiledCode);
     }
 
     [Fact]
     public async Task Method()
     {
         var services = await TestHelper.CreateTestServicesWithAssembly();
-        int typeToken = GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "TestAssembly", "SomeClass");
-        int memberToken = GetMemberToken(services.GetRequiredService<DecompilerBackend>(), typeToken,
+        int typeToken = await GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "TestAssembly",
+            "SomeClass");
+        int memberToken = await GetMemberToken(services.GetRequiredService<DecompilerBackend>(), typeToken,
             "ToString() : string");
         var nodeMetadata = new NodeMetadata
         {
@@ -220,16 +230,18 @@ public enum SomeEnum
     return base.ToString() ?? string.Empty;
 }
 ",
-            services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
-                .Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);
+            (await services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
+                .Decompile(nodeMetadata, LanguageName.CSharpLatest)).DecompiledCode);
     }
 
     [Fact]
     public async Task Field()
     {
         var services = await TestHelper.CreateTestServicesWithAssembly();
-        int typeToken = GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "TestAssembly", "SomeClass");
-        int memberToken = GetMemberToken(services.GetRequiredService<DecompilerBackend>(), typeToken, "_ProgId");
+        int typeToken = await GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "TestAssembly",
+            "SomeClass");
+        int memberToken = await
+            GetMemberToken(services.GetRequiredService<DecompilerBackend>(), typeToken, "_ProgId");
         var nodeMetadata = new NodeMetadata
         {
             AssemblyPath = TestHelper.AssemblyPath,
@@ -241,16 +253,18 @@ public enum SomeEnum
         Assert.Equal(
             @"private int _ProgId;
 ",
-            services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
-                .Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);
+            (await services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
+                .Decompile(nodeMetadata, LanguageName.CSharpLatest)).DecompiledCode);
     }
 
     [Fact]
     public async Task Property()
     {
         var services = await TestHelper.CreateTestServicesWithAssembly();
-        int typeToken = GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "TestAssembly", "SomeClass");
-        int memberToken = GetMemberToken(services.GetRequiredService<DecompilerBackend>(), typeToken, "ProgId");
+        int typeToken = await GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "TestAssembly",
+            "SomeClass");
+        int memberToken = await
+            GetMemberToken(services.GetRequiredService<DecompilerBackend>(), typeToken, "ProgId");
         var nodeMetadata = new NodeMetadata
         {
             AssemblyPath = TestHelper.AssemblyPath,
@@ -272,16 +286,17 @@ public enum SomeEnum
     }
 }
 ",
-            services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
-                .Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);
+            (await services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
+                .Decompile(nodeMetadata, LanguageName.CSharpLatest)).DecompiledCode);
     }
 
     [Fact]
     public async Task Constructor()
     {
         var services = await TestHelper.CreateTestServicesWithAssembly();
-        int typeToken = GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "TestAssembly", "SomeClass");
-        int memberToken =
+        int typeToken = await GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "TestAssembly",
+            "SomeClass");
+        int memberToken = await
             GetMemberToken(services.GetRequiredService<DecompilerBackend>(), typeToken, "SomeClass(int)");
         var nodeMetadata = new NodeMetadata
         {
@@ -297,8 +312,8 @@ public enum SomeEnum
     ProgId = ProgramId;
 }
 ",
-            services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
-                .Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);
+            (await services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
+                .Decompile(nodeMetadata, LanguageName.CSharpLatest)).DecompiledCode);
     }
 
     [Fact]
@@ -311,8 +326,8 @@ public enum SomeEnum
         };
         Assert.Equal(
             @"// System.Runtime, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
-            services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
-                .Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);
+            (await services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
+                .Decompile(nodeMetadata, LanguageName.CSharpLatest)).DecompiledCode);
     }
 
     [Fact]
@@ -327,15 +342,16 @@ public enum SomeEnum
         };
         Assert.Equal(
             @"// System.Runtime, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
-            services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
-                .Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);
+            (await services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
+                .Decompile(nodeMetadata, LanguageName.CSharpLatest)).DecompiledCode);
     }
 
     [Fact]
     public async Task CSharpVariant_Latest()
     {
         var services = await TestHelper.CreateTestServicesWithAssembly();
-        int typeToken = GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "CSharpVariants",
+        int typeToken = await GetTypeToken(services.GetRequiredService<DecompilerBackend>(),
+            "CSharpVariants",
             "CSharpVariants");
         var nodeMetadata = new NodeMetadata
         {
@@ -349,15 +365,16 @@ public class CSharpVariants
     public string? nullableMember;
 }
 ",
-            services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
-                .Decompile(nodeMetadata, LanguageName.CSharpLatest).DecompiledCode);
+            (await services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
+                .Decompile(nodeMetadata, LanguageName.CSharpLatest)).DecompiledCode);
     }
 
     [Fact]
     public async Task CSharpVariant_8()
     {
         var services = await TestHelper.CreateTestServicesWithAssembly();
-        int typeToken = GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "CSharpVariants",
+        int typeToken = await GetTypeToken(services.GetRequiredService<DecompilerBackend>(),
+            "CSharpVariants",
             "CSharpVariants");
         var nodeMetadata = new NodeMetadata
         {
@@ -372,15 +389,16 @@ public class CSharpVariants
     }
 }
 ",
-            services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
-                .Decompile(nodeMetadata, LanguageName.CSharp_8).DecompiledCode);
+            (await services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
+                .Decompile(nodeMetadata, LanguageName.CSharp_8)).DecompiledCode);
     }
 
     [Fact]
     public async Task CSharpVariant_1()
     {
         var services = await TestHelper.CreateTestServicesWithAssembly();
-        int typeToken = GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "CSharpVariants",
+        int typeToken = await GetTypeToken(services.GetRequiredService<DecompilerBackend>(),
+            "CSharpVariants",
             "CSharpVariants");
         var nodeMetadata = new NodeMetadata
         {
@@ -398,7 +416,7 @@ namespace CSharpVariants
     }
 }
 ",
-            services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
-                .Decompile(nodeMetadata, LanguageName.CSharp_1).DecompiledCode);
+            (await services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
+                .Decompile(nodeMetadata, LanguageName.CSharp_1)).DecompiledCode);
     }
 }

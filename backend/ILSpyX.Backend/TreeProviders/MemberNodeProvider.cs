@@ -10,27 +10,28 @@ namespace ILSpyX.Backend.TreeProviders;
 
 public class MemberNodeProvider(DecompilerBackend decompilerBackend) : ITreeNodeProvider
 {
-    public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
+    public Task<DecompileResult> Decompile(NodeMetadata nodeMetadata, string outputLanguage)
     {
         return decompilerBackend.GetCode(
-            nodeMetadata.AssemblyPath,
+            nodeMetadata.GetAssemblyFileIdentifier(),
             MetadataTokens.EntityHandle(nodeMetadata.SymbolToken),
             outputLanguage);
     }
 
-    public Task<IEnumerable<Node>> CreateNodesAsync(string assemblyPath, int parentTypeSymbolToken)
+    public async Task<IEnumerable<Node>> CreateNodesAsync(AssemblyFileIdentifier assemblyFile,
+        int parentTypeSymbolToken)
     {
-        var decompiler = decompilerBackend.CreateDecompiler(assemblyPath);
+        var decompiler = await decompilerBackend.CreateDecompiler(assemblyFile);
         if (decompiler is null)
         {
-            return Task.FromResult(Enumerable.Empty<Node>());
+            return [];
         }
 
         var typeSystem = decompiler.TypeSystem;
         var typeDefinition = typeSystem.MainModule.GetDefinition(
             MetadataTokens.TypeDefinitionHandle(parentTypeSymbolToken));
 
-        return Task.FromResult(
+        return
             typeDefinition == null
                 ? []
                 : typeDefinition.NestedTypes
@@ -38,7 +39,8 @@ public class MemberNodeProvider(DecompilerBackend decompilerBackend) : ITreeNode
                     {
                         Metadata = new NodeMetadata
                         {
-                            AssemblyPath = assemblyPath,
+                            AssemblyPath = assemblyFile.File,
+                            BundledAssemblyName = assemblyFile.BundledAssemblyFile,
                             Type = NodeTypeHelper.GetNodeTypeFromTypeKind(nestedTypeDefinition.Kind),
                             Name = nestedTypeDefinition.TypeToString(false),
                             SymbolToken = MetadataTokens.GetToken(nestedTypeDefinition.MetadataToken),
@@ -52,21 +54,20 @@ public class MemberNodeProvider(DecompilerBackend decompilerBackend) : ITreeNode
                         Flags = NodeFlagsHelper.GetNodeFlags(nestedTypeDefinition)
                     })
                     .Union(typeDefinition.Fields.Select(field =>
-                            CreateMemberNode(parentTypeSymbolToken, field, assemblyPath, typeDefinition))
+                            CreateMemberNode(parentTypeSymbolToken, field, assemblyFile, typeDefinition))
                         .OrderBy(m => m.Metadata?.Name))
                     .Union(typeDefinition.Properties.Select(property =>
-                            CreateMemberNode(parentTypeSymbolToken, property, assemblyPath, typeDefinition))
+                            CreateMemberNode(parentTypeSymbolToken, property, assemblyFile, typeDefinition))
                         .OrderBy(m => m.Metadata?.Name))
                     .Union(typeDefinition.Events.Select(@event =>
-                            CreateMemberNode(parentTypeSymbolToken, @event, assemblyPath, typeDefinition))
+                            CreateMemberNode(parentTypeSymbolToken, @event, assemblyFile, typeDefinition))
                         .OrderBy(m => m.Metadata?.Name))
                     .Union(typeDefinition.Methods.Select(method =>
-                            CreateMemberNode(parentTypeSymbolToken, method, assemblyPath, typeDefinition))
-                        .OrderBy(m => m.Metadata?.Name))
-        );
+                            CreateMemberNode(parentTypeSymbolToken, method, assemblyFile, typeDefinition))
+                        .OrderBy(m => m.Metadata?.Name));
     }
 
-    private static Node CreateMemberNode(int parentTypeSymbolToken, IMember member, string assemblyPath,
+    private static Node CreateMemberNode(int parentTypeSymbolToken, IMember member, AssemblyFileIdentifier assemblyFile,
         ITypeDefinition typeDefinition)
     {
         string memberName = member is IMethod method
@@ -76,7 +77,8 @@ public class MemberNodeProvider(DecompilerBackend decompilerBackend) : ITreeNode
         {
             Metadata = new NodeMetadata
             {
-                AssemblyPath = assemblyPath,
+                AssemblyPath = assemblyFile.File,
+                BundledAssemblyName = assemblyFile.BundledAssemblyFile,
                 Type = NodeTypeHelper.GetNodeTypeFromEntity(member),
                 Name = memberName,
                 SymbolToken = MetadataTokens.GetToken(member.MetadataToken),

@@ -8,18 +8,18 @@ namespace ILSpyX.Backend.TreeProviders;
 
 public class AssemblyReferenceNodeProvider(DecompilerBackend decompilerBackend) : ITreeNodeProvider
 {
-    public DecompileResult Decompile(NodeMetadata nodeMetadata, string outputLanguage)
+    public Task<DecompileResult> Decompile(NodeMetadata nodeMetadata, string outputLanguage)
     {
         string code = $"// {nodeMetadata.Name}";
-        return DecompileResult.WithCode(code);
+        return Task.FromResult(DecompileResult.WithCode(code));
     }
 
-    public Task<IEnumerable<Node>> CreateNodesAsync(string assemblyPath)
+    public async Task<IEnumerable<Node>> CreateNodesAsync(AssemblyFileIdentifier assemblyFile)
     {
-        var decompiler = decompilerBackend.CreateDecompiler(assemblyPath);
+        var decompiler = await decompilerBackend.CreateDecompiler(assemblyFile);
         if (decompiler is null)
         {
-            return Task.FromResult(Enumerable.Empty<Node>());
+            return [];
         }
 
         HashSet<string> references = new(decompiler.TypeSystem.NameComparer);
@@ -32,14 +32,15 @@ public class AssemblyReferenceNodeProvider(DecompilerBackend decompilerBackend) 
             }
         }
 
-        return Task.FromResult(
+        return
             references
                 .OrderBy(n => n)
                 .Select(reference => new Node
                 {
                     Metadata = new NodeMetadata
                     {
-                        AssemblyPath = assemblyPath,
+                        AssemblyPath = assemblyFile.File,
+                        BundledAssemblyName = assemblyFile.BundledAssemblyFile,
                         Type = NodeType.AssemblyReference,
                         Name = reference,
                         IsDecompilable = true
@@ -47,7 +48,6 @@ public class AssemblyReferenceNodeProvider(DecompilerBackend decompilerBackend) 
                     DisplayName = reference,
                     Description = string.Empty,
                     MayHaveChildren = false
-                })
-        );
+                });
     }
 }

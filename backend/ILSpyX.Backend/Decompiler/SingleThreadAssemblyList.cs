@@ -1,7 +1,10 @@
 using ICSharpCode.ILSpyX;
+using ILSpyX.Backend.Model;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ILSpyX.Backend.Decompiler;
@@ -97,7 +100,14 @@ public class SingleThreadAssemblyList
 
     public AssemblyList? AssemblyList => assemblyList;
 
-    public async Task<IList<LoadedAssembly>> GetAllAssemblies()
+    public IList<LoadedAssembly> GetLoadedAssemblies()
+    {
+        return assemblyList is not null
+            ? assemblyList.GetAssemblies()
+            : new List<LoadedAssembly>();
+    }
+
+    public async Task<IList<LoadedAssembly>> GetMetadataFileAssemblies()
     {
         return assemblyList is not null
             ? await assemblyList.GetAllAssemblies()
@@ -107,6 +117,44 @@ public class SingleThreadAssemblyList
     public LoadedAssembly? FindAssembly(string file)
     {
         return assemblyList?.FindAssembly(file);
+    }
+
+    public async Task<LoadedAssembly?> FindAssembly(AssemblyFileIdentifier assemblyFile)
+    {
+        if (assemblyFile.BundledAssemblyFile is not null)
+        {
+            var assembly = FindAssembly(assemblyFile.File);
+            var loadResult = assembly is not null ? await assembly.GetLoadResultAsync() : null;
+            if (loadResult?.Package is { } package)
+            {
+                return ResolveInDescendants(assemblyFile, package.RootFolder);
+            }
+        }
+        else
+        {
+            return FindAssembly(assemblyFile.File);
+        }
+
+        return null;
+    }
+
+    private static LoadedAssembly? ResolveInDescendants(AssemblyFileIdentifier assemblyFile, PackageFolder folder)
+    {
+        if (folder.Entries.FirstOrDefault(entry => entry.Name == assemblyFile.BundledAssemblyFile) is
+            { } assemblyEntry)
+        {
+            return folder.ResolveFileName(assemblyEntry.Name);
+        }
+
+        foreach (var subFolder in folder.Folders)
+        {
+            if (ResolveInDescendants(assemblyFile, subFolder) is { } asm)
+            {
+                return asm;
+            }
+        }
+
+        return null;
     }
 }
 

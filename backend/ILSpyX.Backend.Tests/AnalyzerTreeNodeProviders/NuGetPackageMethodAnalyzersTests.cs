@@ -96,8 +96,9 @@ public class NuGetPackageMethodAnalyzersTests
         var methodUsesNodes =
             await analyzerNodeProvider.GetChildrenAsync(
                 analyzerNodes.First(analyzer => analyzer.Metadata?.SubType == "MethodUsesAnalyzer")?.Metadata);
-        var node = Assert.Single(methodUsesNodes);
-        Assert.Equal("Join(string?, string?[]) : string", node.DisplayName);
+        Assert.Equal(3, methodUsesNodes.Count());
+        var node = methodUsesNodes.ElementAt(2);
+        Assert.Equal("Join(string?, ReadOnlySpan<string?>) : string", node.DisplayName);
         Assert.Equal("System.String", node.Description);
         Assert.Contains("System.Private.CoreLib.dll", node.Metadata?.AssemblyPath);
         Assert.Equal(NodeType.Method, node.Metadata?.Type);

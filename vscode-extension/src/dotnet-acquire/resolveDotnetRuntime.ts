@@ -29,18 +29,29 @@ export async function resolveDotnetRuntime(
 
     if (cachedDotnetRuntime) {
       logger.writeLine(
-        `Already acquired ${cachedDotnetRuntime}, use that for now`
+        `Already acquired ${cachedDotnetRuntime}, use that for now and try updating in background`
       );
       dotnetPath = cachedDotnetRuntime;
-    }
 
-    acquireDotnetRuntime(context, logger).then((acquiredDotnetRuntime) => {
+      acquireDotnetRuntime(context, logger).then((acquiredDotnetRuntime) => {
+        cacheDotnetRuntimePath(
+          context,
+          DOTNET_RUNTIME_VERSION,
+          acquiredDotnetRuntime
+        );
+      });
+    } else {
+      logger.writeLine(
+        `No known installed runtime for v${DOTNET_RUNTIME_VERSION}, wait until it's acquired...`
+      );
+      const acquiredDotnetRuntime = await acquireDotnetRuntime(context, logger);
+      dotnetPath = acquiredDotnetRuntime;
       cacheDotnetRuntimePath(
         context,
         DOTNET_RUNTIME_VERSION,
         acquiredDotnetRuntime
       );
-    });
+    }
   } catch (error: any) {
     logger.writeLine(`[ERROR] Acquiring .NET runtime: ${error.toString()}`);
     vscode.window.showWarningMessage(formatAcquireError(error.toString()));

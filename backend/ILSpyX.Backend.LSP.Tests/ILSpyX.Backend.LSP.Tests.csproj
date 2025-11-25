@@ -1,19 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\ILSpyX.Backend.LSP\ILSpyX.Backend.LSP.csproj" />
-      <ProjectReference Include="..\TestAssembly\TestAssembly.csproj" />
+        <ProjectReference Include="..\ILSpyX.Backend.LSP\ILSpyX.Backend.LSP.csproj"/>
+        <ProjectReference Include="..\TestAssembly\TestAssembly.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
-      <PackageReference Include="xunit" Version="2.9.3" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1"/>
+        <PackageReference Include="xunit" Version="2.9.3"/>
     </ItemGroup>
 
 </Project>

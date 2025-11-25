@@ -6,6 +6,7 @@ All notable changes to the "ilspy-vscode" extension will be documented in this f
 
 - Support for analyzing NuGet packages (add to assembly tree, browse contents and bundled assemblies)
 - New ILSpy activity bar icon for our view containers (thanks to @banditoth for the icon!)
+- Backend has been migrated to .NET 10, the extension now installs .NET 10 runtime on start
 
 ## 0.22
 

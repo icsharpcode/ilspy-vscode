@@ -13,7 +13,7 @@ public class TreeNodeProviderTests
         var services = await TestHelper.CreateTestServicesWithAssembly();
         var list = await services.GetRequiredService<AssemblyTreeRootNodesProvider>().GetChildrenAsync(null);
         var node = Assert.Single(list);
-        Assert.Equal("TestAssembly, 1.0.0.0, .NETCoreApp, v8.0", node.DisplayName);
+        Assert.Equal("TestAssembly, 1.0.0.0, .NETCoreApp, v10.0", node.DisplayName);
         Assert.Equal(TestHelper.AssemblyPath, node.Description);
         Assert.True(node.MayHaveChildren);
         Assert.Equal(TestHelper.AssemblyPath, node.Metadata?.AssemblyPath);

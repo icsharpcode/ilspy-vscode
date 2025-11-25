@@ -12,7 +12,7 @@ import {
   getCachedDotnetRuntimePath,
 } from "../decompiler/settings";
 
-const DOTNET_RUNTIME_VERSION = "8.0";
+const DOTNET_RUNTIME_VERSION = "10.0";
 
 export async function resolveDotnetRuntime(
   context: vscode.ExtensionContext,

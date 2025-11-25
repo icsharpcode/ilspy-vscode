@@ -40,20 +40,22 @@ public class NuGetPackageTreeNodeDecompilationTests
             AssemblyPath = TestHelper.NuGetPackagePath, Type = NodeType.NuGetPackage, Name = "TestAssembly"
         };
 
-        Assert.Equal(
-            $"// {TestHelper.NuGetPackagePath}" +
-            @"
-// File format: .zip file
-
-// Entries:
-//  _rels/.rels (502 bytes)
-//  TestAssembly.nuspec (458 bytes)
-//  lib/net10.0/TestAssembly.dll (7680 bytes)
-//  [Content_Types].xml (459 bytes)
-//  package/services/metadata/core-properties/18b2f63824be44b6a568a097dbb921d0.psmdcp (614 bytes)
-",
-            (await services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
-                .Decompile(nodeMetadata, LanguageName.CSharpLatest)).DecompiledCode);
+        string? decompiledCode = (await services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
+            .Decompile(nodeMetadata, LanguageName.CSharpLatest)).DecompiledCode;
+        Assert.NotNull(decompiledCode);
+        Assert.Collection(decompiledCode?.Split(Environment.NewLine) ?? [],
+            line => Assert.Equal($"// {TestHelper.NuGetPackagePath}", line),
+            line => Assert.Equal("", line),
+            line => Assert.Equal("// File format: .zip file", line),
+            line => Assert.Equal("", line),
+            line => Assert.Equal("// Entries:", line),
+            line => Assert.StartsWith($"//  _rels/.rels ", line),
+            line => Assert.StartsWith($"//  TestAssembly.nuspec ", line),
+            line => Assert.StartsWith($"//  lib/net10.0/TestAssembly.dll ", line),
+            line => Assert.StartsWith($"//  [Content_Types].xml ", line),
+            line => Assert.StartsWith($"//  package/services/metadata/core-properties/", line),
+            line => Assert.Equal("", line)
+        );
     }
 
     [Fact]

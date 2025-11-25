@@ -379,6 +379,7 @@ public class DecompilerBackend(
     {
         await using var output = new StringWriter();
         WriteCommentLine(output, packageFile.File);
+        WriteCommentLine(output);
 
         var loadedAssembly = await assemblyList.FindAssembly(packageFile);
         if (loadedAssembly is not null)

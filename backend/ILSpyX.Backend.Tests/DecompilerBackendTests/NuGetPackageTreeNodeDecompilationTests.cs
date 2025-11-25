@@ -32,6 +32,31 @@ public class NuGetPackageTreeNodeDecompilationTests
     }
 
     [Fact]
+    public async Task NuGetPackage()
+    {
+        var services = await TestHelper.CreateTestServicesWithNuGetPackage();
+        var nodeMetadata = new NodeMetadata
+        {
+            AssemblyPath = TestHelper.NuGetPackagePath, Type = NodeType.NuGetPackage, Name = "TestAssembly"
+        };
+
+        Assert.Equal(
+            $"// {TestHelper.NuGetPackagePath}" +
+            @"
+// File format: .zip file
+
+// Entries:
+//  _rels/.rels (502 bytes)
+//  TestAssembly.nuspec (458 bytes)
+//  lib/net10.0/TestAssembly.dll (7680 bytes)
+//  [Content_Types].xml (459 bytes)
+//  package/services/metadata/core-properties/18b2f63824be44b6a568a097dbb921d0.psmdcp (614 bytes)
+",
+            (await services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
+                .Decompile(nodeMetadata, LanguageName.CSharpLatest)).DecompiledCode);
+    }
+
+    [Fact]
     public async Task Assembly()
     {
         var services = await TestHelper.CreateTestServicesWithNuGetPackage();

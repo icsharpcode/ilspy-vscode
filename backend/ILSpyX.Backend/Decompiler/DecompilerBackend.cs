@@ -6,6 +6,7 @@ using ICSharpCode.Decompiler.CSharp;
 using ICSharpCode.Decompiler.Disassembler;
 using ICSharpCode.Decompiler.Metadata;
 using ICSharpCode.Decompiler.TypeSystem;
+using ICSharpCode.ILSpyX;
 using ILSpyX.Backend.Application;
 using ILSpyX.Backend.Model;
 using Microsoft.Extensions.Logging;
@@ -201,9 +202,10 @@ public class DecompilerBackend(
                 return GetAssemblyCode(assemblyFile, decompiler);
             case HandleKind.TypeDefinition:
                 var typeDefinition = module.GetDefinition((TypeDefinitionHandle) handle);
-                if (typeDefinition.DeclaringType == null)
-                    return decompiler.DecompileTypesAsString(new[] { (TypeDefinitionHandle) handle });
-                return decompiler.DecompileAsString(handle);
+                return typeDefinition.DeclaringType == null
+                    ? decompiler.DecompileTypesAsString([(TypeDefinitionHandle) handle])
+                    : decompiler.DecompileAsString(handle);
+
             case HandleKind.FieldDefinition:
             case HandleKind.MethodDefinition:
             case HandleKind.PropertyDefinition:
@@ -302,7 +304,7 @@ public class DecompilerBackend(
         {
             return string.Empty;
         }
-        
+
         var metadata = module.Metadata;
         if (metadata.IsAssembly)
         {
@@ -373,9 +375,51 @@ public class DecompilerBackend(
         return output.ToString();
     }
 
-    private static void WriteCommentLine(StringWriter output, string s)
+    public async Task<DecompileResult> GetRootPackageCode(AssemblyFileIdentifier packageFile)
     {
-        output.WriteLine($"// {s}");
+        await using var output = new StringWriter();
+        WriteCommentLine(output, packageFile.File);
+
+        var loadedAssembly = await assemblyList.FindAssembly(packageFile);
+        if (loadedAssembly is not null)
+        {
+            var package = (await loadedAssembly.GetLoadResultAsync()).Package;
+            if (package is not null)
+            {
+                switch (package.Kind)
+                {
+                    case LoadedPackage.PackageKind.Zip:
+                        WriteCommentLine(output, "File format: .zip file");
+                        break;
+                    case LoadedPackage.PackageKind.Bundle:
+                        var header = package.BundleHeader;
+                        WriteCommentLine(output,
+                            $"File format: .NET bundle {header.MajorVersion}.{header.MinorVersion}");
+                        break;
+                }
+
+                WriteCommentLine(output);
+                WriteCommentLine(output, "Entries:");
+                foreach (var entry in package.Entries)
+                {
+                    WriteCommentLine(output, $" {entry.Name} ({entry.TryGetLength()} bytes)");
+                }
+            }
+        }
+
+        return DecompileResult.WithCode(output.ToString());
+    }
+
+    private static void WriteCommentLine(StringWriter output, string? s = null)
+    {
+        if (s is not null)
+        {
+            output.WriteLine($"// {s}");
+        }
+        else
+        {
+            output.WriteLine();
+        }
     }
 
     public async Task<IEnumerable<MemberData>> ListTypes(AssemblyFileIdentifier assemblyFile, string? @namespace)

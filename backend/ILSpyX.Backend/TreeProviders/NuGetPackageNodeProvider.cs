@@ -1,19 +1,23 @@
+using ICSharpCode.Decompiler;
+using ICSharpCode.ILSpyX;
 using ILSpyX.Backend.Decompiler;
 using ILSpyX.Backend.Model;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace ILSpyX.Backend.TreeProviders;
 
 public class NuGetPackageNodeProvider(
     SingleThreadAssemblyList assemblyList,
-    PackageFolderNodeProvider packageFolderNodeProvider) : ITreeNodeProvider
+    PackageFolderNodeProvider packageFolderNodeProvider,
+    DecompilerBackend decompilerBackend) : ITreeNodeProvider
 {
     public Task<DecompileResult> Decompile(NodeMetadata nodeMetadata, string outputLanguage)
     {
-        return Task.FromResult(DecompileResult.Empty());
+        return decompilerBackend.GetRootPackageCode(nodeMetadata.GetAssemblyFileIdentifier());
     }
 
     public static Node CreateNode(AssemblyData assemblyData)

@@ -45,6 +45,7 @@ import { AnalyzeResultTreeProvider } from "./decompiler/analyze/AnalyzeResultTre
 import { registerAnalyzeCommand } from "./commands/analyze";
 import { registerRefreshAssemblyListCommand } from "./commands/refreshAssemblyList";
 import { AssemblyNodeDecorationProvider } from "./decompiler/AssemblyNodeDecorationProvider";
+import { registerAddAssemblyByPathCommand } from "./commands/addAssemblyByPath";
 
 let client: LanguageClient;
 
@@ -99,7 +100,8 @@ export async function activate(context: ExtensionContext) {
   const ilspyBackend = new ILSpyBackend(client);
   const decompiledTreeProvider = new DecompiledTreeProvider(
     context,
-    ilspyBackend
+    ilspyBackend,
+    logger
   );
   const decompiledTreeView = createDecompiledTreeView(decompiledTreeProvider);
   disposables.push(decompiledTreeView);
@@ -110,6 +112,9 @@ export async function activate(context: ExtensionContext) {
     window.registerFileDecorationProvider(assemblyNodeDecorationProvider)
   );
 
+  disposables.push(
+    registerAddAssemblyByPathCommand(decompiledTreeProvider, decompiledTreeView)
+  );
   disposables.push(
     registerDecompileAssemblyInWorkspaceCommand(
       decompiledTreeProvider,

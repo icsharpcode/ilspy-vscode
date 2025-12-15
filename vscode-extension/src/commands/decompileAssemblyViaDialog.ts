@@ -7,6 +7,7 @@ import * as vscode from "vscode";
 import { DecompiledTreeProvider } from "../decompiler/DecompiledTreeProvider";
 import { addAssemblyFromFilePath } from "./utils";
 import Node from "../protocol/Node";
+import { ASSEMBLY_FILE_EXTENSIONS } from "../decompiler/utils";
 
 export function registerDecompileAssemblyViaDialogCommand(
   decompiledTreeProvider: DecompiledTreeProvider,
@@ -34,14 +35,7 @@ async function promptForAssemblyFilesPathViaDialog(): Promise<string[]> {
     canSelectFolders: false,
     canSelectMany: true,
     filters: {
-      ".NET Decompilables": [
-        "dll",
-        "exe",
-        "winmd",
-        "netmodule",
-        "wasm",
-        "nupkg",
-      ],
+      ".NET Decompilables": ASSEMBLY_FILE_EXTENSIONS,
     },
   });
 

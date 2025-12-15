@@ -3,6 +3,15 @@ import Node from "../protocol/Node";
 import { NodeType } from "../protocol/NodeType";
 import { NodeFlags } from "../protocol/NodeFlags";
 
+export const ASSEMBLY_FILE_EXTENSIONS = [
+  "dll",
+  "exe",
+  "winmd",
+  "netmodule",
+  "wasm",
+  "nupkg",
+];
+
 export function isTypeNode(nodeType: NodeType) {
   return (
     nodeType === NodeType.Class ||

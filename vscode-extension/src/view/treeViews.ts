@@ -13,6 +13,7 @@ export function createDecompiledTreeView(
   return window.createTreeView("ilspyDecompiledMembers", {
     treeDataProvider: decompiledTreeProvider,
     showCollapseAll: true,
+    dragAndDropController: decompiledTreeProvider
   });
 }
 

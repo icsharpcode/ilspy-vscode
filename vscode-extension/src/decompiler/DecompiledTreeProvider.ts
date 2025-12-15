@@ -204,7 +204,6 @@ export class DecompiledTreeProvider
     dataTransfer: DataTransfer,
     token: CancellationToken
   ): Promise<void> {
-    const test = 1;
     const uris =
       (await dataTransfer.get("text/uri-list")?.asString())?.split("\r\n") ??
       [];

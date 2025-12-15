@@ -11,11 +11,12 @@ import {
   TreeItemCollapsibleState,
   ProviderResult,
   window,
-  ThemeIcon,
   ExtensionContext,
   commands,
   Uri,
-  MarkdownString,
+  DataTransfer,
+  TreeDragAndDropController,
+  CancellationToken,
 } from "vscode";
 import IILSpyBackend from "./IILSpyBackend";
 import Node from "../protocol/Node";
@@ -28,15 +29,26 @@ import {
 } from "./settings";
 import { getNodeIcon } from "../icons";
 import { NodeFlags } from "../protocol/NodeFlags";
-import { createNodeTooltip, getNodeContextValue, hasNodeFlag } from "./utils";
+import {
+  ASSEMBLY_FILE_EXTENSIONS,
+  createNodeTooltip,
+  getNodeContextValue,
+  hasNodeFlag,
+} from "./utils";
+import path = require("path");
+import OutputWindowLogger from "../OutputWindowLogger";
+import { addAssemblyFromFilePath } from "../commands/utils";
 
-export class DecompiledTreeProvider implements TreeDataProvider<Node> {
+export class DecompiledTreeProvider
+  implements TreeDataProvider<Node>, TreeDragAndDropController<Node>
+{
   private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
   readonly onDidChangeTreeData: Event<any> = this._onDidChangeTreeData.event;
 
   constructor(
     private extensionContext: ExtensionContext,
-    private backend: IILSpyBackend
+    private backend: IILSpyBackend,
+    private logger: OutputWindowLogger
   ) {}
 
   public refresh(): void {
@@ -182,6 +194,43 @@ export class DecompiledTreeProvider implements TreeDataProvider<Node> {
             !hasNodeFlag(node, NodeFlags.CompilerGenerated))
       ) ?? []
     );
+  }
+
+  readonly dropMimeTypes = ["text/uri-list"];
+  readonly dragMimeTypes = [];
+
+  async handleDrop(
+    target: Node | undefined,
+    dataTransfer: DataTransfer,
+    token: CancellationToken
+  ): Promise<void> {
+    const test = 1;
+    const uris =
+      (await dataTransfer.get("text/uri-list")?.asString())?.split("\r\n") ??
+      [];
+    uris.forEach((uri) => {
+      const fileUri = Uri.parse(uri);
+      const filePath = fileUri.fsPath;
+      if (this.isValidFile(fileUri.fsPath)) {
+        this.processDroppedFile(target, filePath);
+        this.logger.writeLine(
+          `Dropped assembly file ${filePath}, trying to add to assembly list`
+        );
+      } else {
+        this.logger.writeLine(`Dropped unsupported file ${filePath}!`);
+      }
+    });
+  }
+
+  private isValidFile(filePath: string): boolean {
+    const ext = path.extname(filePath);
+    return ASSEMBLY_FILE_EXTENSIONS.includes(
+      path.extname(filePath).substring(1)
+    );
+  }
+
+  private processDroppedFile(target: Node | undefined, filePath: string): void {
+    commands.executeCommand("ilspy.addAssemblyByPath", filePath);
   }
 }
 

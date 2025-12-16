@@ -6,7 +6,7 @@ Please see the [Feature Comparison List](https://github.com/icsharpcode/ilspy-vs
 
 ## Getting started
 
-You can [install](https://github.com/icsharpcode/ilspy-vscode/wiki/Installation) the extension in Visual Studio Code via the [marketplace](https://marketplace.visualstudio.com/items?itemName=icsharpcode.ilspy-vscode).
+You can [install](https://github.com/icsharpcode/ilspy-vscode/wiki/Installation) the extension in Visual Studio Code via the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=icsharpcode.ilspy-vscode) or [Open VSX](https://open-vsx.org/extension/icsharpcode/ilspy-vscode).
 
 Please see the [Feature Tour](https://github.com/icsharpcode/ilspy-vscode/wiki/Feature-Tour) to explore the extension's features.
 
@@ -20,13 +20,7 @@ If you have issues during installation of .NET Runtime, please see [here](https:
 
 ## Develop
 
-The extension consists of two parts: The VSCode extension itself (written in TypeScript) and a "backend" server process (written in C#), which provides a bridge to ILSpy functionality.
-
-If first time
-
-```
-npm i @vscode/vsce -g
-```
+The extension consists of two parts: The VS Code extension itself (written in TypeScript) and a "backend" server process (written in C#), which provides a bridge to ILSpy functionality.
 
 Compile and package all parts:
 
@@ -60,3 +54,5 @@ then run
 cd vscode-extension
 code .
 ```
+
+The backend code must have been built at least once (as seen above) for the extension to run.

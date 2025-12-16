@@ -3,41 +3,40 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+import * as path from "path";
 import {
-  TreeDataProvider,
-  EventEmitter,
-  TreeItem,
-  Event,
-  TreeItemCollapsibleState,
-  ProviderResult,
-  window,
-  ExtensionContext,
-  commands,
-  Uri,
-  DataTransfer,
-  TreeDragAndDropController,
   CancellationToken,
+  commands,
+  DataTransfer,
+  Event,
+  EventEmitter,
+  ExtensionContext,
+  ProviderResult,
+  TreeDataProvider,
+  TreeDragAndDropController,
+  TreeItem,
+  TreeItemCollapsibleState,
+  Uri,
+  window,
 } from "vscode";
-import IILSpyBackend from "./IILSpyBackend";
+import { getNodeIcon } from "../icons";
+import OutputWindowLogger from "../OutputWindowLogger";
 import Node from "../protocol/Node";
+import { NodeFlags } from "../protocol/NodeFlags";
 import { NodeType } from "../protocol/NodeType";
+import IILSpyBackend from "./IILSpyBackend";
 import {
   getAssemblyList,
   getAutoLoadDependenciesSetting,
   getShowCompilerGeneratedSymbolsSetting,
   updateAssemblyListIfNeeded,
 } from "./settings";
-import { getNodeIcon } from "../icons";
-import { NodeFlags } from "../protocol/NodeFlags";
 import {
   ASSEMBLY_FILE_EXTENSIONS,
   createNodeTooltip,
   getNodeContextValue,
   hasNodeFlag,
 } from "./utils";
-import path = require("path");
-import OutputWindowLogger from "../OutputWindowLogger";
-import { addAssemblyFromFilePath } from "../commands/utils";
 
 export class DecompiledTreeProvider
   implements TreeDataProvider<Node>, TreeDragAndDropController<Node>

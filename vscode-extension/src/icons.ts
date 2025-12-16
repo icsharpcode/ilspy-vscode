@@ -5,7 +5,7 @@
 
 import { ThemeIcon } from "vscode";
 import { NodeType } from "./protocol/NodeType";
-import path = require("path");
+import * as path from "path";
 
 const UNKNOWN_ICON = { id: "question" };
 

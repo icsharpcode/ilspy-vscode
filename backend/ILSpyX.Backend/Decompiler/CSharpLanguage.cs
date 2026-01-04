@@ -15,10 +15,6 @@ namespace ILSpyX.Backend.Decompiler;
 
 public class CSharpLanguage : ILanguage
 {
-    public CSharpLanguage()
-    {
-    }
-
     public string EventToString(IEvent @event, bool includeDeclaringTypeName, bool includeNamespace, bool includeNamespaceOfDeclaringTypeName)
     {
         if (@event == null)
@@ -49,8 +45,10 @@ public class CSharpLanguage : ILanguage
                 var declaringType = fd.GetDeclaringType();
                 if (fullName)
                 {
-                    return ToCSharpString(metadata, declaringType, fullName, omitGenerics) + "." + metadata.GetString(fd.Name);
+                    return ToCSharpString(metadata, declaringType, fullName, omitGenerics) + "." +
+                           metadata.GetString(fd.Name);
                 }
+
                 return metadata.GetString(fd.Name);
             case HandleKind.MethodDefinition:
                 var md = metadata.GetMethodDefinition((MethodDefinitionHandle) handle);
@@ -61,21 +59,29 @@ public class CSharpLanguage : ILanguage
                     case ".ctor":
                     case ".cctor":
                         var td = metadata.GetTypeDefinition(declaringType);
-                        methodName = ReflectionHelper.SplitTypeParameterCountFromReflectionName(metadata.GetString(td.Name));
+                        methodName =
+                            ReflectionHelper.SplitTypeParameterCountFromReflectionName(metadata.GetString(td.Name));
                         break;
                     case "Finalize":
-                        const MethodAttributes finalizerAttributes = (MethodAttributes.Virtual | MethodAttributes.Family | MethodAttributes.HideBySig);
+                        const MethodAttributes finalizerAttributes = (MethodAttributes.Virtual |
+                                                                      MethodAttributes.Family |
+                                                                      MethodAttributes.HideBySig);
                         if ((md.Attributes & finalizerAttributes) != finalizerAttributes)
                         {
                             goto default;
                         }
-                        var methodSignature = md.DecodeSignature(MetadataExtensions.MinimalSignatureTypeProvider, default);
+
+                        MethodSignature<IType> methodSignature =
+                            md.DecodeSignature(MetadataExtensions.MinimalSignatureTypeProvider, default);
                         if (methodSignature.GenericParameterCount != 0 || methodSignature.ParameterTypes.Length != 0)
                         {
                             goto default;
                         }
+
                         td = metadata.GetTypeDefinition(declaringType);
-                        methodName = "~" + ReflectionHelper.SplitTypeParameterCountFromReflectionName(metadata.GetString(td.Name));
+                        methodName = "~" +
+                                     ReflectionHelper.SplitTypeParameterCountFromReflectionName(
+                                         metadata.GetString(td.Name));
                         break;
                     default:
                         var genericParams = md.GetGenericParameters();
@@ -106,25 +112,59 @@ public class CSharpLanguage : ILanguage
                 declaringType = metadata.GetMethodDefinition(ed.GetAccessors().GetAny()).GetDeclaringType();
                 if (fullName && !declaringType.IsNil)
                 {
-                    return ToCSharpString(metadata, declaringType, fullName, omitGenerics) + "." + metadata.GetString(ed.Name);
+                    return ToCSharpString(metadata, declaringType, fullName, omitGenerics) + "." +
+                           metadata.GetString(ed.Name);
                 }
+
                 return metadata.GetString(ed.Name);
             case HandleKind.PropertyDefinition:
                 var pd = metadata.GetPropertyDefinition((PropertyDefinitionHandle) handle);
                 declaringType = metadata.GetMethodDefinition(pd.GetAccessors().GetAny()).GetDeclaringType();
                 if (fullName && !declaringType.IsNil)
                 {
-                    return ToCSharpString(metadata, declaringType, fullName, omitGenerics) + "." + metadata.GetString(pd.Name);
+                    return ToCSharpString(metadata, declaringType, fullName, omitGenerics) + "." +
+                           metadata.GetString(pd.Name);
                 }
+
                 return metadata.GetString(pd.Name);
             default:
-                return "";
+                return null;
         }
     }
 
     public string GetTooltip(IEntity entity)
     {
         return "";
+    }
+
+    public string TypeToString(IType type,
+        ConversionFlags conversionFlags = ConversionFlags.None | ConversionFlags.UseFullyQualifiedTypeNames |
+                                          ConversionFlags.UseFullyQualifiedEntityNames)
+    {
+        if (type == null)
+            throw new ArgumentNullException(nameof(type));
+        var ambience = CreateAmbience();
+        // Do not forget to update CSharpAmbienceTests.ILSpyMainTreeViewFlags, if this ever changes.
+        ambience.ConversionFlags |= conversionFlags;
+        if (type is ITypeDefinition definition)
+        {
+            return ambience.ConvertSymbol(definition);
+        }
+        else
+        {
+            return ambience.ConvertType(type);
+        }
+    }
+
+    public string EntityToString(IEntity entity, ConversionFlags conversionFlags)
+    {
+        // Do not forget to update CSharpAmbienceTests, if this ever changes.
+        var ambience = CreateAmbience();
+        ambience.ConversionFlags |= conversionFlags
+                                    | ConversionFlags.ShowReturnType
+                                    | ConversionFlags.ShowParameterList
+                                    | ConversionFlags.ShowParameterModifiers;
+        return ambience.ConvertSymbol(entity);
     }
 
     public string MethodToString(IMethod method, bool includeDeclaringTypeName, bool includeNamespace, bool includeNamespaceOfDeclaringTypeName)

@@ -4,6 +4,7 @@ All notable changes to the "ilspy-vscode" extension will be documented in this f
 
 ## 0.23
 
+- Upgrade to ICSharpCode.Decompiler 10.0 Preview 2 (see release notes for [ILSpy 10.0 Preview 2](https://github.com/icsharpcode/ILSpy/releases/tag/v10.0-preview2) to get more details)
 - Support for analyzing NuGet packages (add to assembly tree, browse contents and bundled assemblies)
 - Allow to drag&drop assembly files from outside into assembly tree, adding them to the list
 - New ILSpy activity bar icon for our view containers (thanks to [@banditoth](https://github.com/banditoth) for the icon!)

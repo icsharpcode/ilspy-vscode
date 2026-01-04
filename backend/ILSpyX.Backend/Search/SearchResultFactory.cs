@@ -18,6 +18,7 @@
 
 using System;
 using ICSharpCode.Decompiler.Metadata;
+using ICSharpCode.Decompiler.Output;
 using ICSharpCode.Decompiler.TypeSystem;
 using ICSharpCode.ILSpyX.Abstractions;
 using ICSharpCode.ILSpyX.Search;
@@ -61,15 +62,15 @@ internal class SearchResultFactory : ISearchResultFactory
         switch (member)
         {
             case ITypeDefinition t:
-                return language.TypeToString(t, false);
+                return language.TypeToString(t, ConversionFlags.None);
             case IField f:
-                return language.FieldToString(f, true, false, false);
+                return language.EntityToString(f, ConversionFlags.ShowDeclaringType);
             case IProperty p:
-                return language.PropertyToString(p, true, false, false);
+                return language.EntityToString(p, ConversionFlags.ShowDeclaringType);
             case IMethod m:
-                return language.MethodToString(m, true, false, false);
+                return language.EntityToString(m, ConversionFlags.ShowDeclaringType);
             case IEvent e:
-                return language.EventToString(e, true, false, false);
+                return language.EntityToString(e, ConversionFlags.ShowDeclaringType);
             default:
                 throw new NotSupportedException(member?.GetType() + " not supported!");
         }
@@ -83,9 +84,13 @@ internal class SearchResultFactory : ISearchResultFactory
             Member = entity,
             Fitness = CalculateFitness(entity),
             Name = GetLanguageSpecificName(entity),
-            Location = declaringType != null ? language.TypeToString(declaringType, includeNamespace: true) : entity.Namespace,
-            Assembly = entity?.ParentModule?.MetadataFile?.FileName ?? "",
-            ToolTip = entity?.ParentModule?.MetadataFile?.FileName,
+            Location =
+                declaringType != null
+                    ? language.TypeToString(declaringType,
+                        ConversionFlags.UseFullyQualifiedEntityNames | ConversionFlags.UseFullyQualifiedTypeNames)
+                    : entity.Namespace,
+            Assembly = entity.ParentModule?.FullAssemblyName ?? "",
+            ToolTip = entity.ParentModule?.MetadataFile?.FileName ?? "",
             Image = new object(),
             LocationImage = new object(),
             AssemblyImage = new object(),

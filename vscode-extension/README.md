@@ -9,6 +9,10 @@ This is the actual VSCode extension part of the project, which fulfills followin
 
 A description of the extension's features can be found in [Feature Tour](https://github.com/icsharpcode/ilspy-vscode/wiki/Feature-Tour).
 
+## Export decompiled code
+
+To export all decompiled code of a loaded assembly (keeping the namespace directory structure), right-click the assembly node in the `ILSpy: Assemblies` view and run `Export Decompiled Code...`.
+
 ## Requirements
 
 - Visual Studio Code >= 1.101
@@ -34,4 +38,3 @@ npm install
 ```
 
 Open this directory in Visual Studio Code and start debugging with <kbd>F5</kbd>. A development instance of VS Code will open with the latest extension code running.
-

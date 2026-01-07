@@ -60,6 +60,26 @@ namespace ILSpyX.Backend.LSP.Protocol
 
     #endregion
 
+    #region exportAssembly
+
+    [Serial, Method("ilspy/exportAssembly", Direction.ClientToServer)]
+    public record ExportAssemblyRequest(
+        NodeMetadata NodeMetadata,
+        string OutputLanguage,
+        string OutputDirectory,
+        bool IncludeCompilerGenerated)
+        : IRequest<ExportAssemblyResponse>;
+
+    public record ExportAssemblyResponse(
+        bool Succeeded,
+        string? OutputDirectory,
+        int FilesWritten,
+        int ErrorCount,
+        string? ErrorMessage,
+        bool ShouldUpdateAssemblyList);
+
+    #endregion
+
     #region getNodes
 
     [Serial, Method("ilspy/getNodes", Direction.ClientToServer)]

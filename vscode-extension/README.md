@@ -11,7 +11,9 @@ A description of the extension's features can be found in [Feature Tour](https:/
 
 ## Export decompiled code
 
-To export all decompiled code of a loaded assembly (keeping the namespace directory structure), right-click the assembly node in the `ILSpy: Assemblies` view and run `Export Decompiled Code...`.
+To export all decompiled code of a loaded assembly, right-click the assembly node in the `ILSpy: Assemblies` view and run `Export Decompiled Code...`. This will generate a complete C# project including:
+- All decompiled source files organized by namespace
+- A .csproj project file for easy compilation
 
 ## Requirements
 

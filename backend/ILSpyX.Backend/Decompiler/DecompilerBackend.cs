@@ -564,7 +564,7 @@ public class DecompilerBackend(
         settings.UseNestedDirectoriesForNamespaces = true;
 
         var resolver = loadedAssembly.GetAssemblyResolver(true);
-        var projectDecompiler = new CodeOnlyProjectDecompiler(
+        var projectDecompiler = new SimpleProjectDecompiler(
             settings,
             resolver,
             metadataFile,
@@ -785,7 +785,7 @@ public class DecompilerBackend(
         return candidate;
     }
 
-    private sealed class CodeOnlyProjectDecompiler : WholeProjectDecompiler
+    private sealed class SimpleProjectDecompiler : WholeProjectDecompiler
     {
         private readonly bool includeCompilerGenerated;
         private readonly DecompilerTypeSystem? typeSystem;
@@ -793,7 +793,7 @@ public class DecompilerBackend(
 
         public int FilesWritten => filesWritten;
 
-        public CodeOnlyProjectDecompiler(
+        public SimpleProjectDecompiler(
             DecompilerSettings settings,
             IAssemblyResolver assemblyResolver,
             MetadataFile metadataFile,
@@ -835,11 +835,6 @@ public class DecompilerBackend(
 
         protected override TextWriter CreateFile(string path)
         {
-            if (path.EndsWith(".csproj", StringComparison.OrdinalIgnoreCase))
-            {
-                return TextWriter.Null;
-            }
-
             Interlocked.Increment(ref filesWritten);
             return base.CreateFile(path);
         }

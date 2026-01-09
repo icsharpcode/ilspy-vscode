@@ -81,23 +81,25 @@ export function registerExportDecompiledAssemblyCommand(
             const fileCount = response.filesWritten ?? 0;
 
             if (response.errorCount > 0) {
-              const choice = await vscode.window.showWarningMessage(
+              vscode.window.showWarningMessage(
                 `Exported ${fileCount} files to ${outputDirectory} with ${response.errorCount} errors.`,
                 "Reveal in File Explorer"
-              );
-              if (choice === "Reveal in File Explorer") {
-                vscode.commands.executeCommand("revealFileInOS", outputUri);
-              }
+              ).then((choice) => {
+                if (choice === "Reveal in File Explorer") {
+                  vscode.commands.executeCommand("revealFileInOS", outputUri);
+                }
+              });
               return;
             }
 
-            const choice = await vscode.window.showInformationMessage(
+            vscode.window.showInformationMessage(
               `Exported ${fileCount} files to ${outputDirectory}`,
               "Reveal in File Explorer"
-            );
-            if (choice === "Reveal in File Explorer") {
-              vscode.commands.executeCommand("revealFileInOS", outputUri);
-            }
+            ).then((choice) => {
+              if (choice === "Reveal in File Explorer") {
+                vscode.commands.executeCommand("revealFileInOS", outputUri);
+              }
+            });
           } catch (err) {
             if (token.isCancellationRequested) {
               return;

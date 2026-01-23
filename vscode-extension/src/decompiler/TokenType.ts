@@ -1,7 +1,7 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) Microsoft Corporation. All rights reserved.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------------------------------
+ *  Copyright (c) ICSharpCode
+ *  Licensed under the MIT License. See LICENSE.TXT in the project root for license information.
+ *-----------------------------------------------------------------------------------------------*/
 
 // from https://raw.githubusercontent.com/dotnet/corefx/28cb4c8917c25033bb136055c3c2462907a281fe/src/System.Reflection.Metadata/src/System/Reflection/Metadata/HandleKind.cs
 export enum TokenType

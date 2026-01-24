@@ -64,7 +64,7 @@ export function uriToNode(uri: vscode.Uri): NodeMetadata | undefined {
 
 function trimLeadingSlashes(input: string) {
   let result = input;
-  if (result.startsWith("/")) {
+  if (result.startsWith(path.sep)) {
     result = result.substring(1);
   }
   return result;
@@ -72,7 +72,7 @@ function trimLeadingSlashes(input: string) {
 
 function trimTrailingSlashes(input: string) {
   let result = input;
-  if (result.endsWith("/")) {
+  if (result.endsWith(path.sep)) {
     result = result.slice(0, -1);
   }
   return result;

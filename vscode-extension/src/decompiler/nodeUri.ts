@@ -19,7 +19,7 @@ export function nodeDataToUri(nodeData: Node): vscode.Uri {
       bundledAssemblyName
         ? `${assemblyFile};${bundledAssemblyName}`
         : assemblyFile,
-      ":",
+      "::",
       nodeData.metadata?.name ?? ""
     )
   ).with({
@@ -29,7 +29,7 @@ export function nodeDataToUri(nodeData: Node): vscode.Uri {
       nodeData.metadata?.type,
       nodeData.metadata?.parentSymbolToken,
       nodeData.metadata?.isDecompilable ? "1" : "0",
-    ].join(":"),
+    ].join(","),
   });
 }
 
@@ -38,7 +38,7 @@ export function uriToNode(uri: vscode.Uri): NodeMetadata | undefined {
     return undefined;
   }
 
-  const assemblyPathAndNameParts = uri.fsPath.split(":");
+  const assemblyPathAndNameParts = uri.fsPath.split("::");
   const name =
     assemblyPathAndNameParts.length > 1 ? assemblyPathAndNameParts[1] : "";
 
@@ -48,7 +48,7 @@ export function uriToNode(uri: vscode.Uri): NodeMetadata | undefined {
     assemblyPathParts.length > 1 ? assemblyPathParts[1] : undefined;
 
   const [symbolToken, type, parentSymbolToken, isDecompilable] =
-    uri.query.split(":");
+    uri.query.split(",");
   return {
     assemblyPath: trimTrailingSlashes(assembly),
     bundledAssemblyName: bundledAssemblyName
@@ -62,18 +62,26 @@ export function uriToNode(uri: vscode.Uri): NodeMetadata | undefined {
   };
 }
 
+// function trimLeadingSlashes(input: string) {
+//   let result = input;
+//   if (result.startsWith(path.sep)) {
+//     result = result.substring(1);
+//   }
+//   return result;
+// }
+
+// function trimTrailingSlashes(input: string) {
+//   let result = input;
+//   if (result.endsWith(path.sep)) {
+//     result = result.slice(0, -1);
+//   }
+//   return result;
+// }
+
 function trimLeadingSlashes(input: string) {
-  let result = input;
-  if (result.startsWith(path.sep)) {
-    result = result.substring(1);
-  }
-  return result;
+  return input.replace(/^[\\/]+/, "");
 }
 
 function trimTrailingSlashes(input: string) {
-  let result = input;
-  if (result.endsWith(path.sep)) {
-    result = result.slice(0, -1);
-  }
-  return result;
+  return input.replace(/[\\/]+$/, "");
 }

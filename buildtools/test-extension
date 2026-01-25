@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+
+cd ./vscode-extension
+npm install
+npm run test:unit

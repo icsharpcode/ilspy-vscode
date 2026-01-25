@@ -41,6 +41,9 @@ jobs:
       - name: Test Backend
         run: buildtools/test-backend
 
+      - name: Test Extension
+        run: buildtools/test-extension
+
       - name: Build Extension
         run: buildtools/build-vsix
 

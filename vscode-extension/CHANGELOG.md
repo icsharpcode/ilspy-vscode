@@ -2,6 +2,10 @@
 
 All notable changes to the "ilspy-vscode" extension will be documented in this file.
 
+## 0.23.1
+
+- Fix broken decompilation on Windows systems ([#620](https://github.com/icsharpcode/ilspy-vscode/issues/620))
+
 ## 0.23
 
 - Upgrade to ICSharpCode.Decompiler 10.0 Preview 2 (see release notes for [ILSpy 10.0 Preview 2](https://github.com/icsharpcode/ILSpy/releases/tag/v10.0-preview2) to get more details)

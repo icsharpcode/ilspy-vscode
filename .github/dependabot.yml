@@ -12,7 +12,7 @@ updates:
     schedule:
       interval: "weekly"
     cooldown:
-      default-days: 3
+      default-days: 5
     ignore:
       - dependency-name: "@types/vscode"
       - dependency-name: "@types/node"

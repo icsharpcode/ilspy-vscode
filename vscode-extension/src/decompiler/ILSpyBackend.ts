@@ -42,6 +42,11 @@ import {
   AnalyzeRequest,
   AnalyzeResponse,
 } from "../protocol/analyze";
+import {
+  ExportAssemblyParams,
+  ExportAssemblyRequest,
+} from "../protocol/exportAssembly";
+import ExportAssemblyResponse from "../protocol/ExportAssemblyResponse";
 
 export default class ILSpyBackend implements IILSpyBackend {
   constructor(private languageClient: LanguageClient) {}
@@ -91,5 +96,16 @@ export default class ILSpyBackend implements IILSpyBackend {
 
   sendAnalyze(params: AnalyzeParams): Promise<AnalyzeResponse | null> {
     return this.languageClient.sendRequest(AnalyzeRequest.type, params);
+  }
+
+  sendExportAssembly(
+    params: ExportAssemblyParams,
+    token?: vscode.CancellationToken
+  ): Promise<ExportAssemblyResponse | null> {
+    return this.languageClient.sendRequest(
+      ExportAssemblyRequest.type,
+      params,
+      token
+    );
   }
 }

@@ -46,6 +46,7 @@ import { registerAnalyzeCommand } from "./commands/analyze";
 import { registerRefreshAssemblyListCommand } from "./commands/refreshAssemblyList";
 import { AssemblyNodeDecorationProvider } from "./decompiler/AssemblyNodeDecorationProvider";
 import { registerAddAssemblyByPathCommand } from "./commands/addAssemblyByPath";
+import { registerExportDecompiledAssemblyCommand } from "./commands/exportDecompiledAssembly";
 
 let client: LanguageClient;
 
@@ -176,6 +177,9 @@ export async function activate(context: ExtensionContext) {
   disposables.push(registerReloadAssemblyCommand(decompiledTreeProvider));
   disposables.push(registerUnloadAssemblyCommand(decompiledTreeProvider));
   disposables.push(registerRefreshAssemblyListCommand(decompiledTreeProvider));
+  disposables.push(
+    registerExportDecompiledAssemblyCommand(decompiledTreeProvider, ilspyBackend)
+  );
 
   disposables.push(registerSearchEditorSelectionCommand());
 

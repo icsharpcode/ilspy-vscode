@@ -38,6 +38,7 @@ jobs:
         with:
           node-version: "22"
           cache: 'pnpm'
+          cache-dependency-path: vscode-extension/pnpm-lock.yaml
 
       - name: Bootstrap Build Tools
         run: buildtools/bootstrap

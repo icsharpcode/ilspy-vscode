@@ -11,4 +11,4 @@ if [[ -n "$PRERELEASETAG" ]]; then
    npm pkg set preview='true'
 fi
 pnpm install
-pnpm build:vsix -- -o $VSIX_FILENAME
+pnpm build:vsix -o ../artifacts/ilspy-vscode-$SEMVER.vsix

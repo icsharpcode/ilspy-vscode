@@ -14,7 +14,7 @@ A description of the extension's features can be found in [Feature Tour](https:/
 - Visual Studio Code >= 1.101
 - .NET 10.0 (installed automatically on first start)
 - Node.js (22 or newer)
-- NPM
+- PNPM
 
 ## Development
 
@@ -30,7 +30,7 @@ The backend's binaries are automatically copied to `vscode-extension/bin/ilspy-b
 Then initialize the project with
 
 ```
-npm install
+pnpm install
 ```
 
 Open this directory in Visual Studio Code and start debugging with <kbd>F5</kbd>. A development instance of VS Code will open with the latest extension code running.

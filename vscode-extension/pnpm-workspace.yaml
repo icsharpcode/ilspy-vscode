@@ -1,0 +1,12 @@
+minimumReleaseAge: 7200
+ignoreDepScripts: true
+trustPolicy: no-downgrade
+trustPolicyExclude:
+  - "semver@5.7.2"
+overrides:
+  "glob@10.4.5": "10.5.0"
+  "js-yaml@4.1.0": "4.1.1"
+  "jws@3.2.2": "3.2.3"
+  "qs@6.14.0": "6.14.1"
+  "undici-types@6.21.0": "6.23.0"
+  "chokidar@4.0.3": "5.0.0"

@@ -1,12 +1,14 @@
 #!/usr/bin/env sh
 
 SEMVER=`dotnet dotnet-gitversion -showvariable SemVer`
+PRERELEASETAG=`dotnet dotnet-gitversion -showvariable PreReleaseTag`
 
 mkdir ./artifacts
 
 cd ./vscode-extension
 npm version --git-tag-version false --allow-same-version true -- $SEMVER
-npm install
-npm run package
-npm install @vscode/vsce -g
-vsce package -o ../artifacts/ilspy-vscode-$SEMVER.vsix
+if [[ -n "$PRERELEASETAG" ]]; then
+   npm pkg set preview='true'
+fi
+pnpm install
+pnpm build:vsix -o ../artifacts/ilspy-vscode-$SEMVER.vsix

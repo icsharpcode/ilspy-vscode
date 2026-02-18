@@ -30,7 +30,7 @@ updates:
       dev-dependencies:
         dependency-type: "development"
 
-  - package-ecosystem: "dotnet-sdk"
+  - package-ecosystem: "nuget"
     directories:
       - "/backend/"
     schedule:

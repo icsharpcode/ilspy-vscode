@@ -22,12 +22,12 @@
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
         <PackageReference Include="ICSharpCode.ILSpyX" Version="10.0.0.8282-preview2"/>
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.1"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.3"/>
         <PackageReference Include="Mono.Cecil" Version="0.11.6"/>
         <PackageReference Include="OmniSharp.Extensions.LanguageServer" Version="0.19.9"/>
-        <PackageReference Include="Serilog" Version="4.3.0"/>
+        <PackageReference Include="Serilog" Version="4.3.1"/>
         <PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0"/>
         <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.1"/>
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.3"/>
     </ItemGroup>
 </Project>

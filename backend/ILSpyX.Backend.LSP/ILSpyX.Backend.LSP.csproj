@@ -17,6 +17,10 @@
         <OutputPath>..\..\vscode-extension\bin\ilspy-backend</OutputPath>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     </PropertyGroup>
+    <PropertyGroup>
+        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+        <RestoreLockedMode>true</RestoreLockedMode>
+    </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="GitVersion.MsBuild" Version="6.5.1">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

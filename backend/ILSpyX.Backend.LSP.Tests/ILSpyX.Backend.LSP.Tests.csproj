@@ -6,6 +6,11 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+        <RestoreLockedMode>true</RestoreLockedMode>
+    </PropertyGroup>
+
     <ItemGroup>
         <ProjectReference Include="..\ILSpyX.Backend.LSP\ILSpyX.Backend.LSP.csproj"/>
         <ProjectReference Include="..\TestAssembly\TestAssembly.csproj"/>

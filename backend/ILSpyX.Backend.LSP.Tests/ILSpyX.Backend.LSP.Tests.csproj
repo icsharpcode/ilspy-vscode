@@ -8,7 +8,7 @@
 
     <PropertyGroup>
         <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-        <RestoreLockedMode>true</RestoreLockedMode>
+        <RestoreLockedMode Condition="'$(CIBuild)' == 'true'">true</RestoreLockedMode>
     </PropertyGroup>
 
     <ItemGroup>

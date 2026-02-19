@@ -19,7 +19,7 @@
     </PropertyGroup>
     <PropertyGroup>
         <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-        <RestoreLockedMode>true</RestoreLockedMode>
+        <RestoreLockedMode Condition="'$(CIBuild)' == 'true'">true</RestoreLockedMode>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="GitVersion.MsBuild" Version="6.5.1">

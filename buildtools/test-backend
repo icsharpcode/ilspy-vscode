@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 
 cd ./backend/ILSpyX.Backend.Tests
-dotnet test
+dotnet test -p:CIBuild=true

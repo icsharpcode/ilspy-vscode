@@ -332,11 +332,11 @@
 		"glob": "13.0.6",
 		"minimist": "1.2.8",
 		"mocha": "11.7.5",
-		"terser-webpack-plugin": "5.3.16",
+		"terser-webpack-plugin": "5.3.17",
 		"ts-loader": "9.5.4",
 		"typescript": "5.9.3",
 		"vitest": "4.0.18",
-		"webpack": "5.105.3",
+		"webpack": "5.105.4",
 		"webpack-cli": "6.0.1"
 	},
 	"extensionDependencies": [

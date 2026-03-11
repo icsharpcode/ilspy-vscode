@@ -17,6 +17,4 @@ overrides:
   "diff@7.0.0": "8.0.3"
   "markdown-it@14.1.0": "14.1.1"
   "rollup@4.56.0": "4.59.0"
-  "serialize-javascript@7.0.2": "7.0.3"
-
-
+  "serialize-javascript@6.0.2": "7.0.4"

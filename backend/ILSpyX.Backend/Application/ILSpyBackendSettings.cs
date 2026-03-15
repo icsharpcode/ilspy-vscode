@@ -2,12 +2,13 @@ using ICSharpCode.Decompiler;
 using ICSharpCode.Decompiler.CSharp;
 using ICSharpCode.Decompiler.CSharp.OutputVisitor;
 using ILSpyX.Backend.Model;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ILSpyX.Backend.Application;
 
 public class ILSpyBackendSettings
 {
-    private CSharpFormattingOptions formattingOptions;
+    private readonly CSharpFormattingOptions formattingOptions;
 
     public ILSpyBackendSettings()
     {
@@ -26,6 +27,7 @@ public class ILSpyBackendSettings
         return decompilerSettings;
     }
 
+    [SuppressMessage("ReSharper", "RedundantSwitchExpressionArms")]
     private LanguageVersion GetCSharpLanguageVersion(string languageName)
     {
         return languageName switch
@@ -45,7 +47,9 @@ public class ILSpyBackendSettings
             LanguageName.CSharp_10 => LanguageVersion.CSharp10_0,
             LanguageName.CSharp_11 => LanguageVersion.CSharp11_0,
             LanguageName.CSharp_12 => LanguageVersion.CSharp12_0,
-            _ => LanguageVersion.CSharp12_0,
+            LanguageName.CSharp_13 => LanguageVersion.CSharp13_0,
+            LanguageName.CSharp_14 => LanguageVersion.CSharp14_0,
+            _ => LanguageVersion.CSharp14_0,
         };
     }
 }

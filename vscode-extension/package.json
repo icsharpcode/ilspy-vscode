@@ -32,8 +32,10 @@
 					"ilspy.defaultOutputLanguage": {
 						"description": "Defines to which language or language variant ILSpy will decompile assemblies by default. Note that you can choose a different language for a specific view later.",
 						"type": "string",
-						"default": "C# 12.0 / VS 2022.8",
+						"default": "C# 14.0 / VS 2026",
 						"enum": [
+							"C# 14.0 / VS 2026",
+							"C# 13.0 / VS 2022.12",
 							"C# 12.0 / VS 2022.8",
 							"C# 11.0 / VS 2022.4",
 							"C# 10.0 / VS 2022",
@@ -52,6 +54,8 @@
 							"IL"
 						],
 						"enumDescriptions": [
+							"Decompile to C# 14.0 by default",
+							"Decompile to C# 13.0 by default",
 							"Decompile to C# 12.0 by default",
 							"Decompile to C# 11.0 by default",
 							"Decompile to C# 10.0 by default",

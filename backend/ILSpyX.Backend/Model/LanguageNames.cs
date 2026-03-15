@@ -18,5 +18,7 @@ public static class LanguageName
     public const string CSharp_10 = "cs-10";
     public const string CSharp_11 = "cs-11";
     public const string CSharp_12 = "cs-12";
-    public const string CSharpLatest = CSharp_12;
+    public const string CSharp_13 = "cs-13";
+    public const string CSharp_14 = "cs-14";
+    public const string CSharpLatest = CSharp_14;
 }

@@ -83,9 +83,19 @@ export const languageInfos = createLanguageMap([
     displayName: "C# 12.0 / VS 2022.8",
     vsLanguageMode: "csharp",
   },
+  {
+    name: LanguageName.CSharp_13,
+    displayName: "C# 13.0 / VS 2022.12",
+    vsLanguageMode: "csharp",
+  },
+  {
+    name: LanguageName.CSharp_14,
+    displayName: "C# 14.0 / VS 2026",
+    vsLanguageMode: "csharp",
+  },
 ]);
 
-export const LATEST_OUTPUT_LANGUAGE: LanguageName = LanguageName.CSharp_12;
+export const LATEST_OUTPUT_LANGUAGE: LanguageName = LanguageName.CSharp_14;
 
 export const languageFromDisplayName = (name?: string) =>
   Object.entries(languageInfos).find(

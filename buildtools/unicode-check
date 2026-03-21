@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# buildtool: unicode-check v1
+
+set -euo pipefail
+PARAMS="${1:-}"
+
+echo "🔍 Checking for dangerous Unicode..."
+
+COMPARE_WITH='origin/master'
+CODE_EXTENSIONS='\.(sh|bash|zsh|js|ts|jsx|tsx|py|go|rs|java|c|cpp|h|hpp|cs|rb|php|swift|kt|scala|yml|yaml|json)$'
+EXCLUDED_DIRS='^(node_modules/|build/|bin/|out/)'
+
+if [[ "$PARAMS" = "--all" ]]; then
+    FILES=$(git ls-files \
+    | grep -E "$CODE_EXTENSIONS" \
+    | grep -Ev "$EXCLUDED_DIRS" \
+    || true)
+else
+    FILES=$(git diff --name-only $COMPARE_WITH...HEAD \
+    | grep -E "$CODE_EXTENSIONS" \
+    | grep -Ev "$EXCLUDED_DIRS" \
+    || true)
+fi
+
+# Dangerous Unicode ranges
+# PATTERN='[\x00-\x08\x0B\x0C\x0E-\x1F\x7F\x{200B}-\x{200F}\x{202A}-\x{202E}\x{2066}-\x{2069}]'
+PATTERN='[^\x00-\x7F]'
+
+FAIL=0
+COUNT=0
+
+for file in $FILES; do
+  if [[ -f "$file" ]]; then
+    if grep -nP "$PATTERN" "$file"; then
+      echo "❌ Suspicious Unicode found in $file"
+      FAIL=1
+    fi
+    COUNT=$((COUNT + 1))
+  fi
+done
+
+if [[ $FAIL -eq 1 ]]; then
+  echo "🚨 Build failed due to unsafe Unicode (checked $COUNT files)."
+  echo "Tip: run 'grep -nP \"$PATTERN\" <file>' locally to debug."
+  exit 1
+else
+  echo "✅ Unicode safety check passed (checked $COUNT files)."
+fi

@@ -5,7 +5,7 @@
         <Company>ic#code</Company>
         <Title>ILSpy .NET Decompiler LSP Backend</Title>
         <Product>ILSpy .NET Decompiler</Product>
-        <Copyright>Copyright 2017-2025 ICSharpCode, Microsoft Corporation</Copyright>
+        <Copyright>Copyright (c) ICSharpCode</Copyright>
         <Nullable>enable</Nullable>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">

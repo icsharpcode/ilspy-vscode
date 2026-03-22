@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright(c) ICSharpCode
 // Licensed under the MIT license. See the LICENSE file in the project root for more information.
 
 using ILSpyX.Backend.Application;

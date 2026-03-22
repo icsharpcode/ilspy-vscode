@@ -1,4 +1,4 @@
-﻿namespace Generics
+namespace Generics
 {
     public class ClassGeneric<T> { }
 

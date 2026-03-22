@@ -1,4 +1,4 @@
-﻿namespace ILSpyX.Backend.Model;
+namespace ILSpyX.Backend.Model;
 
 public static class LanguageName
 {

@@ -1,3 +1,3 @@
-﻿public class ClassInGlobalNamespace
+public class ClassInGlobalNamespace
 {
 }

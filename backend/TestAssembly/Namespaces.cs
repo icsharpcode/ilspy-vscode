@@ -1,4 +1,4 @@
-﻿namespace A
+namespace A
 {
     public class A1
     {

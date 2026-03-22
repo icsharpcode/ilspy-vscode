@@ -1,4 +1,4 @@
-﻿namespace TestAssembly
+namespace TestAssembly
 {
     /// <summary>
     /// Some enum

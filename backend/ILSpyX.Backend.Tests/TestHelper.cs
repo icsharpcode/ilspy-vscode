@@ -1,4 +1,4 @@
-﻿using ILSpyX.Backend.Decompiler;
+using ILSpyX.Backend.Decompiler;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ILSpyX.Backend.Tests;

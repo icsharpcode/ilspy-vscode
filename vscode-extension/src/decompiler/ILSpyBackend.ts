@@ -42,11 +42,10 @@ import {
   AnalyzeRequest,
   AnalyzeResponse,
 } from "../protocol/analyze";
-import {
-  ExportAssemblyParams,
-  ExportAssemblyRequest,
-} from "../protocol/exportAssembly";
-import ExportAssemblyResponse from "../protocol/ExportAssemblyResponse";
+import ExportNodeResponse, {
+  ExportNodeParams,
+  ExportNodeRequest,
+} from "../protocol/exportNode";
 
 export default class ILSpyBackend implements IILSpyBackend {
   constructor(private languageClient: LanguageClient) {}
@@ -99,11 +98,11 @@ export default class ILSpyBackend implements IILSpyBackend {
   }
 
   sendExportAssembly(
-    params: ExportAssemblyParams,
+    params: ExportNodeParams,
     token?: vscode.CancellationToken
-  ): Promise<ExportAssemblyResponse | null> {
+  ): Promise<ExportNodeResponse | null> {
     return this.languageClient.sendRequest(
-      ExportAssemblyRequest.type,
+      ExportNodeRequest.type,
       params,
       token
     );

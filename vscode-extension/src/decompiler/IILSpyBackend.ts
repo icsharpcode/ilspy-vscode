@@ -20,8 +20,7 @@ import {
   InitWithAssembliesResponse,
 } from "../protocol/initWithAssemblies";
 import { AnalyzeParams, AnalyzeResponse } from "../protocol/analyze";
-import { ExportAssemblyParams } from "../protocol/exportAssembly";
-import ExportAssemblyResponse from "../protocol/ExportAssemblyResponse";
+import ExportNodeResponse, { ExportNodeParams } from "../protocol/exportNode";
 import { CancellationToken } from "vscode";
 
 export default interface IILSpyBackend {
@@ -46,7 +45,7 @@ export default interface IILSpyBackend {
   sendSearch(params: SearchParams): Promise<SearchResponse | null>;
   sendAnalyze(params: AnalyzeParams): Promise<AnalyzeResponse | null>;
   sendExportAssembly(
-    params: ExportAssemblyParams,
+    params: ExportNodeParams,
     token?: CancellationToken
-  ): Promise<ExportAssemblyResponse | null>;
+  ): Promise<ExportNodeResponse | null>;
 }

@@ -41,7 +41,7 @@ class Program
                 .WithHandler<InitWithAssembliesHandler>()
                 .WithHandler<AddAssemblyHandler>()
                 .WithHandler<DecompileNodeHandler>()
-                .WithHandler<ExportAssemblyHandler>()
+                .WithHandler<ExportNodeHandler>()
                 .WithHandler<GetNodesHandler>()
                 .WithHandler<RemoveAssemblyHandler>()
                 .WithHandler<SearchHandler>()

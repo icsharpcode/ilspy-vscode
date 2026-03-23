@@ -26,29 +26,34 @@ public class ExportBackend(
 {
     private readonly ILogger logger = loggerFactory.CreateLogger<ExportBackend>();
 
-    public async Task<ExportAssemblyResult> ExportAssemblyAsync(
+    public async Task<ExportNodeResult> ExportNodeAsync(
         NodeMetadata nodeMetadata,
         string outputLanguage,
         string outputDirectory,
         bool includeCompilerGenerated,
         CancellationToken cancellationToken)
     {
+        if (nodeMetadata.Type != NodeType.Assembly)
+        {
+            return new ExportNodeResult(false, null, 0, 1, "This object can't be exported.");
+        }
+
         if (string.IsNullOrWhiteSpace(outputDirectory))
         {
-            return new ExportAssemblyResult(false, null, 0, 1, "Output directory is required.");
+            return new ExportNodeResult(false, null, 0, 1, "Output directory is required.");
         }
 
         var assemblyFile = nodeMetadata.GetAssemblyFileIdentifier();
         var loadedAssembly = await assemblyList.FindAssembly(assemblyFile);
         if (loadedAssembly is null)
         {
-            return new ExportAssemblyResult(false, null, 0, 1, "Assembly is not loaded.");
+            return new ExportNodeResult(false, null, 0, 1, "Assembly is not loaded.");
         }
 
         var metadataFile = await loadedAssembly.GetMetadataFileOrNullAsync();
         if (metadataFile is null)
         {
-            return new ExportAssemblyResult(false, null, 0, 1, "Assembly metadata could not be loaded.");
+            return new ExportNodeResult(false, null, 0, 1, "Assembly metadata could not be loaded.");
         }
 
         try
@@ -61,7 +66,7 @@ public class ExportBackend(
                 ex,
                 "Failed to create output directory {outputDirectory}",
                 outputDirectory);
-            return new ExportAssemblyResult(false, outputDirectory, 0, 1, ex.Message);
+            return new ExportNodeResult(false, outputDirectory, 0, 1, ex.Message);
         }
 
         string assemblyName = nodeMetadata.Name;
@@ -81,14 +86,14 @@ public class ExportBackend(
         try
         {
             return outputLanguage == LanguageName.IL
-                ? await ExportIlAsync(
+                ? await ExportAssemblyToILAsync(
                     metadataFile,
                     loadedAssembly,
                     assemblyFile,
                     targetDirectory,
                     includeCompilerGenerated,
                     cancellationToken)
-                : await ExportCSharpAsync(
+                : await ExportAssemblyToCSharpAsync(
                     metadataFile,
                     loadedAssembly,
                     targetDirectory,
@@ -107,11 +112,11 @@ public class ExportBackend(
                 "Failed to export assembly {assembly} to {outputDirectory}",
                 assemblyName,
                 targetDirectory);
-            return new ExportAssemblyResult(false, targetDirectory, 0, 1, ex.Message);
+            return new ExportNodeResult(false, targetDirectory, 0, 1, ex.Message);
         }
     }
 
-    private async Task<ExportAssemblyResult> ExportCSharpAsync(
+    private async Task<ExportNodeResult> ExportAssemblyToCSharpAsync(
         MetadataFile metadataFile,
         LoadedAssembly loadedAssembly,
         string targetDirectory,
@@ -132,7 +137,7 @@ public class ExportBackend(
             () => projectDecompiler.DecompileProject(metadataFile, targetDirectory, cancellationToken),
             cancellationToken);
 
-        return new ExportAssemblyResult(
+        return new ExportNodeResult(
             true,
             targetDirectory,
             projectDecompiler.FilesWritten,
@@ -140,7 +145,7 @@ public class ExportBackend(
             null);
     }
 
-    private async Task<ExportAssemblyResult> ExportIlAsync(
+    private async Task<ExportNodeResult> ExportAssemblyToILAsync(
         MetadataFile metadataFile,
         LoadedAssembly loadedAssembly,
         AssemblyFileIdentifier assemblyFile,
@@ -226,7 +231,7 @@ public class ExportBackend(
             }
         }
 
-        return new ExportAssemblyResult(true, targetDirectory, filesWritten, errorCount, null);
+        return new ExportNodeResult(true, targetDirectory, filesWritten, errorCount, null);
     }
 
     private static bool ShouldExportType(

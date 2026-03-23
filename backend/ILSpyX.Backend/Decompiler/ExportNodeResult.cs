@@ -3,7 +3,7 @@
 
 namespace ILSpyX.Backend.Decompiler;
 
-public record ExportAssemblyResult(
+public record ExportNodeResult(
     bool Succeeded,
     string? OutputDirectory,
     int FilesWritten,

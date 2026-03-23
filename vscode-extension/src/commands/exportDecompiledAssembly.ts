@@ -18,7 +18,7 @@ export function registerExportDecompiledAssemblyCommand(
   backend: IILSpyBackend
 ) {
   return vscode.commands.registerCommand(
-    "ilspy.exportDecompiledAssembly",
+    "ilspy.export",
     async (node?: Node) => {
       const assemblyNode = await getOrPickAssemblyNode(
         node,

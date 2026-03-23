@@ -10,29 +10,37 @@ import {
   RequestHandler,
   RequestType,
 } from "vscode-languageclient";
-import ExportAssemblyResponse from "./ExportAssemblyResponse";
 import NodeMetadata from "./NodeMetadata";
 
-export interface ExportAssemblyParams {
+export interface ExportNodeParams {
   nodeMetadata: NodeMetadata;
   outputLanguage: string;
   outputDirectory: string;
   includeCompilerGenerated: boolean;
 }
 
-export namespace ExportAssemblyRequest {
+export default interface ExportNodeResponse {
+  succeeded: boolean;
+  outputDirectory?: string;
+  filesWritten: number;
+  errorCount: number;
+  errorMessage?: string;
+  shouldUpdateAssemblyList: boolean;
+}
+
+export namespace ExportNodeRequest {
   export const type = new RequestType<
-    ExportAssemblyParams,
-    ExportAssemblyResponse | null,
+    ExportNodeParams,
+    ExportNodeResponse | null,
     never
-  >("ilspy/exportAssembly", ParameterStructures.byName);
+  >("ilspy/exportNode", ParameterStructures.byName);
   export type HandlerSignature = RequestHandler<
-    ExportAssemblyParams,
-    ExportAssemblyResponse | null,
+    ExportNodeParams,
+    ExportNodeResponse | null,
     void
   >;
   export type MiddlewareSignature = (
     token: CancellationToken,
     next: HandlerSignature
-  ) => HandlerResult<ExportAssemblyResponse | null, void>;
+  ) => HandlerResult<ExportNodeResponse | null, void>;
 }

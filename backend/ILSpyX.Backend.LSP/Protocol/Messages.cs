@@ -63,14 +63,14 @@ namespace ILSpyX.Backend.LSP.Protocol
     #region exportAssembly
 
     [Serial, Method("ilspy/exportAssembly", Direction.ClientToServer)]
-    public record ExportAssemblyRequest(
+    public record ExportNodeRequest(
         NodeMetadata NodeMetadata,
         string OutputLanguage,
         string OutputDirectory,
         bool IncludeCompilerGenerated)
-        : IRequest<ExportAssemblyResponse>;
+        : IRequest<ExportNodeResponse>;
 
-    public record ExportAssemblyResponse(
+    public record ExportNodeResponse(
         bool Succeeded,
         string? OutputDirectory,
         int FilesWritten,

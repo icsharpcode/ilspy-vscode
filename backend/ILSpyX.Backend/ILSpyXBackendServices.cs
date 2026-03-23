@@ -48,6 +48,7 @@ public static class ILSpyXServiceCollectionExtensions
             .AddSingleton<AssemblyListManager>()
             .AddSingleton<SingleThreadAssemblyList>()
             .AddSingleton<DecompilerBackend>()
+            .AddSingleton<ExportBackend>()
             .AddSingleton<TreeNodeProviders>()
             .AddSingleton<SearchBackend>()
             .AddSingleton<AnalyzerBackend>();

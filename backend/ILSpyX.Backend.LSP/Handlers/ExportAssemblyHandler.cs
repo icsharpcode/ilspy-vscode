@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace ILSpyX.Backend.LSP.Handlers;
 
 [Serial, Method("ilspy/exportAssembly", Direction.ClientToServer)]
-public class ExportAssemblyHandler(DecompilerBackend decompilerBackend)
+public class ExportAssemblyHandler(ExportBackend exportBackend, DecompilerBackend decompilerBackend)
     : IJsonRpcRequestHandler<ExportAssemblyRequest, ExportAssemblyResponse>
 {
     public async Task<ExportAssemblyResponse> Handle(
@@ -19,7 +19,7 @@ public class ExportAssemblyHandler(DecompilerBackend decompilerBackend)
     {
         (var result, bool shouldUpdateAssemblyList) =
             await decompilerBackend.DetectAutoLoadedAssemblies(() =>
-                decompilerBackend.ExportAssemblyAsync(
+                exportBackend.ExportAssemblyAsync(
                     request.NodeMetadata,
                     request.OutputLanguage,
                     request.OutputDirectory,

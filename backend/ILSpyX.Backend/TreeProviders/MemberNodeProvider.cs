@@ -45,7 +45,7 @@ public class MemberNodeProvider(DecompilerBackend decompilerBackend) : ITreeNode
                             Name = nestedTypeDefinition.TypeToString(false),
                             SymbolToken = MetadataTokens.GetToken(nestedTypeDefinition.MetadataToken),
                             ParentSymbolToken = parentTypeSymbolToken,
-                            IsDecompilable = true
+                            AvailableCommands = AvailableNodeCommands.Decompile | AvailableNodeCommands.Analyze
                         },
                         DisplayName = nestedTypeDefinition.TypeToString(false),
                         Description = "",
@@ -83,7 +83,7 @@ public class MemberNodeProvider(DecompilerBackend decompilerBackend) : ITreeNode
                 Name = memberName,
                 SymbolToken = MetadataTokens.GetToken(member.MetadataToken),
                 ParentSymbolToken = parentTypeSymbolToken,
-                IsDecompilable = true
+                AvailableCommands = AvailableNodeCommands.Decompile | AvailableNodeCommands.Analyze
             },
             DisplayName = memberName,
             Description = "",

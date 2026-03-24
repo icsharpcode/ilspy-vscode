@@ -29,6 +29,7 @@ import type Node from "../protocol/Node";
 import type NodeMetadata from "../protocol/NodeMetadata";
 import { SymbolModifiers } from "../protocol/SymbolModifiers";
 import { NodeFlags } from "../protocol/NodeFlags";
+import { AvailableNodeCommands } from "../protocol/AvailableNodeCommands";
 import type { Uri } from "vscode";
 
 describe("nodeUri utilities", () => {
@@ -39,7 +40,7 @@ describe("nodeUri utilities", () => {
       symbolToken: 42,
       type: NodeType.Method,
       parentSymbolToken: 21,
-      isDecompilable: true,
+      availableCommands: AvailableNodeCommands.Decompile,
     };
 
     const node: Node = {
@@ -61,7 +62,10 @@ describe("nodeUri utilities", () => {
     expect(result!.symbolToken).toEqual(42);
     expect(result!.parentSymbolToken).toEqual(21);
     expect(result!.type).toEqual(NodeType.Method);
-    expect(result!.isDecompilable).toBe(true);
+    expect(
+      (result!.availableCommands & AvailableNodeCommands.Decompile) ===
+        AvailableNodeCommands.Decompile
+    ).toBe(true);
   });
 
   it("handles bundled assembly names and trims slashes", () => {
@@ -72,7 +76,7 @@ describe("nodeUri utilities", () => {
       symbolToken: 7,
       type: NodeType.Class,
       parentSymbolToken: 1,
-      isDecompilable: false,
+      availableCommands: AvailableNodeCommands.None,
     };
 
     const node: Node = {
@@ -89,7 +93,7 @@ describe("nodeUri utilities", () => {
     expect(result.assemblyPath).toEqual("/path/to/asm.dll");
     expect(result.bundledAssemblyName).toEqual("sub-directory/bundle");
     expect(result.name).toEqual("MyType");
-    expect(result.isDecompilable).toBe(false);
+    expect(result.availableCommands).toBe(AvailableNodeCommands.None);
   });
 
   it("handles path-alike names correctly", () => {
@@ -99,7 +103,7 @@ describe("nodeUri utilities", () => {
       symbolToken: 0,
       type: NodeType.Resource,
       parentSymbolToken: 0,
-      isDecompilable: false,
+      availableCommands: AvailableNodeCommands.None,
     };
 
     const node: Node = {
@@ -115,7 +119,7 @@ describe("nodeUri utilities", () => {
     const result = uriToNode(uri)!;
     expect(result.assemblyPath).toEqual("/path/to/asm.dll");
     expect(result.name).toEqual("sub-directory/file.xml");
-    expect(result.isDecompilable).toBe(false);
+    expect(result.availableCommands).toBe(AvailableNodeCommands.None);
   });
 
   it("returns undefined for non-ilspy schemes", () => {

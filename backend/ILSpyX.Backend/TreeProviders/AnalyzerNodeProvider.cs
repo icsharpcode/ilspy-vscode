@@ -77,7 +77,7 @@ public class AnalyzerNodeProvider(
                             ParentSymbolToken = entity.DeclaringTypeDefinition?.MetadataToken is not null
                                 ? MetadataTokens.GetToken(entity.DeclaringTypeDefinition.MetadataToken)
                                 : 0,
-                            IsDecompilable = true
+                            AvailableCommands = AvailableNodeCommands.Decompile
                         },
                         DisplayName = nodeName,
                         Description = location,

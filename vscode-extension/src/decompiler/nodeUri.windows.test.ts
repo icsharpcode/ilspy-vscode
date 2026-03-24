@@ -38,6 +38,7 @@ import type Node from "../protocol/Node";
 import type NodeMetadata from "../protocol/NodeMetadata";
 import { SymbolModifiers } from "../protocol/SymbolModifiers";
 import { NodeFlags } from "../protocol/NodeFlags";
+import { AvailableNodeCommands } from "../protocol/AvailableNodeCommands";
 
 it("handles Windows-style backslashes when path.sep is '\\'", () => {
   const metadata: NodeMetadata = {
@@ -47,7 +48,7 @@ it("handles Windows-style backslashes when path.sep is '\\'", () => {
     symbolToken: 9,
     type: NodeType.Enum,
     parentSymbolToken: 2,
-    isDecompilable: false,
+    availableCommands: AvailableNodeCommands.None,
   };
 
   const node: Node = {

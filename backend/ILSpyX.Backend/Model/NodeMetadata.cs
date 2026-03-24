@@ -11,6 +11,6 @@ public record NodeMetadata
     public string? BundledAssemblyName { get; init; }
     public int SymbolToken { get; init; } // = 0
     public int ParentSymbolToken { get; init; } // = 0
-    public bool IsDecompilable { get; init; } // = false
     public string? SubType { get; init; }
+    public AvailableNodeCommands AvailableCommands { get; init; } = AvailableNodeCommands.None;
 }

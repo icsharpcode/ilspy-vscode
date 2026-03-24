@@ -2,6 +2,8 @@ import { MarkdownString, TreeItemCollapsibleState } from "vscode";
 import Node from "../protocol/Node";
 import { NodeType } from "../protocol/NodeType";
 import { NodeFlags } from "../protocol/NodeFlags";
+import { AvailableNodeCommands } from "../protocol/AvailableNodeCommands";
+import NodeMetadata from "../protocol/NodeMetadata";
 
 export const ASSEMBLY_FILE_EXTENSIONS = [
   "dll",
@@ -34,23 +36,19 @@ export function getTreeNodeCollapsibleState(
 }
 
 export function getNodeContextValue(node: Node) {
-  switch (node.metadata?.type) {
-    case NodeType.Assembly:
-      return "assemblyNode";
-    case NodeType.Class:
-    case NodeType.Interface:
-    case NodeType.Event:
-    case NodeType.Method:
-    case NodeType.Enum:
-    case NodeType.Const:
-    case NodeType.Property:
-    case NodeType.Field:
-      return "analyzableNode";
-    default:
-      break;
+  let contextValue = "";
+
+  if (node.metadata?.type === NodeType.Assembly) {
+    contextValue += "#assemblyNode";
+  }
+  if (hasNodeCommand(node, AvailableNodeCommands.Analyze)) {
+    contextValue += "#analyzable";
+  }
+  if (hasNodeCommand(node, AvailableNodeCommands.Export)) {
+    contextValue += "#exportable";
   }
 
-  return undefined;
+  return contextValue;
 }
 
 export function createNodeTooltip(node: Node) {
@@ -70,4 +68,8 @@ export function createNodeTooltip(node: Node) {
 
 export function hasNodeFlag(node: Node, flag: NodeFlags) {
   return (node.flags & flag) === flag;
+}
+
+export function hasNodeCommand(node: Node, flag: AvailableNodeCommands) {
+  return !!node.metadata && (node.metadata.availableCommands & flag) === flag;
 }

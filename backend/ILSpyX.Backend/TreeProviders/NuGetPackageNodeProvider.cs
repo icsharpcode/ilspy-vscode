@@ -29,7 +29,7 @@ public class NuGetPackageNodeProvider(
                 AssemblyPath = assemblyData.FilePath,
                 Type = NodeType.NuGetPackage,
                 Name = Path.GetFileName(assemblyData.FilePath),
-                IsDecompilable = true
+                AvailableCommands = AvailableNodeCommands.Decompile
             },
             DisplayName = assemblyData.Name,
             Description = assemblyData.FilePath,

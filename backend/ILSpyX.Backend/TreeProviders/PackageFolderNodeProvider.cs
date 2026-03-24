@@ -76,7 +76,7 @@ public class PackageFolderNodeProvider(ResourceNodeProvider resourceNodeProvider
                     BundledAssemblyName = $"{rootPath}{newName}",
                     Type = NodeType.PackageFolder,
                     Name = $"{rootPath}{newName}",
-                    IsDecompilable = false
+                    AvailableCommands = AvailableNodeCommands.None
                 },
                 DisplayName = newName,
                 Description = newName,

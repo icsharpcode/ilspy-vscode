@@ -79,7 +79,7 @@ public class ResourceNodeProvider(SingleThreadAssemblyList assemblyList) : ITree
                 BundledAssemblyName = assemblyFile.BundledAssemblyFile,
                 Name = $"{relativePath}{entry.Name}",
                 Type = NodeType.Resource,
-                IsDecompilable = true,
+                AvailableCommands = AvailableNodeCommands.Decompile,
             },
             DisplayName = entry.Name,
             Description = entry.Name,

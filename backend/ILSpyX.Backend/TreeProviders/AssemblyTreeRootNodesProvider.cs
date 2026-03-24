@@ -15,7 +15,6 @@ public class AssemblyTreeRootNodesProvider(DecompilerBackend decompilerBackend) 
 
     public async Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
     {
-        var test = await decompilerBackend.GetLoadedAssembliesAsync();
         return (await decompilerBackend.GetLoadedAssembliesAsync())
             .Select(data => data.PackageType switch
             {

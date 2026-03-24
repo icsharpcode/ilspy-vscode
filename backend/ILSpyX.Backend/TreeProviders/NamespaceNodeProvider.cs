@@ -51,7 +51,7 @@ public class NamespaceNodeProvider(TypeNodeProvider typeNodeProvider, Decompiler
                     BundledAssemblyName = assemblyFile.BundledAssemblyFile,
                     Type = NodeType.Namespace,
                     Name = ns,
-                    IsDecompilable = true
+                    AvailableCommands = AvailableNodeCommands.Decompile
                 },
                 DisplayName = ns,
                 Description = string.Empty,

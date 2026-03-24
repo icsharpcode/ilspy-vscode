@@ -111,7 +111,7 @@ public class SearchBackend(SingleThreadAssemblyList assemblyList, ILSpyBackendSe
                 ParentSymbolToken = memberSearchResult.Member?.DeclaringTypeDefinition?.MetadataToken != null
                     ? MetadataTokens.GetToken(memberSearchResult.Member.DeclaringTypeDefinition.MetadataToken)
                     : 0,
-                IsDecompilable = true
+                AvailableCommands = AvailableNodeCommands.Decompile | AvailableNodeCommands.Analyze
             },
             DisplayName = memberSearchResult.Name,
             Description = memberSearchResult.Location,

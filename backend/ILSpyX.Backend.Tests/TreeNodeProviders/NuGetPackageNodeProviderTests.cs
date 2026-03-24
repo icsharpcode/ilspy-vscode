@@ -423,7 +423,7 @@ public class NuGetPackageNodeProviderTests
                 Assert.Equal(NodeType.Interface, node.Metadata?.Type);
                 Assert.NotEqual(0, node.Metadata?.SymbolToken);
                 Assert.Equal(SymbolModifiers.Public | SymbolModifiers.Abstract, node.SymbolModifiers);
-                Assert.True(node.Metadata?.IsDecompilable);
+                Assert.True(node.HasCommand(AvailableNodeCommands.Decompile));
                 Assert.False(node.MayHaveChildren);
             },
             node => {
@@ -432,7 +432,7 @@ public class NuGetPackageNodeProviderTests
                 Assert.Equal(NodeType.Class, node.Metadata?.Type);
                 Assert.NotEqual(0, node.Metadata?.SymbolToken);
                 Assert.Equal(SymbolModifiers.Public, node.SymbolModifiers);
-                Assert.True(node.Metadata?.IsDecompilable);
+                Assert.True(node.HasCommand(AvailableNodeCommands.Decompile));
                 Assert.False(node.MayHaveChildren);
             }
         );
@@ -477,7 +477,7 @@ public class NuGetPackageNodeProviderTests
                 Assert.Equal(NodeType.Class, node.Metadata?.Type);
                 Assert.NotEqual(0, node.Metadata?.SymbolToken);
                 Assert.Equal(SymbolModifiers.Public, node.SymbolModifiers);
-                Assert.True(node.Metadata?.IsDecompilable);
+                Assert.True(node.HasCommand(AvailableNodeCommands.Decompile));
                 Assert.False(node.MayHaveChildren);
             },
             node => {
@@ -486,7 +486,7 @@ public class NuGetPackageNodeProviderTests
                 Assert.Equal(NodeType.Interface, node.Metadata?.Type);
                 Assert.NotEqual(0, node.Metadata?.SymbolToken);
                 Assert.Equal(SymbolModifiers.Public | SymbolModifiers.Abstract, node.SymbolModifiers);
-                Assert.True(node.Metadata?.IsDecompilable);
+                Assert.True(node.HasCommand(AvailableNodeCommands.Decompile));
                 Assert.False(node.MayHaveChildren);
             }
         );

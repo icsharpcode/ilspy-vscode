@@ -45,7 +45,7 @@ public class AssemblyNodeProvider(
                     BundledAssemblyName = assemblyData.FilePath,
                     Type = NodeType.Assembly,
                     Name = Path.GetFileName(assemblyData.FilePath),
-                    IsDecompilable = true
+                    AvailableCommands = AvailableNodeCommands.Decompile | AvailableNodeCommands.Export
                 },
                 DisplayName = GetAssemblyDisplayText(assemblyData),
                 Description = Path.GetFileName(assemblyData.FilePath),
@@ -62,7 +62,7 @@ public class AssemblyNodeProvider(
                 AssemblyPath = assemblyData.FilePath,
                 Type = NodeType.Assembly,
                 Name = Path.GetFileName(assemblyData.FilePath),
-                IsDecompilable = true
+                AvailableCommands = AvailableNodeCommands.Decompile | AvailableNodeCommands.Export
             },
             DisplayName = GetAssemblyDisplayText(assemblyData),
             Description = assemblyData.FilePath,

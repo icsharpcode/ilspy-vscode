@@ -43,7 +43,7 @@ public class AssemblyReferenceNodeProvider(DecompilerBackend decompilerBackend) 
                         BundledAssemblyName = assemblyFile.BundledAssemblyFile,
                         Type = NodeType.AssemblyReference,
                         Name = reference,
-                        IsDecompilable = true
+                        AvailableCommands = AvailableNodeCommands.Decompile
                     },
                     DisplayName = reference,
                     Description = string.Empty,

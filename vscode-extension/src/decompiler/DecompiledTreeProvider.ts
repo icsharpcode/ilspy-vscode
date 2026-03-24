@@ -35,8 +35,10 @@ import {
   ASSEMBLY_FILE_EXTENSIONS,
   createNodeTooltip,
   getNodeContextValue,
+  hasNodeCommand,
   hasNodeFlag,
 } from "./utils";
+import { AvailableNodeCommands } from "../protocol/AvailableNodeCommands";
 
 export class DecompiledTreeProvider
   implements TreeDataProvider<Node>, TreeDragAndDropController<Node>
@@ -122,7 +124,7 @@ export class DecompiledTreeProvider
       collapsibleState: node.mayHaveChildren
         ? TreeItemCollapsibleState.Collapsed
         : void 0,
-      command: node.metadata?.isDecompilable
+      command: hasNodeCommand(node, AvailableNodeCommands.Decompile)
         ? {
             command: "ilspy.decompileNode",
             arguments: [node],

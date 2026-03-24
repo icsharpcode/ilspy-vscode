@@ -1,0 +1,12 @@
+using System;
+
+namespace ILSpyX.Backend.Model;
+
+[Flags]
+public enum AvailableNodeCommands
+{
+    None = 0,
+    Decompile = 1,
+    Analyze = 2,
+    Export = 4,
+}

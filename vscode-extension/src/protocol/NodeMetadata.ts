@@ -3,6 +3,7 @@
  *  Licensed under the MIT License. See LICENSE.TXT in the project root for license information.
  *-----------------------------------------------------------------------------------------------*/
 
+import { AvailableNodeCommands } from "./AvailableNodeCommands";
 import { NodeType } from "./NodeType";
 
 export default interface NodeMetadata {
@@ -13,5 +14,5 @@ export default interface NodeMetadata {
   symbolToken: number;
   parentSymbolToken: number;
   subType?: string;
-  isDecompilable: boolean;
+  availableCommands: AvailableNodeCommands;
 }

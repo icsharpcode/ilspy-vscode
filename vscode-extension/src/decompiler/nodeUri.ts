@@ -8,6 +8,7 @@ import * as path from "path";
 import NodeMetadata from "../protocol/NodeMetadata";
 import Node from "../protocol/Node";
 import { NodeType } from "../protocol/NodeType";
+import { AvailableNodeCommands } from "../protocol/AvailableNodeCommands";
 
 export const ILSPY_URI_SCHEME = "ilspy";
 
@@ -28,7 +29,7 @@ export function nodeDataToUri(nodeData: Node): vscode.Uri {
       nodeData.metadata?.symbolToken,
       nodeData.metadata?.type,
       nodeData.metadata?.parentSymbolToken,
-      nodeData.metadata?.isDecompilable ? "1" : "0",
+      nodeData.metadata?.availableCommands ?? AvailableNodeCommands.None,
     ].join(","),
   });
 }
@@ -47,8 +48,9 @@ export function uriToNode(uri: vscode.Uri): NodeMetadata | undefined {
   const bundledAssemblyName =
     assemblyPathParts.length > 1 ? assemblyPathParts[1] : undefined;
 
-  const [symbolToken, type, parentSymbolToken, isDecompilable] =
+  const [symbolToken, type, parentSymbolToken, availableCommands] =
     uri.query.split(",");
+  const parsedAvailableCommands = parseInt(availableCommands);
   return {
     assemblyPath: trimTrailingSlashes(assembly),
     bundledAssemblyName: bundledAssemblyName
@@ -57,26 +59,12 @@ export function uriToNode(uri: vscode.Uri): NodeMetadata | undefined {
     type: parseInt(type) as NodeType,
     symbolToken: parseInt(symbolToken),
     parentSymbolToken: parseInt(parentSymbolToken),
-    isDecompilable: isDecompilable === "1",
+    availableCommands: Number.isNaN(parsedAvailableCommands)
+      ? AvailableNodeCommands.None
+      : (parsedAvailableCommands as AvailableNodeCommands),
     name: trimLeadingSlashes(name),
   };
 }
-
-// function trimLeadingSlashes(input: string) {
-//   let result = input;
-//   if (result.startsWith(path.sep)) {
-//     result = result.substring(1);
-//   }
-//   return result;
-// }
-
-// function trimTrailingSlashes(input: string) {
-//   let result = input;
-//   if (result.endsWith(path.sep)) {
-//     result = result.slice(0, -1);
-//   }
-//   return result;
-// }
 
 function trimLeadingSlashes(input: string) {
   return input.replace(/^[\\/]+/, "");

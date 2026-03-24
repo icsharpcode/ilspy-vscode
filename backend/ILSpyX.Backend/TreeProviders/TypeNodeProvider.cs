@@ -81,7 +81,7 @@ public class TypeNodeProvider(
                 Name = name,
                 SymbolToken = MetadataTokens.GetToken(typeDefinition.MetadataToken),
                 ParentSymbolToken = 0,
-                IsDecompilable = true
+                AvailableCommands = AvailableNodeCommands.Decompile | AvailableNodeCommands.Analyze
             },
             DisplayName = name,
             Description = "",

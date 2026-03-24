@@ -328,8 +328,8 @@
 		"@types/mocha": "10.0.10",
 		"@types/node": "22.15.31",
 		"@types/vscode": "1.74.0",
-		"@typescript-eslint/eslint-plugin": "8.57.0",
-		"@typescript-eslint/parser": "8.57.0",
+		"@typescript-eslint/eslint-plugin": "8.57.1",
+		"@typescript-eslint/parser": "8.57.1",
 		"@vscode/test-electron": "2.5.2",
 		"@vscode/vsce": "3.7.1",
 		"eslint": "10.0.3",
@@ -341,7 +341,7 @@
 		"typescript": "5.9.3",
 		"vitest": "4.1.0",
 		"webpack": "5.105.4",
-		"webpack-cli": "6.0.1"
+		"webpack-cli": "7.0.2"
 	},
 	"extensionDependencies": [
 		"ms-dotnettools.vscode-dotnet-runtime"

@@ -189,6 +189,12 @@
 				"title": "Analyze Element",
 				"category": "ILSpy",
 				"icon": "$(search-view-icon)"
+			},
+			{
+				"command": "ilspy.exportDecompiledAssembly",
+				"title": "Export Decompiled Code...",
+				"category": "ILSpy",
+				"icon": "$(export)"
 			}
 		],
 		"menus": {
@@ -239,6 +245,11 @@
 					"group": "inline"
 				},
 				{
+					"command": "ilspy.exportDecompiledAssembly",
+					"when": "view == ilspyDecompiledMembers && viewItem == assemblyNode",
+					"group": "navigation"
+				},
+				{
 					"command": "ilspy.analyze",
 					"when": "(view == ilspyDecompiledMembers || view == ilspySearchResultsContainer || view == ilspyAnalyzeResultsContainer) && viewItem == analyzableNode",
 					"group": "inline"
@@ -280,6 +291,10 @@
 				{
 					"command": "ilspy.unloadAssembly",
 					"when": "false"
+				},
+				{
+					"command": "ilspy.exportDecompiledAssembly",
+					"when": "ilspy.backendAvailable && ilspy.treeWithNodes"
 				}
 			]
 		},

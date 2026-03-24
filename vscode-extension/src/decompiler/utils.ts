@@ -38,14 +38,14 @@ export function getTreeNodeCollapsibleState(
 export function getNodeContextValue(node: Node) {
   let contextValue = "";
 
-  if (node.metadata?.type === NodeType.Assembly) {
-    contextValue += "#assemblyNode";
+  if (hasNodeCommand(node, AvailableNodeCommands.ManageRootEntries)) {
+    contextValue += "#manageRootEntries";
   }
   if (hasNodeCommand(node, AvailableNodeCommands.Analyze)) {
-    contextValue += "#analyzable";
+    contextValue += "#analyze";
   }
   if (hasNodeCommand(node, AvailableNodeCommands.Export)) {
-    contextValue += "#exportable";
+    contextValue += "#export";
   }
 
   return contextValue;

@@ -62,7 +62,8 @@ public class AssemblyNodeProvider(
                 AssemblyPath = assemblyData.FilePath,
                 Type = NodeType.Assembly,
                 Name = Path.GetFileName(assemblyData.FilePath),
-                AvailableCommands = AvailableNodeCommands.Decompile | AvailableNodeCommands.Export
+                AvailableCommands = AvailableNodeCommands.Decompile | AvailableNodeCommands.Export |
+                                    AvailableNodeCommands.ManageRootEntries
             },
             DisplayName = GetAssemblyDisplayText(assemblyData),
             Description = assemblyData.FilePath,

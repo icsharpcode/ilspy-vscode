@@ -18,7 +18,13 @@ import Node from "../../protocol/Node";
 import { getNodeIcon } from "../../icons";
 import { getShowCompilerGeneratedSymbolsSetting } from "../settings";
 import { NodeFlags } from "../../protocol/NodeFlags";
-import { createNodeTooltip, getNodeContextValue, hasNodeFlag } from "../utils";
+import {
+  createNodeTooltip,
+  getNodeContextValue,
+  hasNodeCommand,
+  hasNodeFlag,
+} from "../utils";
+import { AvailableNodeCommands } from "../../protocol/AvailableNodeCommands";
 
 interface PerformedSearch {
   term: string;
@@ -71,11 +77,13 @@ export class SearchResultTreeProvider
         description: node.description,
         tooltip: createNodeTooltip(node),
         collapsibleState: TreeItemCollapsibleState.None,
-        command: {
-          command: "ilspy.decompileNode",
-          arguments: [node],
-          title: "Decompile",
-        },
+        command: hasNodeCommand(node, AvailableNodeCommands.Decompile)
+          ? {
+              command: "ilspy.decompileNode",
+              arguments: [node],
+              title: "Decompile",
+            }
+          : undefined,
         contextValue: getNodeContextValue(node),
         iconPath: getNodeIcon(node.metadata?.type),
       };

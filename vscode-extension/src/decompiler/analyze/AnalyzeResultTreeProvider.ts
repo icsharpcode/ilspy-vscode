@@ -21,10 +21,12 @@ import {
   createNodeTooltip,
   getNodeContextValue,
   getTreeNodeCollapsibleState,
+  hasNodeCommand,
   hasNodeFlag,
 } from "../utils";
 import { getShowCompilerGeneratedSymbolsSetting } from "../settings";
 import { NodeFlags } from "../../protocol/NodeFlags";
+import { AvailableNodeCommands } from "../../protocol/AvailableNodeCommands";
 
 export interface PerformedAnalyze {
   symbol: string;
@@ -93,11 +95,13 @@ export class AnalyzeResultTreeProvider
         description: node.description,
         tooltip: createNodeTooltip(node),
         collapsibleState: getTreeNodeCollapsibleState(node),
-        command: {
-          command: "ilspy.decompileNode",
-          arguments: [node],
-          title: "Decompile",
-        },
+        command: hasNodeCommand(node, AvailableNodeCommands.Decompile)
+          ? {
+              command: "ilspy.decompileNode",
+              arguments: [node],
+              title: "Decompile",
+            }
+          : undefined,
         contextValue: getNodeContextValue(node),
         iconPath: getNodeIcon(node.metadata?.type),
       };

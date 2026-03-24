@@ -20,6 +20,7 @@ public class NuGetPackageNodeProviderTests
         Assert.Equal(TestHelper.NuGetPackagePath, node.Metadata?.AssemblyPath);
         Assert.Equal(Path.GetFileName(TestHelper.NuGetPackagePath), node.Metadata?.Name);
         Assert.Equal(NodeType.NuGetPackage, node.Metadata?.Type);
+        Assert.True(node.HasCommand(AvailableNodeCommands.ManageRootEntries));
     }
 
     [Fact]
@@ -116,6 +117,8 @@ public class NuGetPackageNodeProviderTests
         Assert.Equal(Path.GetFileName(TestHelper.NuGetBundledAssemblyName), node.Metadata?.Name);
         Assert.Equal(TestHelper.NuGetBundledAssemblyName, node.Metadata?.BundledAssemblyName);
         Assert.Equal(NodeType.Assembly, node.Metadata?.Type);
+        Assert.False(node.HasCommand(AvailableNodeCommands.ManageRootEntries));
+        Assert.True(node.HasCommand(AvailableNodeCommands.Export));
     }
 
 

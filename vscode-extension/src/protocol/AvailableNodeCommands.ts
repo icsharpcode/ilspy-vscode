@@ -3,4 +3,5 @@ export enum AvailableNodeCommands {
   Decompile = 1,
   Analyze = 2,
   Export = 4,
+  ManageRootEntries = 8,
 }

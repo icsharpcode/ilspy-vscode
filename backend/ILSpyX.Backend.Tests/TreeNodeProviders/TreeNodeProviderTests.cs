@@ -19,6 +19,7 @@ public class TreeNodeProviderTests
         Assert.Equal(TestHelper.AssemblyPath, node.Metadata?.AssemblyPath);
         Assert.Equal(Path.GetFileName(TestHelper.AssemblyPath), node.Metadata?.Name);
         Assert.Equal(NodeType.Assembly, node.Metadata?.Type);
+        Assert.True(node.HasCommand(AvailableNodeCommands.Export | AvailableNodeCommands.ManageRootEntries));
     }
 
     [Fact]

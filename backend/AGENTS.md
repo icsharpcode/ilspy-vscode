@@ -16,8 +16,9 @@ Extension counterpart instructions: [`../vscode-extension/AGENTS.md`](../vscode-
 
 1. Keep LSP method names and payload contracts explicit and version-safe.
 2. Prefer strongly typed request/response models over ad-hoc JSON handling.
-3. Keep decompilation/search/analyze behavior deterministic for identical inputs.
-4. When changing public behavior, update or add tests in the closest test project.
+3. Keep backend as the primary home for domain/business behavior and decision-making (for example, which actions are available, which node capabilities/attributes are exposed, and which data is returned).
+4. Keep decompilation/search/analyze behavior deterministic for identical inputs.
+5. When changing public behavior, update or add tests in the closest test project.
 
 ## Local commands
 

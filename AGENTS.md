@@ -39,3 +39,4 @@ Cross-project references:
 - Do not introduce new tooling when existing scripts already cover the task.
 - Avoid wide refactors unless explicitly requested.
 - Preserve backward compatibility for user-visible commands/settings unless asked to change behavior.
+- Keep architecture boundaries clear: prefer placing domain/business logic in `backend/` and keep `vscode-extension/` focused on user interaction, VS Code API integration, and presentation concerns.

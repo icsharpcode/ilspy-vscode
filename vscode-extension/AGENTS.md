@@ -16,8 +16,10 @@ Backend counterpart instructions: [`../backend/AGENTS.md`](../backend/AGENTS.md)
 
 1. Keep command IDs, configuration keys, and context keys stable unless change is requested.
 2. For protocol-facing changes, verify backend LSP handlers and DTOs stay compatible.
-3. Prefer extending existing services/providers over adding new parallel abstractions.
+3. Keep extension logic UI-oriented: interaction flow, VS Code API wiring, and presentation (for example, how node types are rendered in trees).
 4. Keep startup path robust: backend process launch and initialization should remain explicit and observable.
+5. Prefer backend-owned behavior decisions: when feasible, let backend/LSP define available commands, node capabilities/attributes, and data shape; extension should consume and visualize.
+6. Prefer extending existing services/providers over adding new parallel abstractions.
 
 ## Local commands
 

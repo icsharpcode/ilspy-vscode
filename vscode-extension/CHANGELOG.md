@@ -2,6 +2,12 @@
 
 All notable changes to the "ilspy-vscode" extension will be documented in this file.
 
+## 0.24.0
+
+- Allow to export assemblies as full .NET projects to file system (thanks to [@k-o-n-t-o-r](https://github.com/k-o-n-t-o-r))
+- Fix: Assembly list allowed to "reload" or "unload" assembly files inside of NuGet packages, which makes no sense
+- Fix: NuGet packages could not be reloaded or removed from assembly list
+
 ## 0.23.1
 
 - Fix broken decompilation on Windows systems ([#620](https://github.com/icsharpcode/ilspy-vscode/issues/620))

@@ -18,6 +18,7 @@ This document describes the custom LSP (JSON-RPC) requests used between the VS C
 | `ilspy/removeAssembly` | `assemblyPath: string` | `removed: boolean` | Removes a single assembly from assembly list. |
 | `ilspy/getNodes` | `nodeMetadata?: NodeMetadata` | `nodes?: Node[]`, `shouldUpdateAssemblyList: boolean` | Retrieves a list of child nodes of a node - or root nodes, if `nodeMetadata === null` |
 | `ilspy/decompileNode` | `nodeMetadata: NodeMetadata`, `outputLanguage: string` | `decompiledCode?: string`, `isError: boolean`, `errorMessage?: string`, `shouldUpdateAssemblyList: boolean` | Retrieves the (decompiled) code behind a node. |
+| `ilspy/exportNode` | `nodeMetadata: NodeMetadata`, `outputLanguage: string`, `outputDirectory: string`, `includeCompilerGenerated: boolean` | `succeeded: boolean`, `outputDirectory?: string`, `filesWritten: number`, `errorCount: number`, `errorMessage?: string`, `shouldUpdateAssemblyList: boolean` | Exports node contents to the file system. |
 | `ilspy/search` | `term: string` | `results: Node[]`, `shouldUpdateAssemblyList: boolean` | Searches for nodes in loaded assemblies using a free-text term. |
 | `ilspy/analyze` | `nodeMetadata?: NodeMetadata` | `results: Node[]`, `shouldUpdateAssemblyList: boolean` | Analyzes a node and gets the list of related nodes (like types implementing a specific interface, callers of a method etc.) |
 
@@ -47,8 +48,16 @@ This document describes the custom LSP (JSON-RPC) requests used between the VS C
   Token handle of the parent symbol (usually references the type symbol for type member nodes)
 - `subType?: string` \
   Additional (domain-specific) free-text type classifying the node.
-- `isDecompilable: boolean` \
- Indicates that the node can provide decompiled code. In case of `false` frontend should disable decompilatinon for this node.
+- `availableCommands: AvailableNodeCommands` \
+  Bit-flag set describing which commands are available for the node.
+
+### `AvailableNodeCommands`
+
+- `None = 0`
+- `Decompile = 1`
+- `Analyze = 2`
+- `Export = 4`
+- `ManageRootEntries = 8`
 
 ### `Node`
 
@@ -63,6 +72,15 @@ This document describes the custom LSP (JSON-RPC) requests used between the VS C
 
 - `decompiledCode?: string`
 - `isError: boolean`
+- `errorMessage?: string`
+- `shouldUpdateAssemblyList: boolean`
+
+### `ExportNodeResponse`
+
+- `succeeded: boolean`
+- `outputDirectory?: string`
+- `filesWritten: number`
+- `errorCount: number`
 - `errorMessage?: string`
 - `shouldUpdateAssemblyList: boolean`
 

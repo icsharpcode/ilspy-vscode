@@ -15,17 +15,17 @@ import {
   SymbolQueryInput,
 } from "./toolUtils";
 
-interface IDecompileToolParameters extends SymbolQueryInput {
+interface IDecompileSymbolToolParameters extends SymbolQueryInput {
   outputLanguage?: string;
 }
 
-export class DecompileTool implements vscode.LanguageModelTool<IDecompileToolParameters> {
+export class DecompileSymbolTool implements vscode.LanguageModelTool<IDecompileSymbolToolParameters> {
   static Name: string = "decompile_symbol";
 
   constructor(private ilspyBackend: IILSpyBackend) {}
 
   async invoke(
-    options: vscode.LanguageModelToolInvocationOptions<IDecompileToolParameters>,
+    options: vscode.LanguageModelToolInvocationOptions<IDecompileSymbolToolParameters>,
     token: vscode.CancellationToken,
   ) {
     const symbol = options.input.symbol;
@@ -81,7 +81,7 @@ export class DecompileTool implements vscode.LanguageModelTool<IDecompileToolPar
   }
 
   async prepareInvocation(
-    options: vscode.LanguageModelToolInvocationPrepareOptions<IDecompileToolParameters>,
+    options: vscode.LanguageModelToolInvocationPrepareOptions<IDecompileSymbolToolParameters>,
     token: vscode.CancellationToken,
   ) {
     return {

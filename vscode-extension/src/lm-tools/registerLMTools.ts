@@ -4,7 +4,8 @@
  *-----------------------------------------------------------------------------------------------*/
 
 import * as vscode from "vscode";
-import { DecompileTool } from "./DecompileTool";
+import { DecompileNodeTool } from "./DecompileNodeTool";
+import { DecompileSymbolTool } from "./DecompileSymbolTool";
 import IILSpyBackend from "../decompiler/IILSpyBackend";
 import { ListAssembliesTool } from "./ListAssembliesTool";
 import { AddAssemblyTool } from "./AddAssemblyTool";
@@ -33,7 +34,14 @@ export function registerLMTools(ilspyBackend: IILSpyBackend) {
       ListAssembliesTool.Name,
       new ListAssembliesTool(ilspyBackend),
     ),
-    vscode.lm.registerTool(DecompileTool.Name, new DecompileTool(ilspyBackend)),
+    vscode.lm.registerTool(
+      DecompileSymbolTool.Name,
+      new DecompileSymbolTool(ilspyBackend),
+    ),
+    vscode.lm.registerTool(
+      DecompileNodeTool.Name,
+      new DecompileNodeTool(ilspyBackend),
+    ),
     vscode.lm.registerTool(ListNodesTool.Name, new ListNodesTool(ilspyBackend)),
     vscode.lm.registerTool(
       SearchSymbolsTool.Name,

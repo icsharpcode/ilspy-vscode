@@ -18,7 +18,7 @@ import {
 type IListNodesToolParameters = SymbolQueryInput;
 
 export class ListNodesTool implements vscode.LanguageModelTool<IListNodesToolParameters> {
-  static Name: string = "list_decompiler_nodes";
+  static Name: string = "list_nodes";
 
   constructor(private ilspyBackend: IILSpyBackend) {}
 

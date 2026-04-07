@@ -354,9 +354,9 @@
 					"load"
 				],
 				"toolReferenceName": "ilspy-add-assembly",
-				"displayName": "Add assembly to ILSpy",
-				"modelDescription": "Adds one assembly file to the set of assemblies currently loaded in ILSpy so that it can be searched, analyzed, decompiled, and exported.",
-				"userDescription": "Add one assembly file to ILSpy",
+				"displayName": "Add assembly or NuGet package to ILSpy",
+				"modelDescription": "Adds one assembly or NuGet package file to the set of assemblies currently loaded in ILSpy so that it can be searched, analyzed, decompiled, and exported.",
+				"userDescription": "Add one assembly or NuGet package file to ILSpy",
 				"canBeReferencedInPrompt": true,
 				"icon": "$(add)",
 				"inputSchema": {
@@ -380,9 +380,9 @@
 					"unload"
 				],
 				"toolReferenceName": "ilspy-remove-assembly",
-				"displayName": "Remove assembly from ILSpy",
-				"modelDescription": "Removes one currently loaded assembly from ILSpy. Prefer assemblyPath for exact targeting; assemblyName can be used when it uniquely identifies a loaded assembly.",
-				"userDescription": "Remove one loaded assembly from ILSpy",
+				"displayName": "Remove assembly or NuGet package from ILSpy",
+				"modelDescription": "Removes one currently loaded assembly or NuGet package from ILSpy. Prefer assemblyPath for exact targeting; assemblyName can be used when it uniquely identifies a loaded assembly.",
+				"userDescription": "Remove one loaded assembly or NuGet package from ILSpy",
 				"canBeReferencedInPrompt": true,
 				"icon": "$(close)",
 				"inputSchema": {
@@ -390,7 +390,7 @@
 					"properties": {
 						"assemblyPath": {
 							"type": "string",
-							"description": "Absolute file system path of the loaded assembly to remove"
+							"description": "Absolute file system path of the loaded assembly or NuGet package to remove"
 						},
 						"assemblyName": {
 							"type": "string",
@@ -422,7 +422,7 @@
 					"ilspy",
 					"decompile"
 				],
-				"toolReferenceName": "ilspy-decompile",
+				"toolReferenceName": "ilspy-decompile-symbol",
 				"displayName": "Decompile symbol with ILSpy",
 				"modelDescription": "Searches the currently loaded ILSpy assemblies for a .NET symbol such as a type, member, or namespace, then returns the decompiled source code for the matching symbol or symbols. Use assemblyPath or assemblyName to disambiguate when the same symbol exists in multiple assemblies.",
 				"userDescription": "Decompile a .NET symbol from the assemblies currently loaded in ILSpy",
@@ -454,16 +454,89 @@
 				}
 			},
 			{
-				"name": "list_decompiler_nodes",
+				"name": "decompile_node",
+				"tags": [
+					"ilspy",
+					"decompile",
+					"tree",
+					"nodes"
+				],
+				"toolReferenceName": "ilspy-decompile-node",
+				"displayName": "Decompile ILSpy tree node",
+				"modelDescription": "Decompiles one specific ILSpy tree node using its exact nodeMetadata payload. Use this when you already have a concrete node from list_nodes or another ILSpy tool result, especially for non-symbol nodes such as references, resources, or other tree entries that are not best addressed by symbol search.",
+				"userDescription": "Decompile one specific ILSpy tree node",
+				"canBeReferencedInPrompt": true,
+				"icon": "$(files)",
+				"inputSchema": {
+					"type": "object",
+					"required": [
+						"nodeMetadata"
+					],
+					"properties": {
+						"nodeMetadata": {
+							"type": "object",
+							"description": "Exact ILSpy node metadata, typically copied verbatim from the nodeMetadata field returned by list_decompiler_nodes or another ILSpy tool result",
+							"required": [
+								"assemblyPath",
+								"type",
+								"name",
+								"symbolToken",
+								"parentSymbolToken",
+								"availableCommands"
+							],
+							"properties": {
+								"assemblyPath": {
+									"type": "string",
+									"description": "Assembly path associated with the node"
+								},
+								"type": {
+									"type": "integer",
+									"description": "Numeric ILSpy node type enum value"
+								},
+								"name": {
+									"type": "string",
+									"description": "Node name from ILSpy metadata"
+								},
+								"bundledAssemblyName": {
+									"type": "string",
+									"description": "Optional bundled assembly name for package-backed nodes"
+								},
+								"symbolToken": {
+									"type": "integer",
+									"description": "Node symbol token from ILSpy metadata"
+								},
+								"parentSymbolToken": {
+									"type": "integer",
+									"description": "Parent symbol token from ILSpy metadata"
+								},
+								"subType": {
+									"type": "string",
+									"description": "Optional ILSpy node subtype"
+								},
+								"availableCommands": {
+									"type": "integer",
+									"description": "Bitmask of commands ILSpy reports as available for the node"
+								}
+							}
+						},
+						"outputLanguage": {
+							"type": "string",
+							"description": "Optional ILSpy output language. When omitted, the extension's current default output language is used"
+						}
+					}
+				}
+			},
+			{
+				"name": "list_nodes",
 				"tags": [
 					"ilspy",
 					"tree",
 					"nodes"
 				],
 				"toolReferenceName": "ilspy-list-nodes",
-				"displayName": "List ILSpy decompiler nodes",
-				"modelDescription": "Lists nodes from ILSpy's decompiler tree. With no input it returns the root nodes, which are usually the loaded assemblies. With a symbol or assembly target it returns the direct child nodes of that target.",
-				"userDescription": "List ILSpy decompiler tree nodes",
+				"displayName": "List ILSpy nodes",
+				"modelDescription": "Lists nodes from ILSpy's assembly tree. With no input it returns the root nodes, which are usually the loaded assemblies. With a symbol or assembly target it returns the direct child nodes of that target. Results include exact nodeMetadata that can be passed to decompile_node.",
+				"userDescription": "List ILSpy assembly tree nodes",
 				"canBeReferencedInPrompt": true,
 				"icon": "$(list-tree)",
 				"inputSchema": {
@@ -493,7 +566,7 @@
 				],
 				"toolReferenceName": "ilspy-search-symbols",
 				"displayName": "Search loaded ILSpy symbols",
-				"modelDescription": "Searches the symbols in assemblies currently loaded in ILSpy and returns matching nodes with type, assembly path, and display information. Use it to discover exact symbol names before decompiling or analyzing them.",
+				"modelDescription": "Searches the symbols in assemblies currently loaded in ILSpy and returns matching nodes with type, assembly path, display information, and exact nodeMetadata. Use it to discover exact symbol names before decompiling or analyzing them, or to obtain nodeMetadata for decompile_node.",
 				"userDescription": "Search the symbols in assemblies currently loaded in ILSpy",
 				"canBeReferencedInPrompt": true,
 				"icon": "$(search-view-icon)",

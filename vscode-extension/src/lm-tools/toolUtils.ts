@@ -9,6 +9,7 @@ import IILSpyBackend from "../decompiler/IILSpyBackend";
 import { AvailableNodeCommands } from "../protocol/AvailableNodeCommands";
 import AssemblyData from "../protocol/AssemblyData";
 import Node from "../protocol/Node";
+import NodeMetadata from "../protocol/NodeMetadata";
 import { NodeType } from "../protocol/NodeType";
 
 export interface AssemblyFilterInput {
@@ -169,16 +170,27 @@ export function summarizeAssemblyNode(node: Node) {
 
 export function summarizeNode(node: Node) {
   return {
-    name: node.metadata?.name ?? node.displayName,
     displayName: node.displayName,
     description: node.description,
-    type: NodeType[node.metadata?.type ?? NodeType.Unknown],
-    assemblyPath: node.metadata?.assemblyPath,
-    symbolToken: node.metadata?.symbolToken,
-    parentSymbolToken: node.metadata?.parentSymbolToken,
+    ...summarizeNodeMetadata(node.metadata, node.displayName),
+  };
+}
+
+export function summarizeNodeMetadata(
+  nodeMetadata: NodeMetadata | undefined,
+  fallbackName = "",
+) {
+  return {
+    name: nodeMetadata?.name ?? fallbackName,
+    type: NodeType[nodeMetadata?.type ?? NodeType.Unknown],
+    assemblyPath: nodeMetadata?.assemblyPath,
+    symbolToken: nodeMetadata?.symbolToken,
+    parentSymbolToken: nodeMetadata?.parentSymbolToken,
+    subType: nodeMetadata?.subType,
     availableCommands: getAvailableCommandNames(
-      node.metadata?.availableCommands ?? AvailableNodeCommands.None,
+      nodeMetadata?.availableCommands ?? AvailableNodeCommands.None,
     ),
+    nodeMetadata,
   };
 }
 
@@ -187,6 +199,20 @@ export function hasAssemblyFilter(filter: AssemblyFilterInput) {
     isNonEmptyString(filter.assemblyPath) ||
     isNonEmptyString(filter.assemblyName)
   );
+}
+
+export function requireNodeMetadata(
+  value: unknown,
+  purpose: string,
+): NodeMetadata {
+  if (!isNodeMetadata(value)) {
+    throw new Error(
+      `A valid nodeMetadata object is required to ${purpose}. ` +
+        `Use list_decompiler_nodes to get one from the ILSpy tree.`,
+    );
+  }
+
+  return value;
 }
 
 function matchesAssembly(node: Node, filter?: AssemblyFilterInput) {
@@ -216,14 +242,23 @@ function ensureNodeCan(
   purpose: string,
   requiredCommand?: AvailableNodeCommands,
 ) {
-  if (!requiredCommand) {
+  ensureNodeMetadataCan(node.metadata, node.displayName, purpose, requiredCommand);
+}
+
+export function ensureNodeMetadataCan(
+  nodeMetadata: NodeMetadata | undefined,
+  displayName: string,
+  purpose: string,
+  requiredCommand?: AvailableNodeCommands,
+) {
+  if (!requiredCommand || !nodeMetadata) {
     return;
   }
 
   const availableCommands =
-    node.metadata?.availableCommands ?? AvailableNodeCommands.None;
+    nodeMetadata.availableCommands ?? AvailableNodeCommands.None;
   if ((availableCommands & requiredCommand) !== requiredCommand) {
-    throw new Error(`"${node.displayName}" cannot be used to ${purpose}.`);
+    throw new Error(`"${displayName}" cannot be used to ${purpose}.`);
   }
 }
 
@@ -307,4 +342,34 @@ function isSameText(left: string, right: string) {
 
 function isNonEmptyString(value: string | undefined): value is string {
   return typeof value === "string" && value.trim().length > 0;
+}
+
+function isNodeMetadata(value: unknown): value is NodeMetadata {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const candidate = value as Record<string, unknown>;
+  return (
+    isNonEmptyString(asString(candidate.assemblyPath)) &&
+    isNonEmptyString(asString(candidate.name)) &&
+    isInteger(candidate.type) &&
+    isInteger(candidate.symbolToken) &&
+    isInteger(candidate.parentSymbolToken) &&
+    isInteger(candidate.availableCommands) &&
+    (!("bundledAssemblyName" in candidate) ||
+      candidate.bundledAssemblyName === undefined ||
+      isNonEmptyString(asString(candidate.bundledAssemblyName))) &&
+    (!("subType" in candidate) ||
+      candidate.subType === undefined ||
+      isNonEmptyString(asString(candidate.subType)))
+  );
+}
+
+function asString(value: unknown) {
+  return typeof value === "string" ? value : undefined;
+}
+
+function isInteger(value: unknown): value is number {
+  return typeof value === "number" && Number.isInteger(value);
 }

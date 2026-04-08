@@ -60,9 +60,9 @@ namespace ILSpyX.Backend.LSP.Protocol
 
     #endregion
 
-    #region exportAssembly
+    #region exportNode
 
-    [Serial, Method("ilspy/exportAssembly", Direction.ClientToServer)]
+    [Serial, Method("ilspy/exportNode", Direction.ClientToServer)]
     public record ExportNodeRequest(
         NodeMetadata NodeMetadata,
         string OutputLanguage,

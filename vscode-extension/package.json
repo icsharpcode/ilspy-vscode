@@ -407,8 +407,8 @@
 				],
 				"toolReferenceName": "ilspy-list-assemblies",
 				"displayName": "List loaded ILSpy assemblies",
-				"modelDescription": "Returns the assemblies currently loaded in ILSpy, including their names and full paths. Use this before decompilation or analysis when you need to know what ILSpy can already inspect.",
-				"userDescription": "List the assemblies currently loaded in ILSpy",
+				"modelDescription": "Returns the assemblies or NuGet packages currently loaded in ILSpy, including their names and full paths. Use this before decompilation or analysis when you need to know what ILSpy can already inspect.",
+				"userDescription": "List the assemblies or NuGet packages currently loaded in ILSpy",
 				"canBeReferencedInPrompt": true,
 				"icon": "$(files)",
 				"inputSchema": {

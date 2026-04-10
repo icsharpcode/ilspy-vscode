@@ -46,7 +46,9 @@ export async function getAssemblyNodes(
   backend: IILSpyBackend,
 ): Promise<Node[]> {
   return (await getRootNodes(backend)).filter(
-    (node) => node.metadata?.type === NodeType.Assembly,
+    (node) =>
+      node.metadata?.type === NodeType.Assembly ||
+      node.metadata?.type === NodeType.NuGetPackage,
   );
 }
 

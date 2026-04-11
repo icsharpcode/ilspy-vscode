@@ -5,17 +5,22 @@
 
 import * as vscode from "vscode";
 import IILSpyBackend from "../decompiler/IILSpyBackend";
+import NodeMetadata from "../protocol/NodeMetadata";
 import {
   createJsonResult,
   getRootNodes,
   hasAssemblyFilter,
   refreshAssemblyList,
+  requireNodeMetadata,
   resolveSingleNode,
   summarizeNode,
+  summarizeNodeMetadata,
   SymbolQueryInput,
 } from "./toolUtils";
 
-type IListNodesToolParameters = SymbolQueryInput;
+interface IListNodesToolParameters extends SymbolQueryInput {
+  nodeMetadata?: NodeMetadata;
+}
 
 export class ListNodesTool implements vscode.LanguageModelTool<IListNodesToolParameters> {
   static Name: string = "list_nodes";
@@ -26,6 +31,24 @@ export class ListNodesTool implements vscode.LanguageModelTool<IListNodesToolPar
     options: vscode.LanguageModelToolInvocationOptions<IListNodesToolParameters>,
     token: vscode.CancellationToken,
   ) {
+    if (options.input.nodeMetadata !== undefined) {
+      const nodeMetadata = requireNodeMetadata(
+        options.input.nodeMetadata,
+        "list child nodes for a tree node",
+      );
+      const response = await this.ilspyBackend.sendGetNodes({
+        nodeMetadata,
+      });
+      if (response?.shouldUpdateAssemblyList) {
+        await refreshAssemblyList();
+      }
+
+      return createJsonResult({
+        target: summarizeNodeMetadata(nodeMetadata),
+        nodes: (response?.nodes ?? []).map(summarizeNode),
+      });
+    }
+
     const hasTarget =
       (options.input.symbol?.trim().length ?? 0) > 0 ||
       hasAssemblyFilter(options.input);

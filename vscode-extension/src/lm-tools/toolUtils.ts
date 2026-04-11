@@ -174,6 +174,7 @@ export function summarizeNode(node: Node) {
   return {
     displayName: node.displayName,
     description: node.description,
+    mayHaveChildren: node.mayHaveChildren,
     ...summarizeNodeMetadata(node.metadata, node.displayName),
   };
 }
@@ -210,7 +211,7 @@ export function requireNodeMetadata(
   if (!isNodeMetadata(value)) {
     throw new Error(
       `A valid nodeMetadata object is required to ${purpose}. ` +
-        `Use list_decompiler_nodes to get one from the ILSpy tree.`,
+        `Use list_nodes to get one from the ILSpy tree.`,
     );
   }
 

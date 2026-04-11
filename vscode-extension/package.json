@@ -475,7 +475,7 @@
 					"properties": {
 						"nodeMetadata": {
 							"type": "object",
-							"description": "Exact ILSpy node metadata, typically copied verbatim from the nodeMetadata field returned by list_decompiler_nodes or another ILSpy tool result",
+							"description": "Exact ILSpy node metadata, typically copied verbatim from the nodeMetadata field returned by list_nodes or another ILSpy tool result",
 							"required": [
 								"assemblyPath",
 								"type",
@@ -535,24 +535,70 @@
 				],
 				"toolReferenceName": "ilspy-list-nodes",
 				"displayName": "List ILSpy nodes",
-				"modelDescription": "Lists nodes from ILSpy's assembly tree. With no input it returns the root nodes, which are usually the loaded assemblies. With a symbol or assembly target it returns the direct child nodes of that target. Results include exact nodeMetadata that can be passed to decompile_node.",
+				"modelDescription": "Lists nodes from ILSpy's assembly tree. With no input it returns the root nodes, which are usually the loaded assemblies. Prefer passing exact nodeMetadata from a prior list_nodes result to navigate to the next level of any tree node. Symbol or assembly inputs are still supported as shortcuts for choosing the first target. Results include exact nodeMetadata for further tree navigation or decompilation.",
 				"userDescription": "List ILSpy assembly tree nodes",
 				"canBeReferencedInPrompt": true,
 				"icon": "$(list-tree)",
 				"inputSchema": {
 					"type": "object",
 					"properties": {
+						"nodeMetadata": {
+							"type": "object",
+							"description": "Exact ILSpy node metadata, typically copied verbatim from the nodeMetadata field returned by list_nodes or another ILSpy tool result. Prefer this for navigating deeper into the tree from any node type.",
+							"required": [
+								"assemblyPath",
+								"type",
+								"name",
+								"symbolToken",
+								"parentSymbolToken",
+								"availableCommands"
+							],
+							"properties": {
+								"assemblyPath": {
+									"type": "string",
+									"description": "Assembly path associated with the node"
+								},
+								"type": {
+									"type": "integer",
+									"description": "Numeric ILSpy node type enum value"
+								},
+								"name": {
+									"type": "string",
+									"description": "Node name from ILSpy metadata"
+								},
+								"bundledAssemblyName": {
+									"type": "string",
+									"description": "Optional bundled assembly name for package-backed nodes"
+								},
+								"symbolToken": {
+									"type": "integer",
+									"description": "Node symbol token from ILSpy metadata"
+								},
+								"parentSymbolToken": {
+									"type": "integer",
+									"description": "Parent symbol token from ILSpy metadata"
+								},
+								"subType": {
+									"type": "string",
+									"description": "Optional ILSpy node subtype"
+								},
+								"availableCommands": {
+									"type": "integer",
+									"description": "Bitmask of commands ILSpy reports as available for the node"
+								}
+							}
+						},
 						"symbol": {
 							"type": "string",
-							"description": "Optional symbol whose direct children should be listed"
+							"description": "Optional symbol whose direct children should be listed when nodeMetadata is not provided"
 						},
 						"assemblyPath": {
 							"type": "string",
-							"description": "Optional absolute assembly path whose direct child nodes should be listed, or used to disambiguate a symbol"
+							"description": "Optional absolute assembly path whose direct child nodes should be listed, or used to disambiguate a symbol when nodeMetadata is not provided"
 						},
 						"assemblyName": {
 							"type": "string",
-							"description": "Optional assembly file name or simple assembly name whose direct child nodes should be listed, or used to disambiguate a symbol"
+							"description": "Optional assembly file name or simple assembly name whose direct child nodes should be listed, or used to disambiguate a symbol when nodeMetadata is not provided"
 						}
 					}
 				}

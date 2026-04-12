@@ -10,7 +10,7 @@ import { AvailableNodeCommands } from "../protocol/AvailableNodeCommands";
 import NodeMetadata from "../protocol/NodeMetadata";
 import {
   createJsonResult,
-  ensureNodeMetadataCan,
+  ensureNodeMetadataCommandAvailable,
   refreshAssemblyList,
   requireNodeMetadata,
   summarizeNodeMetadata,
@@ -36,7 +36,7 @@ export class DecompileNodeTool
       options.input.nodeMetadata,
       "decompile a tree node",
     );
-    ensureNodeMetadataCan(
+    ensureNodeMetadataCommandAvailable(
       nodeMetadata,
       nodeMetadata.name,
       "decompile",

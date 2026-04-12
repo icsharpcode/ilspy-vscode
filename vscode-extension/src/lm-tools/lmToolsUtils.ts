@@ -126,7 +126,7 @@ export async function resolveSingleNode(
   }
 
   const match = matches[0];
-  ensureNodeCan(match, purpose, requiredCommand);
+  ensureNodeCommandAvailable(match, purpose, requiredCommand);
   return match;
 }
 
@@ -240,15 +240,20 @@ function matchesAssembly(node: Node, filter?: AssemblyFilterInput) {
   return pathMatches && nameMatches;
 }
 
-function ensureNodeCan(
+function ensureNodeCommandAvailable(
   node: Node,
   purpose: string,
   requiredCommand?: AvailableNodeCommands,
 ) {
-  ensureNodeMetadataCan(node.metadata, node.displayName, purpose, requiredCommand);
+  ensureNodeMetadataCommandAvailable(
+    node.metadata,
+    node.displayName,
+    purpose,
+    requiredCommand,
+  );
 }
 
-export function ensureNodeMetadataCan(
+export function ensureNodeMetadataCommandAvailable(
   nodeMetadata: NodeMetadata | undefined,
   displayName: string,
   purpose: string,

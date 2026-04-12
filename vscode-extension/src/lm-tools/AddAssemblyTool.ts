@@ -9,7 +9,7 @@ import {
   createJsonResult,
   refreshAssemblyList,
   summarizeAssemblyData,
-} from "./toolUtils";
+} from "./lmToolsUtils";
 
 interface IAddAssemblyToolParameters {
   assemblyPath?: string;

@@ -9,7 +9,7 @@ import {
   createJsonResult,
   getAssemblyNodes,
   summarizeAssemblyNode,
-} from "./toolUtils";
+} from "./lmToolsUtils";
 
 export class ListAssembliesTool implements vscode.LanguageModelTool<{}> {
   static Name: string = "list_loaded_assemblies";

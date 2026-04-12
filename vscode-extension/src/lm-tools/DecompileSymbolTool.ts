@@ -13,7 +13,7 @@ import {
   searchNodes,
   summarizeNode,
   SymbolQueryInput,
-} from "./toolUtils";
+} from "./lmToolsUtils";
 
 interface IDecompileSymbolToolParameters extends SymbolQueryInput {
   outputLanguage?: string;

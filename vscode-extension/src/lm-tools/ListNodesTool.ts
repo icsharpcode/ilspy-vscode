@@ -16,7 +16,7 @@ import {
   summarizeNode,
   summarizeNodeMetadata,
   SymbolQueryInput,
-} from "./toolUtils";
+} from "./lmToolsUtils";
 
 interface IListNodesToolParameters extends SymbolQueryInput {
   nodeMetadata?: NodeMetadata;

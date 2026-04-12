@@ -10,7 +10,7 @@ import {
   createJsonResult,
   searchNodes,
   summarizeNode,
-} from "./toolUtils";
+} from "./lmToolsUtils";
 
 interface ISearchSymbolsToolParameters extends AssemblyFilterInput {
   term?: string;

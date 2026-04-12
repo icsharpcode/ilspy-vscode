@@ -12,7 +12,7 @@ import {
   resolveSingleNode,
   summarizeNode,
   SymbolQueryInput,
-} from "./toolUtils";
+} from "./lmToolsUtils";
 
 type IAnalyzeSymbolToolParameters = SymbolQueryInput;
 

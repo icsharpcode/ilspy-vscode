@@ -10,7 +10,7 @@ import {
   createJsonResult,
   refreshAssemblyList,
   resolveAssemblyNode,
-} from "./toolUtils";
+} from "./lmToolsUtils";
 
 type IRemoveAssemblyToolParameters = AssemblyFilterInput;
 

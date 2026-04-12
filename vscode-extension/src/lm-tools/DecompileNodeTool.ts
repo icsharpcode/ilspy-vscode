@@ -14,7 +14,7 @@ import {
   refreshAssemblyList,
   requireNodeMetadata,
   summarizeNodeMetadata,
-} from "./toolUtils";
+} from "./lmToolsUtils";
 
 interface IDecompileNodeToolParameters {
   nodeMetadata?: NodeMetadata;

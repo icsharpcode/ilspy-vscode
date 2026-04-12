@@ -16,7 +16,7 @@ import {
   resolveSingleNode,
   summarizeNode,
   SymbolQueryInput,
-} from "./toolUtils";
+} from "./lmToolsUtils";
 
 interface IExportNodeToolParameters extends SymbolQueryInput {
   outputDirectory?: string;

@@ -318,35 +318,6 @@
 		],
 		"languageModelTools": [
 			{
-				"name": "initialize_loaded_assemblies",
-				"tags": [
-					"ilspy",
-					"assemblies",
-					"load"
-				],
-				"toolReferenceName": "ilspy-init-assemblies",
-				"displayName": "Initialize loaded ILSpy assemblies",
-				"modelDescription": "Loads a specific set of assembly file paths into ILSpy using the backend initialization request that the extension uses to restore a session. Use it when you need ILSpy to start working against a known set of assemblies.",
-				"userDescription": "Initialize ILSpy with a specific set of assembly file paths",
-				"canBeReferencedInPrompt": true,
-				"icon": "$(files)",
-				"inputSchema": {
-					"type": "object",
-					"required": [
-						"assemblyPaths"
-					],
-					"properties": {
-						"assemblyPaths": {
-							"type": "array",
-							"description": "Absolute file system paths of assemblies to load into ILSpy",
-							"items": {
-								"type": "string"
-							}
-						}
-					}
-				}
-			},
-			{
 				"name": "add_loaded_assembly",
 				"tags": [
 					"ilspy",

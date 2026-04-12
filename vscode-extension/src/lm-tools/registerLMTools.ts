@@ -11,17 +11,12 @@ import { ListAssembliesTool } from "./ListAssembliesTool";
 import { AddAssemblyTool } from "./AddAssemblyTool";
 import { AnalyzeSymbolTool } from "./AnalyzeSymbolTool";
 import { ExportNodeTool } from "./ExportNodeTool";
-import { InitializeAssembliesTool } from "./InitializeAssembliesTool";
 import { ListNodesTool } from "./ListNodesTool";
 import { RemoveAssemblyTool } from "./RemoveAssemblyTool";
 import { SearchSymbolsTool } from "./SearchSymbolsTool";
 
 export function registerLMTools(ilspyBackend: IILSpyBackend) {
   return [
-    vscode.lm.registerTool(
-      InitializeAssembliesTool.Name,
-      new InitializeAssembliesTool(ilspyBackend),
-    ),
     vscode.lm.registerTool(
       AddAssemblyTool.Name,
       new AddAssemblyTool(ilspyBackend),

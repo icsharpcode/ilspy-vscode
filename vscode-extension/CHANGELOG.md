@@ -5,11 +5,12 @@ All notable changes to the "ilspy-vscode" extension will be documented in this f
 ## 0.24.0
 
 - Allow to export assemblies as full .NET projects to file system (thanks to [@k-o-n-t-o-r](https://github.com/k-o-n-t-o-r))
-- Introdude ILSpy-specific Language Model Tools allowing to use ILSpy analysis and decompilation in VSCode chats with agents
+- Introduce ILSpy-specific Language Model Tools allowing to use ILSpy analysis and decompilation in VSCode chats with agents
 - Fix: Assembly list allowed to "reload" or "unload" assembly files inside of NuGet packages, which makes no sense
 - Fix: NuGet packages could not be reloaded or removed from assembly list
 - Fix: Empty assembly list if one of added assemblies doesn't exist anymore
 - Upgrade to ICSharpCode.Decompiler 10.0 (see release notes for [ILSpy 10.0](https://github.com/icsharpcode/ILSpy/releases/tag/v10.0) to get more details)
+- Support selecting C# 13 and C# 14 for output
 
 ## 0.23.1
 

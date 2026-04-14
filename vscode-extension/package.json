@@ -147,23 +147,23 @@
 			},
 			{
 				"command": "ilspy.decompileAssemblyInWorkspace",
-				"title": "Add assembly from workspace",
+				"title": "Add assembly or package from workspace",
 				"category": "ILSpy"
 			},
 			{
 				"command": "ilspy.decompileAssemblyViaDialog",
-				"title": "Pick assembly from file system",
+				"title": "Pick assembly or package from file system",
 				"category": "ILSpy"
 			},
 			{
 				"command": "ilspy.unloadAssembly",
-				"title": "Unload Assembly",
+				"title": "Unload",
 				"category": "ILSpy",
 				"icon": "$(close)"
 			},
 			{
 				"command": "ilspy.reloadAssembly",
-				"title": "Reload Assembly",
+				"title": "Reload",
 				"category": "ILSpy",
 				"icon": "$(refresh)"
 			},
@@ -194,7 +194,7 @@
 				"command": "ilspy.export",
 				"title": "Export Decompiled Code...",
 				"category": "ILSpy",
-				"icon": "$(export)"
+				"icon": "$(save-all)"
 			}
 		],
 		"menus": {
@@ -245,13 +245,13 @@
 					"group": "inline@1"
 				},
 				{
-					"command": "ilspy.unloadAssembly",
-					"when": "view == ilspyDecompiledMembers && viewItem =~ /#manageRootEntries/",
+					"command": "ilspy.export",
+					"when": "view == ilspyDecompiledMembers && viewItem =~ /#export/",
 					"group": "inline@2"
 				},
 				{
-					"command": "ilspy.export",
-					"when": "view == ilspyDecompiledMembers && viewItem =~ /#export/",
+					"command": "ilspy.unloadAssembly",
+					"when": "view == ilspyDecompiledMembers && viewItem =~ /#manageRootEntries/",
 					"group": "inline@3"
 				}
 			],

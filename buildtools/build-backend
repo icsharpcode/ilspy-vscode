@@ -1,3 +1,4 @@
 #!/usr/bin/env sh
 
-dotnet build ./backend/ILSpy-backend.sln --configuration Debug
+ASSEMBLYVERSION=`buildtools/versionize --assembly`
+dotnet build ./backend/ILSpy-backend.sln --configuration Debug -p:Version=$ASSEMBLYVERSION

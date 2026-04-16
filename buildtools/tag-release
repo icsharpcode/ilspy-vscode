@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 
-RELEASEVERSION=`dotnet dotnet-gitversion -showvariable MajorMinorPatch`
+RELEASEVERSION=`buildtools/versionize --next`
 git tag v$RELEASEVERSION

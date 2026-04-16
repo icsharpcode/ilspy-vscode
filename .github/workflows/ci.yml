@@ -48,9 +48,6 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: vscode-extension/pnpm-lock.yaml
 
-      - name: Bootstrap Build Tools
-        run: buildtools/bootstrap
-
       - name: Publish Backend
         run: buildtools/publish-backend
 

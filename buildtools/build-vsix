@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
-SEMVER=`dotnet dotnet-gitversion -showvariable SemVer`
-PRERELEASETAG=`dotnet dotnet-gitversion -showvariable PreReleaseTag`
+SEMVER=`buildtools/versionize`
+PRERELEASETAG=`buildtools/versionize --type`
 
 mkdir ./artifacts
 

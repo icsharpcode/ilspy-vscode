@@ -18,10 +18,6 @@
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="GitVersion.MsBuild">
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-            <PrivateAssets>all</PrivateAssets>
-        </PackageReference>
         <PackageReference Include="ICSharpCode.ILSpyX"/>
         <PackageReference Include="Mono.Cecil"/>
         <PackageReference Include="OmniSharp.Extensions.LanguageServer"/>

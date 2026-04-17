@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# buildtool: versionize v1.0
+# buildtool: versionize v1.1
 
 get_latest_tag() {
     git describe --tags --abbrev=0 --match 'v*' | sort -V | tail -n1
@@ -30,11 +30,17 @@ current_branch_pretag() {
         if [[ "$branch" == "master" || "$branch" == "main" ]]; then
             echo "preview"
         else
-            echo $branch
+            escape_branch_name "$branch"
         fi
     else
-        echo ""
+        probable_ref=$(git for-each-ref --points-at HEAD --format='%(refname:short)' | head -n1)
+        escape_branch_name "$probable_ref"
     fi
+}
+
+escape_branch_name() {
+    branch=$1
+    echo "${branch//\//-}"
 }
 
 extract_major() {
@@ -110,7 +116,6 @@ next_minor=$minor
 next_patch=$patch
 
 branch=$(current_branch)
-next_major=$((major + 1))
 if [[ "$branch" == "master" || "$branch" == "main" ]]; then
     next_minor=$((minor + 1))
 else

@@ -7,7 +7,7 @@ mkdir ./artifacts
 
 cd ./vscode-extension
 npm version --git-tag-version false --allow-same-version true -- $SEMVER
-if [[ -n "$PRERELEASETAG" ]]; then
+if [ -n "$PRERELEASETAG" ]; then
    npm pkg set preview='true'
 fi
 pnpm install

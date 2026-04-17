@@ -11,21 +11,13 @@ assembly tree, decompilation, symbol search and analysis features as known from 
 A [Language Server Procotol](https://microsoft.github.io/language-server-protocol/) interface around `ILSpyX.Backend` to
 be accessible from the VSCode extension.
 
-Apart from general service initialization, following custom LSP messages are supported:
-
-- `ilspy/initWithAssemblies`
-- `ilspy/addAssembly`
-- `ilspy/removeAssembly`
-- `ilspy/decompileNode`
-- `ilspy/getNodes`
-- `ilspy/search`
-- `ilspy/analyze`
-
 The idea of the interface is a dynamic tree of typed _nodes_ representing the list of assemblies and their contents.
 This is similar to the tree presented in ILSpy desktop application.
 Clients use `ilspy/getNodes` message to access nodes and their children.
 To get the code for a specific node (which may be an assembly, a class, a single method etc.), clients use
 `ilspy/decompileNode` message.
+
+Further information on the LSP interface [in the docs](docs/lsp-messages-protocol.md).
 
 ## Develop
 

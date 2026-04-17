@@ -1,4 +1,6 @@
 #!/usr/bin/env sh
 
-ASSEMBLYVERSION=`buildtools/versionize --assembly`
-dotnet build ./backend/ILSpy-backend.sln --configuration Debug -p:Version=$ASSEMBLYVERSION
+ASSEMBLYVERSION=`buildtools/versionize --next`
+FULLASSEMBLYVERSION=`buildtools/versionize --assembly`
+INFOVERSION=`buildtools/versionize`
+dotnet build ./backend/ILSpy-backend.sln --configuration Debug -p:Version=$ASSEMBLYVERSION -p:FileVersion=$FULLASSEMBLYVERSION -p:InformationalVersion=$INFOVERSION

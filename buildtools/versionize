@@ -1,0 +1,145 @@
+#!/usr/bin/env bash
+# buildtool: versionize v1.1
+
+get_latest_tag() {
+    git describe --tags --abbrev=0 --match 'v*' | sort -V | tail -n1
+}
+
+extract_version() {
+    echo "$1" | sed 's/^v//'
+}
+
+commits_since_tag() {
+    local tag=$1
+    local commits=$(git rev-list $tag..HEAD --count)
+    echo "$commits"
+}
+
+current_branch() {
+    branch=$(git symbolic-ref --short HEAD 2>/dev/null)
+    if [ $? -eq 0 ]; then
+        echo $branch
+    else
+        echo ""
+    fi
+}
+
+current_branch_pretag() {
+    branch=$(git symbolic-ref --short HEAD 2>/dev/null)
+    if [ $? -eq 0 ]; then
+        if [[ "$branch" == "master" || "$branch" == "main" ]]; then
+            echo "preview"
+        else
+            escape_branch_name "$branch"
+        fi
+    else
+        probable_ref=$(git for-each-ref --points-at HEAD --format='%(refname:short)' | head -n1)
+        escape_branch_name "$probable_ref"
+    fi
+}
+
+escape_branch_name() {
+    branch=$1
+    echo "${branch//\//-}"
+}
+
+extract_major() {
+    local version="$1"
+    local result=$(echo "${version#"v"}" | sed -E 's/([0-9]+)(\..*)?.*/\1/')
+    if [[ "v$result" == "$version" ]]; then
+        echo 0
+    else
+        echo $result
+    fi
+}
+
+extract_minor() {
+    local version="$1"
+    local result=$(echo "${version#"v"}" | sed -E 's/[0-9]+\.([0-9]+)(\..*)?.*/\1/')
+    if [[ "v$result" == "$version" ]]; then
+        echo 0
+    else
+        echo $result
+    fi
+}
+
+extract_patch() {
+    local version="$1"
+    local result=$(echo "${version#"v"}" | sed -E 's/[0-9]+\.[0-9]+\.([0-9]+)(-.*)?/\1/')
+    if [[ "v$result" == "$version" ]]; then
+        echo 0
+    else
+        echo $result
+    fi
+}
+
+extract_preview_tag() {
+    local version="$1"
+    local result=$(echo "${version#"v"}" | sed -E 's/[0-9]+\.[0-9]+(\.[0-9]+)?-(.*)/\2/')
+    if [[ "v$result" == "$version" ]]; then
+        echo $(current_branch_pretag)
+    else
+        echo $result
+    fi
+}
+
+latest_tag=$(get_latest_tag)
+major=$(extract_major "$latest_tag")
+minor=$(extract_minor "$latest_tag")
+patch=$(extract_patch "$latest_tag")
+pretag=$(extract_preview_tag "$latest_tag")
+
+if [ -z "$latest_tag" ]; then
+    echo "No tags found starting with 'v'"
+    exit 1
+fi
+
+latest_tag_sha=$(git rev-parse "$latest_tag")
+head_sha=$(git rev-parse HEAD)
+
+# echo "Latest tag: $latest_tag_sha"
+# echo "HEAD: $head_sha"
+# echo "Major: $major"
+# echo "Minor: $minor"
+# echo "Patch: $patch"
+# echo "Pretag: $pretag"
+
+package_version=""
+assembly_version=""
+version_type=""
+next_package_version=""
+
+commits=$(( $(commits_since_tag "$latest_tag") ))
+
+next_major=$major
+next_minor=$minor
+next_patch=$patch
+
+branch=$(current_branch)
+if [[ "$branch" == "master" || "$branch" == "main" ]]; then
+    next_minor=$((minor + 1))
+else
+    next_patch=$((patch + 1))
+fi
+
+if [ $commits -eq 0 ]; then
+    package_version="${major}.${minor}.${patch}"
+    next_package_version="${next_major}.${next_minor}.${next_patch}"
+    assembly_version="${major}.${minor}.${patch}.10000"
+    version_type="release"
+else
+    package_version="${next_major}.${next_minor}.${next_patch}-${pretag}.${commits}"
+    next_package_version="${next_major}.${next_minor}.${next_patch}"
+    assembly_version="${next_major}.${next_minor}.${next_patch}.${commits}"
+    version_type="preview"
+fi
+
+if [[ "$1" == "--assembly" ]]; then
+    echo $assembly_version
+elif [[ "$1" == "--type" ]]; then
+    echo $version_type
+elif [[ "$1" == "--next" ]]; then
+    echo $next_package_version
+else
+    echo $package_version
+fi

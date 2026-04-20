@@ -1,13 +1,13 @@
 #!/usr/bin/env sh
 
-SEMVER=`dotnet dotnet-gitversion -showvariable SemVer`
-PRERELEASETAG=`dotnet dotnet-gitversion -showvariable PreReleaseTag`
+SEMVER=`buildtools/versionize`
+PRERELEASETAG=`buildtools/versionize --type`
 
 mkdir ./artifacts
 
 cd ./vscode-extension
 npm version --git-tag-version false --allow-same-version true -- $SEMVER
-if [[ -n "$PRERELEASETAG" ]]; then
+if [ -n "$PRERELEASETAG" ]; then
    npm pkg set preview='true'
 fi
 pnpm install

@@ -684,6 +684,27 @@
 					}
 				}
 			}
+		],
+		"languages": [
+			{
+				"id": "ilspy-code-cs",
+				"aliases": [
+					"ILSpy (C#)"
+				]
+			},
+			{
+				"id": "ilspy-code-il",
+				"aliases": [
+					"ILSpy (IL)"
+				]
+			}
+		],
+		"grammars": [
+			{
+				"language": "ilspy-code-cs",
+				"scopeName": "source.ilspy-code-cs",
+				"path": "resources/ilspy-code-cs.tmLanguage.json"
+			}
 		]
 	},
 	"scripts": {

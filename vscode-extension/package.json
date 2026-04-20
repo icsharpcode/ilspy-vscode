@@ -690,13 +690,21 @@
 				"id": "ilspy-code-cs",
 				"aliases": [
 					"ILSpy (C#)"
-				]
+				],
+				"icon": {
+					"light": "resources/il-spy-modern-icon.svg",
+					"dark": "resources/il-spy-modern-icon-dark.svg"
+				}
 			},
 			{
 				"id": "ilspy-code-il",
 				"aliases": [
 					"ILSpy (IL)"
-				]
+				],
+				"icon": {
+					"light": "resources/il-spy-modern-icon.svg",
+					"dark": "resources/il-spy-modern-icon-dark.svg"
+				}
 			}
 		],
 		"grammars": [

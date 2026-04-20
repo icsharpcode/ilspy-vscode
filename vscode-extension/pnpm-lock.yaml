@@ -5,20 +5,13 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  glob@10.4.5: 10.5.0
-  js-yaml@4.1.0: 4.1.1
-  jws@3.2.2: 3.2.3
-  qs@6.14.1: 6.14.2
-  undici-types@6.21.0: 6.23.0
   chokidar@4.0.3: 5.0.0
-  minimatch@3.1.2: 3.1.4
-  minimatch@5.1.6: 5.1.8
-  minimatch@9.0.6: 9.0.7
-  underscore@1.13.7: 1.13.8
-  diff@7.0.0: 8.0.3
-  markdown-it@14.1.0: 14.1.1
-  rollup@4.56.0: 4.59.0
-  serialize-javascript@6.0.2: 7.0.4
+  diff@>=6.0.0 <8.0.3: 8.0.3
+  lodash@<=4.17.23: 4.18.0
+  serialize-javascript@<7.0.5: 7.0.5
+  undici-types@6.21.0: 6.23.0
+  undici@>=7.0.0 <7.24.0: 7.24.0
+  vite@>=7.0.0 <=7.3.1: 7.3.2
 
 importers:
 
@@ -715,7 +708,7 @@ packages:
     resolution: {integrity: sha512-R9HTZBhW6yCSGbGQnDnH3QHfJxokKN4KB+Yvk9Q1le7eQNYwiCyKxmLmurSpFy6BzJanSLuEUDrD+j97Q+ZLPg==}
     peerDependencies:
       msw: ^2.4.9
-      vite: ^6.0.0 || ^7.0.0 || ^8.0.0
+      vite: 7.3.2
     peerDependenciesMeta:
       msw:
         optional: true
@@ -1726,8 +1719,9 @@ packages:
   lodash.truncate@4.4.2:
     resolution: {integrity: sha512-jttmRe7bRse52OsWIMDLaXxWqRAmtIUccAQ3garviCqJjafXOfNMO0yMfNpdD6zbGaTU0P5Nz7e7gAT6cKmJRw==}
 
-  lodash@4.17.23:
-    resolution: {integrity: sha512-LgVTMpQtIopCi79SJeDiP0TfWi5CNEc/L/aRdTh3yIvmZXTnheWpKjSZhnvMl8iXbC1tFg9gdHHDMLoV7CnG+w==}
+  lodash@4.18.0:
+    resolution: {integrity: sha512-l1mfj2atMqndAHI3ls7XqPxEjV2J9ZkcNyHpoZA3r2T1LLwDB69jgkMWh71YKwhBbK0G2f4WSn05ahmQXVxupA==}
+    deprecated: Bad release. Please use lodash@4.17.21 instead.
 
   log-symbols@4.1.0:
     resolution: {integrity: sha512-8XPvpAA8uyhfteu8pIvQxpJZ7SYYdpUivZpGy6sFsBuKRY/7rQGavedeB8aK+Zkyq6upMFVL/9AW6vOYzfRyLg==}
@@ -2144,8 +2138,8 @@ packages:
     engines: {node: '>=10'}
     hasBin: true
 
-  serialize-javascript@7.0.4:
-    resolution: {integrity: sha512-DuGdB+Po43Q5Jxwpzt1lhyFSYKryqoNjQSA9M92tyw0lyHIOur+XCalOUe0KTJpyqzT8+fQ5A0Jf7vCx/NKmIg==}
+  serialize-javascript@7.0.5:
+    resolution: {integrity: sha512-F4LcB0UqUl1zErq+1nYEEzSHJnIwb3AF2XWB94b+afhrekOUijwooAYqFyRbjYkm2PAKBabx6oYv/xDxNi8IBw==}
     engines: {node: '>=20.0.0'}
 
   setimmediate@1.0.5:
@@ -2412,8 +2406,8 @@ packages:
   undici-types@6.23.0:
     resolution: {integrity: sha512-HN7GeXgBUs1StmY/vf9hIH11LrNI5SfqmFVtxKyp9Dhuf1P1cDSRlS+H1NJDaGOWzlI08q+NmiHgu11Vx6QnhA==}
 
-  undici@7.19.0:
-    resolution: {integrity: sha512-Heho1hJD81YChi+uS2RkSjcVO+EQLmLSyUlHyp7Y/wFbxQaGb4WXVKD073JytrjXJVkSZVzoE2MCSOKugFGtOQ==}
+  undici@7.24.0:
+    resolution: {integrity: sha512-jxytwMHhsbdpBXxLAcuu0fzlQeXCNnWdDyRHpvWsUl8vd98UwYdl9YTyn8/HcpcJPC3pwUveefsa3zTxyD/ERg==}
     engines: {node: '>=20.18.1'}
 
   unicorn-magic@0.1.0:
@@ -2513,7 +2507,7 @@ packages:
       '@vitest/ui': 4.1.4
       happy-dom: '*'
       jsdom: '*'
-      vite: ^6.0.0 || ^7.0.0 || ^8.0.0
+      vite: 7.3.2
     peerDependenciesMeta:
       '@edge-runtime/vm':
         optional: true
@@ -3097,7 +3091,7 @@ snapshots:
       chalk: 4.1.2
       debug: 4.4.3(supports-color@8.1.1)
       js-yaml: 4.1.1
-      lodash: 4.17.23
+      lodash: 4.18.0
       pluralize: 2.0.0
       string-width: 4.2.3
       strip-ansi: 6.0.1
@@ -3626,7 +3620,7 @@ snapshots:
       parse5: 7.3.0
       parse5-htmlparser2-tree-adapter: 7.1.0
       parse5-parser-stream: 7.1.2
-      undici: 7.19.0
+      undici: 7.24.0
       whatwg-mimetype: 4.0.0
 
   chokidar@5.0.0:
@@ -4337,7 +4331,7 @@ snapshots:
 
   lodash.truncate@4.4.2: {}
 
-  lodash@4.17.23: {}
+  lodash@4.18.0: {}
 
   log-symbols@4.1.0:
     dependencies:
@@ -4439,7 +4433,7 @@ snapshots:
       minimatch: 9.0.7
       ms: 2.1.3
       picocolors: 1.1.1
-      serialize-javascript: 7.0.4
+      serialize-javascript: 7.0.5
       strip-json-comments: 3.1.1
       supports-color: 8.1.1
       workerpool: 9.3.4
@@ -4805,7 +4799,7 @@ snapshots:
 
   semver@7.7.4: {}
 
-  serialize-javascript@7.0.4: {}
+  serialize-javascript@7.0.5: {}
 
   setimmediate@1.0.5: {}
 
@@ -5074,7 +5068,7 @@ snapshots:
 
   undici-types@6.23.0: {}
 
-  undici@7.19.0: {}
+  undici@7.24.0: {}
 
   unicorn-magic@0.1.0: {}
 

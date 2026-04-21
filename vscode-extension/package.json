@@ -741,10 +741,10 @@
 		"@types/mocha": "10.0.10",
 		"@types/node": "22.15.31",
 		"@types/vscode": "1.110.0",
-		"@typescript-eslint/eslint-plugin": "8.58.1",
-		"@typescript-eslint/parser": "8.58.1",
+		"@typescript-eslint/eslint-plugin": "8.58.2",
+		"@typescript-eslint/parser": "8.58.2",
 		"@vscode/test-electron": "2.5.2",
-		"@vscode/vsce": "3.7.1",
+		"@vscode/vsce": "3.9.0",
 		"eslint": "10.2.0",
 		"glob": "13.0.6",
 		"minimist": "1.2.8",
@@ -753,7 +753,7 @@
 		"ts-loader": "9.5.7",
 		"typescript": "6.0.2",
 		"vitest": "4.1.4",
-		"webpack": "5.106.0",
+		"webpack": "5.106.2",
 		"webpack-cli": "7.0.2"
 	},
 	"extensionDependencies": [

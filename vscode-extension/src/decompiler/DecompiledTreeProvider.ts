@@ -11,7 +11,6 @@ import {
   Event,
   EventEmitter,
   ExtensionContext,
-  ProviderResult,
   TreeDataProvider,
   TreeDragAndDropController,
   TreeItem,
@@ -33,6 +32,7 @@ import {
 } from "./settings";
 import {
   ASSEMBLY_FILE_EXTENSIONS,
+  createNodeId,
   createNodeTooltip,
   getNodeContextValue,
   hasNodeCommand,
@@ -49,7 +49,7 @@ export class DecompiledTreeProvider
   constructor(
     private extensionContext: ExtensionContext,
     private backend: IILSpyBackend,
-    private logger: OutputWindowLogger
+    private logger: OutputWindowLogger,
   ) {}
 
   public refresh(): void {
@@ -66,7 +66,7 @@ export class DecompiledTreeProvider
       return true;
     } else {
       window.showWarningMessage(
-        `Assemblies could not be restored from last session.`
+        `Assemblies could not be restored from last session.`,
       );
     }
 
@@ -82,7 +82,7 @@ export class DecompiledTreeProvider
       return true;
     } else {
       window.showWarningMessage(
-        `File '${assembly}' could not be loaded as assembly.`
+        `File '${assembly}' could not be loaded as assembly.`,
       );
     }
 
@@ -116,9 +116,8 @@ export class DecompiledTreeProvider
   }
 
   public getTreeItem(node: Node): TreeItem {
-    const test = getNodeIcon(node.metadata?.type);
-
     return {
+      id: createNodeId(node),
       label: node.displayName,
       tooltip: createNodeTooltip(node),
       collapsibleState: node.mayHaveChildren
@@ -137,7 +136,7 @@ export class DecompiledTreeProvider
         ? Uri.parse(
             `ilspy-autoloaded://${node.metadata?.assemblyPath}/${
               node.metadata?.name ?? ""
-            }`
+            }`,
           )
         : undefined,
     };
@@ -151,8 +150,14 @@ export class DecompiledTreeProvider
     return this.getChildNodes(node);
   }
 
-  public getParent?(node: Node): ProviderResult<Node> {
-    // Note: This allows releasing of assembly nodes in TreeView, which are placed in root. It won't work for other nodes.
+  public async getParent?(node: Node): Promise<Node | undefined> {
+    const path = await this.backend.sendResolveNodePath({
+      nodeMetadata: node.metadata,
+    });
+    if (path?.nodePath && path.nodePath.length > 0) {
+      return path.nodePath[path.nodePath?.length - 1];
+    }
+
     return undefined;
   }
 
@@ -170,9 +175,9 @@ export class DecompiledTreeProvider
               (node) =>
                 (node.metadata?.type === NodeType.Assembly ||
                   node.metadata?.type === NodeType.NuGetPackage) &&
-                !hasNodeFlag(node, NodeFlags.AutoLoaded)
+                !hasNodeFlag(node, NodeFlags.AutoLoaded),
             )
-            .map((node) => node.metadata!.assemblyPath)
+            .map((node) => node.metadata!.assemblyPath),
         );
       }
 
@@ -192,7 +197,7 @@ export class DecompiledTreeProvider
           (showAutoLoadedAssemblies ||
             !hasNodeFlag(node, NodeFlags.AutoLoaded)) &&
           (showCompilerGeneratedSymbols ||
-            !hasNodeFlag(node, NodeFlags.CompilerGenerated))
+            !hasNodeFlag(node, NodeFlags.CompilerGenerated)),
       ) ?? []
     );
   }
@@ -203,7 +208,7 @@ export class DecompiledTreeProvider
   async handleDrop(
     target: Node | undefined,
     dataTransfer: DataTransfer,
-    token: CancellationToken
+    token: CancellationToken,
   ): Promise<void> {
     const uris =
       (await dataTransfer.get("text/uri-list")?.asString())?.split("\r\n") ??
@@ -214,7 +219,7 @@ export class DecompiledTreeProvider
       if (this.isValidFile(fileUri.fsPath)) {
         this.processDroppedFile(target, filePath);
         this.logger.writeLine(
-          `Dropped assembly file ${filePath}, trying to add to assembly list`
+          `Dropped assembly file ${filePath}, trying to add to assembly list`,
         );
       } else {
         this.logger.writeLine(`Dropped unsupported file ${filePath}!`);
@@ -225,7 +230,7 @@ export class DecompiledTreeProvider
   private isValidFile(filePath: string): boolean {
     const ext = path.extname(filePath);
     return ASSEMBLY_FILE_EXTENSIONS.includes(
-      path.extname(filePath).substring(1)
+      path.extname(filePath).substring(1),
     );
   }
 

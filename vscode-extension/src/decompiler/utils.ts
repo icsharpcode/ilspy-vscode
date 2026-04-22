@@ -35,6 +35,21 @@ export function getTreeNodeCollapsibleState(
     : TreeItemCollapsibleState.None;
 }
 
+export function createNodeId(node: Node) {
+  const metadata = node.metadata;
+  if (metadata && metadata.symbolToken !== 0) {
+    return [
+      metadata.assemblyPath,
+      metadata.bundledAssemblyName,
+      metadata.type,
+      metadata.symbolToken,
+      metadata.parentSymbolToken,
+    ].join(":");
+  }
+
+  return undefined;
+}
+
 export function getNodeContextValue(node: Node) {
   let contextValue = "";
 

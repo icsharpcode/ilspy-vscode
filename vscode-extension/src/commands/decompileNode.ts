@@ -17,24 +17,26 @@ export function registerDecompileNodeCommand(
 ) {
   return vscode.commands.registerCommand(
     "ilspy.decompileNode",
-    async (node: Node) => {
-      if (lastSelectedNode === node) {
-        return;
+    async (node: Node, revealInTree = false) => {
+      if (lastSelectedNode !== node) {
+        lastSelectedNode = node;
+
+        const uri = nodeDataToUri(node);
+        const language = getDefaultOutputLanguage();
+
+        contentProvider.setDocumentOutputLanguage(uri, language);
+
+        let doc = await vscode.workspace.openTextDocument(uri);
+        vscode.languages.setTextDocumentLanguage(
+          doc,
+          languageInfos[language].vsLanguageMode,
+        );
+        await vscode.window.showTextDocument(doc, { preview: true });
       }
 
-      lastSelectedNode = node;
-
-      const uri = nodeDataToUri(node);
-      const language = getDefaultOutputLanguage();
-
-      contentProvider.setDocumentOutputLanguage(uri, language);
-
-      let doc = await vscode.workspace.openTextDocument(uri);
-      vscode.languages.setTextDocumentLanguage(
-        doc,
-        languageInfos[language].vsLanguageMode
-      );
-      await vscode.window.showTextDocument(doc, { preview: true });
-    }
+      if (revealInTree) {
+        await vscode.commands.executeCommand("ilspy.revealNode", node);
+      }
+    },
   );
 }

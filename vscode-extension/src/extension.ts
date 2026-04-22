@@ -48,6 +48,7 @@ import { AssemblyNodeDecorationProvider } from "./decompiler/AssemblyNodeDecorat
 import { registerAddAssemblyByPathCommand } from "./commands/addAssemblyByPath";
 import { registerExportDecompiledAssemblyCommand } from "./commands/exportDecompiledAssembly";
 import { registerLMTools } from "./lm-tools/registerLMTools";
+import { registerRevealNodeCommand } from "./commands/revealNode";
 
 let client: LanguageClient;
 
@@ -178,6 +179,7 @@ export async function activate(context: ExtensionContext) {
     ),
   );
 
+  disposables.push(registerRevealNodeCommand(decompiledTreeView));
   disposables.push(registerReloadAssemblyCommand(decompiledTreeProvider));
   disposables.push(registerUnloadAssemblyCommand(decompiledTreeProvider));
   disposables.push(registerRefreshAssemblyListCommand(decompiledTreeProvider));

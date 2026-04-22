@@ -19,6 +19,7 @@ import { getNodeIcon } from "../../icons";
 import { getShowCompilerGeneratedSymbolsSetting } from "../settings";
 import { NodeFlags } from "../../protocol/NodeFlags";
 import {
+  createNodeId,
   createNodeTooltip,
   getNodeContextValue,
   hasNodeCommand,
@@ -73,6 +74,7 @@ export class SearchResultTreeProvider
       };
     } else {
       return {
+        id: createNodeId(node),
         label: node.displayName,
         description: node.description,
         tooltip: createNodeTooltip(node),
@@ -80,10 +82,11 @@ export class SearchResultTreeProvider
         command: hasNodeCommand(node, AvailableNodeCommands.Decompile)
           ? {
               command: "ilspy.decompileNode",
-              arguments: [node],
+              arguments: [node, true],
               title: "Decompile",
             }
           : undefined,
+
         contextValue: getNodeContextValue(node),
         iconPath: getNodeIcon(node.metadata?.type),
       };

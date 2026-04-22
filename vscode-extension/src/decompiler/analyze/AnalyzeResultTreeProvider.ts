@@ -18,6 +18,7 @@ import Node from "../../protocol/Node";
 import { NodeType } from "../../protocol/NodeType";
 import { getNodeIcon } from "../../icons";
 import {
+  createNodeId,
   createNodeTooltip,
   getNodeContextValue,
   getTreeNodeCollapsibleState,
@@ -91,6 +92,7 @@ export class AnalyzeResultTreeProvider
       };
     } else {
       return {
+        id: createNodeId(node),
         label: node.displayName,
         description: node.description,
         tooltip: createNodeTooltip(node),
@@ -98,7 +100,7 @@ export class AnalyzeResultTreeProvider
         command: hasNodeCommand(node, AvailableNodeCommands.Decompile)
           ? {
               command: "ilspy.decompileNode",
-              arguments: [node],
+              arguments: [node, true],
               title: "Decompile",
             }
           : undefined,

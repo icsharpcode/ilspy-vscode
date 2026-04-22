@@ -22,30 +22,38 @@ import {
 import { AnalyzeParams, AnalyzeResponse } from "../protocol/analyze";
 import ExportNodeResponse, { ExportNodeParams } from "../protocol/exportNode";
 import { CancellationToken } from "vscode";
+import {
+  ResolveNodePathParams,
+  ResolveNodePathResponse,
+} from "../protocol/resolveNodePath";
 
 export default interface IILSpyBackend {
   sendInitWithAssemblies(
-    params: InitWithAssembliesParams
+    params: InitWithAssembliesParams,
   ): Promise<InitWithAssembliesResponse | null>;
 
   sendAddAssembly(
-    params: AddAssemblyParams
+    params: AddAssemblyParams,
   ): Promise<AddAssemblyResponse | null>;
 
   sendRemoveAssembly(
-    params: RemoveAssemblyParams
+    params: RemoveAssemblyParams,
   ): Promise<RemoveAssemblyResponse | null>;
 
   sendDecompileNode(
-    params: DecompileNodeParams
+    params: DecompileNodeParams,
   ): Promise<DecompileResponse | null>;
 
   sendGetNodes(params: GetNodesParams): Promise<GetNodesResponse | null>;
+
+  sendResolveNodePath(
+    params: ResolveNodePathParams,
+  ): Promise<ResolveNodePathResponse | null>;
 
   sendSearch(params: SearchParams): Promise<SearchResponse | null>;
   sendAnalyze(params: AnalyzeParams): Promise<AnalyzeResponse | null>;
   sendExportAssembly(
     params: ExportNodeParams,
-    token?: CancellationToken
+    token?: CancellationToken,
   ): Promise<ExportNodeResponse | null>;
 }

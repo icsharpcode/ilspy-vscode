@@ -8,8 +8,9 @@ namespace ILSpyX.Backend.TreeProviders;
 
 public interface ITreeNodeProvider
 {
-    public Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata) => Task.FromResult(Enumerable.Empty<Node>());
+    Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata) => Task.FromResult(Enumerable.Empty<Node>());
     Task<DecompileResult> Decompile(NodeMetadata nodeMetadata, string outputLanguage);
+    Task<Node?> FindParentAsync(NodeMetadata nodeMetadata) => Task.FromResult<Node?>(null);
 }
 
 public class DummyTreeNodeProvider : ITreeNodeProvider

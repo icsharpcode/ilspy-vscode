@@ -43,6 +43,7 @@ class Program
                 .WithHandler<DecompileNodeHandler>()
                 .WithHandler<ExportNodeHandler>()
                 .WithHandler<GetNodesHandler>()
+                .WithHandler<ResolveNodePathHandler>()
                 .WithHandler<RemoveAssemblyHandler>()
                 .WithHandler<SearchHandler>()
                 .WithHandler<AnalyzeHandler>()

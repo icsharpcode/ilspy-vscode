@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace ILSpyX.Backend.TreeProviders;
 
-public class NamespaceNodeProvider(TypeNodeProvider typeNodeProvider, DecompilerBackend decompilerBackend)
+public class NamespaceNodeProvider(
+    TypeNodeProvider typeNodeProvider,
+    AssemblyTreeRootNodesProvider assemblyTreeRootNodesProvider,
+    DecompilerBackend decompilerBackend)
     : ITreeNodeProvider
 {
     public Task<DecompileResult> Decompile(NodeMetadata nodeMetadata, string outputLanguage)
@@ -17,6 +20,13 @@ public class NamespaceNodeProvider(TypeNodeProvider typeNodeProvider, Decompiler
             LanguageName.IL => DecompileResult.WithCode($"namespace {namespaceName}"),
             _ => DecompileResult.WithCode($"namespace {namespaceName} {{ }}")
         });
+    }
+
+    public async Task<Node?> FindParentAsync(NodeMetadata nodeMetadata)
+    {
+        var assemblyFile = nodeMetadata.GetAssemblyFileIdentifier();
+        return (await assemblyTreeRootNodesProvider.GetChildrenAsync(null)).FirstOrDefault(node =>
+            node.Metadata?.GetAssemblyFileIdentifier() == assemblyFile);
     }
 
     public async Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
@@ -43,19 +53,24 @@ public class NamespaceNodeProvider(TypeNodeProvider typeNodeProvider, Decompiler
 
         return namespaces
             .OrderBy(n => n)
-            .Select(ns => new Node
+            .Select(ns => CreateNode(assemblyFile, ns));
+    }
+
+    public static Node CreateNode(AssemblyFileIdentifier assemblyFile, string ns)
+    {
+        return new Node
+        {
+            Metadata = new NodeMetadata
             {
-                Metadata = new NodeMetadata
-                {
-                    AssemblyPath = assemblyFile.File,
-                    BundledAssemblyName = assemblyFile.BundledAssemblyFile,
-                    Type = NodeType.Namespace,
-                    Name = ns,
-                    AvailableCommands = AvailableNodeCommands.Decompile
-                },
-                DisplayName = ns,
-                Description = string.Empty,
-                MayHaveChildren = true,
-            });
+                AssemblyPath = assemblyFile.File,
+                BundledAssemblyName = assemblyFile.BundledAssemblyFile,
+                Type = NodeType.Namespace,
+                Name = ns,
+                AvailableCommands = AvailableNodeCommands.Decompile
+            },
+            DisplayName = ns,
+            Description = string.Empty,
+            MayHaveChildren = true,
+        };
     }
 }

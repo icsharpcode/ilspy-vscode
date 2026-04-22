@@ -50,6 +50,7 @@ public static class ILSpyXServiceCollectionExtensions
             .AddSingleton<DecompilerBackend>()
             .AddSingleton<ExportBackend>()
             .AddSingleton<TreeNodeProviders>()
+            .AddSingleton<TreePathResolver>()
             .AddSingleton<SearchBackend>()
             .AddSingleton<AnalyzerBackend>();
     }

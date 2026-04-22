@@ -1,5 +1,6 @@
 using ILSpyX.Backend.Decompiler;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection.Metadata.Ecma335;
 
 namespace ILSpyX.Backend.Tests;
 
@@ -37,5 +38,29 @@ public class TestHelper
         string test = NuGetPackagePath;
         await services.GetRequiredService<DecompilerBackend>().AddAssemblyAsync(NuGetPackagePath);
         return services;
+    }
+
+    public static async Task<int> GetTypeToken(DecompilerBackend decompilerBackend, string @namespace,
+        string name)
+    {
+        return (await decompilerBackend
+                .ListTypes(
+                    new AssemblyFileIdentifier(TestHelper.AssemblyPath),
+                    @namespace))
+            .Where(memberData => memberData.Name == name)
+            .Select(memberData => memberData.Token)
+            .FirstOrDefault();
+    }
+
+    public static async Task<int> GetMemberToken(DecompilerBackend decompilerBackend, int parentTypeToken,
+        string name)
+    {
+        return (await decompilerBackend
+                .GetMembers(
+                    new AssemblyFileIdentifier(TestHelper.AssemblyPath),
+                    MetadataTokens.TypeDefinitionHandle(parentTypeToken)))
+            .Where(memberData => memberData.Name == name)
+            .Select(memberData => memberData.Token)
+            .FirstOrDefault();
     }
 }

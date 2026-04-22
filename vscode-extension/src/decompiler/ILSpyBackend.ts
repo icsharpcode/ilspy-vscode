@@ -46,47 +46,58 @@ import ExportNodeResponse, {
   ExportNodeParams,
   ExportNodeRequest,
 } from "../protocol/exportNode";
+import {
+  ResolveNodePathParams,
+  ResolveNodePathRequest,
+  ResolveNodePathResponse,
+} from "../protocol/resolveNodePath";
 
 export default class ILSpyBackend implements IILSpyBackend {
   constructor(private languageClient: LanguageClient) {}
 
   public static getExecutable(context: vscode.ExtensionContext) {
     return context.asAbsolutePath(
-      path.join("bin", "ilspy-backend", "ILSpyX.Backend.LSP.dll")
+      path.join("bin", "ilspy-backend", "ILSpyX.Backend.LSP.dll"),
     );
   }
 
   public sendInitWithAssemblies(
-    params: InitWithAssembliesParams
+    params: InitWithAssembliesParams,
   ): Promise<InitWithAssembliesResponse | null> {
     return this.languageClient.sendRequest(
       InitWithAssembliesRequest.type,
-      params
+      params,
     );
   }
 
   public sendAddAssembly(
-    params: AddAssemblyParams
+    params: AddAssemblyParams,
   ): Promise<AddAssemblyResponse | null> {
     return this.languageClient.sendRequest(AddAssemblyRequest.type, params);
   }
 
   public sendRemoveAssembly(
-    params: RemoveAssemblyParams
+    params: RemoveAssemblyParams,
   ): Promise<RemoveAssemblyResponse | null> {
     return this.languageClient.sendRequest(RemoveAssemblyRequest.type, params);
   }
 
   public sendDecompileNode(
-    params: DecompileNodeParams
+    params: DecompileNodeParams,
   ): Promise<DecompileResponse | null> {
     return this.languageClient.sendRequest(DecompileNodeRequest.type, params);
   }
 
   public sendGetNodes(
-    params: GetNodesParams
+    params: GetNodesParams,
   ): Promise<GetNodesResponse | null> {
     return this.languageClient.sendRequest(GetNodesRequest.type, params);
+  }
+
+  public sendResolveNodePath(
+    params: ResolveNodePathParams,
+  ): Promise<ResolveNodePathResponse | null> {
+    return this.languageClient.sendRequest(ResolveNodePathRequest.type, params);
   }
 
   public sendSearch(params: SearchParams): Promise<SearchResponse | null> {
@@ -99,12 +110,12 @@ export default class ILSpyBackend implements IILSpyBackend {
 
   sendExportAssembly(
     params: ExportNodeParams,
-    token?: vscode.CancellationToken
+    token?: vscode.CancellationToken,
   ): Promise<ExportNodeResponse | null> {
     return this.languageClient.sendRequest(
       ExportNodeRequest.type,
       params,
-      token
+      token,
     );
   }
 }

@@ -49,6 +49,10 @@ import type {
   RemoveAssemblyResponse,
 } from "../protocol/removeAssembly";
 import type { SearchParams, SearchResponse } from "../protocol/search";
+import {
+  ResolveNodePathParams,
+  ResolveNodePathResponse,
+} from "../protocol/resolveNodePath";
 
 function createBackend(): IILSpyBackend {
   return {
@@ -68,6 +72,10 @@ function createBackend(): IILSpyBackend {
     ),
     sendGetNodes: vi.fn(
       async (_params: GetNodesParams) => null as GetNodesResponse | null,
+    ),
+    sendResolveNodePath: vi.fn(
+      async (_params: ResolveNodePathParams) =>
+        null as ResolveNodePathResponse | null,
     ),
     sendSearch: vi.fn(
       async (_params: SearchParams) => null as SearchResponse | null,

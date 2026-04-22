@@ -23,6 +23,21 @@ public class TypeNodeProvider(
             outputLanguage);
     }
 
+    public async Task<Node?> FindParentAsync(NodeMetadata nodeMetadata)
+    {
+        var assemblyFile = nodeMetadata.GetAssemblyFileIdentifier();
+        var decompiler = await decompilerBackend.CreateDecompiler(assemblyFile);
+        if (decompiler is null)
+        {
+            return null;
+        }
+
+        var typeSystem = decompiler.TypeSystem;
+        var typeDefinition = typeSystem.MainModule.GetDefinition(
+            MetadataTokens.TypeDefinitionHandle(nodeMetadata.SymbolToken));
+        return typeDefinition is null ? null : NamespaceNodeProvider.CreateNode(assemblyFile, typeDefinition.Namespace);
+    }
+
     public async Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
     {
         if (nodeMetadata is null || !NodeTypeHelper.IsTypeNode(nodeMetadata.Type))

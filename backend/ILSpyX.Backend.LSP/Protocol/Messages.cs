@@ -90,6 +90,19 @@ namespace ILSpyX.Backend.LSP.Protocol
 
     #endregion
 
+    #region resolveNodePath
+
+    [Serial, Method("ilspy/resolveNodePath", Direction.ClientToServer)]
+    public record ResolveNodePathRequest(NodeMetadata? NodeMetadata)
+        : IRequest<ResolveNodePathResponse>;
+
+    public record ResolveNodePathResponse(
+        IEnumerable<Node>? NodePath,
+        NodeMetadata? LeafNode,
+        bool ShouldUpdateAssemblyList);
+
+    #endregion
+
     #region search
 
     [Serial, Method("ilspy/search", Direction.ClientToServer)]

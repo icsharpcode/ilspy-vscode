@@ -2,6 +2,11 @@
 
 All notable changes to the "ilspy-vscode" extension will be documented in this file.
 
+## 1.0.0
+
+- Reveal decompiled nodes in assembly tree when clicked in search or analyzer result lists
+- Fix: Don't show pseudo-errors in editor tabs with decompiled code
+
 ## 0.24.0
 
 - Allow to export assemblies as full .NET projects to file system (thanks to [@k-o-n-t-o-r](https://github.com/k-o-n-t-o-r))

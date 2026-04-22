@@ -79,14 +79,11 @@ export class SearchResultTreeProvider
         description: node.description,
         tooltip: createNodeTooltip(node),
         collapsibleState: TreeItemCollapsibleState.None,
-        command: hasNodeCommand(node, AvailableNodeCommands.Decompile)
-          ? {
-              command: "ilspy.decompileNode",
-              arguments: [node, true],
-              title: "Decompile",
-            }
-          : undefined,
-
+        command: {
+          command: "ilspy.decompileNode",
+          arguments: [node, true],
+          title: "Decompile",
+        },
         contextValue: getNodeContextValue(node),
         iconPath: getNodeIcon(node.metadata?.type),
       };

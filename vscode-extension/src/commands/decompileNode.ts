@@ -4,10 +4,12 @@
  *-----------------------------------------------------------------------------------------------*/
 
 import * as vscode from "vscode";
-import { nodeDataToUri } from "../decompiler/nodeUri";
-import { languageInfos } from "../decompiler/languageInfos";
-import { getDefaultOutputLanguage } from "../decompiler/settings";
 import { DecompilerTextDocumentContentProvider } from "../decompiler/DecompilerTextDocumentContentProvider";
+import { languageInfos } from "../decompiler/languageInfos";
+import { nodeDataToUri } from "../decompiler/nodeUri";
+import { getDefaultOutputLanguage } from "../decompiler/settings";
+import { hasNodeCommand } from "../decompiler/utils";
+import { AvailableNodeCommands } from "../protocol/AvailableNodeCommands";
 import Node from "../protocol/Node";
 
 let lastSelectedNode: Node | undefined = undefined;
@@ -18,7 +20,10 @@ export function registerDecompileNodeCommand(
   return vscode.commands.registerCommand(
     "ilspy.decompileNode",
     async (node: Node, revealInTree = false) => {
-      if (lastSelectedNode !== node) {
+      if (
+        hasNodeCommand(node, AvailableNodeCommands.Decompile) &&
+        lastSelectedNode !== node
+      ) {
         lastSelectedNode = node;
 
         const uri = nodeDataToUri(node);

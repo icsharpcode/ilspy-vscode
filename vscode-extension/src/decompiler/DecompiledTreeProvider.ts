@@ -123,13 +123,11 @@ export class DecompiledTreeProvider
       collapsibleState: node.mayHaveChildren
         ? TreeItemCollapsibleState.Collapsed
         : void 0,
-      command: hasNodeCommand(node, AvailableNodeCommands.Decompile)
-        ? {
-            command: "ilspy.decompileNode",
-            arguments: [node],
-            title: "Decompile",
-          }
-        : undefined,
+      command: {
+        command: "ilspy.decompileNode",
+        arguments: [node],
+        title: "Decompile",
+      },
       contextValue: getNodeContextValue(node),
       iconPath: getNodeIcon(node.metadata?.type),
       resourceUri: hasNodeFlag(node, NodeFlags.AutoLoaded)

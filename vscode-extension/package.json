@@ -237,6 +237,26 @@
 				{
 					"command": "ilspy.analyze",
 					"when": "(view == ilspyDecompiledMembers || view == ilspySearchResultsContainer || view == ilspyAnalyzeResultsContainer) && viewItem =~ /#analyze/",
+					"group": "assembly@0"
+				},
+				{
+					"command": "ilspy.reloadAssembly",
+					"when": "view == ilspyDecompiledMembers && viewItem =~ /#manageRootEntries/",
+					"group": "assembly@1"
+				},
+				{
+					"command": "ilspy.export",
+					"when": "view == ilspyDecompiledMembers && viewItem =~ /#export/",
+					"group": "assembly@2"
+				},
+				{
+					"command": "ilspy.unloadAssembly",
+					"when": "view == ilspyDecompiledMembers && viewItem =~ /#manageRootEntries/",
+					"group": "assembly@3"
+				},
+				{
+					"command": "ilspy.analyze",
+					"when": "(view == ilspyDecompiledMembers || view == ilspySearchResultsContainer || view == ilspyAnalyzeResultsContainer) && viewItem =~ /#analyze/",
 					"group": "inline@0"
 				},
 				{

@@ -17,6 +17,7 @@ This document describes the custom LSP (JSON-RPC) requests used between the VS C
 | `ilspy/addAssembly` | `assemblyPath: string` | `added: boolean`, `assemblyData?: AssemblyData` | Adds a single assembly or NuGet package to assembly list. |
 | `ilspy/removeAssembly` | `assemblyPath: string` | `removed: boolean` | Removes a single assembly from assembly list. |
 | `ilspy/getNodes` | `nodeMetadata?: NodeMetadata` | `nodes?: Node[]`, `shouldUpdateAssemblyList: boolean` | Retrieves a list of child nodes of a node - or root nodes, if `nodeMetadata === null` |
+| `ilspy/resolveNodePath` | `nodeMetadata?: NodeMetadata` | `nodePath?: Node[]`, `leafNode?: NodeMetadata`, `shouldUpdateAssemblyList: boolean` | Resolves the path of parent nodes leading to a node. |
 | `ilspy/decompileNode` | `nodeMetadata: NodeMetadata`, `outputLanguage: string` | `decompiledCode?: string`, `isError: boolean`, `errorMessage?: string`, `shouldUpdateAssemblyList: boolean` | Retrieves the (decompiled) code behind a node. |
 | `ilspy/exportNode` | `nodeMetadata: NodeMetadata`, `outputLanguage: string`, `outputDirectory: string`, `includeCompilerGenerated: boolean` | `succeeded: boolean`, `outputDirectory?: string`, `filesWritten: number`, `errorCount: number`, `errorMessage?: string`, `shouldUpdateAssemblyList: boolean` | Exports node contents to the file system. |
 | `ilspy/search` | `term: string` | `results: Node[]`, `shouldUpdateAssemblyList: boolean` | Searches for nodes in loaded assemblies using a free-text term. |
@@ -73,6 +74,14 @@ This document describes the custom LSP (JSON-RPC) requests used between the VS C
 - `decompiledCode?: string`
 - `isError: boolean`
 - `errorMessage?: string`
+- `shouldUpdateAssemblyList: boolean`
+
+### `ResolveNodePathResponse`
+
+- `nodePath?: Node[]` \
+  Parent nodes of the requested node, ordered from root to direct parent.
+- `leafNode?: NodeMetadata` \
+  Metadata of the requested node at the end of the resolved path.
 - `shouldUpdateAssemblyList: boolean`
 
 ### `ExportNodeResponse`

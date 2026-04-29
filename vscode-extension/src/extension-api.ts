@@ -6,7 +6,7 @@
 import * as vscode from "vscode";
 import { Node } from "./extension-types";
 
-export interface ILSpyCommands {
+export interface ILSpyExtensionCommands {
   "ilspy.addAssemblyByPath": (filePath: string) => Promise<void>;
   "ilspy.analyze": (node: Node) => Promise<void>;
   "ilspy.decompileAssemblyInWorkspace": () => Promise<void>;
@@ -25,13 +25,18 @@ export interface ILSpyCommands {
   "ilspy.unloadAssembly": (node: Node) => Promise<void>;
 }
 
-export type ILSpyCommandId = keyof ILSpyCommands;
-export type ILSpyCommandArgs<K extends ILSpyCommandId> = Parameters<
-  ILSpyCommands[K]
->;
-export type ILSpyCommandResult<K extends ILSpyCommandId> = Awaited<
-  ReturnType<ILSpyCommands[K]>
->;
-export type ILSpyCommandHandler<K extends ILSpyCommandId> = (
-  ...args: ILSpyCommandArgs<K>
-) => ReturnType<ILSpyCommands[K]>;
+export type ILSpyExtensionCommandId = keyof ILSpyExtensionCommands;
+export type ILSpyExtensionCommandArgs<K extends ILSpyExtensionCommandId> =
+  Parameters<ILSpyExtensionCommands[K]>;
+export type ILSpyExtensionCommandResult<K extends ILSpyExtensionCommandId> =
+  Awaited<ReturnType<ILSpyExtensionCommands[K]>>;
+export type ILSpyExtensionCommandHandler<K extends ILSpyExtensionCommandId> = (
+  ...args: ILSpyExtensionCommandArgs<K>
+) => ReturnType<ILSpyExtensionCommands[K]>;
+
+export type ILSpyExtensionApi = {
+  executeILSpyCommand: <K extends ILSpyExtensionCommandId>(
+    command: K,
+    ...args: ILSpyExtensionCommandArgs<K>
+  ) => Thenable<ILSpyExtensionCommandResult<K>>;
+};

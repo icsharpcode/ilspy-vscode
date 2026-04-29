@@ -5,17 +5,17 @@
 
 import * as vscode from "vscode";
 import {
-  ILSpyCommandArgs,
-  ILSpyCommandHandler,
-  ILSpyCommandId,
-  ILSpyCommandResult,
+  ILSpyExtensionCommandArgs,
+  ILSpyExtensionCommandHandler,
+  ILSpyExtensionCommandId,
+  ILSpyExtensionCommandResult,
 } from "../extension-api";
 
 type UntypedCommandHandler = (...args: unknown[]) => unknown;
 
-export function registerILSpyCommand<K extends ILSpyCommandId>(
+export function registerILSpyCommand<K extends ILSpyExtensionCommandId>(
   command: K,
-  handler: ILSpyCommandHandler<K>,
+  handler: ILSpyExtensionCommandHandler<K>,
   thisArg?: unknown,
 ): vscode.Disposable {
   return vscode.commands.registerCommand(
@@ -25,11 +25,11 @@ export function registerILSpyCommand<K extends ILSpyCommandId>(
   );
 }
 
-export function executeILSpyCommand<K extends ILSpyCommandId>(
+export function executeILSpyCommand<K extends ILSpyExtensionCommandId>(
   command: K,
-  ...args: ILSpyCommandArgs<K>
-): Thenable<ILSpyCommandResult<K>> {
-  return vscode.commands.executeCommand<ILSpyCommandResult<K>>(
+  ...args: ILSpyExtensionCommandArgs<K>
+): Thenable<ILSpyExtensionCommandResult<K>> {
+  return vscode.commands.executeCommand<ILSpyExtensionCommandResult<K>>(
     command,
     ...args,
   );

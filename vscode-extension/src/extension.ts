@@ -49,10 +49,14 @@ import { registerAddAssemblyByPathCommand } from "./commands/addAssemblyByPathCo
 import { registerExportDecompiledAssemblyCommand } from "./commands/exportDecompiledAssemblyCommand";
 import { registerLMTools } from "./lm-tools/registerLMTools";
 import { registerRevealNodeCommand } from "./commands/revealNodeCommand";
+import { ILSpyExtensionApi } from "./extension-api";
+import { executeILSpyCommand } from "./commands/commandUtils";
 
 let client: LanguageClient;
 
-export async function activate(context: ExtensionContext) {
+export async function activate(
+  context: ExtensionContext,
+): Promise<ILSpyExtensionApi> {
   const disposables: Disposable[] = [];
 
   const logger = new OutputWindowLogger();
@@ -195,6 +199,10 @@ export async function activate(context: ExtensionContext) {
   disposables.push(...registerLMTools(ilspyBackend));
 
   context.subscriptions.push(...disposables);
+
+  return {
+    executeILSpyCommand: executeILSpyCommand,
+  };
 }
 
 export function deactivate(): Thenable<void> | undefined {

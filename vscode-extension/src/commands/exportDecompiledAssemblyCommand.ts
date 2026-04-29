@@ -11,7 +11,7 @@ import {
 } from "../decompiler/settings";
 import IILSpyBackend from "../decompiler/IILSpyBackend";
 import { Node, NodeType } from "../extension-types";
-import { registerILSpyCommand } from "./commandUtils";
+import { executeILSpyCommand, registerILSpyCommand } from "./commandUtils";
 
 export function registerExportDecompiledAssemblyCommand(
   decompiledTreeProvider: DecompiledTreeProvider,
@@ -55,7 +55,7 @@ export function registerExportDecompiledAssemblyCommand(
           );
 
           if (response?.shouldUpdateAssemblyList) {
-            vscode.commands.executeCommand("ilspy.refreshAssemblyList");
+            await executeILSpyCommand("ilspy.refreshAssemblyList");
           }
 
           if (!response) {

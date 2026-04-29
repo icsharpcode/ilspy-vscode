@@ -9,7 +9,7 @@ import { languageInfos } from "../decompiler/languageInfos";
 import { nodeDataToUri } from "../decompiler/nodeUri";
 import { getDefaultOutputLanguage } from "../decompiler/settings";
 import { hasNodeCommand } from "../decompiler/utils";
-import { registerILSpyCommand } from "./commandUtils";
+import { executeILSpyCommand, registerILSpyCommand } from "./commandUtils";
 import { AvailableNodeCommands, Node } from "../extension-types";
 
 let lastSelectedNode: Node | undefined = undefined;
@@ -40,7 +40,7 @@ export function registerDecompileNodeCommand(
       }
 
       if (revealInTree) {
-        await vscode.commands.executeCommand("ilspy.revealNode", node);
+        await executeILSpyCommand("ilspy.revealNode", node);
       }
     },
   );

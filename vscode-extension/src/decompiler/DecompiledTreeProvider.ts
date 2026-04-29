@@ -41,6 +41,7 @@ import {
   hasNodeCommand,
   hasNodeFlag,
 } from "./utils";
+import { executeILSpyCommand } from "../commands/commandUtils";
 
 export class DecompiledTreeProvider
   implements TreeDataProvider<Node>, TreeDragAndDropController<Node>
@@ -235,7 +236,7 @@ export class DecompiledTreeProvider
   }
 
   private processDroppedFile(target: Node | undefined, filePath: string): void {
-    commands.executeCommand("ilspy.addAssemblyByPath", filePath);
+    executeILSpyCommand("ilspy.addAssemblyByPath", filePath);
   }
 }
 

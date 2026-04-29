@@ -4,7 +4,7 @@
  *-----------------------------------------------------------------------------------------------*/
 
 import * as vscode from "vscode";
-import { registerILSpyCommand } from "./commandUtils";
+import { executeILSpyCommand, registerILSpyCommand } from "./commandUtils";
 
 export function registerSearchEditorSelectionCommand() {
   return registerILSpyCommand("ilspy.searchEditorSelection", async () => {
@@ -17,6 +17,6 @@ export function registerSearchEditorSelectionCommand() {
       editor.selection.start,
     );
     const selectedText = editor.document.getText(wordRange);
-    vscode.commands.executeCommand("ilspy.search", selectedText);
+    await executeILSpyCommand("ilspy.search", selectedText);
   });
 }

@@ -30,6 +30,7 @@ import {
   hasNodeFlag,
 } from "../utils";
 import { getShowCompilerGeneratedSymbolsSetting } from "../settings";
+import { executeILSpyCommand } from "../../commands/commandUtils";
 
 export interface PerformedAnalyze {
   symbol: string;
@@ -67,7 +68,7 @@ export class AnalyzeResultTreeProvider
     });
     this.refresh();
     if (analyzeResponse?.shouldUpdateAssemblyList) {
-      commands.executeCommand("ilspy.refreshAssemblyList");
+      await executeILSpyCommand("ilspy.refreshAssemblyList");
     }
   }
 

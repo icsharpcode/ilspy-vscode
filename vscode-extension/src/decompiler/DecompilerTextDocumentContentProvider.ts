@@ -8,6 +8,7 @@ import { getDefaultOutputLanguage } from "./settings";
 import IILSpyBackend from "./IILSpyBackend";
 import { ILSPY_URI_SCHEME, uriToNode } from "./nodeUri";
 import { LanguageName, NodeMetadata } from "../extension-types";
+import { executeILSpyCommand } from "../commands/commandUtils";
 
 export class DecompilerTextDocumentContentProvider
   implements vscode.TextDocumentContentProvider
@@ -48,7 +49,7 @@ export class DecompilerTextDocumentContentProvider
     });
 
     if (decompileResponse?.shouldUpdateAssemblyList) {
-      vscode.commands.executeCommand("ilspy.refreshAssemblyList");
+      await executeILSpyCommand("ilspy.refreshAssemblyList");
     }
 
     return decompileResponse?.decompiledCode;

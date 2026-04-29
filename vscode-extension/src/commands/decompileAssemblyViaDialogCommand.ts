@@ -7,26 +7,19 @@ import * as vscode from "vscode";
 import { DecompiledTreeProvider } from "../decompiler/DecompiledTreeProvider";
 import { addAssemblyFromFilePath } from "./utils";
 import { ASSEMBLY_FILE_EXTENSIONS } from "../decompiler/utils";
-import { registerILSpyCommand } from "./registerILSpyCommand";
+import { registerILSpyCommand } from "./commandUtils";
 import { Node } from "../extension-types";
 
 export function registerDecompileAssemblyViaDialogCommand(
   decompiledTreeProvider: DecompiledTreeProvider,
-  decompiledTreeView: vscode.TreeView<Node>
+  decompiledTreeView: vscode.TreeView<Node>,
 ) {
-  return registerILSpyCommand(
-    "ilspy.decompileAssemblyViaDialog",
-    async () => {
-      const files = await promptForAssemblyFilesPathViaDialog();
-      files.forEach((file) => {
-        addAssemblyFromFilePath(
-          file,
-          decompiledTreeProvider,
-          decompiledTreeView
-        );
-      });
-    }
-  );
+  return registerILSpyCommand("ilspy.decompileAssemblyViaDialog", async () => {
+    const files = await promptForAssemblyFilesPathViaDialog();
+    files.forEach((file) => {
+      addAssemblyFromFilePath(file, decompiledTreeProvider, decompiledTreeView);
+    });
+  });
 }
 
 async function promptForAssemblyFilesPathViaDialog(): Promise<string[]> {

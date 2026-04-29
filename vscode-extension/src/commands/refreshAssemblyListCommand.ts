@@ -5,22 +5,12 @@
 
 import * as vscode from "vscode";
 import { DecompiledTreeProvider } from "../decompiler/DecompiledTreeProvider";
-import { addAssemblyFromFilePath } from "./utils";
-import { Node } from "../extension-types";
-import { registerILSpyCommand } from "./registerILSpyCommand";
+import { registerILSpyCommand } from "./commandUtils";
 
-export function registerAddAssemblyByPathCommand(
+export function registerRefreshAssemblyListCommand(
   decompiledTreeProvider: DecompiledTreeProvider,
-  decompiledTreeView: vscode.TreeView<Node>
 ) {
-  return registerILSpyCommand(
-    "ilspy.addAssemblyByPath",
-    async (filePath: string) => {
-      addAssemblyFromFilePath(
-        filePath,
-        decompiledTreeProvider,
-        decompiledTreeView,
-      );
-    },
-  );
+  return registerILSpyCommand("ilspy.refreshAssemblyList", async () => {
+    await decompiledTreeProvider.refresh();
+  });
 }

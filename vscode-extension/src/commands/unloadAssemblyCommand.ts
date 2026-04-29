@@ -5,11 +5,11 @@
 
 import * as vscode from "vscode";
 import { DecompiledTreeProvider } from "../decompiler/DecompiledTreeProvider";
-import { registerILSpyCommand } from "./registerILSpyCommand";
+import { registerILSpyCommand } from "./commandUtils";
 import { Node } from "../extension-types";
 
 export function registerUnloadAssemblyCommand(
-  decompiledTreeProvider: DecompiledTreeProvider
+  decompiledTreeProvider: DecompiledTreeProvider,
 ) {
   return registerILSpyCommand("ilspy.unloadAssembly", async (node: Node) => {
     if (!node || !node.metadata) {

@@ -9,27 +9,24 @@ import {
   AnalyzeTreeNode,
 } from "../decompiler/analyze/AnalyzeResultTreeProvider";
 import { Node } from "../extension-types";
-import { registerILSpyCommand } from "./registerILSpyCommand";
+import { registerILSpyCommand } from "./commandUtils";
 
 export function registerAnalyzeCommand(
   analyzeResultTreeProvider: AnalyzeResultTreeProvider,
-  analyzeResultTreeView: vscode.TreeView<AnalyzeTreeNode>
+  analyzeResultTreeView: vscode.TreeView<AnalyzeTreeNode>,
 ) {
-  return registerILSpyCommand(
-    "ilspy.analyze",
-    async (node: Node) => {
-      vscode.commands.executeCommand(
-        "setContext",
-        "ilspy.analyzeResultsToShow",
-        true
-      );
-      await analyzeResultTreeProvider.analyze(node);
-      vscode.commands.executeCommand("ilspyAnalyzeResultsContainer.focus");
+  return registerILSpyCommand("ilspy.analyze", async (node: Node) => {
+    vscode.commands.executeCommand(
+      "setContext",
+      "ilspy.analyzeResultsToShow",
+      true,
+    );
+    await analyzeResultTreeProvider.analyze(node);
+    vscode.commands.executeCommand("ilspyAnalyzeResultsContainer.focus");
 
-      const firstNode = analyzeResultTreeProvider.getFirstNode();
-      if (firstNode) {
-        analyzeResultTreeView.reveal(firstNode);
-      }
+    const firstNode = analyzeResultTreeProvider.getFirstNode();
+    if (firstNode) {
+      analyzeResultTreeView.reveal(firstNode);
     }
-  );
+  });
 }

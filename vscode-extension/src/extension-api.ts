@@ -35,13 +35,3 @@ export type ILSpyCommandResult<K extends ILSpyCommandId> = Awaited<
 export type ILSpyCommandHandler<K extends ILSpyCommandId> = (
   ...args: ILSpyCommandArgs<K>
 ) => ReturnType<ILSpyCommands[K]>;
-
-export function executeILSpyCommand<K extends ILSpyCommandId>(
-  command: K,
-  ...args: ILSpyCommandArgs<K>
-): Thenable<ILSpyCommandResult<K>> {
-  return vscode.commands.executeCommand<ILSpyCommandResult<K>>(
-    command,
-    ...args,
-  );
-}

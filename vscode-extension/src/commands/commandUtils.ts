@@ -4,7 +4,12 @@
  *-----------------------------------------------------------------------------------------------*/
 
 import * as vscode from "vscode";
-import { ILSpyCommandHandler, ILSpyCommandId } from "../extension-api";
+import {
+  ILSpyCommandArgs,
+  ILSpyCommandHandler,
+  ILSpyCommandId,
+  ILSpyCommandResult,
+} from "../extension-api";
 
 type UntypedCommandHandler = (...args: unknown[]) => unknown;
 
@@ -17,5 +22,15 @@ export function registerILSpyCommand<K extends ILSpyCommandId>(
     command,
     handler as UntypedCommandHandler,
     thisArg,
+  );
+}
+
+export function executeILSpyCommand<K extends ILSpyCommandId>(
+  command: K,
+  ...args: ILSpyCommandArgs<K>
+): Thenable<ILSpyCommandResult<K>> {
+  return vscode.commands.executeCommand<ILSpyCommandResult<K>>(
+    command,
+    ...args,
   );
 }

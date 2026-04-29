@@ -9,13 +9,13 @@ import { languageInfos } from "../decompiler/languageInfos";
 import { nodeDataToUri } from "../decompiler/nodeUri";
 import { getDefaultOutputLanguage } from "../decompiler/settings";
 import { hasNodeCommand } from "../decompiler/utils";
-import { registerILSpyCommand } from "./registerILSpyCommand";
+import { registerILSpyCommand } from "./commandUtils";
 import { AvailableNodeCommands, Node } from "../extension-types";
 
 let lastSelectedNode: Node | undefined = undefined;
 
 export function registerDecompileNodeCommand(
-  contentProvider: DecompilerTextDocumentContentProvider
+  contentProvider: DecompilerTextDocumentContentProvider,
 ) {
   return registerILSpyCommand(
     "ilspy.decompileNode",

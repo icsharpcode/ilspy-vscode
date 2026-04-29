@@ -12,3 +12,9 @@ if [ -n "$PRERELEASETAG" ]; then
 fi
 pnpm install
 pnpm build:vsix -o ../artifacts/ilspy-vscode-$SEMVER.vsix
+
+echo "// ILSpy VSCode Extension, v$SEMVER" > ../artifacts/extension-types.ts
+cat src/extension-types.ts >> ../artifacts/extension-types.ts
+
+echo "// ILSpy VSCode Extension, v$SEMVER" > ../artifacts/extension-api.ts
+cat src/extension-api.ts >> ../artifacts/extension-api.ts

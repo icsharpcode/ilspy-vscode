@@ -10,8 +10,7 @@ import {
   RequestHandler,
   RequestType,
 } from "vscode-languageclient";
-import Node from "./Node";
-import NodeMetadata from "./NodeMetadata";
+import { Node, NodeMetadata } from "../extension-types";
 
 export interface AnalyzeParams {
   nodeMetadata?: NodeMetadata;

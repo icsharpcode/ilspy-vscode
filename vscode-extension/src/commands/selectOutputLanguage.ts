@@ -11,7 +11,8 @@ import {
 } from "../decompiler/languageInfos";
 import { ILSPY_URI_SCHEME } from "../decompiler/nodeUri";
 import { setDefaultOutputLanguage } from "../decompiler/settings";
-import { LanguageName } from "../protocol/LanguageName";
+import { registerILSpyCommand } from "./registerILSpyCommand";
+import { LanguageName } from "../extension-types";
 
 type OutputLanguageQuickPickItem = vscode.QuickPickItem & {
   languageName: string;
@@ -21,7 +22,7 @@ type OutputLanguageQuickPickItem = vscode.QuickPickItem & {
 export function registerSelectOutputLanguageCommand(
   contentProvider: DecompilerTextDocumentContentProvider
 ) {
-  return vscode.commands.registerCommand(
+  return registerILSpyCommand(
     "ilspy.selectOutputLanguage",
     async () => {
       let document = vscode.window.activeTextEditor?.document;

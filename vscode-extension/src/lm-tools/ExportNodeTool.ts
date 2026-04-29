@@ -9,7 +9,7 @@ import {
   getShowCompilerGeneratedSymbolsSetting,
 } from "../decompiler/settings";
 import IILSpyBackend from "../decompiler/IILSpyBackend";
-import { AvailableNodeCommands } from "../protocol/AvailableNodeCommands";
+import { AvailableNodeCommands } from "../extension-types";
 import {
   createJsonResult,
   refreshAssemblyList,

@@ -26,10 +26,12 @@ vi.mock("vscode", () => {
 import type { CancellationToken } from "vscode";
 import type IILSpyBackend from "../decompiler/IILSpyBackend";
 import { ListNodesTool } from "./ListNodesTool";
-import { AvailableNodeCommands } from "../protocol/AvailableNodeCommands";
-import { NodeType } from "../protocol/NodeType";
-import type Node from "../protocol/Node";
-import type NodeMetadata from "../protocol/NodeMetadata";
+import {
+  AvailableNodeCommands,
+  Node,
+  NodeMetadata,
+  NodeType,
+} from "../extension-types";
 import type {
   AddAssemblyParams,
   AddAssemblyResponse,

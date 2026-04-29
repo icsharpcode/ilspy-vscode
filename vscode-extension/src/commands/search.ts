@@ -5,12 +5,13 @@
 
 import * as vscode from "vscode";
 import { SearchResultTreeProvider } from "../decompiler/search/SearchResultTreeProvider";
-import Node from "../protocol/Node";
+import { registerILSpyCommand } from "./registerILSpyCommand";
+import { Node } from "../extension-types";
 
 export function registerSearchCommand(
   searchResultTreeProvider: SearchResultTreeProvider
 ) {
-  return vscode.commands.registerCommand(
+  return registerILSpyCommand(
     "ilspy.search",
     async (term?: string | Node) => {
       const searchTerm =

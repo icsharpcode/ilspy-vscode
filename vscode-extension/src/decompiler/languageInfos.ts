@@ -1,4 +1,4 @@
-import { LanguageName } from "../protocol/LanguageName";
+import { LanguageName } from "../extension-types";
 
 const ILSPY_CODE_CS_LANG = "ilspy-code-cs";
 const ILSPY_CODE_IL_LANG = "ilspy-code-il";

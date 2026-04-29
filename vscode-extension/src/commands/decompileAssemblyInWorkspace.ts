@@ -7,13 +7,14 @@ import * as vscode from "vscode";
 import * as path from "path";
 import { DecompiledTreeProvider } from "../decompiler/DecompiledTreeProvider";
 import { addAssemblyToTree } from "./utils";
-import Node from "../protocol/Node";
+import { registerILSpyCommand } from "./registerILSpyCommand";
+import { Node } from "../extension-types";
 
 export function registerDecompileAssemblyInWorkspaceCommand(
   decompiledTreeProvider: DecompiledTreeProvider,
   decompiledTreeView: vscode.TreeView<Node>
 ) {
-  return vscode.commands.registerCommand(
+  return registerILSpyCommand(
     "ilspy.decompileAssemblyInWorkspace",
     async () => {
       const assembly = await pickAssembly();

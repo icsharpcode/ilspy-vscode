@@ -10,14 +10,14 @@ import {
   getShowCompilerGeneratedSymbolsSetting,
 } from "../decompiler/settings";
 import IILSpyBackend from "../decompiler/IILSpyBackend";
-import Node from "../protocol/Node";
-import { NodeType } from "../protocol/NodeType";
+import { Node, NodeType } from "../extension-types";
+import { registerILSpyCommand } from "./registerILSpyCommand";
 
 export function registerExportDecompiledAssemblyCommand(
   decompiledTreeProvider: DecompiledTreeProvider,
   backend: IILSpyBackend
 ) {
-  return vscode.commands.registerCommand(
+  return registerILSpyCommand(
     "ilspy.export",
     async (node?: Node) => {
       const assemblyNode = await getOrPickAssemblyNode(

@@ -5,12 +5,13 @@
 
 import * as vscode from "vscode";
 import { DecompiledTreeProvider } from "../decompiler/DecompiledTreeProvider";
-import Node from "../protocol/Node";
+import { registerILSpyCommand } from "./registerILSpyCommand";
+import { Node } from "../extension-types";
 
 export function registerReloadAssemblyCommand(
   decompiledTreeProvider: DecompiledTreeProvider
 ) {
-  return vscode.commands.registerCommand(
+  return registerILSpyCommand(
     "ilspy.reloadAssembly",
     async (node: Node) => {
       if (!node || !node.metadata) {

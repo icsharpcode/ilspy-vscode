@@ -20,9 +20,12 @@ import {
 } from "vscode";
 import { getNodeIcon } from "../icons";
 import OutputWindowLogger from "../OutputWindowLogger";
-import Node from "../protocol/Node";
-import { NodeFlags } from "../protocol/NodeFlags";
-import { NodeType } from "../protocol/NodeType";
+import {
+  AvailableNodeCommands,
+  Node,
+  NodeFlags,
+  NodeType,
+} from "../extension-types";
 import IILSpyBackend from "./IILSpyBackend";
 import {
   getAssemblyList,
@@ -38,7 +41,6 @@ import {
   hasNodeCommand,
   hasNodeFlag,
 } from "./utils";
-import { AvailableNodeCommands } from "../protocol/AvailableNodeCommands";
 
 export class DecompiledTreeProvider
   implements TreeDataProvider<Node>, TreeDragAndDropController<Node>

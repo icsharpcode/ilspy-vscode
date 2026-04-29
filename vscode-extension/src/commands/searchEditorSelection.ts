@@ -4,9 +4,10 @@
  *-----------------------------------------------------------------------------------------------*/
 
 import * as vscode from "vscode";
+import { registerILSpyCommand } from "./registerILSpyCommand";
 
 export function registerSearchEditorSelectionCommand() {
-  return vscode.commands.registerCommand(
+  return registerILSpyCommand(
     "ilspy.searchEditorSelection",
     async () => {
       const editor = vscode.window.activeTextEditor;

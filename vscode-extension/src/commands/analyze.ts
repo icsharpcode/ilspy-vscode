@@ -8,13 +8,14 @@ import {
   AnalyzeResultTreeProvider,
   AnalyzeTreeNode,
 } from "../decompiler/analyze/AnalyzeResultTreeProvider";
-import Node from "../protocol/Node";
+import { Node } from "../extension-types";
+import { registerILSpyCommand } from "./registerILSpyCommand";
 
 export function registerAnalyzeCommand(
   analyzeResultTreeProvider: AnalyzeResultTreeProvider,
   analyzeResultTreeView: vscode.TreeView<AnalyzeTreeNode>
 ) {
-  return vscode.commands.registerCommand(
+  return registerILSpyCommand(
     "ilspy.analyze",
     async (node: Node) => {
       vscode.commands.executeCommand(

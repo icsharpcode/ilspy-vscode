@@ -5,11 +5,12 @@
 
 import * as vscode from "vscode";
 import { DecompiledTreeProvider } from "../decompiler/DecompiledTreeProvider";
+import { registerILSpyCommand } from "./registerILSpyCommand";
 
 export function registerRefreshAssemblyListCommand(
   decompiledTreeProvider: DecompiledTreeProvider
 ) {
-  return vscode.commands.registerCommand(
+  return registerILSpyCommand(
     "ilspy.refreshAssemblyList",
     async () => {
       await decompiledTreeProvider.refresh();

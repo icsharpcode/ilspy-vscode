@@ -7,8 +7,7 @@ import * as vscode from "vscode";
 import { getDefaultOutputLanguage } from "./settings";
 import IILSpyBackend from "./IILSpyBackend";
 import { ILSPY_URI_SCHEME, uriToNode } from "./nodeUri";
-import NodeMetadata from "../protocol/NodeMetadata";
-import { LanguageName } from "../protocol/LanguageName";
+import { LanguageName, NodeMetadata } from "../extension-types";
 
 export class DecompilerTextDocumentContentProvider
   implements vscode.TextDocumentContentProvider

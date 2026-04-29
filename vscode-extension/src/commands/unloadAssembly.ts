@@ -5,22 +5,20 @@
 
 import * as vscode from "vscode";
 import { DecompiledTreeProvider } from "../decompiler/DecompiledTreeProvider";
-import Node from "../protocol/Node";
+import { registerILSpyCommand } from "./registerILSpyCommand";
+import { Node } from "../extension-types";
 
 export function registerUnloadAssemblyCommand(
   decompiledTreeProvider: DecompiledTreeProvider
 ) {
-  return vscode.commands.registerCommand(
-    "ilspy.unloadAssembly",
-    async (node: Node) => {
-      if (!node || !node.metadata) {
-        vscode.window.showInformationMessage(
-          'Please use context menu: right-click on the assembly node then select "Unload Assembly"'
-        );
-        return;
-      }
-      console.log("Unloading assembly " + node.metadata.name);
-      await decompiledTreeProvider.removeAssembly(node.metadata.assemblyPath);
+  return registerILSpyCommand("ilspy.unloadAssembly", async (node: Node) => {
+    if (!node || !node.metadata) {
+      vscode.window.showInformationMessage(
+        'Please use context menu: right-click on the assembly node then select "Unload Assembly"',
+      );
+      return;
     }
-  );
+    console.log("Unloading assembly " + node.metadata.name);
+    await decompiledTreeProvider.removeAssembly(node.metadata.assemblyPath);
+  });
 }

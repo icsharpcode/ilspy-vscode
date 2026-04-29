@@ -14,10 +14,8 @@ import {
   commands,
 } from "vscode";
 import IILSpyBackend from "../IILSpyBackend";
-import Node from "../../protocol/Node";
 import { getNodeIcon } from "../../icons";
 import { getShowCompilerGeneratedSymbolsSetting } from "../settings";
-import { NodeFlags } from "../../protocol/NodeFlags";
 import {
   createNodeId,
   createNodeTooltip,
@@ -25,7 +23,7 @@ import {
   hasNodeCommand,
   hasNodeFlag,
 } from "../utils";
-import { AvailableNodeCommands } from "../../protocol/AvailableNodeCommands";
+import { AvailableNodeCommands, Node, NodeFlags } from "../../extension-types";
 
 interface PerformedSearch {
   term: string;

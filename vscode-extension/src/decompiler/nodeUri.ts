@@ -5,10 +5,12 @@
 
 import * as vscode from "vscode";
 import * as path from "path";
-import NodeMetadata from "../protocol/NodeMetadata";
-import Node from "../protocol/Node";
-import { NodeType } from "../protocol/NodeType";
-import { AvailableNodeCommands } from "../protocol/AvailableNodeCommands";
+import {
+  AvailableNodeCommands,
+  Node,
+  NodeMetadata,
+  NodeType,
+} from "../extension-types";
 
 export const ILSPY_URI_SCHEME = "ilspy";
 

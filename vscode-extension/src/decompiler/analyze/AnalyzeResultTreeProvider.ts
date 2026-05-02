@@ -14,8 +14,12 @@ import {
   commands,
 } from "vscode";
 import IILSpyBackend from "../IILSpyBackend";
-import Node from "../../protocol/Node";
-import { NodeType } from "../../protocol/NodeType";
+import {
+  AvailableNodeCommands,
+  Node,
+  NodeFlags,
+  NodeType,
+} from "../../extension-types";
 import { getNodeIcon } from "../../icons";
 import {
   createNodeId,
@@ -26,8 +30,7 @@ import {
   hasNodeFlag,
 } from "../utils";
 import { getShowCompilerGeneratedSymbolsSetting } from "../settings";
-import { NodeFlags } from "../../protocol/NodeFlags";
-import { AvailableNodeCommands } from "../../protocol/AvailableNodeCommands";
+import { executeILSpyCommand } from "../../commands/commandUtils";
 
 export interface PerformedAnalyze {
   symbol: string;
@@ -65,7 +68,7 @@ export class AnalyzeResultTreeProvider
     });
     this.refresh();
     if (analyzeResponse?.shouldUpdateAssemblyList) {
-      commands.executeCommand("ilspy.refreshAssemblyList");
+      await executeILSpyCommand("ilspy.refreshAssemblyList");
     }
   }
 

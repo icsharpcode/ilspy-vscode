@@ -5,7 +5,6 @@
 
 import * as vscode from "vscode";
 import IILSpyBackend from "../decompiler/IILSpyBackend";
-import NodeMetadata from "../protocol/NodeMetadata";
 import {
   createJsonResult,
   getRootNodes,
@@ -17,6 +16,7 @@ import {
   summarizeNodeMetadata,
   SymbolQueryInput,
 } from "./lmToolsUtils";
+import { NodeMetadata } from "../extension-types";
 
 interface IListNodesToolParameters extends SymbolQueryInput {
   nodeMetadata?: NodeMetadata;

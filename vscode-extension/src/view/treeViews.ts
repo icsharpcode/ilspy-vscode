@@ -1,6 +1,6 @@
 import { TreeView, window } from "vscode";
-import Node from "../protocol/Node";
 import { DecompiledTreeProvider } from "../decompiler/DecompiledTreeProvider";
+import { Node } from "../extension-types";
 import { SearchResultTreeProvider } from "../decompiler/search/SearchResultTreeProvider";
 import {
   AnalyzeResultTreeProvider,

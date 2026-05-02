@@ -4,7 +4,7 @@ import {
   LanguageInfo,
   LATEST_OUTPUT_LANGUAGE,
 } from "./languageInfos";
-import { LanguageName } from "../protocol/LanguageName";
+import { LanguageName } from "../extension-types";
 
 export function getDefaultOutputLanguage() {
   return (languageFromDisplayName(

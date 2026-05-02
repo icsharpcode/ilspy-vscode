@@ -33,12 +33,14 @@ vi.mock("path", () => {
 });
 
 import { nodeDataToUri, uriToNode } from "./nodeUri";
-import { NodeType } from "../protocol/NodeType";
-import type Node from "../protocol/Node";
-import type NodeMetadata from "../protocol/NodeMetadata";
-import { SymbolModifiers } from "../protocol/SymbolModifiers";
-import { NodeFlags } from "../protocol/NodeFlags";
-import { AvailableNodeCommands } from "../protocol/AvailableNodeCommands";
+import {
+  AvailableNodeCommands,
+  Node,
+  NodeFlags,
+  NodeMetadata,
+  NodeType,
+  SymbolModifiers,
+} from "../extension-types";
 
 it("handles Windows-style backslashes when path.sep is '\\'", () => {
   const metadata: NodeMetadata = {

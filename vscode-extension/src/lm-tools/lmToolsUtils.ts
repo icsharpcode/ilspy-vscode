@@ -6,11 +6,14 @@
 import * as nodePath from "path";
 import * as vscode from "vscode";
 import IILSpyBackend from "../decompiler/IILSpyBackend";
-import { AvailableNodeCommands } from "../protocol/AvailableNodeCommands";
 import AssemblyData from "../protocol/AssemblyData";
-import Node from "../protocol/Node";
-import NodeMetadata from "../protocol/NodeMetadata";
-import { NodeType } from "../protocol/NodeType";
+import {
+  AvailableNodeCommands,
+  Node,
+  NodeMetadata,
+  NodeType,
+} from "../extension-types";
+import { executeILSpyCommand } from "../commands/commandUtils";
 
 export interface AssemblyFilterInput {
   assemblyPath?: string;
@@ -30,7 +33,7 @@ export function createJsonResult(
 }
 
 export async function refreshAssemblyList() {
-  await vscode.commands.executeCommand("ilspy.refreshAssemblyList");
+  await executeILSpyCommand("ilspy.refreshAssemblyList");
 }
 
 export async function getRootNodes(backend: IILSpyBackend): Promise<Node[]> {

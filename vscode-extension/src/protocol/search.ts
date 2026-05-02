@@ -10,7 +10,7 @@ import {
   RequestHandler,
   RequestType,
 } from "vscode-languageclient";
-import Node from "./Node";
+import { Node } from "../extension-types";
 
 export interface SearchParams {
   term: string;

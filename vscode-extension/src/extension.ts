@@ -12,11 +12,11 @@ import {
 } from "vscode-languageclient/node";
 import ILSpyBackend from "./decompiler/ILSpyBackend";
 import { DecompiledTreeProvider } from "./decompiler/DecompiledTreeProvider";
-import { registerDecompileAssemblyInWorkspaceCommand } from "./commands/decompileAssemblyInWorkspace";
-import { registerDecompileAssemblyViaDialogCommand } from "./commands/decompileAssemblyViaDialog";
-import { registerDecompileSelectedAssemblyCommand } from "./commands/decompileSelectedAssembly";
-import { registerReloadAssemblyCommand } from "./commands/reloadAssembly";
-import { registerUnloadAssemblyCommand } from "./commands/unloadAssembly";
+import { registerDecompileAssemblyInWorkspaceCommand } from "./commands/decompileAssemblyInWorkspaceCommand";
+import { registerDecompileAssemblyViaDialogCommand } from "./commands/decompileAssemblyViaDialogCommand";
+import { registerDecompileSelectedAssemblyCommand } from "./commands/decompileSelectedAssemblyCommand";
+import { registerReloadAssemblyCommand } from "./commands/reloadAssemblyCommand";
+import { registerUnloadAssemblyCommand } from "./commands/unloadAssemblyCommand";
 import { resolveDotnetRuntime } from "./dotnet-acquire/resolveDotnetRuntime";
 import OutputWindowLogger from "./OutputWindowLogger";
 import {
@@ -30,29 +30,33 @@ import { DecompilerTextDocumentContentProvider } from "./decompiler/DecompilerTe
 import {
   registerSelectOutputLanguageCommand,
   registerSelectOutputLanguageStatusBarItem,
-} from "./commands/selectOutputLanguage";
+} from "./commands/selectOutputLanguageCommand";
 import { ILSPY_URI_SCHEME } from "./decompiler/nodeUri";
-import { registerSearchCommand } from "./commands/search";
+import { registerSearchCommand } from "./commands/searchCommand";
 import { SearchResultTreeProvider } from "./decompiler/search/SearchResultTreeProvider";
-import { registerDecompileNodeCommand } from "./commands/decompileNode";
+import { registerDecompileNodeCommand } from "./commands/decompileNodeCommand";
 import {
   createAnalyzeResultTreeView,
   createDecompiledTreeView,
   createSearchResultTreeView,
 } from "./view/treeViews";
-import { registerSearchEditorSelectionCommand } from "./commands/searchEditorSelection";
+import { registerSearchEditorSelectionCommand } from "./commands/searchEditorSelectionCommand";
 import { AnalyzeResultTreeProvider } from "./decompiler/analyze/AnalyzeResultTreeProvider";
-import { registerAnalyzeCommand } from "./commands/analyze";
-import { registerRefreshAssemblyListCommand } from "./commands/refreshAssemblyList";
+import { registerAnalyzeCommand } from "./commands/analyzeCommand";
+import { registerRefreshAssemblyListCommand } from "./commands/refreshAssemblyListCommand";
 import { AssemblyNodeDecorationProvider } from "./decompiler/AssemblyNodeDecorationProvider";
-import { registerAddAssemblyByPathCommand } from "./commands/addAssemblyByPath";
-import { registerExportDecompiledAssemblyCommand } from "./commands/exportDecompiledAssembly";
+import { registerAddAssemblyByPathCommand } from "./commands/addAssemblyByPathCommand";
+import { registerExportDecompiledAssemblyCommand } from "./commands/exportDecompiledAssemblyCommand";
 import { registerLMTools } from "./lm-tools/registerLMTools";
-import { registerRevealNodeCommand } from "./commands/revealNode";
+import { registerRevealNodeCommand } from "./commands/revealNodeCommand";
+import { ILSpyExtensionApi } from "./extension-api";
+import { executeILSpyCommand } from "./commands/commandUtils";
 
 let client: LanguageClient;
 
-export async function activate(context: ExtensionContext) {
+export async function activate(
+  context: ExtensionContext,
+): Promise<ILSpyExtensionApi> {
   const disposables: Disposable[] = [];
 
   const logger = new OutputWindowLogger();
@@ -195,6 +199,10 @@ export async function activate(context: ExtensionContext) {
   disposables.push(...registerLMTools(ilspyBackend));
 
   context.subscriptions.push(...disposables);
+
+  return {
+    executeILSpyCommand: executeILSpyCommand,
+  };
 }
 
 export function deactivate(): Thenable<void> | undefined {

@@ -7,13 +7,14 @@ import * as vscode from "vscode";
 import * as path from "path";
 import { DecompiledTreeProvider } from "../decompiler/DecompiledTreeProvider";
 import { addAssemblyToTree } from "./utils";
-import Node from "../protocol/Node";
+import { registerILSpyCommand } from "./commandUtils";
+import { Node } from "../extension-types";
 
 export function registerDecompileAssemblyInWorkspaceCommand(
   decompiledTreeProvider: DecompiledTreeProvider,
-  decompiledTreeView: vscode.TreeView<Node>
+  decompiledTreeView: vscode.TreeView<Node>,
 ) {
-  return vscode.commands.registerCommand(
+  return registerILSpyCommand(
     "ilspy.decompileAssemblyInWorkspace",
     async () => {
       const assembly = await pickAssembly();
@@ -21,10 +22,10 @@ export function registerDecompileAssemblyInWorkspaceCommand(
         await addAssemblyToTree(
           assembly.assemblyPath,
           decompiledTreeProvider,
-          decompiledTreeView
+          decompiledTreeView,
         );
       }
-    }
+    },
   );
 }
 
@@ -32,15 +33,15 @@ async function pickAssembly(): Promise<AssemblyQuickPickItem | undefined> {
   const assemblies = await findAssemblies();
   const assemblyPathInfo: AssemblyPathInfo[] = parseAssemblyPath(assemblies);
   const quickPickItems = assemblyPathInfo.map((info) =>
-    createAssemblyQuickPickItem(info)
+    createAssemblyQuickPickItem(info),
   );
   if (quickPickItems.length === 0) {
     vscode.window.showInformationMessage(
-      "No assembly found inside the workspace"
+      "No assembly found inside the workspace",
     );
   } else {
     return await vscode.window.showQuickPick<AssemblyQuickPickItem>(
-      quickPickItems
+      quickPickItems,
     );
   }
 }
@@ -50,7 +51,7 @@ function parseAssemblyPath(assemblies: string[]): AssemblyPathInfo[] {
   return assemblies.map((assemblyPath) => {
     const p = path.parse(assemblyPath);
     const assemblyWorkspace = workspaceFolders?.find((w) =>
-      p.dir.includes(w.uri.fsPath)
+      p.dir.includes(w.uri.fsPath),
     );
     return {
       fileName: p.base,
@@ -69,7 +70,7 @@ async function findAssemblies(): Promise<string[]> {
 
   const resources = await vscode.workspace.findFiles(
     /*include*/ "{**/*.dll,**/*.exe,**/*.winmd,**/*.netmodule,**/*.wasm}",
-    /*exclude*/ "{**/node_modules/**,**/.git/**,**/bower_components/**}"
+    /*exclude*/ "{**/node_modules/**,**/.git/**,**/bower_components/**}",
   );
   return resources
     .map((uri) => uri.fsPath)
@@ -85,7 +86,7 @@ async function findAssemblies(): Promise<string[]> {
 }
 
 function createAssemblyQuickPickItem(
-  assemblyPathInfo: AssemblyPathInfo
+  assemblyPathInfo: AssemblyPathInfo,
 ): AssemblyQuickPickItem {
   const selectIcon = (extension: string) => {
     switch (extension) {
@@ -107,7 +108,7 @@ function createAssemblyQuickPickItem(
     description: assemblyPathInfo.fullPath,
     detail: path.join(
       assemblyPathInfo.workspaceFolder ?? "",
-      assemblyPathInfo.relativePath
+      assemblyPathInfo.relativePath,
     ),
     assemblyPath: assemblyPathInfo.fullPath,
   };

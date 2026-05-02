@@ -4,19 +4,17 @@
  *-----------------------------------------------------------------------------------------------*/
 
 import * as vscode from "vscode";
-import Node from "../protocol/Node";
+import { registerILSpyCommand } from "./commandUtils";
+import { Node } from "../extension-types";
 
 export function registerRevealNodeCommand(
   decompiledTreeView: vscode.TreeView<Node>,
 ) {
-  return vscode.commands.registerCommand(
-    "ilspy.revealNode",
-    async (node: Node) => {
-      await decompiledTreeView.reveal(node, {
-        expand: true,
-        select: true,
-        focus: true,
-      });
-    },
-  );
+  return registerILSpyCommand("ilspy.revealNode", async (node: Node) => {
+    await decompiledTreeView.reveal(node, {
+      expand: true,
+      select: true,
+      focus: true,
+    });
+  });
 }

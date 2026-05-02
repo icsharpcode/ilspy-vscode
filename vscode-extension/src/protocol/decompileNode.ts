@@ -11,7 +11,7 @@ import {
   RequestType,
 } from "vscode-languageclient";
 import DecompileResponse from "./DecompileResponse";
-import NodeMetadata from "./NodeMetadata";
+import { NodeMetadata } from "../extension-types";
 
 export interface DecompileNodeParams {
   nodeMetadata: NodeMetadata;

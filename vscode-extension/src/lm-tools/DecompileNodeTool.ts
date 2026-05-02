@@ -6,8 +6,7 @@
 import * as vscode from "vscode";
 import { getDefaultOutputLanguage } from "../decompiler/settings";
 import IILSpyBackend from "../decompiler/IILSpyBackend";
-import { AvailableNodeCommands } from "../protocol/AvailableNodeCommands";
-import NodeMetadata from "../protocol/NodeMetadata";
+import { AvailableNodeCommands, NodeMetadata } from "../extension-types";
 import {
   createJsonResult,
   ensureNodeMetadataCommandAvailable,

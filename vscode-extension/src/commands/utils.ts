@@ -6,7 +6,7 @@
 import * as vscode from "vscode";
 import * as fs from "fs";
 import { DecompiledTreeProvider } from "../decompiler/DecompiledTreeProvider";
-import Node from "../protocol/Node";
+import { Node } from "../extension-types";
 
 export function addAssemblyFromFilePath(
   filePath: string,

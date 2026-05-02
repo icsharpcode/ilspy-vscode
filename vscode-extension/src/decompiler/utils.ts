@@ -1,9 +1,10 @@
 import { MarkdownString, TreeItemCollapsibleState } from "vscode";
-import Node from "../protocol/Node";
-import { NodeType } from "../protocol/NodeType";
-import { NodeFlags } from "../protocol/NodeFlags";
-import { AvailableNodeCommands } from "../protocol/AvailableNodeCommands";
-import NodeMetadata from "../protocol/NodeMetadata";
+import {
+  AvailableNodeCommands,
+  Node,
+  NodeFlags,
+  NodeType,
+} from "../extension-types";
 
 export const ASSEMBLY_FILE_EXTENSIONS = [
   "dll",

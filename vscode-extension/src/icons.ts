@@ -4,7 +4,7 @@
  *-----------------------------------------------------------------------------------------------*/
 
 import { ThemeIcon, Uri } from "vscode";
-import { NodeType } from "./protocol/NodeType";
+import { NodeType } from "./extension-types";
 import * as path from "path";
 
 const UNKNOWN_ICON = { id: "question" };

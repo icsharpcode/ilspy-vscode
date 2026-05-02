@@ -5,7 +5,7 @@
 
 import * as vscode from "vscode";
 import { SearchResultTreeProvider } from "../decompiler/search/SearchResultTreeProvider";
-import { registerILSpyCommand } from "./commandUtils";
+import { executeILSpyCommand, registerILSpyCommand } from "./commandUtils";
 import { Node } from "../extension-types";
 
 export function registerSearchCommand(
@@ -26,7 +26,7 @@ export function registerSearchCommand(
         true,
       );
       searchResultTreeProvider.performSearch(searchTerm);
-      vscode.commands.executeCommand("ilspySearchResultsContainer.focus");
+      executeILSpyCommand("ilspySearchResultsContainer.focus");
     }
   });
 }

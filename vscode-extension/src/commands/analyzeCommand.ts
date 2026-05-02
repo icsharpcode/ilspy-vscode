@@ -9,7 +9,7 @@ import {
   AnalyzeTreeNode,
 } from "../decompiler/analyze/AnalyzeResultTreeProvider";
 import { Node } from "../extension-types";
-import { registerILSpyCommand } from "./commandUtils";
+import { executeILSpyCommand, registerILSpyCommand } from "./commandUtils";
 
 export function registerAnalyzeCommand(
   analyzeResultTreeProvider: AnalyzeResultTreeProvider,
@@ -22,7 +22,7 @@ export function registerAnalyzeCommand(
       true,
     );
     await analyzeResultTreeProvider.analyze(node);
-    vscode.commands.executeCommand("ilspyAnalyzeResultsContainer.focus");
+    executeILSpyCommand("ilspyAnalyzeResultsContainer.focus");
 
     const firstNode = analyzeResultTreeProvider.getFirstNode();
     if (firstNode) {

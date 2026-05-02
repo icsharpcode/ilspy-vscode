@@ -23,6 +23,8 @@ export interface ILSpyExtensionCommands {
   "ilspy.searchEditorSelection": () => Promise<void>;
   "ilspy.selectOutputLanguage": () => Promise<void>;
   "ilspy.unloadAssembly": (node: Node) => Promise<void>;
+  "ilspyAnalyzeResultsContainer.focus": () => Promise<void>;
+  "ilspySearchResultsContainer.focus": () => Promise<void>;
 }
 
 export type ILSpyExtensionCommandId = keyof ILSpyExtensionCommands;

@@ -92,7 +92,7 @@ export async function activate(
           setBackendAvailable(false);
           break;
         case State.Stopped:
-          logger.writeLine("ILSpyF LSP Backend has stopped");
+          logger.writeLine("ILSpy LSP Backend has stopped");
           setBackendAvailable(false);
           break;
       }

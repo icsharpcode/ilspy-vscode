@@ -63,7 +63,8 @@ export async function activate(
 
   setBackendAvailable(false);
 
-  const dotnetCli = await resolveDotnetRuntime(context, logger);
+  const { dotnetPath: dotnetCli, refreshRuntimeInBackground } =
+    await resolveDotnetRuntime(context, logger);
   if (dotnetCli) {
     const backendExecutable = ILSpyBackend.getExecutable(context);
     const serverOptions: ServerOptions = {
@@ -81,11 +82,22 @@ export async function activate(
     );
     await client.setTrace(Trace.Verbose);
 
+    let runtimeRefreshStarted = false;
+    const startRuntimeRefresh = () => {
+      if (!refreshRuntimeInBackground || runtimeRefreshStarted) {
+        return;
+      }
+
+      runtimeRefreshStarted = true;
+      void refreshRuntimeInBackground();
+    };
+
     client.onDidChangeState((e) => {
       switch (e.newState) {
         case State.Running:
           logger.writeLine("ILSpy LSP Backend is running");
           setBackendAvailable(true);
+          startRuntimeRefresh();
           break;
         case State.Starting:
           logger.writeLine("ILSpy LSP Backend is starting...");

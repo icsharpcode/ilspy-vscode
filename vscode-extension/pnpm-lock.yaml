@@ -35,8 +35,8 @@ importers:
         specifier: 3.0.0
         version: 3.0.0
       terser:
-        specifier: 5.46.2
-        version: 5.46.2
+        specifier: 5.47.1
+        version: 5.47.1
       vscode-languageclient:
         specifier: 9.0.1
         version: 9.0.1
@@ -88,7 +88,7 @@ importers:
         version: 6.0.3
       vitest:
         specifier: 4.1.5
-        version: 4.1.5(@types/node@22.15.31)(vite@7.3.2(@types/node@22.15.31)(terser@5.46.2))
+        version: 4.1.5(@types/node@22.15.31)(vite@7.3.2(@types/node@22.15.31)(terser@5.47.1))
       webpack:
         specifier: 5.106.2
         version: 5.106.2(webpack-cli@7.0.2)
@@ -2336,8 +2336,8 @@ packages:
       uglify-js:
         optional: true
 
-  terser@5.46.2:
-    resolution: {integrity: sha512-uxfo9fPcSgLDYob/w1FuL0c99MWiJDnv+5qXSQc5+Ki5NjVNsYi66INnMFBjf6uFz6OnX12piJQPF4IpjJTNTw==}
+  terser@5.47.1:
+    resolution: {integrity: sha512-tPbLXTI6ohPASb/1YViL428oEHu6/qv1OxqYnfaonVCFHqx4+wCd95pHrQWsL5X4pl90CTyW9piSAsS2L0VoMw==}
     engines: {node: '>=10'}
     hasBin: true
 
@@ -3274,13 +3274,13 @@ snapshots:
       chai: 6.2.2
       tinyrainbow: 3.1.0
 
-  '@vitest/mocker@4.1.5(vite@7.3.2(@types/node@22.15.31)(terser@5.46.2))':
+  '@vitest/mocker@4.1.5(vite@7.3.2(@types/node@22.15.31)(terser@5.47.1))':
     dependencies:
       '@vitest/spy': 4.1.5
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 7.3.2(@types/node@22.15.31)(terser@5.46.2)
+      vite: 7.3.2(@types/node@22.15.31)(terser@5.47.1)
 
   '@vitest/pretty-format@4.1.5':
     dependencies:
@@ -5015,10 +5015,10 @@ snapshots:
       '@jridgewell/trace-mapping': 0.3.31
       jest-worker: 27.5.1
       schema-utils: 4.3.3
-      terser: 5.46.2
+      terser: 5.47.1
       webpack: 5.106.2(webpack-cli@7.0.2)
 
-  terser@5.46.2:
+  terser@5.47.1:
     dependencies:
       '@jridgewell/source-map': 0.3.11
       acorn: 8.16.0
@@ -5126,7 +5126,7 @@ snapshots:
 
   version-range@4.15.0: {}
 
-  vite@7.3.2(@types/node@22.15.31)(terser@5.46.2):
+  vite@7.3.2(@types/node@22.15.31)(terser@5.47.1):
     dependencies:
       esbuild: 0.27.7
       fdir: 6.5.0(picomatch@4.0.4)
@@ -5137,12 +5137,12 @@ snapshots:
     optionalDependencies:
       '@types/node': 22.15.31
       fsevents: 2.3.3
-      terser: 5.46.2
+      terser: 5.47.1
 
-  vitest@4.1.5(@types/node@22.15.31)(vite@7.3.2(@types/node@22.15.31)(terser@5.46.2)):
+  vitest@4.1.5(@types/node@22.15.31)(vite@7.3.2(@types/node@22.15.31)(terser@5.47.1)):
     dependencies:
       '@vitest/expect': 4.1.5
-      '@vitest/mocker': 4.1.5(vite@7.3.2(@types/node@22.15.31)(terser@5.46.2))
+      '@vitest/mocker': 4.1.5(vite@7.3.2(@types/node@22.15.31)(terser@5.47.1))
       '@vitest/pretty-format': 4.1.5
       '@vitest/runner': 4.1.5
       '@vitest/snapshot': 4.1.5
@@ -5159,7 +5159,7 @@ snapshots:
       tinyexec: 1.1.1
       tinyglobby: 0.2.16
       tinyrainbow: 3.1.0
-      vite: 7.3.2(@types/node@22.15.31)(terser@5.46.2)
+      vite: 7.3.2(@types/node@22.15.31)(terser@5.47.1)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 22.15.31

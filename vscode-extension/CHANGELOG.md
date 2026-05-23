@@ -6,6 +6,9 @@ All notable changes to the "ilspy-vscode" extension will be documented in this f
 
 - Reveal decompiled nodes in assembly tree when clicked in search or analyzer result lists
 - Fix: Don't show pseudo-errors in editor tabs with decompiled code
+- Fix: Race condition on startup preventing backend from starting under certain circumstances
+- Upgrade to ICSharpCode.Decompiler 10.0.1 (see release notes for [ILSpy 10.0.1](https://github.com/icsharpcode/ILSpy/releases/tag/v10.0.1) to get more details)
+
 
 ## 0.24.0
 

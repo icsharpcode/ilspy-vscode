@@ -1,13 +1,15 @@
 #!/usr/bin/env sh
 
 SEMVER=`buildtools/versionize`
-PRERELEASETAG=`buildtools/versionize --type`
+VERSIONTYPE=`buildtools/versionize --type`
+
+echo "Build version $SEMVER ($VERSIONTYPE)"
 
 mkdir ./artifacts
 
 cd ./vscode-extension
-npm version --git-tag-version false --allow-same-version true -- $SEMVER
-if [ -n "$PRERELEASETAG" ]; then
+pnpm version $SEMVER --no-git-tag-version --allow-same-version --no-git-checks
+if [ "$VERSIONTYPE" = "preview" ]; then
    npm pkg set preview='true'
 fi
 pnpm install

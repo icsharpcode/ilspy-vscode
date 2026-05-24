@@ -2,10 +2,9 @@
 	"name": "ilspy-vscode",
 	"displayName": "ilspy-vscode",
 	"description": "Decompile MSIL assemblies - support for full framework, .NET Core and .NET Standard",
-	"version": "0.16.1",
+	"version": "1.0.0",
 	"icon": "resources/ILSpy-vscode-marketplace-icon.png",
 	"publisher": "icsharpcode",
-	"preview": true,
 	"private": true,
 	"license": "SEE LICENSE",
 	"homepage": "https://github.com/icsharpcode/ilspy-vscode/tree/master/vscode-extension",
@@ -748,13 +747,13 @@
 	},
 	"dependencies": {
 		"ansi-regex": "6.2.2",
+		"brace-expansion": "5.0.6",
 		"chai": "6.2.2",
 		"os": "0.1.2",
 		"path": "0.12.7",
 		"temp-dir": "3.0.0",
 		"terser": "5.47.1",
-		"vscode-languageclient": "9.0.1",
-		"brace-expansion": "5.0.6"
+		"vscode-languageclient": "9.0.1"
 	},
 	"devDependencies": {
 		"@types/chai": "5.2.3",

@@ -20,13 +20,13 @@ export function registerDecompileNodeCommand(
   return registerILSpyCommand(
     "ilspy.decompileNode",
     async (node: Node, revealInTree = false) => {
+      const uri = nodeDataToUri(node);
       if (
         hasNodeCommand(node, AvailableNodeCommands.Decompile) &&
         lastSelectedNode !== node
       ) {
         lastSelectedNode = node;
 
-        const uri = nodeDataToUri(node);
         const language = getDefaultOutputLanguage();
 
         contentProvider.setDocumentOutputLanguage(uri, language);
@@ -37,6 +37,13 @@ export function registerDecompileNodeCommand(
           languageInfos[language].vsLanguageMode,
         );
         await vscode.window.showTextDocument(doc, { preview: true });
+      } else if (lastSelectedNode === node) {
+        let doc = vscode.workspace.textDocuments.find(
+          (d) => d.uri.toString() === uri.toString(),
+        );
+        if (doc) {
+          await vscode.window.showTextDocument(doc, { preview: true });
+        }
       }
 
       if (revealInTree) {

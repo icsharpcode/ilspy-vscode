@@ -34,19 +34,46 @@ const ProductIconMapping: {
   [NodeType.PackageFolder]: { id: "folder" },
   [NodeType.Resource]: { id: "file" },
 };
+const ProductColorMapping: {
+  [key in NodeType]?: { id: string };
+} = {
+  [NodeType.Assembly]: { id: "symbolIcon.packageForeground" },
+  [NodeType.Namespace]: { id: "symbolIcon.namespaceForeground" },
+  [NodeType.Event]: { id: "symbolIcon.eventForeground" },
+  [NodeType.Field]: { id: "symbolIcon.fieldForeground" },
+  [NodeType.Method]: { id: "symbolIcon.methodForeground" },
+  [NodeType.Enum]: { id: "symbolIcon.enumeratorForeground" },
+  [NodeType.Class]: { id: "symbolIcon.classForeground" },
+  [NodeType.Interface]: { id: "symbolIcon.interfaceForeground" },
+  [NodeType.Struct]: { id: "symbolIcon.structForeground" },
+  [NodeType.Delegate]: { id: "symbolIcon.classForeground" },
+  [NodeType.Const]: { id: "symbolIcon.constantForeground" },
+  [NodeType.Property]: { id: "symbolIcon.propertyForeground" },
+  [NodeType.ReferencesRoot]: { id: "symbolIcon.folderForeground" },
+  [NodeType.AssemblyReference]: { id: "symbolIcon.referenceForeground" },
+  [NodeType.Unknown]: { id: "foreground" },
+  [NodeType.Analyzer]: { id: "symbolIcon.methodForeground" },
+  [NodeType.BaseTypes]: { id: "symbolIcon.interfaceForeground" },
+  [NodeType.DerivedTypes]: { id: "symbolIcon.interfaceForeground" },
+  [NodeType.NuGetPackage]: { id: "symbolIcon.referenceForeground" },
+  [NodeType.PackageFolder]: { id: "symbolIcon.folderForeground" },
+  [NodeType.Resource]: { id: "symbolIcon.fileForeground" },
+};
 
 export function getNodeIcon(nodeType: NodeType | undefined) {
   const iconMapping =
     ProductIconMapping[nodeType ?? NodeType.Unknown] ?? UNKNOWN_ICON;
+  const colorMapping =
+    ProductColorMapping[nodeType ?? NodeType.Unknown] ?? undefined;
   if ("id" in iconMapping) {
-    return new ThemeIcon(iconMapping.id);
+    return new ThemeIcon(iconMapping.id, colorMapping);
   } else {
     const basePath = path.join(
       __dirname,
       "..",
       "resources",
       "tree-icons",
-      iconMapping.customIcon
+      iconMapping.customIcon,
     );
     return {
       light: Uri.file(`${basePath}_light.svg`),

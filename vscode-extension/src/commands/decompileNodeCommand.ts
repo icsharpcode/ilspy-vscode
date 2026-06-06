@@ -24,10 +24,7 @@ export function registerDecompileNodeCommand(
 
         contentProvider.setDocumentOutputLanguage(uri, language);
 
-        let doc =
-          vscode.workspace.textDocuments.find(
-            (d) => d.uri.toString() === uri.toString(),
-          ) ?? (await vscode.workspace.openTextDocument(uri));
+        let doc = await vscode.workspace.openTextDocument(uri);
 
         vscode.languages.setTextDocumentLanguage(
           doc,

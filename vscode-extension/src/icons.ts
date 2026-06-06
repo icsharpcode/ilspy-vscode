@@ -7,10 +7,12 @@ import { ThemeColor, ThemeIcon, Uri } from "vscode";
 import { NodeType } from "./extension-types";
 import * as path from "path";
 
-const UNKNOWN_ICON = { id: "question", colorKey: "foreground" };
+const UNKNOWN_ICON = { id: "question", colorKey: undefined };
 
 const ProductIconMapping: {
-  [key in NodeType]?: { id: string; colorKey: string } | { customIcon: string };
+  [key in NodeType]?:
+    | { id: string; colorKey?: string }
+    | { customIcon: string };
 } = {
   [NodeType.Assembly]: {
     id: "library",
@@ -93,7 +95,10 @@ export function getNodeIcon(nodeType: NodeType | undefined) {
   const iconMapping =
     ProductIconMapping[nodeType ?? NodeType.Unknown] ?? UNKNOWN_ICON;
   if ("id" in iconMapping) {
-    return new ThemeIcon(iconMapping.id, new ThemeColor(iconMapping.colorKey));
+    return new ThemeIcon(
+      iconMapping.id,
+      iconMapping.colorKey ? new ThemeColor(iconMapping.colorKey) : undefined,
+    );
   } else {
     const basePath = path.join(
       __dirname,

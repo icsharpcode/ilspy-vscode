@@ -12,26 +12,20 @@ import { hasNodeCommand } from "../decompiler/utils";
 import { executeILSpyCommand, registerILSpyCommand } from "./commandUtils";
 import { AvailableNodeCommands, Node } from "../extension-types";
 
-let lastSelectedNode: Node | undefined = undefined;
-
 export function registerDecompileNodeCommand(
   contentProvider: DecompilerTextDocumentContentProvider,
 ) {
   return registerILSpyCommand(
     "ilspy.decompileNode",
     async (node: Node, revealInTree = false) => {
-      if (
-        hasNodeCommand(node, AvailableNodeCommands.Decompile) &&
-        lastSelectedNode !== node
-      ) {
-        lastSelectedNode = node;
-
-        const uri = nodeDataToUri(node);
+      const uri = nodeDataToUri(node);
+      if (hasNodeCommand(node, AvailableNodeCommands.Decompile)) {
         const language = getDefaultOutputLanguage();
 
         contentProvider.setDocumentOutputLanguage(uri, language);
 
         let doc = await vscode.workspace.openTextDocument(uri);
+
         vscode.languages.setTextDocumentLanguage(
           doc,
           languageInfos[language].vsLanguageMode,

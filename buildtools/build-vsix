@@ -12,7 +12,7 @@ pnpm version $SEMVER --no-git-tag-version --allow-same-version --no-git-checks
 if [ "$VERSIONTYPE" = "preview" ]; then
    npm pkg set preview='true'
 fi
-pnpm install
+pnpm ci
 pnpm build:vsix -o ../artifacts/ilspy-vscode-$SEMVER.vsix
 
 echo "// ILSpy VSCode Extension, v$SEMVER" > ../artifacts/extension-types.ts

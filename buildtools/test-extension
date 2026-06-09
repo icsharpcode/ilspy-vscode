@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
 
 cd ./vscode-extension
-pnpm install
+pnpm ci
 pnpm test:unit

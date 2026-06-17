@@ -71,6 +71,6 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v')
         shell: bash
         run: |
-          gh release create "${GITHUB_REF#refs/tags/}" --draft --title "${GITHUB_REF#refs/tags/v}" artifacts/*.vsix
+          gh release create "${GITHUB_REF#refs/tags/}" --draft --title "${GITHUB_REF#refs/tags/v}" artifacts/*.*
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}

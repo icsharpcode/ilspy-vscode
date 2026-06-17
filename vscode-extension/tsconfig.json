@@ -3,6 +3,7 @@
 		"module": "commonjs",
 		"target": "es2019",
 		"lib": [ "ES2019" ],
+		"types": [ "node", "vscode" ],
 		"outDir": "out",
 		"sourceMap": true,
 		"rootDir": "src",
@@ -17,6 +18,7 @@
 	],
 	"exclude": [
 		"node_modules",
+		"src/**/*.test.ts",
 		"test/**/*",
 	]
 }

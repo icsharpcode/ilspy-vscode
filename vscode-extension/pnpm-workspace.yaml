@@ -6,6 +6,9 @@ allowBuilds:
 ignoreDepScripts: true
 
 minimumReleaseAge: 7200
+minimumReleaseAgeIgnoreMissingTime: false
+blockExoticSubdeps: true
+resolutionMode: time-based
 
 overrides:
   chokidar@4.0.3: 5.0.0

@@ -26,12 +26,16 @@ import {
 import { AvailableNodeCommands, Node, NodeFlags } from "../../extension-types";
 import { executeILSpyCommand } from "../../commands/commandUtils";
 
-interface PerformedSearch {
+type PerformedSearch = {
   term: string;
-  results: Node[];
-}
+  results: SearchResultNode[];
+};
 
-export type SearchTreeNode = Node | PerformedSearch;
+type SearchResultNode = Node & {
+  searchIndex: number;
+};
+
+export type SearchTreeNode = SearchResultNode | PerformedSearch;
 
 export function isPerformedSearchNode(
   node: SearchTreeNode
@@ -54,9 +58,14 @@ export class SearchResultTreeProvider
 
   public async performSearch(term: string) {
     const searchResponse = await this.backend.sendSearch({ term });
+    const newSearchIndex = this.lastSearches.length;
     this.lastSearches.push({
       term,
-      results: searchResponse?.results ?? [],
+      results:
+        searchResponse?.results.map((result) => ({
+          ...result,
+          searchIndex: newSearchIndex,
+        })) ?? [],
     });
     this.refresh();
     if (searchResponse?.shouldUpdateAssemblyList) {
@@ -72,8 +81,8 @@ export class SearchResultTreeProvider
         iconPath: new ThemeIcon("search-view-icon"),
       };
     } else {
-      return {
-        id: createNodeId(node),
+      const item = {
+        id: `${node.searchIndex}/${createNodeId(node)}`,
         label: node.displayName,
         description: node.description,
         tooltip: createNodeTooltip(node),
@@ -86,11 +95,12 @@ export class SearchResultTreeProvider
         contextValue: getNodeContextValue(node),
         iconPath: getNodeIcon(node.metadata?.type),
       };
+      return item;
     }
   }
 
   public findNode(predicate: (node: SearchTreeNode) => boolean) {
-    return (this.getChildren() as Node[]).find(predicate);
+    return (this.getChildren() as SearchResultNode[]).find(predicate);
   }
 
   public getChildren(

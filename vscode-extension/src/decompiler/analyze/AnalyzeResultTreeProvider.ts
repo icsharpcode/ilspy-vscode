@@ -34,15 +34,38 @@ import { executeILSpyCommand } from "../../commands/commandUtils";
 
 export interface PerformedAnalyze {
   symbol: string;
-  results: Node[];
+  results: AnalyzeResultNode[];
 }
 
-export type AnalyzeTreeNode = Node | PerformedAnalyze;
+type AnalyzeResultNode = Node & {
+  treeItemId: string;
+};
+
+export type AnalyzeTreeNode = AnalyzeResultNode | PerformedAnalyze;
 
 export function isPerformedAnalyzeNode(
   node: AnalyzeTreeNode
 ): node is PerformedAnalyze {
   return "symbol" in node && "results" in node;
+}
+
+function attachAnalyzeIndex(
+  nodes: Node[] | undefined,
+  parentTreeItemId: string
+): AnalyzeResultNode[] {
+  return (
+    nodes?.map((node, index) => {
+      const nodeId = createNodeId(node);
+      const subType = node.metadata?.subType;
+      const identitySuffix =
+        [nodeId, subType].filter((value) => value !== undefined).join("/") ||
+        index.toString();
+      return {
+        ...node,
+        treeItemId: `${parentTreeItemId}/${identitySuffix}`,
+      };
+    }) ?? []
+  );
 }
 
 export class AnalyzeResultTreeProvider
@@ -62,9 +85,13 @@ export class AnalyzeResultTreeProvider
     const analyzeResponse = await this.backend.sendAnalyze({
       nodeMetadata: node.metadata,
     });
+    const newAnalyzeIndex = this.lastAnalyzes.length;
     this.lastAnalyzes.push({
       symbol: node.displayName,
-      results: analyzeResponse?.results ?? [],
+      results: attachAnalyzeIndex(
+        analyzeResponse?.results,
+        newAnalyzeIndex.toString()
+      ),
     });
     this.refresh();
     if (analyzeResponse?.shouldUpdateAssemblyList) {
@@ -89,13 +116,14 @@ export class AnalyzeResultTreeProvider
       };
     } else if (node.metadata?.type === NodeType.Analyzer) {
       return {
+        id: node.treeItemId,
         label: node.displayName,
         collapsibleState: getTreeNodeCollapsibleState(node),
         iconPath: getNodeIcon(node.metadata?.type),
       };
     } else {
       return {
-        id: createNodeId(node),
+        id: node.treeItemId,
         label: node.displayName,
         description: node.description,
         tooltip: createNodeTooltip(node),
@@ -112,7 +140,7 @@ export class AnalyzeResultTreeProvider
   }
 
   public findNode(predicate: (node: AnalyzeTreeNode) => boolean) {
-    return (this.getChildren() as Node[]).find(predicate);
+    return (this.getChildren() as AnalyzeTreeNode[]).find(predicate);
   }
 
   public getChildren(
@@ -145,12 +173,10 @@ export class AnalyzeResultTreeProvider
       nodeMetadata: node?.metadata,
     });
 
-    return (
-      result?.nodes?.filter(
-        (node) =>
-          showCompilerGeneratedSymbols ||
-          !hasNodeFlag(node, NodeFlags.CompilerGenerated)
-      ) ?? []
+    return attachAnalyzeIndex(result?.nodes, node.treeItemId).filter(
+      (node) =>
+        showCompilerGeneratedSymbols ||
+        !hasNodeFlag(node, NodeFlags.CompilerGenerated)
     );
   }
 

@@ -2,6 +2,13 @@
 
 All notable changes to the "ilspy-vscode" extension will be documented in this file.
 
+## 1.1.0
+
+- Fix [#693](https://github.com/icsharpcode/ilspy-vscode/issues/693): Error on decompiling search results after searching twice for same search term.
+- Fix [#679](https://github.com/icsharpcode/ilspy-vscode/issues/679): Cannot refocus a selected node via tree view (thanks to [@autumn-puffin](https://github.com/autumn-puffin))
+- Fix [#680](https://github.com/icsharpcode/ilspy-vscode/issues/680): Bring back icon colors in ILSpy tree views (thanks to [@autumn-puffin](https://github.com/autumn-puffin))
+- Upgrade to ICSharpCode.Decompiler 10.1.1 (see release notes for [ILSpy 10.1.1](https://github.com/icsharpcode/ILSpy/releases/tag/v10.1.1) to get more details)
+
 ## 1.0.0
 
 - Reveal decompiled nodes in assembly tree when clicked in search or analyzer result lists

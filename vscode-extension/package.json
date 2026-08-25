@@ -35,11 +35,11 @@
 		"test:unit": "vitest src --run"
 	},
 	"dependencies": {
-		"ansi-regex": "6.2.2",
+		"ansi-regex": "6.3.0",
 		"brace-expansion": "5.0.9",
 		"chai": "6.2.2",
 		"temp-dir": "3.0.0",
-		"terser": "5.49.0",
+		"terser": "5.50.0",
 		"vscode-languageclient": "10.1.0"
 	},
 	"devDependencies": {

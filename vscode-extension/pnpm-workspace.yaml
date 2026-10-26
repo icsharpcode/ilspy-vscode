@@ -3,8 +3,6 @@ allowBuilds:
   esbuild: false
   keytar: false
 
-ignoreDepScripts: true
-
 minimumReleaseAge: 7200
 minimumReleaseAgeIgnoreMissingTime: false
 blockExoticSubdeps: true

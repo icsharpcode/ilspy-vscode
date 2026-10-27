@@ -1,4 +1,5 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
+set -euo pipefail
 
 cd ./backend/ILSpyX.Backend.Tests
 dotnet test -p:CIBuild=true

@@ -1,4 +1,5 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
+set -euo pipefail
 
 RELEASEVERSION=`buildtools/versionize --next`
 git tag v$RELEASEVERSION

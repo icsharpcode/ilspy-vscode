@@ -1,11 +1,12 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
+set -euo pipefail
 
 SEMVER=`buildtools/versionize`
 VERSIONTYPE=`buildtools/versionize --type`
 
 echo "Build version $SEMVER ($VERSIONTYPE)"
 
-mkdir ./artifacts
+mkdir -p ./artifacts
 
 cd ./vscode-extension
 pnpm version $SEMVER --no-git-tag-version --allow-same-version --no-git-checks

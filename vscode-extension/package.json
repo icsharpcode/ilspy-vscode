@@ -45,7 +45,7 @@
 	"devDependencies": {
 		"@types/chai": "5.2.3",
 		"@types/mocha": "10.0.10",
-		"@types/node": "22.15.31",
+		"@types/node": "24.19.2",
 		"@types/vscode": "1.110.0",
 		"@typescript-eslint/eslint-plugin": "8.71.1",
 		"@typescript-eslint/parser": "8.71.1",
@@ -57,12 +57,12 @@
 		"mocha": "12.0.2",
 		"terser-webpack-plugin": "5.6.1",
 		"ts-loader": "9.6.2",
-		"typescript": "7.0.2",
+		"typescript": "6.0.3",
 		"vitest": "5.0.3",
 		"webpack": "5.111.1",
 		"webpack-cli": "7.2.3"
 	},
-	"packageManager": "pnpm@11.20.0+sha512.9a6f330a95b66446ea088faf1521405a8a01f07fde7124cc9958dfed52d4bb436737e65b08f85f37b46fcba375092558ac51262b816844b22f63406ed166bfee",
+	"packageManager": "pnpm@11.28.8+sha512.f6988a32046b9a3f78d7d7ee0747926bbe905ff9dff73bf19abb87bd7d1906a2ac90d93f73be32b5f9e14c2899569bcb0c9c5ec8a19e083f5d71bbab6dd9e0b8",
 	"extensionDependencies": [
 		"ms-dotnettools.vscode-dotnet-runtime"
 	],

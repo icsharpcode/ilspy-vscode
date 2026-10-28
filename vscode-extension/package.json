@@ -40,7 +40,7 @@
 		"chai": "6.3.0",
 		"temp-dir": "3.0.0",
 		"terser": "5.51.2",
-		"vscode-languageclient": "10.1.2"
+		"vscode-languageclient": "11.0.0"
 	},
 	"devDependencies": {
 		"@types/chai": "5.2.3",

@@ -234,9 +234,15 @@
 			},
 			{
 				"command": "ilspy.export",
-				"title": "Export Decompiled Code...",
+				"title": "Export Code...",
 				"category": "ILSpy",
 				"icon": "$(save-all)"
+			},
+			{
+				"command": "ilspy.exportSingleFile",
+				"title": "Export Code to Single File...",
+				"category": "ILSpy",
+				"icon": "$(save)"
 			}
 		],
 		"menus": {
@@ -292,9 +298,14 @@
 					"group": "assembly@2"
 				},
 				{
+					"command": "ilspy.exportSingleFile",
+					"when": "view == ilspyDecompiledMembers && viewItem =~ /#export/",
+					"group": "assembly@3"
+				},
+				{
 					"command": "ilspy.unloadAssembly",
 					"when": "view == ilspyDecompiledMembers && viewItem =~ /#manageRootEntries/",
-					"group": "assembly@3"
+					"group": "assembly@4"
 				},
 				{
 					"command": "ilspy.analyze",
@@ -312,9 +323,14 @@
 					"group": "inline@2"
 				},
 				{
+					"command": "ilspy.exportSingleFile",
+					"when": "view == ilspyDecompiledMembers && viewItem =~ /#export/",
+					"group": "inline@3"
+				},
+				{
 					"command": "ilspy.unloadAssembly",
 					"when": "view == ilspyDecompiledMembers && viewItem =~ /#manageRootEntries/",
-					"group": "inline@3"
+					"group": "inline@4"
 				}
 			],
 			"commandPalette": [
@@ -333,6 +349,10 @@
 				{
 					"command": "ilspy.search",
 					"when": "ilspy.backendAvailable && ilspy.treeWithNodes"
+				},
+				{
+					"command": "ilspy.exportSingleFile",
+					"when": "ilspy.backendAvailable"
 				},
 				{
 					"command": "ilspy.decompileSelectedAssembly",

@@ -10,8 +10,9 @@ import {
   getShowCompilerGeneratedSymbolsSetting,
 } from "../decompiler/settings";
 import IILSpyBackend from "../decompiler/IILSpyBackend";
-import { Node, NodeType } from "../extension-types";
+import { ExportOutputType, Node } from "../extension-types";
 import { executeILSpyCommand, registerILSpyCommand } from "./commandUtils";
+import { getOrPickAssemblyNode } from "./utils";
 
 export function registerExportDecompiledAssemblyCommand(
   decompiledTreeProvider: DecompiledTreeProvider,
@@ -48,8 +49,9 @@ export function registerExportDecompiledAssemblyCommand(
             {
               nodeMetadata: assemblyMetadata,
               outputLanguage,
-              outputDirectory: baseOutputDir.fsPath,
+              outputTarget: baseOutputDir.fsPath,
               includeCompilerGenerated,
+              exportOutputType: ExportOutputType.Project,
             },
             token,
           );
@@ -73,7 +75,7 @@ export function registerExportDecompiledAssemblyCommand(
           }
 
           const outputDirectory =
-            response.outputDirectory ?? baseOutputDir.fsPath;
+            response.outputTarget ?? baseOutputDir.fsPath;
           const outputUri = vscode.Uri.file(outputDirectory);
           const fileCount = response.filesWritten ?? 0;
 
@@ -111,34 +113,6 @@ export function registerExportDecompiledAssemblyCommand(
       },
     );
   });
-}
-
-async function getOrPickAssemblyNode(
-  node: Node | undefined,
-  decompiledTreeProvider: DecompiledTreeProvider,
-) {
-  if (node?.metadata?.type === NodeType.Assembly) {
-    return node;
-  }
-
-  const assemblies = (await decompiledTreeProvider.getChildNodes()).filter(
-    (n) => n.metadata?.type === NodeType.Assembly,
-  );
-  if (assemblies.length === 0) {
-    vscode.window.showWarningMessage("No assemblies loaded.");
-    return undefined;
-  }
-
-  const pick = await vscode.window.showQuickPick(
-    assemblies.map((a) => ({
-      label: a.displayName,
-      description: a.description,
-      node: a,
-    })),
-    { title: "Select assembly to export" },
-  );
-
-  return pick?.node;
 }
 
 async function promptForExportDirectory(): Promise<vscode.Uri | undefined> {

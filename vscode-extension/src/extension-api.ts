@@ -16,6 +16,7 @@ export interface ILSpyExtensionCommands {
     file: vscode.Uri,
   ) => Promise<Node | undefined>;
   "ilspy.export": (node?: Node) => Promise<void>;
+  "ilspy.exportSingleFile": (node?: Node) => Promise<void>;
   "ilspy.refreshAssemblyList": () => Promise<void>;
   "ilspy.reloadAssembly": (node: Node) => Promise<void>;
   "ilspy.revealNode": (node: Node) => Promise<void>;

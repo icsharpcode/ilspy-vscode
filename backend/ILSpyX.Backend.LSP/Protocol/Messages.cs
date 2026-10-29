@@ -66,13 +66,14 @@ namespace ILSpyX.Backend.LSP.Protocol
     public record ExportNodeRequest(
         NodeMetadata NodeMetadata,
         string OutputLanguage,
-        string OutputDirectory,
-        bool IncludeCompilerGenerated)
+        string OutputTarget,
+        bool IncludeCompilerGenerated,
+        ExportOutputType ExportOutputType = ExportOutputType.Project)
         : IRequest<ExportNodeResponse>;
 
     public record ExportNodeResponse(
         bool Succeeded,
-        string? OutputDirectory,
+        string? OutputTarget,
         int FilesWritten,
         int ErrorCount,
         string? ErrorMessage,

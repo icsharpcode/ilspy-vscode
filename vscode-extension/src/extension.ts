@@ -47,6 +47,7 @@ import { registerRefreshAssemblyListCommand } from "./commands/refreshAssemblyLi
 import { AssemblyNodeDecorationProvider } from "./decompiler/AssemblyNodeDecorationProvider";
 import { registerAddAssemblyByPathCommand } from "./commands/addAssemblyByPathCommand";
 import { registerExportDecompiledAssemblyCommand } from "./commands/exportDecompiledAssemblyCommand";
+import { registerExportDecompiledAssemblyToSingleFileCommand } from "./commands/exportDecompiledAssemblyToSingleFileCommand";
 import { registerLMTools } from "./lm-tools/registerLMTools";
 import { registerRevealNodeCommand } from "./commands/revealNodeCommand";
 import { ILSpyExtensionApi } from "./extension-api";
@@ -201,6 +202,12 @@ export async function activate(
   disposables.push(registerRefreshAssemblyListCommand(decompiledTreeProvider));
   disposables.push(
     registerExportDecompiledAssemblyCommand(
+      decompiledTreeProvider,
+      ilspyBackend,
+    ),
+  );
+  disposables.push(
+    registerExportDecompiledAssemblyToSingleFileCommand(
       decompiledTreeProvider,
       ilspyBackend,
     ),

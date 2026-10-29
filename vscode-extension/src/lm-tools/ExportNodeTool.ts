@@ -9,7 +9,7 @@ import {
   getShowCompilerGeneratedSymbolsSetting,
 } from "../decompiler/settings";
 import IILSpyBackend from "../decompiler/IILSpyBackend";
-import { AvailableNodeCommands } from "../extension-types";
+import { AvailableNodeCommands, ExportOutputType } from "../extension-types";
 import {
   createJsonResult,
   refreshAssemblyList,
@@ -52,10 +52,11 @@ export class ExportNodeTool implements vscode.LanguageModelTool<IExportNodeToolP
         nodeMetadata: targetNode.metadata!,
         outputLanguage:
           options.input.outputLanguage ?? getDefaultOutputLanguage(),
-        outputDirectory,
+        outputTarget: outputDirectory,
         includeCompilerGenerated:
           options.input.includeCompilerGenerated ??
           getShowCompilerGeneratedSymbolsSetting(),
+        exportOutputType: ExportOutputType.Project,
       },
       token,
     );
@@ -66,7 +67,7 @@ export class ExportNodeTool implements vscode.LanguageModelTool<IExportNodeToolP
     return createJsonResult({
       target: summarizeNode(targetNode),
       succeeded: response?.succeeded ?? false,
-      outputDirectory: response?.outputDirectory ?? outputDirectory,
+      outputDirectory: response?.outputTarget ?? outputDirectory,
       filesWritten: response?.filesWritten ?? 0,
       errorCount: response?.errorCount ?? 0,
       errorMessage: response?.errorMessage,

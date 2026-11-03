@@ -35,7 +35,7 @@
 		"test:unit": "vitest src --run"
 	},
 	"dependencies": {
-		"ansi-regex": "6.4.0",
+		"ansi-regex": "6.5.0",
 		"brace-expansion": "5.0.12",
 		"chai": "6.3.0",
 		"temp-dir": "3.0.0",

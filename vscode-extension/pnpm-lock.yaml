@@ -20,8 +20,8 @@ importers:
   .:
     dependencies:
       ansi-regex:
-        specifier: 6.4.0
-        version: 6.4.0
+        specifier: 6.5.0
+        version: 6.5.0
       brace-expansion:
         specifier: 5.0.12
         version: 5.0.12
@@ -884,8 +884,8 @@ packages:
   ajv@8.20.0:
     resolution: {integrity: sha512-Thbli+OlOj+iMPYFBVBfJ3OmCAnaSyNn4M1vz9T6Gka5Jt9ba/HIR56joy65tY6kx/FCF5VXNB819Y7/GUrBGA==}
 
-  ansi-regex@6.4.0:
-    resolution: {integrity: sha512-KzTVk2tCWAHtYrvvvaP8bJKJq2pVinhLcGEQdtLIYPbmNGNyYe8QwNaTUYQp2J7/vIsUKt5QCqAfUkYyG9DkOw==}
+  ansi-regex@6.5.0:
+    resolution: {integrity: sha512-zhvbbbdt1kbw7EJ9OQoxmQcuaNR9P5kTj7e/YdmOSU10aHWbycofJxA6jKfoEy3vlLdctOF9ZHaxLtmSm998wQ==}
     engines: {node: '>=12'}
 
   ansi-styles@4.3.0:
@@ -2903,7 +2903,7 @@ snapshots:
       json-schema-traverse: 1.0.0
       require-from-string: 2.0.2
 
-  ansi-regex@6.4.0: {}
+  ansi-regex@6.5.0: {}
 
   ansi-styles@4.3.0:
     dependencies:
@@ -3800,7 +3800,7 @@ snapshots:
 
   strip-ansi@7.2.0:
     dependencies:
-      ansi-regex: 6.4.0
+      ansi-regex: 6.5.0
 
   strip-json-comments@5.0.3: {}
 
@@ -4062,7 +4062,7 @@ time:
   '@typescript-eslint/parser@8.72.0': '2026-10-19T17:11:48.266Z'
   '@vscode/test-electron@3.1.0': '2026-07-24T21:13:39.379Z'
   '@vscode/vsce@4.0.0': '2026-09-14T18:53:40.922Z'
-  ansi-regex@6.4.0: '2026-09-27T03:34:44.568Z'
+  ansi-regex@6.5.0: '2026-10-29T13:35:20.896Z'
   brace-expansion@5.0.12: '2026-09-14T21:59:00.288Z'
   chai@6.3.0: '2026-09-30T19:18:04.368Z'
   eslint@10.13.0: '2026-10-16T14:24:10.765Z'

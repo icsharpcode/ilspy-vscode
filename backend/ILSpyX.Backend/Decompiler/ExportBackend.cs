@@ -23,7 +23,8 @@ public class ExportBackend(
     ILoggerFactory loggerFactory,
     ILSpyBackendSettings ilspyBackendSettings,
     DecompilerBackend decompilerBackend,
-    SingleThreadAssemblyList assemblyList)
+    SingleThreadAssemblyList assemblyList,
+    IExportFileWriter exportFileWriter)
 {
     private readonly ILogger logger = loggerFactory.CreateLogger<ExportBackend>();
 
@@ -148,22 +149,6 @@ public class ExportBackend(
         }
 
         string targetFile = Path.GetFullPath(outputFile);
-        string? targetDirectory = Path.GetDirectoryName(targetFile);
-        if (!string.IsNullOrEmpty(targetDirectory))
-        {
-            try
-            {
-                Directory.CreateDirectory(targetDirectory);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(
-                    ex,
-                    "Failed to create output directory {targetDirectory}",
-                    targetDirectory);
-                return new ExportNodeResult(false, targetFile, 0, 1, ex.Message);
-            }
-        }
 
         string assemblyName = nodeMetadata.Name;
         if (string.IsNullOrWhiteSpace(assemblyName))
@@ -173,21 +158,22 @@ public class ExportBackend(
 
         try
         {
-            return outputLanguage == LanguageName.IL
-                ? await ExportAssemblyToSingleILFileAsync(
+            (string content, int errorCount) = outputLanguage == LanguageName.IL
+                ? await BuildSingleILFileContentAsync(
                     metadataFile,
                     loadedAssembly,
                     assemblyFile,
-                    targetFile,
                     includeCompilerGenerated,
                     cancellationToken)
-                : await ExportAssemblyToSingleCSharpFileAsync(
+                : await BuildSingleCSharpFileContentAsync(
                     metadataFile,
                     loadedAssembly,
-                    targetFile,
                     outputLanguage,
                     includeCompilerGenerated,
                     cancellationToken);
+
+            await exportFileWriter.WriteTextAsync(targetFile, EnsureTrailingNewline(content), cancellationToken);
+            return new ExportNodeResult(true, targetFile, 1, errorCount, null);
         }
         catch (OperationCanceledException)
         {
@@ -322,10 +308,9 @@ public class ExportBackend(
         return new ExportNodeResult(true, targetDirectory, filesWritten, errorCount, null);
     }
 
-    private async Task<ExportNodeResult> ExportAssemblyToSingleCSharpFileAsync(
+    private async Task<(string Content, int ErrorCount)> BuildSingleCSharpFileContentAsync(
         MetadataFile metadataFile,
         LoadedAssembly loadedAssembly,
-        string targetFile,
         string outputLanguage,
         bool includeCompilerGenerated,
         CancellationToken cancellationToken)
@@ -359,15 +344,13 @@ public class ExportBackend(
             },
             cancellationToken);
 
-        await WriteTextAsync(targetFile, EnsureTrailingNewline(code), cancellationToken);
-        return new ExportNodeResult(true, targetFile, 1, 0, null);
+        return (code, 0);
     }
 
-    private async Task<ExportNodeResult> ExportAssemblyToSingleILFileAsync(
+    private async Task<(string Content, int ErrorCount)> BuildSingleILFileContentAsync(
         MetadataFile metadataFile,
         LoadedAssembly loadedAssembly,
         AssemblyFileIdentifier assemblyFile,
-        string targetFile,
         bool includeCompilerGenerated,
         CancellationToken cancellationToken)
     {
@@ -412,8 +395,7 @@ public class ExportBackend(
             }
         }
 
-        await WriteTextAsync(targetFile, EnsureTrailingNewline(builder.ToString()), cancellationToken);
-        return new ExportNodeResult(true, targetFile, 1, errorCount, null);
+        return (builder.ToString(), errorCount);
     }
 
     private static bool ShouldExportType(

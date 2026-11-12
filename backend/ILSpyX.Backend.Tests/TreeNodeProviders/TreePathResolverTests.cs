@@ -30,7 +30,7 @@ public class TreePathResolverTests
         var path = await services.GetRequiredService<TreePathResolver>().ResolveNodePathAsync(nodeMetadata);
         Assert.NotNull(path);
         var node = Assert.Single(path);
-        Assert.Equal("TestAssembly, 1.0.0.0, .NETCoreApp, v10.0", node.DisplayName);
+        Assert.Equal("TestAssembly, 1.0.0.0, .NETCoreApp, v11.0", node.DisplayName);
         Assert.Equal(TestHelper.AssemblyPath, node.Description);
         Assert.Equal(NodeType.Assembly, node.Metadata?.Type);
     }
@@ -57,7 +57,7 @@ public class TreePathResolverTests
         Assert.NotNull(path);
         Assert.Collection(path,
             node => {
-                Assert.Equal("TestAssembly, 1.0.0.0, .NETCoreApp, v10.0", node.DisplayName);
+                Assert.Equal("TestAssembly, 1.0.0.0, .NETCoreApp, v11.0", node.DisplayName);
                 Assert.Equal(TestHelper.AssemblyPath, node.Description);
                 Assert.Equal(NodeType.Assembly, node.Metadata?.Type);
             },

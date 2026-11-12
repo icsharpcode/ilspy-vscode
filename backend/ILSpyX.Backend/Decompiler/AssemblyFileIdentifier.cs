@@ -2,6 +2,7 @@ using ICSharpCode.Decompiler.Metadata;
 using ICSharpCode.ILSpyX;
 using ILSpyX.Backend.Model;
 using System;
+using System.IO;
 
 namespace ILSpyX.Backend.Decompiler;
 
@@ -17,7 +18,7 @@ public static class AssemblyFileIdentifierNodeMetadataExtensions
     public static AssemblyFileIdentifier GetAssemblyFileIdentifier(this LoadedAssembly loadedAssembly)
     {
         return loadedAssembly.ParentBundle is not null
-            ? new AssemblyFileIdentifier(loadedAssembly.ParentBundle.FileName, loadedAssembly.FileName)
+            ? new AssemblyFileIdentifier(loadedAssembly.ParentBundle.FileName, Path.GetFileName(loadedAssembly.FileName))
             : new AssemblyFileIdentifier(loadedAssembly.FileName);
     }
 

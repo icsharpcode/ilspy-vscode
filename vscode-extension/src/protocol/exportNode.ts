@@ -10,18 +10,19 @@ import {
   RequestHandler,
   RequestType,
 } from "vscode-languageclient";
-import { NodeMetadata } from "../extension-types";
+import { ExportOutputType, NodeMetadata } from "../extension-types";
 
 export interface ExportNodeParams {
   nodeMetadata: NodeMetadata;
   outputLanguage: string;
-  outputDirectory: string;
+  outputTarget: string;
   includeCompilerGenerated: boolean;
+  exportOutputType: ExportOutputType;
 }
 
 export default interface ExportNodeResponse {
   succeeded: boolean;
-  outputDirectory?: string;
+  outputTarget?: string;
   filesWritten: number;
   errorCount: number;
   errorMessage?: string;

@@ -5,7 +5,7 @@ namespace ILSpyX.Backend.Decompiler;
 
 public record ExportNodeResult(
     bool Succeeded,
-    string? OutputDirectory,
+    string? OutputTarget,
     int FilesWritten,
     int ErrorCount,
     string? ErrorMessage);

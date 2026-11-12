@@ -32,6 +32,13 @@ public class TestHelper
         return services;
     }
 
+    public static async Task<ILSpyXBackendServices> CreateTestServicesWithAssembly(IExportFileWriter exportFileWriter)
+    {
+        var services = new ILSpyXBackendServices(services => services.AddSingleton(exportFileWriter));
+        await services.GetRequiredService<DecompilerBackend>().AddAssemblyAsync(AssemblyPath);
+        return services;
+    }
+
     public static async Task<ILSpyXBackendServices> CreateTestServicesWithNuGetPackage()
     {
         var services = new ILSpyXBackendServices();

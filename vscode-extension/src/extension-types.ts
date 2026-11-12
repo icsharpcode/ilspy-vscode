@@ -36,6 +36,11 @@ export enum AvailableNodeCommands {
   ManageRootEntries = 8,
 }
 
+export enum ExportOutputType {
+  Project = 0,
+  SingleFile = 1,
+}
+
 export interface NodeMetadata {
   assemblyPath: string;
   type: NodeType;

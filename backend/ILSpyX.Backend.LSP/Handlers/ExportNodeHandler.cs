@@ -3,6 +3,7 @@
 
 using ILSpyX.Backend.Decompiler;
 using ILSpyX.Backend.LSP.Protocol;
+using ILSpyX.Backend.Model;
 using OmniSharp.Extensions.JsonRpc;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,18 +18,26 @@ public class ExportNodeHandler(ExportBackend exportBackend, DecompilerBackend de
         ExportNodeRequest request,
         CancellationToken cancellationToken)
     {
+        // In SingleFile mode, OutputTarget carries the target file path.
         (var result, bool shouldUpdateAssemblyList) =
             await decompilerBackend.DetectAutoLoadedAssemblies(() =>
-                exportBackend.ExportNodeAsync(
-                    request.NodeMetadata,
-                    request.OutputLanguage,
-                    request.OutputDirectory,
-                    request.IncludeCompilerGenerated,
-                    cancellationToken));
+                request.ExportOutputType == ExportOutputType.SingleFile
+                    ? exportBackend.ExportNodeToSingleFileAsync(
+                        request.NodeMetadata,
+                        request.OutputLanguage,
+                        request.OutputTarget,
+                        request.IncludeCompilerGenerated,
+                        cancellationToken)
+                    : exportBackend.ExportNodeAsync(
+                        request.NodeMetadata,
+                        request.OutputLanguage,
+                        request.OutputTarget,
+                        request.IncludeCompilerGenerated,
+                        cancellationToken));
 
         return new ExportNodeResponse(
             result.Succeeded,
-            result.OutputDirectory,
+            result.OutputTarget,
             result.FilesWritten,
             result.ErrorCount,
             result.ErrorMessage,

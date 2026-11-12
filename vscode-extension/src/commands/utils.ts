@@ -6,7 +6,7 @@
 import * as vscode from "vscode";
 import * as fs from "fs";
 import { DecompiledTreeProvider } from "../decompiler/DecompiledTreeProvider";
-import { Node } from "../extension-types";
+import { Node, NodeType } from "../extension-types";
 
 export function addAssemblyFromFilePath(
   filePath: string,
@@ -47,4 +47,32 @@ export async function addAssemblyToTree(
   }
 
   return undefined;
+}
+
+export async function getOrPickAssemblyNode(
+  node: Node | undefined,
+  decompiledTreeProvider: DecompiledTreeProvider
+) {
+  if (node?.metadata?.type === NodeType.Assembly) {
+    return node;
+  }
+
+  const assemblies = (await decompiledTreeProvider.getChildNodes()).filter(
+    (n) => n.metadata?.type === NodeType.Assembly
+  );
+  if (assemblies.length === 0) {
+    vscode.window.showWarningMessage("No assemblies loaded.");
+    return undefined;
+  }
+
+  const pick = await vscode.window.showQuickPick(
+    assemblies.map((a) => ({
+      label: a.displayName,
+      description: a.description,
+      node: a,
+    })),
+    { title: "Select assembly to export" }
+  );
+
+  return pick?.node;
 }

@@ -4,6 +4,7 @@ All notable changes to the "ilspy-vscode" extension will be documented in this f
 
 ## 1.1.0
 
+- Add "Export Decompiled Code to Single File" command to export a whole assembly as a single C# or IL file (handy for searching and version diffing)
 - Fix [#693](https://github.com/icsharpcode/ilspy-vscode/issues/693): Error on decompiling search results after searching twice for same search term.
 - Fix [#679](https://github.com/icsharpcode/ilspy-vscode/issues/679): Cannot refocus a selected node via tree view (thanks to [@autumn-puffin](https://github.com/autumn-puffin))
 - Fix [#680](https://github.com/icsharpcode/ilspy-vscode/issues/680): Bring back icon colors in ILSpy tree views (thanks to [@autumn-puffin](https://github.com/autumn-puffin))

@@ -48,6 +48,7 @@ public static class ILSpyXServiceCollectionExtensions
             .AddSingleton<AssemblyListManager>()
             .AddSingleton<SingleThreadAssemblyList>()
             .AddSingleton<DecompilerBackend>()
+            .AddSingleton<IExportFileWriter, FileSystemExportFileWriter>()
             .AddSingleton<ExportBackend>()
             .AddSingleton<TreeNodeProviders>()
             .AddSingleton<TreePathResolver>()

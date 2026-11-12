@@ -36,7 +36,11 @@ public class MethodAnalyzersTests
                 Assert.Equal(methodNode.Metadata?.ParentSymbolToken, node.Metadata?.ParentSymbolToken);
             },
             node => { },
-            node => { });
+            node => { },
+            node => {
+                Assert.Equal("Implements", node.DisplayName);
+                Assert.Equal("MemberImplementsInterfaceAnalyzer", node.Metadata?.SubType);
+            });
 
         var methodUsedByNodes =
             await analyzerNodeProvider.GetChildrenAsync(

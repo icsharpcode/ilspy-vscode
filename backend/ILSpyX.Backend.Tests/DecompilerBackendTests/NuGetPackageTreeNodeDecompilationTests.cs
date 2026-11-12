@@ -51,7 +51,7 @@ public class NuGetPackageTreeNodeDecompilationTests
             line => Assert.Equal("// Entries:", line),
             line => Assert.StartsWith($"//  _rels/.rels ", line),
             line => Assert.StartsWith($"//  TestAssembly.nuspec ", line),
-            line => Assert.StartsWith($"//  lib/net10.0/TestAssembly.dll ", line),
+            line => Assert.StartsWith($"//  lib/net11.0/TestAssembly.dll ", line),
             line => Assert.StartsWith($"//  [Content_Types].xml ", line),
             line => Assert.StartsWith($"//  package/services/metadata/core-properties/", line),
             line => Assert.Equal("", line)
@@ -85,7 +85,7 @@ using System.Runtime.Versioning;
 [assembly: CompilationRelaxations(8)]
 [assembly: RuntimeCompatibility(WrapNonExceptionThrows = true)]
 [assembly: Debuggable(DebuggableAttribute.DebuggingModes.Default | DebuggableAttribute.DebuggingModes.DisableOptimizations | DebuggableAttribute.DebuggingModes.IgnoreSymbolStoreSequencePoints | DebuggableAttribute.DebuggingModes.EnableEditAndContinue)]
-[assembly: TargetFramework("".NETCoreApp,Version=v10.0"", FrameworkDisplayName = "".NET 10.0"")]
+[assembly: TargetFramework("".NETCoreApp,Version=v11.0"", FrameworkDisplayName = "".NET 11.0"")]
 [assembly: AssemblyCompany(""TestAssembly"")]
 [assembly: AssemblyConfiguration(""Debug"")]
 [assembly: AssemblyFileVersion(""1.0.0.0"")]
@@ -389,7 +389,7 @@ public enum SomeEnum
             Name = "References",
         };
         Assert.Equal(
-            @"// System.Runtime, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
+            @"// System.Runtime, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
             (await services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
                 .Decompile(nodeMetadata, LanguageName.CSharpLatest)).DecompiledCode);
     }

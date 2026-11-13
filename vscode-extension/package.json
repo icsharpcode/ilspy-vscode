@@ -135,6 +135,13 @@
 			}
 		],
 		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "ilspyAssembliesContainer",
+					"title": "ILSpy",
+					"icon": "resources/il-spy-modern-icon.svg"
+				}
+			],
 			"panel": [
 				{
 					"id": "ilspySearchResultsContainer",
@@ -149,7 +156,7 @@
 			]
 		},
 		"views": {
-			"explorer": [
+			"ilspyAssembliesContainer": [
 				{
 					"id": "ilspyDecompiledMembers",
 					"name": "ILSpy: Assemblies",

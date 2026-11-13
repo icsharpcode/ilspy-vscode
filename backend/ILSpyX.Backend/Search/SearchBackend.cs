@@ -35,11 +35,16 @@ public class SearchBackend(SingleThreadAssemblyList assemblyList, ILSpyBackendSe
             var assemblies = (await assemblyList.GetMetadataFileAssemblies()).Where(assembly => !assembly.IsAutoLoaded);
 
             var resultQueue = new ConcurrentQueue<SearchResult>();
-            var searchRequest = CreateSearchRequest(searchTerm, SearchMode.TypeAndMember);
+            var searchRequest = CreateSearchRequest(searchTerm, SearchMode.TypeAndMember, out bool searchAll);
+            var searchers = searchAll
+                ? CreateSearchAllStrategies(searchRequest, resultQueue)
+                : [CreateSearchStrategy(searchRequest, resultQueue)];
+            if (searchers.Any(searcher => searcher is null))
+            {
+                return [];
+            }
 
             await Task.Factory.StartNew(() => {
-                var searcher =
-                    new MemberSearchStrategy(new CSharpLanguage(), ApiVisibility.All, searchRequest, resultQueue);
                 try
                 {
                     foreach (var loadedAssembly in assemblies)
@@ -50,7 +55,10 @@ public class SearchBackend(SingleThreadAssemblyList assemblyList, ILSpyBackendSe
                             continue;
                         }
 
-                        searcher.Search(module, cancellationToken);
+                        foreach (var searcher in searchers)
+                        {
+                            searcher!.Search(module, cancellationToken);
+                        }
                     }
                 }
                 catch (OperationCanceledException)
@@ -59,8 +67,17 @@ public class SearchBackend(SingleThreadAssemblyList assemblyList, ILSpyBackendSe
                 }
             }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).ConfigureAwait(false);
 
-            return resultQueue.Where(IsNotAccessor).OrderBy(r => r, resultsComparer).Select(ConvertResultToNode)
-                .OfType<Node>();
+            var nodes = new List<Node>();
+            foreach (var result in resultQueue.Where(IsNotAccessor).OrderBy(r => r, resultsComparer))
+            {
+                if (await ConvertResultToNode(result) is { } node)
+                {
+                    nodes.Add(node);
+                }
+            }
+
+            // In "all:" mode the same member can be found by name and by a literal it contains.
+            return nodes.DistinctBy(node => node.Metadata).ToList();
         }
         catch (TaskCanceledException)
         {
@@ -68,6 +85,44 @@ public class SearchBackend(SingleThreadAssemblyList assemblyList, ILSpyBackendSe
         }
 
         return [];
+    }
+
+    /// <summary>
+    /// Picks the search strategy for the mode selected by the search term's prefix (e.g. "c:" for literals),
+    /// mirroring ILSpy's search pane. Resource search ("r:") is not supported yet, because embedded resources
+    /// are not represented as nodes.
+    /// </summary>
+    private static AbstractSearchStrategy? CreateSearchStrategy(SearchRequest request,
+        IProducerConsumerCollection<SearchResult> resultQueue)
+    {
+        var language = new CSharpLanguage();
+        return request.Mode switch
+        {
+            SearchMode.TypeAndMember => new MemberSearchStrategy(language, ApiVisibility.All, request, resultQueue),
+            SearchMode.Member => new MemberSearchStrategy(language, ApiVisibility.All, request, resultQueue,
+                request.MemberSearchKind),
+            SearchMode.Literal => new LiteralSearchStrategy(language, ApiVisibility.All, request, resultQueue),
+            SearchMode.Token => new MetadataTokenSearchStrategy(language, ApiVisibility.All, request, resultQueue),
+            SearchMode.Assembly => new AssemblySearchStrategy(request, resultQueue, request.AssemblySearchKind),
+            SearchMode.Namespace => new NamespaceSearchStrategy(request, resultQueue),
+            _ => null
+        };
+    }
+
+    /// <summary>
+    /// Strategies for the "all:" prefix: types and members, literals, namespaces and assemblies at once.
+    /// </summary>
+    private static List<AbstractSearchStrategy?> CreateSearchAllStrategies(SearchRequest request,
+        IProducerConsumerCollection<SearchResult> resultQueue)
+    {
+        var language = new CSharpLanguage();
+        return
+        [
+            new MemberSearchStrategy(language, ApiVisibility.All, request, resultQueue),
+            new LiteralSearchStrategy(language, ApiVisibility.All, request, resultQueue),
+            new NamespaceSearchStrategy(request, resultQueue),
+            new AssemblySearchStrategy(request, resultQueue, AssemblySearchKind.NameOrFileName)
+        ];
     }
 
     private bool IsNotAccessor(SearchResult searchResult)
@@ -80,12 +135,43 @@ public class SearchBackend(SingleThreadAssemblyList assemblyList, ILSpyBackendSe
         return true;
     }
 
-    private Node? ConvertResultToNode(SearchResult result)
+    private async Task<Node?> ConvertResultToNode(SearchResult result)
     {
         return result switch
         {
             MemberSearchResult memberSearchResult => ConvertMemberSearchResultToNode(memberSearchResult),
+            AssemblySearchResult assemblySearchResult => await ConvertAssemblySearchResultToNode(assemblySearchResult),
+            NamespaceSearchResult namespaceSearchResult => ConvertNamespaceSearchResultToNode(namespaceSearchResult),
             _ => null
+        };
+    }
+
+    private static async Task<Node?> ConvertAssemblySearchResultToNode(AssemblySearchResult assemblySearchResult)
+    {
+        var loadedAssembly = assemblySearchResult.Module.GetLoadedAssembly();
+        if (loadedAssembly is null)
+        {
+            return null;
+        }
+
+        var assemblyData = await AssemblyUtility.CreateAssemblyDataAsync(loadedAssembly);
+        return assemblyData is null ? null : AssemblyNodeProvider.CreateNode(assemblyData);
+    }
+
+    private static Node? ConvertNamespaceSearchResultToNode(NamespaceSearchResult namespaceSearchResult)
+    {
+        var assemblyFileIdentifier = namespaceSearchResult.Namespace.ContributingModules
+            .Select(module => module.MetadataFile?.GetAssemblyFileIdentifier())
+            .FirstOrDefault(identifier => identifier is not null);
+        if (assemblyFileIdentifier is null)
+        {
+            return null;
+        }
+
+        return NamespaceNodeProvider.CreateNode(assemblyFileIdentifier, namespaceSearchResult.Namespace.FullName) with
+        {
+            DisplayName = namespaceSearchResult.Name,
+            Description = namespaceSearchResult.Location
         };
     }
 
@@ -174,8 +260,9 @@ public class SearchBackend(SingleThreadAssemblyList assemblyList, ILSpyBackendSe
         return modifiers;
     }
 
-    private SearchRequest CreateSearchRequest(string input, SearchMode searchMode)
+    private SearchRequest CreateSearchRequest(string input, SearchMode searchMode, out bool searchAll)
     {
+        searchAll = false;
         string[] parts = input.Split(' '); // NativeMethods.CommandLineToArgumentArray(input);
 
         var request = new SearchRequest();
@@ -214,7 +301,9 @@ public class SearchBackend(SingleThreadAssemblyList assemblyList, ILSpyBackendSe
                 searchTerm = searchTerm.Split(' ').First(); // NativeMethods.CommandLineToArgumentArray(searchTerm)[0];
             }
 
-            if (prefix is not { Length: > 2 })
+            // Longer prefixes (e.g. "inassembly:") are filters, not search terms - except "all:".
+            bool isSearchAllPrefix = string.Equals(prefix, "all", StringComparison.OrdinalIgnoreCase);
+            if (prefix is not { Length: > 2 } || isSearchAllPrefix)
             {
                 if (regex == null && searchTerm.StartsWith('/') && searchTerm.Length > 1)
                 {
@@ -241,6 +330,10 @@ public class SearchBackend(SingleThreadAssemblyList assemblyList, ILSpyBackendSe
             {
                 case "@":
                     request.Mode = SearchMode.Token;
+                    break;
+                case "ALL":
+                    searchAll = true;
+                    request.Mode = SearchMode.TypeAndMember;
                     break;
                 case "INNAMESPACE":
                     request.InNamespace ??= searchTerm;

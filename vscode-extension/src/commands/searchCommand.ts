@@ -16,7 +16,8 @@ export function registerSearchCommand(
       typeof term === "string"
         ? term
         : await vscode.window.showInputBox({
-            prompt: "Please enter the search term",
+            prompt:
+              "Please enter the search term (prefixes: all: everything, t: types, m: members, c: literals, n: namespaces, a: assemblies, @ metadata token)",
           });
 
     if (searchTerm) {

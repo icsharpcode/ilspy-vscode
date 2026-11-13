@@ -146,4 +146,121 @@ public class SearchBackendTests
         Assert.Equal("TestAssembly.SomeClass", node.Description);
         Assert.Equal(NodeType.Method, node.Metadata?.Type);
     }
+
+    [Fact]
+    public async Task LiteralWithPrefix()
+    {
+        var searchBackend = await CreateSearchBackend();
+        var nodeData = await searchBackend.Search("c:Test2", CancellationToken.None);
+        var node = Assert.Single(nodeData);
+        Assert.Equal("SomeClass.CallsFrameworkMethod() : string", node.DisplayName);
+        Assert.Equal("TestAssembly.SomeClass", node.Description);
+        Assert.Equal(NodeType.Method, node.Metadata?.Type);
+        Assert.NotEqual(0, node.Metadata?.SymbolToken);
+    }
+
+    [Fact]
+    public async Task LiteralWithoutPrefixIsNotFound()
+    {
+        var searchBackend = await CreateSearchBackend();
+        var nodeData = await searchBackend.Search("Test2", CancellationToken.None);
+        Assert.Empty(nodeData);
+    }
+
+    [Fact]
+    public async Task TypeWithPrefix()
+    {
+        var searchBackend = await CreateSearchBackend();
+        var nodeData = await searchBackend.Search("t:SomeClass", CancellationToken.None);
+        var node = Assert.Single(nodeData);
+        Assert.Equal("SomeClass", node.DisplayName);
+        Assert.Equal(NodeType.Class, node.Metadata?.Type);
+    }
+
+    [Fact]
+    public async Task NamespaceWithPrefix()
+    {
+        var searchBackend = await CreateSearchBackend();
+        var nodeData = await searchBackend.Search("n:Generics", CancellationToken.None);
+        var node = Assert.Single(nodeData);
+        Assert.Equal("Generics", node.DisplayName);
+        Assert.Equal("TestAssembly", node.Description);
+        Assert.Equal(NodeType.Namespace, node.Metadata?.Type);
+        Assert.Equal("Generics", node.Metadata?.Name);
+        Assert.Equal(TestHelper.AssemblyPath, node.Metadata?.AssemblyPath);
+    }
+
+    [Fact]
+    public async Task AssemblyWithPrefix()
+    {
+        var searchBackend = await CreateSearchBackend();
+        var nodeData = await searchBackend.Search("a:TestAssembly", CancellationToken.None);
+        var node = Assert.Single(nodeData);
+        Assert.Equal(NodeType.Assembly, node.Metadata?.Type);
+        Assert.Equal(TestHelper.AssemblyPath, node.Metadata?.AssemblyPath);
+        Assert.StartsWith("TestAssembly", node.DisplayName);
+    }
+
+    [Fact]
+    public async Task AssemblyInNuGetPackageWithPrefix()
+    {
+        var services = await TestHelper.CreateTestServicesWithNuGetPackage();
+        var searchBackend = services.GetRequiredService<SearchBackend>();
+        var nodeData = await searchBackend.Search("a:TestAssembly", CancellationToken.None);
+        var node = Assert.Single(nodeData);
+        Assert.Equal(NodeType.Assembly, node.Metadata?.Type);
+        Assert.Equal(TestHelper.NuGetPackagePath, node.Metadata?.AssemblyPath);
+        Assert.Equal(TestHelper.NuGetBundledAssemblyName, node.Metadata?.BundledAssemblyName);
+    }
+
+    [Fact]
+    public async Task TypeWithPrefixInNamespace()
+    {
+        var searchBackend = await CreateSearchBackend();
+        Assert.Single(await searchBackend.Search("t:SomeClass innamespace:TestAssembly", CancellationToken.None));
+        Assert.Empty(await searchBackend.Search("t:SomeClass innamespace:Generics", CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task AllFindsLiterals()
+    {
+        var searchBackend = await CreateSearchBackend();
+        var nodeData = await searchBackend.Search("all:Test2", CancellationToken.None);
+        var node = Assert.Single(nodeData);
+        Assert.Equal("SomeClass.CallsFrameworkMethod() : string", node.DisplayName);
+        Assert.Equal(NodeType.Method, node.Metadata?.Type);
+    }
+
+    [Fact]
+    public async Task AllFindsTypesNamespacesAndAssemblies()
+    {
+        var searchBackend = await CreateSearchBackend();
+        var nodeData = (await searchBackend.Search("all:Generics", CancellationToken.None)).ToList();
+        Assert.Contains(nodeData, node => node.Metadata?.Type == NodeType.Namespace && node.DisplayName == "Generics");
+
+        nodeData = (await searchBackend.Search("all:SomeClass", CancellationToken.None)).ToList();
+        Assert.Contains(nodeData, node => node.Metadata?.Type == NodeType.Class && node.DisplayName == "SomeClass");
+
+        nodeData = (await searchBackend.Search("all:TestAssembly", CancellationToken.None)).ToList();
+        Assert.Contains(nodeData, node => node.Metadata?.Type == NodeType.Assembly);
+        Assert.Contains(nodeData, node => node.Metadata?.Type == NodeType.Namespace);
+    }
+
+    [Fact]
+    public async Task AllHasNoDuplicates()
+    {
+        var searchBackend = await CreateSearchBackend();
+        foreach (string term in new[] { "all:Test", "all:Some", "all:a" })
+        {
+            var nodeData = (await searchBackend.Search(term, CancellationToken.None)).ToList();
+            Assert.Equal(nodeData.Count, nodeData.Select(node => node.Metadata).Distinct().Count());
+        }
+    }
+
+    [Fact]
+    public async Task AllIsCaseInsensitivePrefix()
+    {
+        var searchBackend = await CreateSearchBackend();
+        Assert.Single(await searchBackend.Search("ALL:Test2", CancellationToken.None));
+    }
 }

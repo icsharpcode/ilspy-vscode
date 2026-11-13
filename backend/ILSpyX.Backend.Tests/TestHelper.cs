@@ -17,7 +17,7 @@ public class TestHelper
             "ILSpyX.Backend.Tests/", "TestAssembly/"),
         "TestAssembly.1.0.0.nupkg");
 
-    public static string NuGetBundledAssemblyName { get; } = "TestAssembly.dll";
+    public static string NuGetBundledAssemblyName { get; } = "lib/net10.0/TestAssembly.dll";
     public static string NuGetBundledAssemblyPath { get; } = "lib/net10.0";
 
     public static ILSpyXBackendServices CreateTestServices()

@@ -49,6 +49,8 @@ export class SearchResultTreeProvider
   private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
   readonly onDidChangeTreeData: Event<any> = this._onDidChangeTreeData.event;
   private lastSearches: PerformedSearch[] = [];
+  // Monotonic, so result node IDs stay unique after single searches are removed.
+  private nextSearchIndex = 0;
 
   constructor(private backend: IILSpyBackend) {}
 
@@ -58,7 +60,7 @@ export class SearchResultTreeProvider
 
   public async performSearch(term: string) {
     const searchResponse = await this.backend.sendSearch({ term });
-    const newSearchIndex = this.lastSearches.length;
+    const newSearchIndex = this.nextSearchIndex++;
     this.lastSearches.push({
       term,
       results:
@@ -67,10 +69,29 @@ export class SearchResultTreeProvider
           searchIndex: newSearchIndex,
         })) ?? [],
     });
-    this.refresh();
+    this.searchesChanged();
     if (searchResponse?.shouldUpdateAssemblyList) {
       await executeILSpyCommand("ilspy.refreshAssemblyList");
     }
+  }
+
+  public removeSearch(search: PerformedSearch) {
+    this.lastSearches = this.lastSearches.filter((s) => s !== search);
+    this.searchesChanged();
+  }
+
+  public clearSearches() {
+    this.lastSearches = [];
+    this.searchesChanged();
+  }
+
+  private searchesChanged() {
+    commands.executeCommand(
+      "setContext",
+      "ilspy.hasSearchResults",
+      this.lastSearches.length > 0,
+    );
+    this.refresh();
   }
 
   public getTreeItem(node: SearchTreeNode): TreeItem {
@@ -79,6 +100,7 @@ export class SearchResultTreeProvider
         label: `Search results for "${node.term}"`,
         collapsibleState: TreeItemCollapsibleState.Expanded,
         iconPath: new ThemeIcon("search-view-icon"),
+        contextValue: "performedSearch",
       };
     } else {
       const item = {

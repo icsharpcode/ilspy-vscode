@@ -102,6 +102,23 @@ export class DecompiledTreeProvider
     return response?.removed ?? false;
   }
 
+  public async clearAssemblies(): Promise<void> {
+    const rootNodes =
+      (await this.backend.sendGetNodes({ nodeMetadata: undefined }))?.nodes ??
+      [];
+    for (const node of rootNodes) {
+      if (
+        node.metadata &&
+        hasNodeCommand(node, AvailableNodeCommands.ManageRootEntries)
+      ) {
+        await this.backend.sendRemoveAssembly({
+          assemblyPath: node.metadata.assemblyPath,
+        });
+      }
+    }
+    this.refresh();
+  }
+
   public async reloadAssembly(assembly: string): Promise<boolean> {
     const response = await this.backend.sendRemoveAssembly({
       assemblyPath: assembly,

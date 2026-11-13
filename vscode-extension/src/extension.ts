@@ -33,6 +33,10 @@ import {
 } from "./commands/selectOutputLanguageCommand";
 import { ILSPY_URI_SCHEME } from "./decompiler/nodeUri";
 import { registerSearchCommand } from "./commands/searchCommand";
+import {
+  registerClearAllSearchResultsCommand,
+  registerClearSearchResultCommand,
+} from "./commands/clearSearchResultsCommand";
 import { SearchResultTreeProvider } from "./decompiler/search/SearchResultTreeProvider";
 import { registerDecompileNodeCommand } from "./commands/decompileNodeCommand";
 import {
@@ -44,6 +48,7 @@ import { registerSearchEditorSelectionCommand } from "./commands/searchEditorSel
 import { AnalyzeResultTreeProvider } from "./decompiler/analyze/AnalyzeResultTreeProvider";
 import { registerAnalyzeCommand } from "./commands/analyzeCommand";
 import { registerRefreshAssemblyListCommand } from "./commands/refreshAssemblyListCommand";
+import { registerClearAssemblyListCommand } from "./commands/clearAssemblyListCommand";
 import { AssemblyNodeDecorationProvider } from "./decompiler/AssemblyNodeDecorationProvider";
 import { registerAddAssemblyByPathCommand } from "./commands/addAssemblyByPathCommand";
 import { registerExportDecompiledAssemblyCommand } from "./commands/exportDecompiledAssemblyCommand";
@@ -165,6 +170,10 @@ export async function activate(
   );
   disposables.push(searchResultTreeView);
   disposables.push(registerSearchCommand(searchResultTreeProvider));
+  disposables.push(registerClearSearchResultCommand(searchResultTreeProvider));
+  disposables.push(
+    registerClearAllSearchResultsCommand(searchResultTreeProvider),
+  );
 
   const analyzeResultTreeProvider = new AnalyzeResultTreeProvider(ilspyBackend);
   const analyzeResultTreeView = createAnalyzeResultTreeView(
@@ -198,6 +207,7 @@ export async function activate(
   disposables.push(registerRevealNodeCommand(decompiledTreeView));
   disposables.push(registerReloadAssemblyCommand(decompiledTreeProvider));
   disposables.push(registerUnloadAssemblyCommand(decompiledTreeProvider));
+  disposables.push(registerClearAssemblyListCommand(decompiledTreeProvider));
   disposables.push(registerRefreshAssemblyListCommand(decompiledTreeProvider));
   disposables.push(
     registerExportDecompiledAssemblyCommand(

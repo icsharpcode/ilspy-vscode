@@ -199,9 +199,27 @@
 			},
 			{
 				"command": "ilspy.unloadAssembly",
-				"title": "Unload",
+				"title": "Unload Assembly",
 				"category": "ILSpy",
 				"icon": "$(close)"
+			},
+			{
+				"command": "ilspy.clearSearchResult",
+				"title": "Clear Search Result",
+				"category": "ILSpy",
+				"icon": "$(close)"
+			},
+			{
+				"command": "ilspy.clearAllSearchResults",
+				"title": "Clear All Search Results",
+				"category": "ILSpy",
+				"icon": "$(clear-all)"
+			},
+			{
+				"command": "ilspy.clearAssemblyList",
+				"title": "Clear Assembly List",
+				"category": "ILSpy",
+				"icon": "$(clear-all)"
 			},
 			{
 				"command": "ilspy.reloadAssembly",
@@ -263,6 +281,11 @@
 					"command": "ilspy.search",
 					"when": "view == ilspyDecompiledMembers && ilspy.treeWithNodes",
 					"group": "navigation"
+				},
+				{
+					"command": "ilspy.clearAllSearchResults",
+					"when": "view == ilspySearchResultsContainer && ilspy.hasSearchResults",
+					"group": "navigation"
 				}
 			],
 			"ilspy/view/assemblytree/add": [
@@ -276,6 +299,16 @@
 				}
 			],
 			"view/item/context": [
+				{
+					"command": "ilspy.clearSearchResult",
+					"when": "view == ilspySearchResultsContainer && viewItem == performedSearch",
+					"group": "inline@0"
+				},
+				{
+					"command": "ilspy.clearSearchResult",
+					"when": "view == ilspySearchResultsContainer && viewItem == performedSearch",
+					"group": "search@0"
+				},
 				{
 					"command": "ilspy.analyze",
 					"when": "(view == ilspyDecompiledMembers || view == ilspySearchResultsContainer || view == ilspyAnalyzeResultsContainer) && viewItem =~ /#analyze/",
@@ -352,7 +385,19 @@
 				},
 				{
 					"command": "ilspy.unloadAssembly",
+					"when": "ilspy.backendAvailable && ilspy.treeWithNodes"
+				},
+				{
+					"command": "ilspy.clearAssemblyList",
+					"when": "ilspy.backendAvailable && ilspy.treeWithNodes"
+				},
+				{
+					"command": "ilspy.clearSearchResult",
 					"when": "false"
+				},
+				{
+					"command": "ilspy.clearAllSearchResults",
+					"when": "ilspy.hasSearchResults"
 				},
 				{
 					"command": "ilspy.export",

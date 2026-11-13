@@ -174,6 +174,27 @@ public class AClass
     }
 
     [Fact]
+    public async Task ClassWithLegacyBundledAssemblyName()
+    {
+        // Identifiers created before ILSpyX 11 only contain the bare entry file name.
+        const string legacyBundledAssemblyName = "TestAssembly.dll";
+        var services = await TestHelper.CreateTestServicesWithNuGetPackage();
+        int typeToken =
+            await GetTypeToken(services.GetRequiredService<DecompilerBackend>(), "Generics", "AClass");
+        var nodeMetadata = new NodeMetadata
+        {
+            AssemblyPath = TestHelper.NuGetPackagePath,
+            BundledAssemblyName = legacyBundledAssemblyName,
+            Type = NodeType.Class,
+            Name = "",
+            SymbolToken = typeToken
+        };
+        Assert.Contains("public class AClass",
+            (await services.GetRequiredService<TreeNodeProviders>().ForNode(nodeMetadata)
+                .Decompile(nodeMetadata, LanguageName.CSharpLatest)).DecompiledCode);
+    }
+
+    [Fact]
     public async Task Interface()
     {
         var services = await TestHelper.CreateTestServicesWithNuGetPackage();

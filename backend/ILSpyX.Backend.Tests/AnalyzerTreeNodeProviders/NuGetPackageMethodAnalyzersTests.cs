@@ -40,6 +40,7 @@ public class NuGetPackageMethodAnalyzersTests
                 Assert.Equal(methodNode.Metadata?.ParentSymbolToken, node.Metadata?.ParentSymbolToken);
             },
             node => { },
+            node => { },
             node => { });
 
         var methodUsedByNodes =

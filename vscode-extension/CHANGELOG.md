@@ -7,6 +7,7 @@ All notable changes to the "ilspy-vscode" extension will be documented in this f
 - Fix search prefixes (e.g. `c:` for string/number literals, `t:`, `m:`, `@` for metadata tokens) being ignored, so literals like `c:X-Api-Key` can be found
 - Support namespace (`n:`) and assembly (`a:`, `an:`, `af:`) search, and document all search prefixes in the README
 - Add `all:` search prefix to search types, members, literals, namespaces and assemblies at once
+- Fix revealing search results in the assembly tree: nested types, their members and namespaces are now expanded and selected; results in hidden compiler-generated code (e.g. async state machines) select their closest visible parent
 - Move "ILSpy: Assemblies" view from the Explorer into its own ILSpy view in the Activity Bar
 - Make "ILSpy: Unload Assembly" available in the Command Palette, asking which assembly or package to unload
 - Add "ILSpy: Clear Assembly List" command to unload all assemblies and packages at once

@@ -35,7 +35,15 @@ public class TypeNodeProvider(
         var typeSystem = decompiler.TypeSystem;
         var typeDefinition = typeSystem.MainModule.GetDefinition(
             MetadataTokens.TypeDefinitionHandle(nodeMetadata.SymbolToken));
-        return typeDefinition is null ? null : NamespaceNodeProvider.CreateNode(assemblyFile, typeDefinition.Namespace);
+        if (typeDefinition is null)
+        {
+            return null;
+        }
+
+        // Nested types are listed below their declaring type, not below the namespace.
+        return typeDefinition.DeclaringTypeDefinition is { } declaringTypeDefinition
+            ? CreateTypeNode(assemblyFile, declaringTypeDefinition)
+            : NamespaceNodeProvider.CreateNode(assemblyFile, typeDefinition.Namespace);
     }
 
     public async Task<IEnumerable<Node>> GetChildrenAsync(NodeMetadata? nodeMetadata)
@@ -95,7 +103,10 @@ public class TypeNodeProvider(
                 Type = NodeTypeHelper.GetNodeTypeFromTypeKind(typeDefinition.Kind),
                 Name = name,
                 SymbolToken = MetadataTokens.GetToken(typeDefinition.MetadataToken),
-                ParentSymbolToken = 0,
+                // Must match the nested type nodes created by MemberNodeProvider, so tree node IDs are equal.
+                ParentSymbolToken = typeDefinition.DeclaringTypeDefinition is { } declaringTypeDefinition
+                    ? MetadataTokens.GetToken(declaringTypeDefinition.MetadataToken)
+                    : 0,
                 AvailableCommands = AvailableNodeCommands.Decompile | AvailableNodeCommands.Analyze
             },
             DisplayName = name,

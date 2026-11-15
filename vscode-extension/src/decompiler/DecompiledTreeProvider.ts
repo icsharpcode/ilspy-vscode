@@ -40,6 +40,7 @@ import {
   getNodeContextValue,
   hasNodeCommand,
   hasNodeFlag,
+  isSameNode,
 } from "./utils";
 import { executeILSpyCommand } from "../commands/commandUtils";
 
@@ -162,6 +163,35 @@ export class DecompiledTreeProvider
 
   public async findNode(predicate: (node: Node) => boolean) {
     return ((await this.getChildren()) as Node[]).find(predicate);
+  }
+
+  /**
+   * Finds the node of this tree, which represents the given node (e.g. a search or analyzer result).
+   * Walks down from the root along the path resolved by the backend. If the node itself is not shown
+   * in the tree (e.g. it's compiler-generated or located in a compiler-generated type), the closest
+   * visible ancestor is returned instead.
+   */
+  public async findTreeNode(node: Node): Promise<Node | undefined> {
+    if (!node.metadata) {
+      return undefined;
+    }
+
+    const response = await this.backend.sendResolveNodePath({
+      nodeMetadata: node.metadata,
+    });
+    const path = [...(response?.nodePath ?? []), node];
+
+    let closestTreeNode: Node | undefined;
+    for (const pathNode of path) {
+      const children = await this.getChildNodes(closestTreeNode);
+      const treeNode = children.find((child) => isSameNode(child, pathNode));
+      if (!treeNode) {
+        break;
+      }
+      closestTreeNode = treeNode;
+    }
+
+    return closestTreeNode;
   }
 
   public getChildren(node?: Node): Node[] | Thenable<Node[]> {

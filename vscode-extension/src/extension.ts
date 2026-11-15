@@ -204,7 +204,9 @@ export async function activate(
     ),
   );
 
-  disposables.push(registerRevealNodeCommand(decompiledTreeView));
+  disposables.push(
+    registerRevealNodeCommand(decompiledTreeView, decompiledTreeProvider),
+  );
   disposables.push(registerReloadAssemblyCommand(decompiledTreeProvider));
   disposables.push(registerUnloadAssemblyCommand(decompiledTreeProvider));
   disposables.push(registerClearAssemblyListCommand(decompiledTreeProvider));

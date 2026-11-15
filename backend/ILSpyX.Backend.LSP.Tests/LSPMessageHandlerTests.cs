@@ -2,7 +2,10 @@ using ILSpyX.Backend.Decompiler;
 using ILSpyX.Backend.LSP.Handlers;
 using ILSpyX.Backend.LSP.Protocol;
 using ILSpyX.Backend.Model;
+using ILSpyX.Backend.Search;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Linq;
+using OmniSharp.Extensions.LanguageServer.Protocol.Serialization;
 using Xunit;
 
 namespace ILSpyX.Backend.LSP.Tests;
@@ -68,5 +71,26 @@ public class LSPMessageHandlerTests
 
         Assert.True(response.Removed);
         Assert.Empty(await decompilerBackend.GetLoadedAssembliesAsync());
+    }
+
+    [Fact]
+    public async Task SearchSendsMatchLocation()
+    {
+        var services = TestHelper.CreateTestServices();
+        var decompilerBackend = services.GetRequiredService<DecompilerBackend>();
+        await decompilerBackend.AddAssemblyAsync(TestHelper.AssemblyPath);
+        var handler = new SearchHandler(decompilerBackend, services.GetRequiredService<SearchBackend>());
+
+        var response = await handler.Handle(new SearchRequest("c:Test2", LanguageName.CSharpLatest),
+            CancellationToken.None);
+
+        // Serialize like the LSP server does, so the extension really receives the match.
+        var json = JObject.Parse(new LspSerializer().SerializeObject(response));
+        var result = Assert.Single(json["results"]!);
+        Assert.Equal("SomeClass.CallsFrameworkMethod() : string", (string?) result["displayName"]);
+        Assert.Equal("Test2", (string?) result["match"]?["text"]);
+        Assert.NotNull((int?) result["match"]?["line"]);
+        Assert.NotNull((int?) result["match"]?["column"]);
+        Assert.Equal(5, (int?) result["match"]?["length"]);
     }
 }

@@ -19,7 +19,7 @@ public class SearchHandler(DecompilerBackend decompilerBackend, SearchBackend se
     {
         (var resultNodes, bool shouldUpdateAssemblyList) =
             await decompilerBackend.DetectAutoLoadedAssemblies(() =>
-                searchBackend.Search(request.Term, cancellationToken));
+                searchBackend.Search(request.Term, cancellationToken, request.OutputLanguage));
         return new SearchResponse(resultNodes, shouldUpdateAssemblyList);
     }
 }

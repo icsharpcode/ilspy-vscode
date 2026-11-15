@@ -132,4 +132,43 @@ describe("SearchResultTreeProvider", () => {
     const ids = resultIds(provider);
     expect(new Set(ids).size).toBe(ids.length);
   });
+
+  it("requests match locations and shows the line of literal matches", async () => {
+    const match = { line: 41, column: 8, length: 3, text: "401" };
+    const backend = {
+      sendSearch: vi.fn(async () => ({
+        results: [
+          {
+            metadata: {
+              assemblyPath: "/a.dll",
+              type: NodeType.Method,
+              name: "MoveNext",
+              symbolToken: 1,
+              parentSymbolToken: 0,
+              availableCommands: 0,
+            },
+            displayName: "MoveNext() : void",
+            description: "N.C",
+            mayHaveChildren: false,
+            symbolModifiers: 0,
+            flags: 0,
+            match,
+          },
+        ],
+        shouldUpdateAssemblyList: false,
+      })),
+    } as unknown as IILSpyBackend;
+    const provider = new SearchResultTreeProvider(backend);
+
+    await provider.performSearch("c:401");
+    const [result] = searches(provider)[0].results;
+    const treeItem = provider.getTreeItem(result);
+
+    expect(backend.sendSearch).toHaveBeenCalledWith({
+      term: "c:401",
+      outputLanguage: expect.any(String),
+    });
+    expect(treeItem.description).toBe("line 42 · N.C");
+    expect(treeItem.command?.arguments).toEqual([result, true, match]);
+  });
 });

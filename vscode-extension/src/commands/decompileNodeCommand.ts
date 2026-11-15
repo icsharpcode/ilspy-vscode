@@ -10,14 +10,15 @@ import { nodeDataToUri } from "../decompiler/nodeUri";
 import { getDefaultOutputLanguage } from "../decompiler/settings";
 import { hasNodeCommand } from "../decompiler/utils";
 import { executeILSpyCommand, registerILSpyCommand } from "./commandUtils";
-import { AvailableNodeCommands, Node } from "../extension-types";
+import { AvailableNodeCommands, Node, SearchMatch } from "../extension-types";
+import { findSearchMatch } from "../decompiler/search/searchMatch";
 
 export function registerDecompileNodeCommand(
   contentProvider: DecompilerTextDocumentContentProvider,
 ) {
   return registerILSpyCommand(
     "ilspy.decompileNode",
-    async (node: Node, revealInTree = false) => {
+    async (node: Node, revealInTree = false, match?: SearchMatch) => {
       const uri = nodeDataToUri(node);
       if (hasNodeCommand(node, AvailableNodeCommands.Decompile)) {
         const language = getDefaultOutputLanguage();
@@ -30,12 +31,36 @@ export function registerDecompileNodeCommand(
           doc,
           languageInfos[language].vsLanguageMode,
         );
-        await vscode.window.showTextDocument(doc, { preview: true });
+        const editor = await vscode.window.showTextDocument(doc, {
+          preview: true,
+        });
+        if (match) {
+          selectSearchMatch(editor, match);
+        }
       }
 
       if (revealInTree) {
         await executeILSpyCommand("ilspy.revealNode", node);
       }
     },
+  );
+}
+
+function selectSearchMatch(editor: vscode.TextEditor, match: SearchMatch) {
+  const position = findSearchMatch(editor.document.getText(), match);
+  if (!position) {
+    return;
+  }
+
+  const range = new vscode.Range(
+    position.line,
+    position.column,
+    position.line,
+    position.column + position.length,
+  );
+  editor.selection = new vscode.Selection(range.start, range.end);
+  editor.revealRange(
+    range,
+    vscode.TextEditorRevealType.InCenterIfOutsideViewport,
   );
 }

@@ -19,11 +19,22 @@ using System.Threading.Tasks;
 
 namespace ILSpyX.Backend.Search;
 
-public class SearchBackend(SingleThreadAssemblyList assemblyList, ILSpyBackendSettings ilspyBackendSettings)
+public partial class SearchBackend(
+    SingleThreadAssemblyList assemblyList,
+    ILSpyBackendSettings ilspyBackendSettings,
+    TreeNodeProviders treeNodeProviders)
 {
+    // Locating a match requires decompiling the result, so limit it for searches with many results.
+    private const int MaxLocatedMatches = 100;
+
     private readonly IComparer<SearchResult> resultsComparer = SearchResult.ComparerByName;
 
-    public async Task<IEnumerable<Node>> Search(string searchTerm, CancellationToken cancellationToken)
+    /// <summary>
+    /// Searches all loaded assemblies. If an output language is given, results found by a literal
+    /// search get the location of the literal in their decompiled code in that language.
+    /// </summary>
+    public async Task<IEnumerable<SearchResultNode>> Search(string searchTerm, CancellationToken cancellationToken,
+        string? outputLanguage = null)
     {
         if (string.IsNullOrEmpty(searchTerm))
         {
@@ -32,13 +43,15 @@ public class SearchBackend(SingleThreadAssemblyList assemblyList, ILSpyBackendSe
 
         try
         {
-            var assemblies = (await assemblyList.GetMetadataFileAssemblies()).Where(assembly => !assembly.IsAutoLoaded);
+            var addedAssemblies = (await assemblyList.GetMetadataFileAssemblies())
+                .Where(assembly => !assembly.IsAutoLoaded).ToList();
 
             var resultQueue = new ConcurrentQueue<SearchResult>();
+            var literalResultQueue = new ConcurrentQueue<SearchResult>();
             var searchRequest = CreateSearchRequest(searchTerm, SearchMode.TypeAndMember, out bool searchAll);
             var searchers = searchAll
-                ? CreateSearchAllStrategies(searchRequest, resultQueue)
-                : [CreateSearchStrategy(searchRequest, resultQueue)];
+                ? CreateSearchAllStrategies(searchRequest, resultQueue, literalResultQueue)
+                : CreateSearchStrategy(searchRequest, resultQueue, literalResultQueue);
             if (searchers.Any(searcher => searcher is null))
             {
                 return [];
@@ -47,7 +60,7 @@ public class SearchBackend(SingleThreadAssemblyList assemblyList, ILSpyBackendSe
             await Task.Factory.StartNew(() => {
                 try
                 {
-                    foreach (var loadedAssembly in assemblies)
+                    foreach (var loadedAssembly in WithDependencies(addedAssemblies, cancellationToken))
                     {
                         var module = loadedAssembly.GetMetadataFileOrNull();
                         if (module == null)
@@ -67,19 +80,47 @@ public class SearchBackend(SingleThreadAssemblyList assemblyList, ILSpyBackendSe
                 }
             }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).ConfigureAwait(false);
 
+            var literalResults = new HashSet<SearchResult>(literalResultQueue);
+            var literalResultNodes = new HashSet<NodeMetadata>();
             var nodes = new List<Node>();
-            foreach (var result in resultQueue.Where(IsNotAccessor).OrderBy(r => r, resultsComparer))
+            foreach (var result in resultQueue.Concat(literalResultQueue).Where(IsNotAccessor)
+                         .OrderBy(r => r, resultsComparer))
             {
                 if (await ConvertResultToNode(result) is { } node)
                 {
                     nodes.Add(node);
+                    if (literalResults.Contains(result) && node.Metadata is not null)
+                    {
+                        literalResultNodes.Add(node.Metadata);
+                    }
                 }
             }
 
             // In "all:" mode the same member can be found by name and by a literal it contains.
-            return nodes.DistinctBy(node => node.Metadata).ToList();
+            var resultNodes = new List<SearchResultNode>();
+            int matchesToLocate = MaxLocatedMatches;
+            foreach (var node in nodes.DistinctBy(node => node.Metadata))
+            {
+                var resultNode = new SearchResultNode(node);
+                bool isLiteralMatch = node.Metadata is not null && literalResultNodes.Contains(node.Metadata);
+                // Members and types found by name: locate the name, usually in the declaration.
+                bool isNameMatch = !isLiteralMatch && node.Metadata is { SymbolToken: not 0 } &&
+                                   searchRequest.Mode != SearchMode.Token;
+                if (outputLanguage is not null && (isLiteralMatch || isNameMatch) && matchesToLocate-- > 0)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    resultNode = resultNode with
+                    {
+                        Match = await LocateMatch(node.Metadata!, outputLanguage, searchRequest, isNameMatch)
+                    };
+                }
+
+                resultNodes.Add(resultNode);
+            }
+
+            return resultNodes;
         }
-        catch (TaskCanceledException)
+        catch (OperationCanceledException)
         {
             // ignore cancellation
         }
@@ -88,38 +129,200 @@ public class SearchBackend(SingleThreadAssemblyList assemblyList, ILSpyBackendSe
     }
 
     /// <summary>
+    /// Lists the given assemblies and their dependencies, recursively. Dependencies, which are part of the
+    /// .NET framework, are skipped: they would slow down the search and flood the results.
+    /// </summary>
+    private static IEnumerable<LoadedAssembly> WithDependencies(IEnumerable<LoadedAssembly> assemblies,
+        CancellationToken cancellationToken)
+    {
+        var visited = new HashSet<LoadedAssembly>(assemblies);
+        var queue = new Queue<LoadedAssembly>(visited);
+        while (queue.TryDequeue(out var assembly))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            yield return assembly;
+
+            var module = assembly.GetMetadataFileOrNull();
+            if (module is null)
+            {
+                continue;
+            }
+
+            var resolver = assembly.GetAssemblyResolver();
+            foreach (var reference in module.AssemblyReferences)
+            {
+                LoadedAssembly? dependency;
+                try
+                {
+                    dependency = resolver.Resolve(reference)?.GetLoadedAssembly();
+                }
+                catch (Exception)
+                {
+                    continue;
+                }
+
+                if (dependency is not null && !IsFrameworkAssembly(dependency.FileName) && visited.Add(dependency))
+                {
+                    queue.Enqueue(dependency);
+                }
+            }
+        }
+    }
+
+    private static bool IsFrameworkAssembly(string fileName) => FrameworkPathRegex().IsMatch(fileName);
+
+    // .NET (Core) shared frameworks and reference packs, .NET Framework and Mono installations.
+    [GeneratedRegex(
+        @"[\\/](shared[\\/]Microsoft\.[^\\/]+\.App|packs[\\/][^\\/]+\.Ref|Microsoft\.NET[\\/](Framework|Framework64|assembly)|Reference Assemblies[\\/]Microsoft[\\/]Framework|mono[\\/][0-9][^\\/]*)[\\/]",
+        RegexOptions.IgnoreCase)]
+    private static partial Regex FrameworkPathRegex();
+
+    /// <summary>
+    /// Finds the first line of the node's decompiled code containing the search term.
+    /// </summary>
+    private async Task<SearchMatch?> LocateMatch(NodeMetadata nodeMetadata, string outputLanguage,
+        SearchRequest request, bool isNameMatch)
+    {
+        string? code;
+        try
+        {
+            code = (await treeNodeProviders.ForNode(nodeMetadata).Decompile(nodeMetadata, outputLanguage))
+                .DecompiledCode;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+
+        string[] lines = (code?.Split('\n') ?? []).Select(line => line.TrimEnd('\r')).ToArray();
+        string[] keywords = request.Keywords.Where(keyword => keyword.Length > 0)
+            // Qualified names (e.g. "Type.Member") don't appear as is in the code, but their last part does.
+            .Select(keyword => isNameMatch && keyword.LastIndexOf('.') is > 0 and var dot && dot < keyword.Length - 1
+                ? keyword[(dot + 1)..]
+                : keyword)
+            .ToArray();
+        // Prefer number 401 itself over 401 in "1401" or in identifiers like Status401, in any line.
+        foreach (bool wholeNumbersOnly in new[] { true, false })
+        {
+            for (int lineIndex = 0; lineIndex < lines.Length; lineIndex++)
+            {
+                string line = lines[lineIndex];
+                // Using directives contain neither declarations nor literals.
+                if (line.TrimStart().StartsWith("using ", StringComparison.Ordinal) &&
+                    line.TrimEnd().EndsWith(';'))
+                {
+                    continue;
+                }
+
+                if (FindInLine(line, request.RegEx, keywords, wholeNumbersOnly) is { } match)
+                {
+                    return new SearchMatch(lineIndex, match.Column, match.Length,
+                        line.Substring(match.Column, match.Length));
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private static (int Column, int Length)? FindInLine(string line, Regex? regex, string[] keywords,
+        bool wholeNumbersOnly)
+    {
+        if (regex is not null)
+        {
+            var match = regex.Match(line);
+            return match is { Success: true, Length: > 0 } ? (match.Index, match.Length) : null;
+        }
+
+        foreach (string keyword in keywords)
+        {
+            bool isNumber = keyword.All(char.IsDigit);
+            for (int index = line.IndexOf(keyword, StringComparison.OrdinalIgnoreCase);
+                 index >= 0;
+                 index = line.IndexOf(keyword, index + 1, StringComparison.OrdinalIgnoreCase))
+            {
+                bool isWholeNumber = (index == 0 || !IsIdentifierChar(line[index - 1])) &&
+                                     (index + keyword.Length == line.Length ||
+                                      !char.IsDigit(line[index + keyword.Length]));
+                if (!wholeNumbersOnly || !isNumber || isWholeNumber)
+                {
+                    return (index, keyword.Length);
+                }
+            }
+        }
+
+        return null;
+
+        static bool IsIdentifierChar(char c) => char.IsLetterOrDigit(c) || c == '_';
+    }
+
+    /// <summary>
     /// Picks the search strategy for the mode selected by the search term's prefix (e.g. "c:" for literals),
     /// mirroring ILSpy's search pane. Resource search ("r:") is not supported yet, because embedded resources
     /// are not represented as nodes.
     /// </summary>
-    private static AbstractSearchStrategy? CreateSearchStrategy(SearchRequest request,
-        IProducerConsumerCollection<SearchResult> resultQueue)
+    private static List<AbstractSearchStrategy?> CreateSearchStrategy(SearchRequest request,
+        IProducerConsumerCollection<SearchResult> resultQueue,
+        IProducerConsumerCollection<SearchResult> literalResultQueue)
     {
         var language = new CSharpLanguage();
         return request.Mode switch
         {
-            SearchMode.TypeAndMember => new MemberSearchStrategy(language, ApiVisibility.All, request, resultQueue),
-            SearchMode.Member => new MemberSearchStrategy(language, ApiVisibility.All, request, resultQueue,
-                request.MemberSearchKind),
-            SearchMode.Literal => new LiteralSearchStrategy(language, ApiVisibility.All, request, resultQueue),
-            SearchMode.Token => new MetadataTokenSearchStrategy(language, ApiVisibility.All, request, resultQueue),
-            SearchMode.Assembly => new AssemblySearchStrategy(request, resultQueue, request.AssemblySearchKind),
-            SearchMode.Namespace => new NamespaceSearchStrategy(request, resultQueue),
-            _ => null
+            SearchMode.TypeAndMember => [new MemberSearchStrategy(language, ApiVisibility.All, request, resultQueue)],
+            SearchMode.Member =>
+            [
+                new MemberSearchStrategy(language, ApiVisibility.All, request, resultQueue, request.MemberSearchKind)
+            ],
+            SearchMode.Literal => CreateLiteralSearchStrategies(request, literalResultQueue),
+            SearchMode.Token =>
+                [new MetadataTokenSearchStrategy(language, ApiVisibility.All, request, resultQueue)],
+            SearchMode.Assembly => [new AssemblySearchStrategy(request, resultQueue, request.AssemblySearchKind)],
+            SearchMode.Namespace => [new NamespaceSearchStrategy(request, resultQueue)],
+            _ => [null]
         };
     }
+
+    /// <summary>
+    /// ILSpy searches a single number term (e.g. "401") only as numeric constant, so string literals
+    /// containing it (e.g. "401") are not found. Search number terms in strings, too.
+    /// </summary>
+    private static List<AbstractSearchStrategy?> CreateLiteralSearchStrategies(SearchRequest request,
+        IProducerConsumerCollection<SearchResult> literalResultQueue)
+    {
+        var language = new CSharpLanguage();
+        var strategies = new List<AbstractSearchStrategy?>
+        {
+            new LiteralSearchStrategy(language, ApiVisibility.All, request, literalResultQueue)
+        };
+
+        string[] terms = request.Keywords.Where(keyword => keyword.Length > 0).ToArray();
+        if (request.RegEx is null && terms is [var term] && NumberLiteralRegex().IsMatch(term))
+        {
+            // With more than one term, the literal strategy doesn't parse the term as a number and finds
+            // strings containing all terms - so repeating the term finds strings containing it.
+            var textRequest = request; // SearchRequest is a struct, this is a copy
+            textRequest.Keywords = [term, term];
+            strategies.Add(new LiteralSearchStrategy(language, ApiVisibility.All, textRequest, literalResultQueue));
+        }
+
+        return strategies;
+    }
+
+    [GeneratedRegex(@"^[+-]?(0x[0-9a-f]+|[0-9]+(\.[0-9]+)?)[a-z]*$", RegexOptions.IgnoreCase)]
+    private static partial Regex NumberLiteralRegex();
 
     /// <summary>
     /// Strategies for the "all:" prefix: types and members, literals, namespaces and assemblies at once.
     /// </summary>
     private static List<AbstractSearchStrategy?> CreateSearchAllStrategies(SearchRequest request,
-        IProducerConsumerCollection<SearchResult> resultQueue)
+        IProducerConsumerCollection<SearchResult> resultQueue,
+        IProducerConsumerCollection<SearchResult> literalResultQueue)
     {
         var language = new CSharpLanguage();
         return
         [
             new MemberSearchStrategy(language, ApiVisibility.All, request, resultQueue),
-            new LiteralSearchStrategy(language, ApiVisibility.All, request, resultQueue),
+            ..CreateLiteralSearchStrategies(request, literalResultQueue),
             new NamespaceSearchStrategy(request, resultQueue),
             new AssemblySearchStrategy(request, resultQueue, AssemblySearchKind.NameOrFileName)
         ];

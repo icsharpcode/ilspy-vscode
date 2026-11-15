@@ -4,7 +4,7 @@
  *-----------------------------------------------------------------------------------------------*/
 
 import * as vscode from "vscode";
-import { Node } from "./extension-types";
+import { Node, SearchMatch } from "./extension-types";
 
 export interface ILSpyExtensionCommands {
   "ilspy.addAssemblyByPath": (filePath: string) => Promise<void>;
@@ -14,7 +14,11 @@ export interface ILSpyExtensionCommands {
   "ilspy.clearSearchResult": (search: { term: string }) => Promise<void>;
   "ilspy.decompileAssemblyInWorkspace": () => Promise<void>;
   "ilspy.decompileAssemblyViaDialog": () => Promise<void>;
-  "ilspy.decompileNode": (node: Node, revealInTree?: boolean) => Promise<void>;
+  "ilspy.decompileNode": (
+    node: Node,
+    revealInTree?: boolean,
+    match?: SearchMatch,
+  ) => Promise<void>;
   "ilspy.decompileSelectedAssembly": (
     file: vscode.Uri,
   ) => Promise<Node | undefined>;

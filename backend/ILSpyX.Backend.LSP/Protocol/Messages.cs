@@ -106,10 +106,10 @@ namespace ILSpyX.Backend.LSP.Protocol
     #region search
 
     [Serial, Method("ilspy/search", Direction.ClientToServer)]
-    public record SearchRequest(string Term)
+    public record SearchRequest(string Term, string? OutputLanguage = null)
         : IRequest<SearchResponse>;
 
-    public record SearchResponse(IEnumerable<Node>? Results, bool ShouldUpdateAssemblyList);
+    public record SearchResponse(IEnumerable<SearchResultNode>? Results, bool ShouldUpdateAssemblyList);
 
     #endregion
 

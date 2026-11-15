@@ -1,3 +1,5 @@
+using ILSpyX.Backend;
+using ILSpyX.Backend.Decompiler;
 using ILSpyX.Backend.Model;
 using ILSpyX.Backend.Search;
 using ILSpyX.Backend.TreeProviders;
@@ -262,5 +264,128 @@ public class SearchBackendTests
     {
         var searchBackend = await CreateSearchBackend();
         Assert.Single(await searchBackend.Search("ALL:Test2", CancellationToken.None));
+    }
+
+    [Theory]
+    [InlineData(LanguageName.CSharpLatest)]
+    [InlineData(LanguageName.IL)]
+    public async Task LiteralMatchIsLocatedInDecompiledCode(string outputLanguage)
+    {
+        var services = await TestHelper.CreateTestServicesWithAssembly();
+        var searchBackend = services.GetRequiredService<SearchBackend>();
+        var node = Assert.Single(await searchBackend.Search("c:test2", CancellationToken.None, outputLanguage));
+        Assert.NotNull(node.Match);
+        Assert.Equal("Test2", node.Match.Text);
+
+        // The match must point to the same text in the code shown when opening the result.
+        string code = (await services.GetRequiredService<TreeNodeProviders>().ForNode(node.Metadata)
+            .Decompile(node.Metadata!, outputLanguage)).DecompiledCode!;
+        string line = code.Split('\n')[node.Match.Line].TrimEnd('\r');
+        Assert.Equal("Test2", line.Substring(node.Match.Column, node.Match.Length));
+    }
+
+    [Fact]
+    public async Task AllLocatesLiteralAndNameMatches()
+    {
+        var services = await TestHelper.CreateTestServicesWithAssembly();
+        var searchBackend = services.GetRequiredService<SearchBackend>();
+        var literalResult = Assert.Single(
+            await searchBackend.Search("all:Test2", CancellationToken.None, LanguageName.CSharpLatest));
+        Assert.Equal("Test2", literalResult.Match?.Text);
+
+        // Names are located in the declaration, not in using directives.
+        var nameResults = (await searchBackend.Search("all:SomeClass", CancellationToken.None,
+            LanguageName.CSharpLatest)).ToList();
+        Assert.NotEmpty(nameResults);
+        foreach (var node in nameResults)
+        {
+            Assert.NotNull(node.Match);
+            Assert.Equal("SomeClass", node.Match.Text);
+            string line = await GetLine(services, node, LanguageName.CSharpLatest);
+            Assert.DoesNotContain("using ", line);
+            Assert.Equal("SomeClass", line.Substring(node.Match.Column, node.Match.Length));
+        }
+    }
+
+    [Fact]
+    public async Task QualifiedNameMatchIsLocatedByLastPart()
+    {
+        var searchBackend = await CreateSearchBackend();
+        var node = Assert.Single(
+            await searchBackend.Search("SomeClass.ToString", CancellationToken.None, LanguageName.CSharpLatest));
+        Assert.Equal("ToString", node.Match?.Text);
+    }
+
+    [Fact]
+    public async Task NoMatchLocationForMetadataTokenSearch()
+    {
+        var searchBackend = await CreateSearchBackend();
+        var node = (await searchBackend.Search("SomeClass", CancellationToken.None)).First();
+        var tokenResults = await searchBackend.Search($"@{node.Metadata!.SymbolToken:x8}", CancellationToken.None,
+            LanguageName.CSharpLatest);
+        Assert.NotEmpty(tokenResults);
+        Assert.All(tokenResults, result => Assert.Null(result.Match));
+    }
+
+    private static async Task<string> GetLine(IServiceProvider services, SearchResultNode node, string language)
+    {
+        string code = (await services.GetRequiredService<TreeNodeProviders>().ForNode(node.Metadata)
+            .Decompile(node.Metadata!, language)).DecompiledCode!;
+        return code.Split('\n')[node.Match!.Line].TrimEnd('\r');
+    }
+
+    [Fact]
+    public async Task NoMatchLocationWithoutOutputLanguage()
+    {
+        var searchBackend = await CreateSearchBackend();
+        var node = Assert.Single(await searchBackend.Search("c:Test2", CancellationToken.None));
+        Assert.Null(node.Match);
+    }
+
+    [Fact]
+    public async Task NumberLiteralFindsNumbersAndStrings()
+    {
+        var searchBackend = await CreateSearchBackend();
+        var nodeData = await searchBackend.Search("c:401", CancellationToken.None, LanguageName.CSharpLatest);
+        Assert.Equal(
+            ["StatusCodes.OtherText() : string", "StatusCodes.UnauthorizedCode() : int",
+                "StatusCodes.UnauthorizedText() : string"],
+            nodeData.Select(node => node.DisplayName).Order());
+        Assert.All(nodeData, node => Assert.Contains("401", node.Match?.Text));
+    }
+
+    [Fact]
+    public async Task AllFindsNumberInStrings()
+    {
+        var searchBackend = await CreateSearchBackend();
+        var nodeData = await searchBackend.Search("all:401", CancellationToken.None);
+        Assert.Contains(nodeData, node => node.DisplayName == "StatusCodes.UnauthorizedText() : string");
+        Assert.Contains(nodeData, node => node.DisplayName == "StatusCodes.UnauthorizedCode() : int");
+    }
+
+    [Fact]
+    public async Task QuotedNumberLiteralFindsExactStringOnly()
+    {
+        var searchBackend = await CreateSearchBackend();
+        var node = Assert.Single(await searchBackend.Search("c:\"401\"", CancellationToken.None));
+        Assert.Equal("StatusCodes.UnauthorizedText() : string", node.DisplayName);
+    }
+
+    [Fact]
+    public async Task SearchInDependenciesButNotInFramework()
+    {
+        // ILSpyX.Backend.dll and its dependencies (like ICSharpCode.ILSpyX.dll) are in the test output folder.
+        string assemblyPath = Path.Combine(AppContext.BaseDirectory, "ILSpyX.Backend.dll");
+        var services = new ILSpyXBackendServices();
+        await services.GetRequiredService<DecompilerBackend>().AddAssemblyAsync(assemblyPath);
+        var searchBackend = services.GetRequiredService<SearchBackend>();
+
+        var dependencyResult = Assert.Single(
+            await searchBackend.Search("t:LiteralSearchStrategy", CancellationToken.None));
+        Assert.Equal("ICSharpCode.ILSpyX.Search", dependencyResult.Description);
+        Assert.Equal(Path.Combine(AppContext.BaseDirectory, "ICSharpCode.ILSpyX.dll"),
+            dependencyResult.Metadata?.AssemblyPath);
+
+        Assert.Empty(await searchBackend.Search("t:ConcurrentQueue", CancellationToken.None));
     }
 }

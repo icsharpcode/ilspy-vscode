@@ -15,7 +15,10 @@ import {
 } from "vscode";
 import IILSpyBackend from "../IILSpyBackend";
 import { getNodeIcon } from "../../icons";
-import { getShowCompilerGeneratedSymbolsSetting } from "../settings";
+import {
+  getDefaultOutputLanguage,
+  getShowCompilerGeneratedSymbolsSetting,
+} from "../settings";
 import {
   createNodeId,
   createNodeTooltip,
@@ -23,7 +26,12 @@ import {
   hasNodeCommand,
   hasNodeFlag,
 } from "../utils";
-import { AvailableNodeCommands, Node, NodeFlags } from "../../extension-types";
+import {
+  AvailableNodeCommands,
+  Node,
+  NodeFlags,
+  SearchMatch,
+} from "../../extension-types";
 import { executeILSpyCommand } from "../../commands/commandUtils";
 
 type PerformedSearch = {
@@ -32,6 +40,7 @@ type PerformedSearch = {
 };
 
 type SearchResultNode = Node & {
+  match?: SearchMatch;
   searchIndex: number;
 };
 
@@ -59,7 +68,10 @@ export class SearchResultTreeProvider
   }
 
   public async performSearch(term: string) {
-    const searchResponse = await this.backend.sendSearch({ term });
+    const searchResponse = await this.backend.sendSearch({
+      term,
+      outputLanguage: getDefaultOutputLanguage(),
+    });
     const newSearchIndex = this.nextSearchIndex++;
     this.lastSearches.push({
       term,
@@ -106,12 +118,14 @@ export class SearchResultTreeProvider
       const item = {
         id: `${node.searchIndex}/${createNodeId(node)}`,
         label: node.displayName,
-        description: node.description,
+        description: node.match
+          ? `line ${node.match.line + 1} · ${node.description}`
+          : node.description,
         tooltip: createNodeTooltip(node),
         collapsibleState: TreeItemCollapsibleState.None,
         command: {
           command: "ilspy.decompileNode",
-          arguments: [node, true],
+          arguments: [node, true, node.match],
           title: "Decompile",
         },
         contextValue: getNodeContextValue(node),

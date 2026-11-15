@@ -17,7 +17,7 @@ The ILSpy extension for VS Code is a cross-platform implementation of ILSpy .NET
 
 ## Search Prefixes
 
-By default, a search looks for types and members by name. Start the search term with a prefix to search for something else:
+Searches cover the loaded assemblies and their dependencies, except assemblies of the .NET framework itself. By default, a search looks for types and members by name. Start the search term with a prefix to search for something else:
 
 | Prefix | Searches for | Example |
 | --- | --- | --- |
@@ -38,6 +38,8 @@ By default, a search looks for types and members by name. Start the search term 
 | `af:` | Assemblies by file path | `af:MyApp.dll` |
 
 You can narrow down any search with `innamespace:` or `inassembly:`, for example `t:Client innamespace:System.Net.Http`. Search terms enclosed in slashes are treated as regular expressions, for example `/^Get.*Async$/`.
+
+Type and member results show the line of the match in their decompiled code (for literals the line using the literal, for names usually the declaration). Opening such a result selects the match. To keep searches fast, lines are shown for the first 100 results only.
 
 Resource search (`r:`) is not supported yet.
 

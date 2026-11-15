@@ -61,6 +61,17 @@ export enum SymbolModifiers {
   ReadOnly = 512,
 }
 
+/**
+ * Location of a search match in the decompiled code of a search result.
+ * Line and column are zero-based.
+ */
+export interface SearchMatch {
+  line: number;
+  column: number;
+  length: number;
+  text: string;
+}
+
 export interface Node {
   metadata?: NodeMetadata;
   displayName: string;

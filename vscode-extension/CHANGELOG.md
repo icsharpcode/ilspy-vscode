@@ -7,6 +7,9 @@ All notable changes to the "ilspy-vscode" extension will be documented in this f
 - Fix search prefixes (e.g. `c:` for string/number literals, `t:`, `m:`, `@` for metadata tokens) being ignored, so literals like `c:X-Api-Key` can be found
 - Support namespace (`n:`) and assembly (`a:`, `an:`, `af:`) search, and document all search prefixes in the README
 - Add `all:` search prefix to search types, members, literals, namespaces and assemblies at once
+- Show the line of the match in search results (literals and type/member names), and select the match when opening a result
+- Find numbers in string literals, too: `c:401` finds both `401` and `"401"` (use `c:"401"` for the exact string only)
+- Search in dependencies of loaded assemblies, too (except .NET framework assemblies)
 - Fix revealing search results in the assembly tree: nested types, their members and namespaces are now expanded and selected; results in hidden compiler-generated code (e.g. async state machines) select their closest visible parent
 - Move "ILSpy: Assemblies" view from the Explorer into its own ILSpy view in the Activity Bar
 - Group and sort assemblies in the assembly tree by the folders containing them (setting `ilspy.groupAssembliesByFolder`)

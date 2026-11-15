@@ -6,6 +6,7 @@ All notable changes to the "ilspy-vscode" extension will be documented in this f
 
 - Fix search prefixes (e.g. `c:` for string/number literals, `t:`, `m:`, `@` for metadata tokens) being ignored, so literals like `c:X-Api-Key` can be found
 - Support namespace (`n:`) and assembly (`a:`, `an:`, `af:`) search, and document all search prefixes in the README
+- Add "Go to Definition" (`F12`, `Ctrl`/`Cmd`+Click, Peek) and "Go to Implementation" (`Ctrl`/`Cmd`+`F12`) in decompiled C# and IL code
 - Add `all:` search prefix to search types, members, literals, namespaces and assemblies at once
 - Show the line of the match in search results (literals and type/member names), and select the match when opening a result
 - Find numbers in string literals, too: `c:401` finds both `401` and `"401"` (use `c:"401"` for the exact string only)

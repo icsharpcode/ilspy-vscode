@@ -27,6 +27,7 @@ import {
   workspace,
 } from "vscode";
 import { DecompilerTextDocumentContentProvider } from "./decompiler/DecompilerTextDocumentContentProvider";
+import { registerSymbolNavigationProvider } from "./decompiler/SymbolNavigationProvider";
 import {
   registerSelectOutputLanguageCommand,
   registerSelectOutputLanguageStatusBarItem,
@@ -187,6 +188,13 @@ export async function activate(
   disposables.push(
     workspace.registerTextDocumentContentProvider(
       ILSPY_URI_SCHEME,
+      decompilerTextDocumentContentProvider,
+    ),
+  );
+
+  disposables.push(
+    ...registerSymbolNavigationProvider(
+      ilspyBackend,
       decompilerTextDocumentContentProvider,
     ),
   );

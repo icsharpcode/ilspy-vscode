@@ -3,7 +3,9 @@
 
 using ICSharpCode.Decompiler;
 using ICSharpCode.Decompiler.CSharp;
+using ICSharpCode.Decompiler.CSharp.OutputVisitor;
 using ICSharpCode.Decompiler.CSharp.ProjectDecompiler;
+using ICSharpCode.Decompiler.CSharp.Syntax;
 using ICSharpCode.Decompiler.Disassembler;
 using ICSharpCode.Decompiler.Metadata;
 using ICSharpCode.Decompiler.TypeSystem;
@@ -30,6 +32,12 @@ public class DecompilerBackend(
 {
     private readonly ILogger logger = loggerFactory.CreateLogger<DecompilerBackend>();
 
+    // Recently decompiled documents with their symbol references, used for code navigation.
+    private const int MaxCachedDocuments = 20;
+    private readonly List<(DocumentKey Key, DecompiledDocument Document)> documentCache = [];
+
+    private record DocumentKey(AssemblyFileIdentifier Assembly, int Token, string OutputLanguage);
+
     public async Task<AssemblyData?> AddAssemblyAsync(string? path)
     {
         if (path is null)
@@ -39,6 +47,7 @@ public class DecompilerBackend(
 
         try
         {
+            ClearDocumentCache();
             var loadedAssembly = await assemblyList.AddAssembly(path);
             if (loadedAssembly is not null)
             {
@@ -60,6 +69,7 @@ public class DecompilerBackend(
             return false;
         }
 
+        ClearDocumentCache();
         await assemblyList.RemoveAssembly(path);
         return true;
     }
@@ -152,11 +162,64 @@ public class DecompilerBackend(
     public async Task<DecompileResult> GetCode(AssemblyFileIdentifier assemblyFile, EntityHandle handle,
         string outputLanguage)
     {
-        return outputLanguage switch
+        var document = await GetDecompiledDocument(assemblyFile, handle, outputLanguage, useCache: false);
+        return DecompileResult.WithCode(document?.Code ?? string.Empty);
+    }
+
+    /// <summary>
+    /// Decompiles the given type or member, returning the code with the positions of all symbol references.
+    /// Decompiled documents are cached, a cached document is returned if <paramref name="useCache"/> is set.
+    /// </summary>
+    public async Task<DecompiledDocument?> GetDecompiledDocument(AssemblyFileIdentifier assemblyFile,
+        EntityHandle handle, string outputLanguage, bool useCache = true)
+    {
+        if (handle.IsNil)
         {
-            LanguageName.IL => DecompileResult.WithCode(await GetILCode(assemblyFile, handle)),
-            _ => DecompileResult.WithCode(await GetCSharpCode(assemblyFile, handle, outputLanguage))
+            return null;
+        }
+
+        var key = new DocumentKey(assemblyFile, MetadataTokens.GetToken(handle), outputLanguage);
+        lock (documentCache)
+        {
+            int index = documentCache.FindIndex(entry => entry.Key == key);
+            if (index >= 0)
+            {
+                var cached = documentCache[index];
+                documentCache.RemoveAt(index);
+                if (useCache)
+                {
+                    documentCache.Add(cached);
+                    return cached.Document;
+                }
+            }
+        }
+
+        var document = outputLanguage switch
+        {
+            LanguageName.IL => await GetILCode(assemblyFile, handle),
+            _ => await GetCSharpCode(assemblyFile, handle, outputLanguage)
         };
+        if (document is not null)
+        {
+            lock (documentCache)
+            {
+                documentCache.Add((key, document));
+                if (documentCache.Count > MaxCachedDocuments)
+                {
+                    documentCache.RemoveAt(0);
+                }
+            }
+        }
+
+        return document;
+    }
+
+    private void ClearDocumentCache()
+    {
+        lock (documentCache)
+        {
+            documentCache.Clear();
+        }
     }
 
     public async Task<IEntity?> GetEntityFromHandle(AssemblyFileIdentifier assemblyFile, EntityHandle handle)
@@ -182,82 +245,82 @@ public class DecompilerBackend(
         return null;
     }
 
-    private async Task<string> GetCSharpCode(AssemblyFileIdentifier assemblyFile, EntityHandle handle,
+    private async Task<DecompiledDocument?> GetCSharpCode(AssemblyFileIdentifier assemblyFile, EntityHandle handle,
         string outputLanguage)
     {
-        if (handle.IsNil)
-        {
-            return string.Empty;
-        }
-
         var decompiler = await CreateDecompiler(assemblyFile, outputLanguage);
         if (decompiler is null)
         {
-            return string.Empty;
+            return null;
         }
 
         var module = decompiler.TypeSystem.MainModule;
+        var settings = ilspyBackendSettings.CreateDecompilerSettings(outputLanguage);
 
         switch (handle.Kind)
         {
             case HandleKind.AssemblyDefinition:
-                return GetAssemblyCode(assemblyFile, decompiler);
+                return new DecompiledDocument(GetAssemblyCode(assemblyFile, decompiler), []);
             case HandleKind.TypeDefinition:
                 var typeDefinition = module.GetDefinition((TypeDefinitionHandle) handle);
-                return typeDefinition.DeclaringType == null
-                    ? decompiler.DecompileTypesAsString([(TypeDefinitionHandle) handle])
-                    : decompiler.DecompileAsString(handle);
+                return WriteSyntaxTree(settings, typeDefinition.DeclaringType == null
+                    ? decompiler.DecompileTypes([(TypeDefinitionHandle) handle])
+                    : decompiler.Decompile(handle));
 
             case HandleKind.FieldDefinition:
             case HandleKind.MethodDefinition:
             case HandleKind.PropertyDefinition:
             case HandleKind.EventDefinition:
-                return decompiler.DecompileAsString(handle);
+                return WriteSyntaxTree(settings, decompiler.Decompile(handle));
         }
 
-        return string.Empty;
+        return null;
     }
 
-    private async Task<string> GetILCode(AssemblyFileIdentifier assemblyFile, EntityHandle handle)
+    private static DecompiledDocument WriteSyntaxTree(DecompilerSettings settings, SyntaxTree syntaxTree)
     {
-        if (handle.IsNil)
-        {
-            return string.Empty;
-        }
+        var formattingOptions = settings.CSharpFormattingOptions;
+        var output = new ReferenceTrackingTextOutput { IndentationString = formattingOptions.IndentationString };
+        syntaxTree.AcceptVisitor(
+            new CSharpOutputVisitor(new TextTokenWriter(output, settings), formattingOptions));
+        return output.ToDocument();
+    }
 
+    private async Task<DecompiledDocument?> GetILCode(AssemblyFileIdentifier assemblyFile, EntityHandle handle)
+    {
         var decompiler = await CreateDecompiler(assemblyFile);
         if (decompiler is null)
         {
-            return string.Empty;
+            return null;
         }
 
         var module = decompiler.TypeSystem.MainModule;
-        var textOutput = new PlainTextOutput();
+        var textOutput = new ReferenceTrackingTextOutput();
         var disassembler = CreateDisassembler(assemblyFile.File, module, textOutput);
 
         switch (handle.Kind)
         {
             case HandleKind.AssemblyDefinition:
                 GetAssemblyILCode(disassembler, assemblyFile.File, module, textOutput);
-                return textOutput.ToString();
+                return textOutput.ToDocument();
             case HandleKind.TypeDefinition:
                 disassembler.DisassembleType(module.MetadataFile, (TypeDefinitionHandle) handle);
-                return textOutput.ToString();
+                return textOutput.ToDocument();
             case HandleKind.FieldDefinition:
                 disassembler.DisassembleField(module.MetadataFile, (FieldDefinitionHandle) handle);
-                return textOutput.ToString();
+                return textOutput.ToDocument();
             case HandleKind.MethodDefinition:
                 disassembler.DisassembleMethod(module.MetadataFile, (MethodDefinitionHandle) handle);
-                return textOutput.ToString();
+                return textOutput.ToDocument();
             case HandleKind.PropertyDefinition:
                 disassembler.DisassembleProperty(module.MetadataFile, (PropertyDefinitionHandle) handle);
-                return textOutput.ToString();
+                return textOutput.ToDocument();
             case HandleKind.EventDefinition:
                 disassembler.DisassembleEvent(module.MetadataFile, (EventDefinitionHandle) handle);
-                return textOutput.ToString();
+                return textOutput.ToDocument();
         }
 
-        return string.Empty;
+        return null;
     }
 
     private static ReflectionDisassembler CreateDisassembler(string assemblyPath, MetadataModule module,

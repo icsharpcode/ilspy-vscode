@@ -15,6 +15,18 @@ The ILSpy extension for VS Code is a cross-platform implementation of ILSpy .NET
     * [Using with VS Code Chat](https://github.com/icsharpcode/ilspy-vscode/wiki/Using-with-VS-Code-Chat)
     * [Settings](https://github.com/icsharpcode/ilspy-vscode/wiki/Settings)
 
+## Code Navigation
+
+Decompiled code supports the usual VS Code navigation shortcuts on types, members, local variables and parameters:
+
+| Command | Shortcut (Windows/Linux) | Shortcut (macOS) | Result |
+| --- | --- | --- | --- |
+| Go to Definition | `F12` or `Ctrl`+Click | `F12` or `Cmd`+Click | Opens the decompiled code of the symbol, also in other assemblies (including .NET framework assemblies) |
+| Peek Definition | `Alt`+`F12` | `Option`+`F12` | Shows the definition inline |
+| Go to Implementation | `Ctrl`+`F12` | `Cmd`+`F12` | Lists implementations of interface members, overrides of virtual/abstract members and derived types |
+
+Navigation works in C# and IL output. Definitions in the same document are selected in place, otherwise the decompiled code of the symbol's tree node is opened.
+
 ## Search Prefixes
 
 Searches cover the loaded assemblies and their dependencies, except assemblies of the .NET framework itself. By default, a search looks for types and members by name. Start the search term with a prefix to search for something else:

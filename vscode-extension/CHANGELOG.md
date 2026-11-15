@@ -9,6 +9,7 @@ All notable changes to the "ilspy-vscode" extension will be documented in this f
 - Add `all:` search prefix to search types, members, literals, namespaces and assemblies at once
 - Fix revealing search results in the assembly tree: nested types, their members and namespaces are now expanded and selected; results in hidden compiler-generated code (e.g. async state machines) select their closest visible parent
 - Move "ILSpy: Assemblies" view from the Explorer into its own ILSpy view in the Activity Bar
+- Group and sort assemblies in the assembly tree by the folders containing them (setting `ilspy.groupAssembliesByFolder`)
 - Make "ILSpy: Unload Assembly" available in the Command Palette, asking which assembly or package to unload
 - Add "ILSpy: Clear Assembly List" command to unload all assemblies and packages at once
 - Allow removing single searches from the search results view, or clearing all of them at once

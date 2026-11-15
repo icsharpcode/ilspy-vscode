@@ -75,6 +75,14 @@ export function cacheDotnetRuntimePath(
   });
 }
 
+export function getGroupAssembliesByFolderSetting() {
+  return (
+    vscode.workspace
+      .getConfiguration("ilspy")
+      .get<boolean>("groupAssembliesByFolder") ?? true
+  );
+}
+
 export function getAutoLoadDependenciesSetting() {
   return (
     vscode.workspace

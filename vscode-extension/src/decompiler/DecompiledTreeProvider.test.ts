@@ -1,17 +1,31 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+const settings = vi.hoisted(() => ({ groupAssembliesByFolder: false }));
 
 vi.mock("vscode", () => {
   class EventEmitter {
     event = () => {};
     fire = vi.fn();
   }
+  class ThemeIcon {
+    constructor(public id: string) {}
+  }
   return {
     EventEmitter,
+    ThemeIcon,
     TreeItemCollapsibleState: { None: 0, Collapsed: 1, Expanded: 2 },
     commands: { executeCommand: vi.fn() },
     window: { showWarningMessage: vi.fn() },
-    // All boolean settings off: no auto-loaded assemblies, no compiler-generated symbols.
-    workspace: { getConfiguration: () => ({ get: () => false }) },
+    // Boolean settings off by default: no auto-loaded assemblies, no compiler-generated symbols,
+    // no grouping by folder.
+    workspace: {
+      getConfiguration: () => ({
+        get: (key: string) =>
+          key === "groupAssembliesByFolder"
+            ? settings.groupAssembliesByFolder
+            : false,
+      }),
+    },
     Uri: { parse: (p: string) => ({ path: p }) },
   };
 });
@@ -19,6 +33,11 @@ vi.mock("vscode", () => {
 import type { ExtensionContext } from "vscode";
 import type IILSpyBackend from "./IILSpyBackend";
 import { DecompiledTreeProvider } from "./DecompiledTreeProvider";
+import {
+  AssemblyFolderNode,
+  groupByFolder,
+  isAssemblyFolderNode,
+} from "./assemblyFolders";
 import { Node, NodeFlags, NodeType } from "../extension-types";
 import type OutputWindowLogger from "../OutputWindowLogger";
 
@@ -111,5 +130,71 @@ describe("DecompiledTreeProvider.findTreeNode", () => {
     ]);
 
     expect(await provider.findTreeNode({ ...moveNext })).toBe(outerType);
+  });
+});
+
+describe("DecompiledTreeProvider with assemblies grouped by folder", () => {
+  beforeEach(() => {
+    settings.groupAssembliesByFolder = true;
+  });
+  afterEach(() => {
+    settings.groupAssembliesByFolder = false;
+  });
+
+  it("shows root entries in expanded folder nodes", async () => {
+    const provider = createProvider([]);
+
+    const [folder] = (await provider.getChildren()) as Node[];
+
+    expect(isAssemblyFolderNode(folder)).toBe(true);
+    expect((folder as AssemblyFolderNode).folderPath).toBe("/");
+    expect(await provider.getChildren(folder)).toEqual([assembly]);
+    expect(provider.getTreeItem(folder)).toMatchObject({
+      id: "assemblyFolder:/",
+      collapsibleState: 2,
+      contextValue: "assemblyFolder",
+    });
+  });
+
+  it("returns folder nodes as parents of root entries", async () => {
+    const provider = createProvider([]);
+    const [folder] = (await provider.getChildren()) as Node[];
+
+    expect(await provider.getParent!({ ...assembly })).toBe(folder);
+    expect(await provider.getParent!(folder)).toBeUndefined();
+  });
+
+  it("finds root entries and search results inside folders", async () => {
+    const provider = createProvider([assembly, namespace, outerType]);
+    const searchResult = { ...runMethod, displayName: "Outer.Run() : Task" };
+
+    expect(
+      await provider.findNode((n) => n.metadata?.type === NodeType.Assembly),
+    ).toBe(assembly);
+    expect(await provider.findTreeNode(searchResult)).toBe(runMethod);
+  });
+
+  it("collapses folders containing only auto-loaded dependencies", () => {
+    const provider = createProvider([]);
+    const inFolder = (n: Node, assemblyPath: string): Node => ({
+      ...n,
+      metadata: { ...n.metadata!, assemblyPath },
+    });
+    const loaded = inFolder(assembly, "/app/a.dll");
+    const dependency = inFolder(
+      node(NodeType.Assembly, "System.Runtime.dll", 0, 0, {
+        flags: NodeFlags.AutoLoaded,
+      }),
+      "/usr/share/dotnet/System.Runtime.dll",
+    );
+    const [loadedFolder, dependencyFolder] = groupByFolder([
+      loaded,
+      dependency,
+    ]) as AssemblyFolderNode[];
+
+    expect(loadedFolder.folderPath).toBe("/app");
+    expect(dependencyFolder.folderPath).toBe("/usr/share/dotnet");
+    expect(provider.getTreeItem(loadedFolder).collapsibleState).toBe(2);
+    expect(provider.getTreeItem(dependencyFolder).collapsibleState).toBe(1);
   });
 });

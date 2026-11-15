@@ -130,6 +130,11 @@
 						"description": "If activated, shows compiler-generated symbols.",
 						"type": "boolean",
 						"default": "false"
+					},
+					"ilspy.groupAssembliesByFolder": {
+						"description": "If activated, groups assemblies and packages in the assembly tree by the folders containing them.",
+						"type": "boolean",
+						"default": true
 					}
 				}
 			}

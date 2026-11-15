@@ -36,6 +36,28 @@ export function getTreeNodeCollapsibleState(
     : TreeItemCollapsibleState.None;
 }
 
+/**
+ * Checks whether two nodes represent the same tree entry, even if they come from different
+ * sources (e.g. a search result and the assembly tree) and differ in display name.
+ */
+export function isSameNode(a: Node, b: Node) {
+  const am = a.metadata;
+  const bm = b.metadata;
+  if (!am || !bm) {
+    return false;
+  }
+
+  return (
+    am.assemblyPath === bm.assemblyPath &&
+    (am.bundledAssemblyName ?? "") === (bm.bundledAssemblyName ?? "") &&
+    am.type === bm.type &&
+    am.symbolToken === bm.symbolToken &&
+    am.parentSymbolToken === bm.parentSymbolToken &&
+    // Nodes without symbol token (assemblies, namespaces, ...) are identified by name.
+    (am.symbolToken !== 0 || am.name === bm.name)
+  );
+}
+
 export function createNodeId(node: Node) {
   const metadata = node.metadata;
   if (metadata && metadata.symbolToken !== 0) {

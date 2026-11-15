@@ -15,7 +15,10 @@ import {
 } from "vscode";
 import IILSpyBackend from "../IILSpyBackend";
 import { getNodeIcon } from "../../icons";
-import { getShowCompilerGeneratedSymbolsSetting } from "../settings";
+import {
+  getDefaultOutputLanguage,
+  getShowCompilerGeneratedSymbolsSetting,
+} from "../settings";
 import {
   createNodeId,
   createNodeTooltip,
@@ -23,7 +26,12 @@ import {
   hasNodeCommand,
   hasNodeFlag,
 } from "../utils";
-import { AvailableNodeCommands, Node, NodeFlags } from "../../extension-types";
+import {
+  AvailableNodeCommands,
+  Node,
+  NodeFlags,
+  SearchMatch,
+} from "../../extension-types";
 import { executeILSpyCommand } from "../../commands/commandUtils";
 
 type PerformedSearch = {
@@ -32,6 +40,7 @@ type PerformedSearch = {
 };
 
 type SearchResultNode = Node & {
+  match?: SearchMatch;
   searchIndex: number;
 };
 
@@ -49,6 +58,8 @@ export class SearchResultTreeProvider
   private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
   readonly onDidChangeTreeData: Event<any> = this._onDidChangeTreeData.event;
   private lastSearches: PerformedSearch[] = [];
+  // Monotonic, so result node IDs stay unique after single searches are removed.
+  private nextSearchIndex = 0;
 
   constructor(private backend: IILSpyBackend) {}
 
@@ -57,8 +68,11 @@ export class SearchResultTreeProvider
   }
 
   public async performSearch(term: string) {
-    const searchResponse = await this.backend.sendSearch({ term });
-    const newSearchIndex = this.lastSearches.length;
+    const searchResponse = await this.backend.sendSearch({
+      term,
+      outputLanguage: getDefaultOutputLanguage(),
+    });
+    const newSearchIndex = this.nextSearchIndex++;
     this.lastSearches.push({
       term,
       results:
@@ -67,10 +81,29 @@ export class SearchResultTreeProvider
           searchIndex: newSearchIndex,
         })) ?? [],
     });
-    this.refresh();
+    this.searchesChanged();
     if (searchResponse?.shouldUpdateAssemblyList) {
       await executeILSpyCommand("ilspy.refreshAssemblyList");
     }
+  }
+
+  public removeSearch(search: PerformedSearch) {
+    this.lastSearches = this.lastSearches.filter((s) => s !== search);
+    this.searchesChanged();
+  }
+
+  public clearSearches() {
+    this.lastSearches = [];
+    this.searchesChanged();
+  }
+
+  private searchesChanged() {
+    commands.executeCommand(
+      "setContext",
+      "ilspy.hasSearchResults",
+      this.lastSearches.length > 0,
+    );
+    this.refresh();
   }
 
   public getTreeItem(node: SearchTreeNode): TreeItem {
@@ -79,17 +112,20 @@ export class SearchResultTreeProvider
         label: `Search results for "${node.term}"`,
         collapsibleState: TreeItemCollapsibleState.Expanded,
         iconPath: new ThemeIcon("search-view-icon"),
+        contextValue: "performedSearch",
       };
     } else {
       const item = {
         id: `${node.searchIndex}/${createNodeId(node)}`,
         label: node.displayName,
-        description: node.description,
+        description: node.match
+          ? `line ${node.match.line + 1} · ${node.description}`
+          : node.description,
         tooltip: createNodeTooltip(node),
         collapsibleState: TreeItemCollapsibleState.None,
         command: {
           command: "ilspy.decompileNode",
-          arguments: [node, true],
+          arguments: [node, true, node.match],
           title: "Decompile",
         },
         contextValue: getNodeContextValue(node),

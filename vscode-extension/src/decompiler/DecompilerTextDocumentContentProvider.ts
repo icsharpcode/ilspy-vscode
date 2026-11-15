@@ -60,6 +60,19 @@ export class DecompilerTextDocumentContentProvider
     this.onDidChangeEmitter.fire(uri);
   }
 
+  /**
+   * Sets the output language of a document, unless a language has been set before.
+   */
+  initDocumentOutputLanguage(uri: vscode.Uri, language: LanguageName) {
+    if (!(uri.toString() in this.documentLanguages)) {
+      const previousLanguage = this.getDocumentOutputLanguage(uri);
+      this.documentLanguages[uri.toString()] = language;
+      if (language !== previousLanguage) {
+        this.onDidChangeEmitter.fire(uri);
+      }
+    }
+  }
+
   getDocumentOutputLanguage(uri: vscode.Uri | undefined): LanguageName {
     if (uri === undefined) {
       return getDefaultOutputLanguage();

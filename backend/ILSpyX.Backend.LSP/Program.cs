@@ -47,6 +47,8 @@ class Program
                 .WithHandler<RemoveAssemblyHandler>()
                 .WithHandler<SearchHandler>()
                 .WithHandler<AnalyzeHandler>()
+                .WithHandler<FindDefinitionsHandler>()
+                .WithHandler<FindImplementationsHandler>()
              );
 
         server.LogInfo($"ILSpy LSP Backend PID: {Environment.ProcessId}");

@@ -3,6 +3,7 @@ using ICSharpCode.ILSpyX.Settings;
 using ILSpyX.Backend.Analyzers;
 using ILSpyX.Backend.Application;
 using ILSpyX.Backend.Decompiler;
+using ILSpyX.Backend.Navigation;
 using ILSpyX.Backend.Search;
 using ILSpyX.Backend.TreeProviders;
 using Microsoft.Extensions.DependencyInjection;
@@ -52,7 +53,8 @@ public static class ILSpyXServiceCollectionExtensions
             .AddSingleton<TreeNodeProviders>()
             .AddSingleton<TreePathResolver>()
             .AddSingleton<SearchBackend>()
-            .AddSingleton<AnalyzerBackend>();
+            .AddSingleton<AnalyzerBackend>()
+            .AddSingleton<SymbolNavigationBackend>();
     }
 
     public static IServiceCollection AddILSpyXTreeNodeProviders(this IServiceCollection serviceCollection)

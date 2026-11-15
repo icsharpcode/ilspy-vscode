@@ -26,6 +26,10 @@ import {
   ResolveNodePathParams,
   ResolveNodePathResponse,
 } from "../protocol/resolveNodePath";
+import {
+  CodeLocationsResponse,
+  SymbolNavigationParams,
+} from "../protocol/symbolNavigation";
 
 export default interface IILSpyBackend {
   sendInitWithAssemblies(
@@ -52,6 +56,14 @@ export default interface IILSpyBackend {
 
   sendSearch(params: SearchParams): Promise<SearchResponse | null>;
   sendAnalyze(params: AnalyzeParams): Promise<AnalyzeResponse | null>;
+  sendFindDefinitions(
+    params: SymbolNavigationParams,
+    token?: CancellationToken,
+  ): Promise<CodeLocationsResponse | null>;
+  sendFindImplementations(
+    params: SymbolNavigationParams,
+    token?: CancellationToken,
+  ): Promise<CodeLocationsResponse | null>;
   sendExportAssembly(
     params: ExportNodeParams,
     token?: CancellationToken,

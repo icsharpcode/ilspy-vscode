@@ -19,6 +19,12 @@ import {
 } from "../protocol/removeAssembly";
 import IILSpyBackend from "./IILSpyBackend";
 import {
+  CodeLocationsResponse,
+  FindDefinitionsRequest,
+  FindImplementationsRequest,
+  SymbolNavigationParams,
+} from "../protocol/symbolNavigation";
+import {
   SearchParams,
   SearchRequest,
   SearchResponse,
@@ -106,6 +112,28 @@ export default class ILSpyBackend implements IILSpyBackend {
 
   sendAnalyze(params: AnalyzeParams): Promise<AnalyzeResponse | null> {
     return this.languageClient.sendRequest(AnalyzeRequest.type, params);
+  }
+
+  sendFindDefinitions(
+    params: SymbolNavigationParams,
+    token?: vscode.CancellationToken,
+  ): Promise<CodeLocationsResponse | null> {
+    return this.languageClient.sendRequest(
+      FindDefinitionsRequest.type,
+      params,
+      token,
+    );
+  }
+
+  sendFindImplementations(
+    params: SymbolNavigationParams,
+    token?: vscode.CancellationToken,
+  ): Promise<CodeLocationsResponse | null> {
+    return this.languageClient.sendRequest(
+      FindImplementationsRequest.type,
+      params,
+      token,
+    );
   }
 
   sendExportAssembly(

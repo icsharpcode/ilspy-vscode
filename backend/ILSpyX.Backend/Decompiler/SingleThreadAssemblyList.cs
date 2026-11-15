@@ -140,15 +140,24 @@ public class SingleThreadAssemblyList
 
     private static LoadedAssembly? ResolveInDescendants(AssemblyFileIdentifier assemblyFile, PackageFolder folder)
     {
-        if (folder.Entries.FirstOrDefault(entry => entry.Name == assemblyFile.BundledAssemblyFile) is
-            { } assemblyEntry)
+        // ILSpyX identifies bundled assemblies by their package-relative path (e.g. "lib/net10.0/Foo.dll"),
+        // which keeps copies in multi-target packages apart. Fall back to the bare entry name for
+        // identifiers created by older versions.
+        string? bundledAssemblyFile = assemblyFile.BundledAssemblyFile;
+        return ResolveInDescendants(folder, entry => entry.FullName == bundledAssemblyFile)
+               ?? ResolveInDescendants(folder, entry => entry.Name == bundledAssemblyFile);
+    }
+
+    private static LoadedAssembly? ResolveInDescendants(PackageFolder folder, Func<PackageEntry, bool> predicate)
+    {
+        if (folder.Entries.FirstOrDefault(predicate) is { } assemblyEntry)
         {
-            return folder.ResolveFileName(assemblyEntry.Name);
+            return folder.ResolveEntry(assemblyEntry);
         }
 
         foreach (var subFolder in folder.Folders)
         {
-            if (ResolveInDescendants(assemblyFile, subFolder) is { } asm)
+            if (ResolveInDescendants(subFolder, predicate) is { } asm)
             {
                 return asm;
             }

@@ -106,10 +106,10 @@ namespace ILSpyX.Backend.LSP.Protocol
     #region search
 
     [Serial, Method("ilspy/search", Direction.ClientToServer)]
-    public record SearchRequest(string Term)
+    public record SearchRequest(string Term, string? OutputLanguage = null)
         : IRequest<SearchResponse>;
 
-    public record SearchResponse(IEnumerable<Node>? Results, bool ShouldUpdateAssemblyList);
+    public record SearchResponse(IEnumerable<SearchResultNode>? Results, bool ShouldUpdateAssemblyList);
 
     #endregion
 
@@ -120,6 +120,20 @@ namespace ILSpyX.Backend.LSP.Protocol
         : IRequest<AnalyzeResponse>;
 
     public record AnalyzeResponse(IEnumerable<Node>? Results, bool ShouldUpdateAssemblyList);
+
+    #endregion
+
+    #region findDefinitions / findImplementations
+
+    [Serial, Method("ilspy/findDefinitions", Direction.ClientToServer)]
+    public record FindDefinitionsRequest(NodeMetadata NodeMetadata, string OutputLanguage, int Line, int Column)
+        : IRequest<CodeLocationsResponse>;
+
+    [Serial, Method("ilspy/findImplementations", Direction.ClientToServer)]
+    public record FindImplementationsRequest(NodeMetadata NodeMetadata, string OutputLanguage, int Line, int Column)
+        : IRequest<CodeLocationsResponse>;
+
+    public record CodeLocationsResponse(IEnumerable<CodeLocation>? Locations, bool ShouldUpdateAssemblyList);
 
     #endregion
 }

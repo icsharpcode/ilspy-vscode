@@ -3,6 +3,7 @@
  *  Licensed under the MIT License. See LICENSE.TXT in the project root for license information.
  *-----------------------------------------------------------------------------------------------*/
 
+import * as os from "os";
 import * as path from "path";
 import {
   CancellationToken,
@@ -12,6 +13,7 @@ import {
   EventEmitter,
   ExtensionContext,
   TreeDataProvider,
+  ThemeIcon,
   TreeDragAndDropController,
   TreeItem,
   TreeItemCollapsibleState,
@@ -30,6 +32,7 @@ import IILSpyBackend from "./IILSpyBackend";
 import {
   getAssemblyList,
   getAutoLoadDependenciesSetting,
+  getGroupAssembliesByFolderSetting,
   getShowCompilerGeneratedSymbolsSetting,
   updateAssemblyListIfNeeded,
 } from "./settings";
@@ -40,14 +43,25 @@ import {
   getNodeContextValue,
   hasNodeCommand,
   hasNodeFlag,
+  isSameNode,
 } from "./utils";
 import { executeILSpyCommand } from "../commands/commandUtils";
+import {
+  AssemblyFolderNode,
+  collectFolderEntries,
+  groupByFolder,
+  isAssemblyFolderNode,
+} from "./assemblyFolders";
 
 export class DecompiledTreeProvider
   implements TreeDataProvider<Node>, TreeDragAndDropController<Node>
 {
   private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
   readonly onDidChangeTreeData: Event<any> = this._onDidChangeTreeData.event;
+
+  // Root entries (assemblies, packages) as shown in the tree, and the folder nodes grouping them.
+  private rootEntries: Node[] = [];
+  private rootEntryFolders = new Map<Node, AssemblyFolderNode>();
 
   constructor(
     private extensionContext: ExtensionContext,
@@ -102,6 +116,23 @@ export class DecompiledTreeProvider
     return response?.removed ?? false;
   }
 
+  public async clearAssemblies(): Promise<void> {
+    const rootNodes =
+      (await this.backend.sendGetNodes({ nodeMetadata: undefined }))?.nodes ??
+      [];
+    for (const node of rootNodes) {
+      if (
+        node.metadata &&
+        hasNodeCommand(node, AvailableNodeCommands.ManageRootEntries)
+      ) {
+        await this.backend.sendRemoveAssembly({
+          assemblyPath: node.metadata.assemblyPath,
+        });
+      }
+    }
+    this.refresh();
+  }
+
   public async reloadAssembly(assembly: string): Promise<boolean> {
     const response = await this.backend.sendRemoveAssembly({
       assemblyPath: assembly,
@@ -119,6 +150,20 @@ export class DecompiledTreeProvider
   }
 
   public getTreeItem(node: Node): TreeItem {
+    if (isAssemblyFolderNode(node)) {
+      return {
+        id: `assemblyFolder:${node.folderPath}`,
+        label: node.displayName,
+        tooltip: node.folderPath,
+        // Folders with only auto-loaded dependencies would push the user's assemblies out of sight.
+        collapsibleState: node.containsLoadedEntries
+          ? TreeItemCollapsibleState.Expanded
+          : TreeItemCollapsibleState.Collapsed,
+        contextValue: "assemblyFolder",
+        iconPath: new ThemeIcon("folder"),
+      };
+    }
+
     return {
       id: createNodeId(node),
       label: node.displayName,
@@ -144,7 +189,40 @@ export class DecompiledTreeProvider
   }
 
   public async findNode(predicate: (node: Node) => boolean) {
-    return ((await this.getChildren()) as Node[]).find(predicate);
+    await this.getChildNodes();
+    return this.rootEntries.find(predicate);
+  }
+
+  /**
+   * Finds the node of this tree, which represents the given node (e.g. a search or analyzer result).
+   * Walks down from the root along the path resolved by the backend. If the node itself is not shown
+   * in the tree (e.g. it's compiler-generated or located in a compiler-generated type), the closest
+   * visible ancestor is returned instead.
+   */
+  public async findTreeNode(node: Node): Promise<Node | undefined> {
+    if (!node.metadata) {
+      return undefined;
+    }
+
+    const response = await this.backend.sendResolveNodePath({
+      nodeMetadata: node.metadata,
+    });
+    const path = [...(response?.nodePath ?? []), node];
+
+    let closestTreeNode: Node | undefined;
+    for (const pathNode of path) {
+      // Root entries may be grouped in folder nodes, which are not part of the backend's path.
+      const children = closestTreeNode
+        ? await this.getChildNodes(closestTreeNode)
+        : (await this.getChildNodes(), this.rootEntries);
+      const treeNode = children.find((child) => isSameNode(child, pathNode));
+      if (!treeNode) {
+        break;
+      }
+      closestTreeNode = treeNode;
+    }
+
+    return closestTreeNode;
   }
 
   public getChildren(node?: Node): Node[] | Thenable<Node[]> {
@@ -152,6 +230,14 @@ export class DecompiledTreeProvider
   }
 
   public async getParent?(node: Node): Promise<Node | undefined> {
+    if (isAssemblyFolderNode(node)) {
+      return node.parentFolder;
+    }
+    const rootEntryFolder = this.findRootEntryFolder(node);
+    if (rootEntryFolder) {
+      return rootEntryFolder;
+    }
+
     const path = await this.backend.sendResolveNodePath({
       nodeMetadata: node.metadata,
     });
@@ -162,7 +248,20 @@ export class DecompiledTreeProvider
     return undefined;
   }
 
+  private findRootEntryFolder(node: Node) {
+    for (const [entry, folder] of this.rootEntryFolders) {
+      if (isSameNode(entry, node)) {
+        return folder;
+      }
+    }
+    return undefined;
+  }
+
   async getChildNodes(node?: Node): Promise<Node[]> {
+    if (isAssemblyFolderNode(node)) {
+      return node.folderChildren;
+    }
+
     const result = await this.backend.sendGetNodes({
       nodeMetadata: node?.metadata,
     });
@@ -192,15 +291,33 @@ export class DecompiledTreeProvider
     const showAutoLoadedAssemblies = getAutoLoadDependenciesSetting();
     const showCompilerGeneratedSymbols =
       getShowCompilerGeneratedSymbolsSetting();
-    return (
+    const nodes =
       result?.nodes?.filter(
         (node) =>
           (showAutoLoadedAssemblies ||
             !hasNodeFlag(node, NodeFlags.AutoLoaded)) &&
           (showCompilerGeneratedSymbols ||
             !hasNodeFlag(node, NodeFlags.CompilerGenerated)),
-      ) ?? []
-    );
+      ) ?? [];
+    return node ? nodes : this.updateRootEntries(nodes);
+  }
+
+  private updateRootEntries(rootEntries: Node[]): Node[] {
+    this.rootEntries = rootEntries;
+    this.rootEntryFolders.clear();
+    if (!getGroupAssembliesByFolderSetting()) {
+      return rootEntries;
+    }
+
+    const groupedNodes = groupByFolder(rootEntries, {
+      homeDir: os.homedir(),
+    });
+    for (const { entry, folder } of collectFolderEntries(groupedNodes)) {
+      if (folder) {
+        this.rootEntryFolders.set(entry, folder);
+      }
+    }
+    return groupedNodes;
   }
 
   readonly dropMimeTypes = ["text/uri-list"];

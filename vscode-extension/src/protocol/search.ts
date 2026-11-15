@@ -10,14 +10,18 @@ import {
   RequestHandler,
   RequestType,
 } from "vscode-languageclient";
-import { Node } from "../extension-types";
+import { Node, SearchMatch } from "../extension-types";
 
 export interface SearchParams {
   term: string;
+  // If set, results found by a literal search include the match location in code of this language.
+  outputLanguage?: string;
 }
 
+export type SearchResultNode = Node & { match?: SearchMatch };
+
 export interface SearchResponse {
-  results: Node[];
+  results: SearchResultNode[];
   shouldUpdateAssemblyList: boolean;
 }
 

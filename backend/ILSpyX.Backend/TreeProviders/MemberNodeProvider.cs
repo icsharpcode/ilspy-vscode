@@ -83,7 +83,7 @@ public class MemberNodeProvider(DecompilerBackend decompilerBackend)
                         .OrderBy(m => m.Metadata?.Name));
     }
 
-    private static Node CreateMemberNode(int parentTypeSymbolToken, IMember member, AssemblyFileIdentifier assemblyFile,
+    public static Node CreateMemberNode(int parentTypeSymbolToken, IMember member, AssemblyFileIdentifier assemblyFile,
         ITypeDefinition typeDefinition)
     {
         string memberName = member is IMethod method

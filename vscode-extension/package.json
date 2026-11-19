@@ -234,7 +234,7 @@
 			},
 			{
 				"command": "ilspy.export",
-				"title": "Export Code...",
+				"title": "Export Code as Project...",
 				"category": "ILSpy",
 				"icon": "$(save-all)"
 			},

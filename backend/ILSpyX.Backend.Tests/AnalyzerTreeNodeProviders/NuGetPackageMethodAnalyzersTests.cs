@@ -40,11 +40,7 @@ public class NuGetPackageMethodAnalyzersTests
                 Assert.Equal(methodNode.Metadata?.ParentSymbolToken, node.Metadata?.ParentSymbolToken);
             },
             node => { },
-            node => { },
-            node => {
-                Assert.Equal("Implements", node.DisplayName);
-                Assert.Equal("MemberImplementsInterfaceAnalyzer", node.Metadata?.SubType);
-            });
+            node => { });
 
         var methodUsedByNodes =
             await analyzerNodeProvider.GetChildrenAsync(

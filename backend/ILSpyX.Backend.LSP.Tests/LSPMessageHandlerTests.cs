@@ -69,4 +69,92 @@ public class LSPMessageHandlerTests
         Assert.True(response.Removed);
         Assert.Empty(await decompilerBackend.GetLoadedAssembliesAsync());
     }
+
+    [Fact]
+    public async Task ExportNodeAsProject()
+    {
+        var services = TestHelper.CreateTestServices();
+        var decompilerBackend = services.GetRequiredService<DecompilerBackend>();
+        var exportBackend = services.GetRequiredService<ExportBackend>();
+        var handler = new ExportNodeHandler(exportBackend, decompilerBackend);
+
+        await decompilerBackend.AddAssemblyAsync(TestHelper.AssemblyPath);
+
+        string outputDirectory = Path.Combine(
+            Path.GetTempPath(), "ilspy-lsp-tests", Guid.NewGuid().ToString("N"));
+        try
+        {
+            var response = await handler.Handle(
+                new ExportNodeRequest(
+                    new NodeMetadata
+                    {
+                        AssemblyPath = TestHelper.AssemblyPath,
+                        Type = NodeType.Assembly,
+                        Name = "TestAssembly.dll"
+                    },
+                    LanguageName.CSharpLatest,
+                    outputDirectory,
+                    IncludeCompilerGenerated: true,
+                    ExportOutputType.Project),
+                CancellationToken.None);
+
+            Assert.True(response.Succeeded);
+            Assert.True(response.FilesWritten > 0);
+            Assert.Equal(0, response.ErrorCount);
+            Assert.NotNull(response.OutputTarget);
+            Assert.True(Directory.Exists(response.OutputTarget));
+        }
+        finally
+        {
+            if (Directory.Exists(outputDirectory))
+            {
+                Directory.Delete(outputDirectory, recursive: true);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task ExportNodeAsSingleFile()
+    {
+        var services = TestHelper.CreateTestServices();
+        var decompilerBackend = services.GetRequiredService<DecompilerBackend>();
+        var exportBackend = services.GetRequiredService<ExportBackend>();
+        var handler = new ExportNodeHandler(exportBackend, decompilerBackend);
+
+        await decompilerBackend.AddAssemblyAsync(TestHelper.AssemblyPath);
+
+        // In SingleFile mode, the output target parameter carries the target file path.
+        string outputFile = Path.Combine(
+            Path.GetTempPath(), "ilspy-lsp-tests", Guid.NewGuid().ToString("N"), "TestAssembly.cs");
+        try
+        {
+            var response = await handler.Handle(
+                new ExportNodeRequest(
+                    new NodeMetadata
+                    {
+                        AssemblyPath = TestHelper.AssemblyPath,
+                        Type = NodeType.Assembly,
+                        Name = "TestAssembly.dll"
+                    },
+                    LanguageName.CSharpLatest,
+                    outputFile,
+                    IncludeCompilerGenerated: true,
+                    ExportOutputType.SingleFile),
+                CancellationToken.None);
+
+            Assert.True(response.Succeeded);
+            Assert.Equal(Path.GetFullPath(outputFile), response.OutputTarget);
+            Assert.Equal(1, response.FilesWritten);
+            Assert.Equal(0, response.ErrorCount);
+            Assert.True(File.Exists(outputFile));
+            Assert.Contains("class SomeClass", await File.ReadAllTextAsync(outputFile));
+        }
+        finally
+        {
+            if (File.Exists(outputFile))
+            {
+                File.Delete(outputFile);
+            }
+        }
+    }
 }

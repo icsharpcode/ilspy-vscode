@@ -19,7 +19,7 @@ This document describes the custom LSP (JSON-RPC) requests used between the VS C
 | `ilspy/getNodes` | `nodeMetadata?: NodeMetadata` | `nodes?: Node[]`, `shouldUpdateAssemblyList: boolean` | Retrieves a list of child nodes of a node - or root nodes, if `nodeMetadata === null` |
 | `ilspy/resolveNodePath` | `nodeMetadata?: NodeMetadata` | `nodePath?: Node[]`, `leafNode?: NodeMetadata`, `shouldUpdateAssemblyList: boolean` | Resolves the path of parent nodes leading to a node. |
 | `ilspy/decompileNode` | `nodeMetadata: NodeMetadata`, `outputLanguage: string` | `decompiledCode?: string`, `isError: boolean`, `errorMessage?: string`, `shouldUpdateAssemblyList: boolean` | Retrieves the (decompiled) code behind a node. |
-| `ilspy/exportNode` | `nodeMetadata: NodeMetadata`, `outputLanguage: string`, `outputDirectory: string`, `includeCompilerGenerated: boolean` | `succeeded: boolean`, `outputDirectory?: string`, `filesWritten: number`, `errorCount: number`, `errorMessage?: string`, `shouldUpdateAssemblyList: boolean` | Exports node contents to the file system. |
+| `ilspy/exportNode` | `nodeMetadata: NodeMetadata`, `outputLanguage: string`, `outputTarget: string`, `includeCompilerGenerated: boolean`, `exportOutputType?: ExportOutputType` (defaults to `Project`) | `succeeded: boolean`, `outputTarget?: string`, `filesWritten: number`, `errorCount: number`, `errorMessage?: string`, `shouldUpdateAssemblyList: boolean` | Exports node contents to the file system. `exportOutputType` selects the output mode: `Project` writes a directory tree into `outputTarget`; `SingleFile` writes one file and interprets `outputTarget` as the target file path (the response's `outputTarget` then carries the written file path, `filesWritten` is 1). |
 | `ilspy/search` | `term: string` | `results: Node[]`, `shouldUpdateAssemblyList: boolean` | Searches for nodes in loaded assemblies using a free-text term. |
 | `ilspy/analyze` | `nodeMetadata?: NodeMetadata` | `results: Node[]`, `shouldUpdateAssemblyList: boolean` | Analyzes a node and gets the list of related nodes (like types implementing a specific interface, callers of a method etc.) |
 
@@ -60,6 +60,11 @@ This document describes the custom LSP (JSON-RPC) requests used between the VS C
 - `Export = 4`
 - `ManageRootEntries = 8`
 
+### `ExportOutputType`
+
+- `Project = 0`
+- `SingleFile = 1`
+
 ### `Node`
 
 - `metadata?: NodeMetadata`
@@ -87,7 +92,8 @@ This document describes the custom LSP (JSON-RPC) requests used between the VS C
 ### `ExportNodeResponse`
 
 - `succeeded: boolean`
-- `outputDirectory?: string`
+- `outputTarget?: string` \
+  Output directory (`Project` mode) or written file path (`SingleFile` mode).
 - `filesWritten: number`
 - `errorCount: number`
 - `errorMessage?: string`

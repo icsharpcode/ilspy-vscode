@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
@@ -22,7 +23,8 @@ public class ExportBackend(
     ILoggerFactory loggerFactory,
     ILSpyBackendSettings ilspyBackendSettings,
     DecompilerBackend decompilerBackend,
-    SingleThreadAssemblyList assemblyList)
+    SingleThreadAssemblyList assemblyList,
+    IExportFileWriter exportFileWriter)
 {
     private readonly ILogger logger = loggerFactory.CreateLogger<ExportBackend>();
 
@@ -113,6 +115,78 @@ public class ExportBackend(
                 assemblyName,
                 targetDirectory);
             return new ExportNodeResult(false, targetDirectory, 0, 1, ex.Message);
+        }
+    }
+
+    public async Task<ExportNodeResult> ExportNodeToSingleFileAsync(
+        NodeMetadata nodeMetadata,
+        string outputLanguage,
+        string outputFile,
+        bool includeCompilerGenerated,
+        CancellationToken cancellationToken)
+    {
+        if (nodeMetadata.Type != NodeType.Assembly)
+        {
+            return new ExportNodeResult(false, null, 0, 1, "This object can't be exported to a single file.");
+        }
+
+        if (string.IsNullOrWhiteSpace(outputFile))
+        {
+            return new ExportNodeResult(false, null, 0, 1, "Output file is required.");
+        }
+
+        var assemblyFile = nodeMetadata.GetAssemblyFileIdentifier();
+        var loadedAssembly = await assemblyList.FindAssembly(assemblyFile);
+        if (loadedAssembly is null)
+        {
+            return new ExportNodeResult(false, null, 0, 1, "Assembly is not loaded.");
+        }
+
+        var metadataFile = await loadedAssembly.GetMetadataFileOrNullAsync();
+        if (metadataFile is null)
+        {
+            return new ExportNodeResult(false, null, 0, 1, "Assembly metadata could not be loaded.");
+        }
+
+        string targetFile = Path.GetFullPath(outputFile);
+
+        string assemblyName = nodeMetadata.Name;
+        if (string.IsNullOrWhiteSpace(assemblyName))
+        {
+            assemblyName = Path.GetFileName(assemblyFile.BundledAssemblyFile ?? assemblyFile.File);
+        }
+
+        try
+        {
+            (string content, int errorCount) = outputLanguage == LanguageName.IL
+                ? await BuildSingleILFileContentAsync(
+                    metadataFile,
+                    loadedAssembly,
+                    assemblyFile,
+                    includeCompilerGenerated,
+                    cancellationToken)
+                : await BuildSingleCSharpFileContentAsync(
+                    metadataFile,
+                    loadedAssembly,
+                    outputLanguage,
+                    includeCompilerGenerated,
+                    cancellationToken);
+
+            await exportFileWriter.WriteTextAsync(targetFile, EnsureTrailingNewline(content), cancellationToken);
+            return new ExportNodeResult(true, targetFile, 1, errorCount, null);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "Failed to export assembly {assembly} to {targetFile}",
+                assemblyName,
+                targetFile);
+            return new ExportNodeResult(false, targetFile, 0, 1, ex.Message);
         }
     }
 
@@ -232,6 +306,96 @@ public class ExportBackend(
         }
 
         return new ExportNodeResult(true, targetDirectory, filesWritten, errorCount, null);
+    }
+
+    private async Task<(string Content, int ErrorCount)> BuildSingleCSharpFileContentAsync(
+        MetadataFile metadataFile,
+        LoadedAssembly loadedAssembly,
+        string outputLanguage,
+        bool includeCompilerGenerated,
+        CancellationToken cancellationToken)
+    {
+        var settings = ilspyBackendSettings.CreateDecompilerSettings(outputLanguage);
+        var resolver = loadedAssembly.GetAssemblyResolver();
+        var decompiler = new CSharpDecompiler(metadataFile, resolver, settings)
+        {
+            CancellationToken = cancellationToken
+        };
+
+        string code = await Task.Run(
+            () =>
+            {
+                if (includeCompilerGenerated)
+                {
+                    return decompiler.DecompileWholeModuleAsString();
+                }
+
+                // Mirror the project export: leave out compiler-generated top-level types.
+                var typeSystem = new DecompilerTypeSystem(metadataFile, resolver, settings);
+                var typeHandles = metadataFile.Metadata.GetTopLevelTypeDefinitions()
+                    .Where(typeHandle => ShouldExportType(
+                        metadataFile, typeHandle, settings, includeCompilerGenerated: false, typeSystem))
+                    .ToArray();
+                var builder = new StringBuilder();
+                builder.Append(decompiler.DecompileModuleAndAssemblyAttributesToString());
+                builder.AppendLine();
+                builder.Append(decompiler.DecompileTypesAsString(typeHandles));
+                return builder.ToString();
+            },
+            cancellationToken);
+
+        return (code, 0);
+    }
+
+    private async Task<(string Content, int ErrorCount)> BuildSingleILFileContentAsync(
+        MetadataFile metadataFile,
+        LoadedAssembly loadedAssembly,
+        AssemblyFileIdentifier assemblyFile,
+        bool includeCompilerGenerated,
+        CancellationToken cancellationToken)
+    {
+        var settings = ilspyBackendSettings.CreateDecompilerSettings();
+        var resolver = loadedAssembly.GetAssemblyResolver();
+        var typeSystem = includeCompilerGenerated
+            ? null
+            : new DecompilerTypeSystem(metadataFile, resolver, settings);
+
+        var builder = new StringBuilder();
+        int errorCount = 0;
+
+        cancellationToken.ThrowIfCancellationRequested();
+        var assemblyInfoResult = await decompilerBackend.GetCode(
+            assemblyFile,
+            EntityHandle.AssemblyDefinition,
+            LanguageName.IL);
+        builder.Append(BuildExportContent(assemblyInfoResult, "assembly"));
+        if (assemblyInfoResult.IsError)
+        {
+            errorCount++;
+        }
+
+        foreach (var typeHandle in metadataFile.Metadata.GetTopLevelTypeDefinitions())
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (!ShouldExportType(metadataFile, typeHandle, settings, includeCompilerGenerated, typeSystem))
+            {
+                continue;
+            }
+
+            var typeDef = metadataFile.Metadata.GetTypeDefinition(typeHandle);
+            string name = metadataFile.Metadata.GetString(typeDef.Name);
+            var result = await decompilerBackend.GetCode(
+                assemblyFile,
+                MetadataTokens.EntityHandle(MetadataTokens.GetToken(typeHandle)),
+                LanguageName.IL);
+            builder.Append(BuildExportContent(result, name));
+            if (result.IsError)
+            {
+                errorCount++;
+            }
+        }
+
+        return (builder.ToString(), errorCount);
     }
 
     private static bool ShouldExportType(

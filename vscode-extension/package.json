@@ -784,6 +784,11 @@
 				"language": "ilspy-code-cs",
 				"scopeName": "source.ilspy-code-cs",
 				"path": "resources/ilspy-code-cs.tmLanguage.json"
+			},
+			{
+				"language": "ilspy-code-il",
+				"scopeName": "source.ilspy-code-il",
+				"path": "resources/ilspy-code-il.tmLanguage.json"
 			}
 		]
 	}

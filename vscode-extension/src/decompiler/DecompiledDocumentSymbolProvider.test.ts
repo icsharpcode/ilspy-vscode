@@ -9,10 +9,22 @@ vi.mock("vscode", () => {
   }
 
   class Range {
+    public start: Position;
+    public end: Position;
     constructor(
-      public start: Position,
-      public end: Position,
-    ) {}
+      startOrLine: Position | number,
+      endOrCharacter: Position | number,
+      endLine?: number,
+      endCharacter?: number,
+    ) {
+      if (typeof startOrLine === "number") {
+        this.start = new Position(startOrLine, endOrCharacter as number);
+        this.end = new Position(endLine as number, endCharacter as number);
+      } else {
+        this.start = startOrLine;
+        this.end = endOrCharacter as Position;
+      }
+    }
   }
 
   class DocumentSymbol {
@@ -74,6 +86,7 @@ import * as vscode from "vscode";
 import type IILSpyBackend from "./IILSpyBackend";
 import {
   AvailableNodeCommands,
+  LanguageName,
   Node,
   NodeMetadata,
   NodeType,
@@ -93,6 +106,10 @@ import type { DecompileNodeParams } from "../protocol/decompileNode";
 import type ExportNodeResponse from "../protocol/exportNode";
 import type { ExportNodeParams } from "../protocol/exportNode";
 import type { GetNodesParams, GetNodesResponse } from "../protocol/getNodes";
+import type {
+  GetNodePositionsParams,
+  GetNodePositionsResponse,
+} from "../protocol/getNodePositions";
 import type {
   InitWithAssembliesParams,
   InitWithAssembliesResponse,
@@ -125,6 +142,10 @@ function createBackend(): IILSpyBackend {
     ),
     sendGetNodes: vi.fn(
       async (_params: GetNodesParams) => null as GetNodesResponse | null,
+    ),
+    sendGetNodePositions: vi.fn(
+      async (_params: GetNodePositionsParams) =>
+        null as GetNodePositionsResponse | null,
     ),
     sendResolveNodePath: vi.fn(
       async (_params: ResolveNodePathParams) =>
@@ -229,8 +250,30 @@ describe("DecompiledDocumentSymbolProvider", () => {
       nodes: [methodNode, propertyNode, resourceNode],
       shouldUpdateAssemblyList: false,
     });
+    vi.mocked(backend.sendGetNodePositions).mockResolvedValue({
+      positions: [
+        {
+          symbolToken: 201,
+          startLine: 2,
+          startCharacter: 4,
+          endLine: 4,
+          endCharacter: 5,
+        },
+        {
+          symbolToken: 202,
+          startLine: 6,
+          startCharacter: 4,
+          endLine: 8,
+          endCharacter: 5,
+        },
+      ],
+      shouldUpdateAssemblyList: false,
+    });
 
-    const provider = new DecompiledDocumentSymbolProvider(backend);
+    const provider = new DecompiledDocumentSymbolProvider(
+      backend,
+      () => LanguageName.CSharpLatest,
+    );
     const document = createDocument(parentNode);
 
     const symbols = await provider.provideDocumentSymbols(
@@ -240,6 +283,10 @@ describe("DecompiledDocumentSymbolProvider", () => {
 
     expect(backend.sendGetNodes).toHaveBeenCalledWith({
       nodeMetadata: parentNode.metadata,
+    });
+    expect(backend.sendGetNodePositions).toHaveBeenCalledWith({
+      nodeMetadata: parentNode.metadata,
+      outputLanguage: LanguageName.CSharpLatest,
     });
     expect(symbols).toHaveLength(2);
     expect(symbols).toEqual([
@@ -254,17 +301,117 @@ describe("DecompiledDocumentSymbolProvider", () => {
         kind: vscode.SymbolKind.Property,
       }),
     ]);
-    for (const symbol of symbols) {
-      expect(symbol.range.start).toEqual(new vscode.Position(0, 0));
-      expect(symbol.range.end).toEqual(new vscode.Position(0, 0));
-      expect(symbol.selectionRange.start).toEqual(new vscode.Position(0, 0));
-      expect(symbol.selectionRange.end).toEqual(new vscode.Position(0, 0));
-    }
+    expect(symbols[0].range).toEqual(
+      new vscode.Range(2, 4, 4, 5),
+    );
+    expect(symbols[0].selectionRange).toEqual(new vscode.Range(2, 4, 2, 4));
+    expect(symbols[1].range).toEqual(
+      new vscode.Range(6, 4, 8, 5),
+    );
+    expect(symbols[1].selectionRange).toEqual(new vscode.Range(6, 4, 6, 4));
+  });
+
+  it("falls back to the document start when no positions are available", async () => {
+    const backend = createBackend();
+    const parentNode = createNode({
+      metadata: createNodeMetadata({
+        name: "Namespace.ParentType",
+        type: NodeType.Class,
+        symbolToken: 200,
+        parentSymbolToken: 100,
+      }),
+    });
+    const methodNode = createNode({
+      displayName: "DoWork",
+      description: "void DoWork()",
+      metadata: createNodeMetadata({
+        name: "DoWork",
+        type: NodeType.Method,
+        symbolToken: 201,
+        parentSymbolToken: 200,
+      }),
+    });
+    vi.mocked(backend.sendGetNodes).mockResolvedValue({
+      nodes: [methodNode],
+      shouldUpdateAssemblyList: false,
+    });
+    vi.mocked(backend.sendGetNodePositions).mockResolvedValue({
+      positions: [],
+      shouldUpdateAssemblyList: false,
+    });
+
+    const provider = new DecompiledDocumentSymbolProvider(
+      backend,
+      () => LanguageName.CSharpLatest,
+    );
+    const symbols = await provider.provideDocumentSymbols(
+      createDocument(parentNode),
+      { isCancellationRequested: false } as CancellationToken,
+    );
+
+    expect(symbols).toHaveLength(1);
+    expect(symbols[0].range.start).toEqual(new vscode.Position(0, 0));
+    expect(symbols[0].range.end).toEqual(new vscode.Position(0, 0));
+    expect(symbols[0].selectionRange.start).toEqual(new vscode.Position(0, 0));
+    expect(symbols[0].selectionRange.end).toEqual(new vscode.Position(0, 0));
+  });
+
+  it("shows a single member itself as symbol for member documents", async () => {
+    const backend = createBackend();
+    const methodNode = createNode({
+      displayName: "DoWork() : void",
+      metadata: createNodeMetadata({
+        name: "DoWork() : void",
+        type: NodeType.Method,
+        symbolToken: 201,
+        parentSymbolToken: 200,
+      }),
+    });
+    vi.mocked(backend.sendGetNodes).mockResolvedValue({
+      nodes: [],
+      shouldUpdateAssemblyList: false,
+    });
+    vi.mocked(backend.sendGetNodePositions).mockResolvedValue({
+      positions: [
+        {
+          symbolToken: 201,
+          startLine: 0,
+          startCharacter: 0,
+          endLine: 0,
+          endCharacter: 0,
+        },
+      ],
+      shouldUpdateAssemblyList: false,
+    });
+
+    const provider = new DecompiledDocumentSymbolProvider(
+      backend,
+      () => LanguageName.CSharpLatest,
+    );
+    const symbols = await provider.provideDocumentSymbols(
+      createDocument(methodNode, "public void DoWork() { }"),
+      { isCancellationRequested: false } as CancellationToken,
+    );
+
+    expect(symbols).toHaveLength(1);
+    expect(symbols[0]).toEqual(
+      expect.objectContaining({
+        name: "DoWork() : void",
+        kind: vscode.SymbolKind.Method,
+      }),
+    );
+    expect(symbols[0].range.start).toEqual(new vscode.Position(0, 0));
+    expect(symbols[0].range.end).toEqual(new vscode.Position(0, 0));
+    expect(symbols[0].selectionRange.start).toEqual(new vscode.Position(0, 0));
+    expect(symbols[0].selectionRange.end).toEqual(new vscode.Position(0, 0));
   });
 
   it("returns no symbols for non-code ilspy documents", async () => {
     const backend = createBackend();
-    const provider = new DecompiledDocumentSymbolProvider(backend);
+    const provider = new DecompiledDocumentSymbolProvider(
+      backend,
+      () => LanguageName.CSharpLatest,
+    );
     const document = createDocument(
       createNode({
         displayName: "Resources",
@@ -285,6 +432,7 @@ describe("DecompiledDocumentSymbolProvider", () => {
 
     expect(symbols).toEqual([]);
     expect(backend.sendGetNodes).not.toHaveBeenCalled();
+    expect(backend.sendGetNodePositions).not.toHaveBeenCalled();
   });
 
   it("registers against the ilspy scheme", () => {

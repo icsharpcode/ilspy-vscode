@@ -17,6 +17,7 @@ This document describes the custom LSP (JSON-RPC) requests used between the VS C
 | `ilspy/addAssembly` | `assemblyPath: string` | `added: boolean`, `assemblyData?: AssemblyData` | Adds a single assembly or NuGet package to assembly list. |
 | `ilspy/removeAssembly` | `assemblyPath: string` | `removed: boolean` | Removes a single assembly from assembly list. |
 | `ilspy/getNodes` | `nodeMetadata?: NodeMetadata` | `nodes?: Node[]`, `shouldUpdateAssemblyList: boolean` | Retrieves a list of child nodes of a node - or root nodes, if `nodeMetadata === null` |
+| `ilspy/getNodePositions` | `nodeMetadata: NodeMetadata`, `outputLanguage: string` | `positions?: NodePosition[]`, `shouldUpdateAssemblyList: boolean` | Retrieves the positions of a node's child declarations within the node's decompiled code (as produced by `ilspy/decompileNode` with the same `outputLanguage`), keyed by `symbolToken`. Only type nodes have child declarations in their decompiled code (C# output languages only; for IL the list is empty). For any non-type node, `positions` contains a single entry for the node itself at the start of the code (0,0). |
 | `ilspy/resolveNodePath` | `nodeMetadata?: NodeMetadata` | `nodePath?: Node[]`, `leafNode?: NodeMetadata`, `shouldUpdateAssemblyList: boolean` | Resolves the path of parent nodes leading to a node. |
 | `ilspy/decompileNode` | `nodeMetadata: NodeMetadata`, `outputLanguage: string` | `decompiledCode?: string`, `isError: boolean`, `errorMessage?: string`, `shouldUpdateAssemblyList: boolean` | Retrieves the (decompiled) code behind a node. |
 | `ilspy/exportNode` | `nodeMetadata: NodeMetadata`, `outputLanguage: string`, `outputTarget: string`, `includeCompilerGenerated: boolean`, `exportOutputType?: ExportOutputType` (defaults to `Project`) | `succeeded: boolean`, `outputTarget?: string`, `filesWritten: number`, `errorCount: number`, `errorMessage?: string`, `shouldUpdateAssemblyList: boolean` | Exports node contents to the file system. `exportOutputType` selects the output mode: `Project` writes a directory tree into `outputTarget`; `SingleFile` writes one file and interprets `outputTarget` as the target file path (the response's `outputTarget` then carries the written file path, `filesWritten` is 1). |
@@ -74,6 +75,19 @@ This document describes the custom LSP (JSON-RPC) requests used between the VS C
 - `modifiers: SymbolModifiers`
 - `flags: NodeFlags`
 
+### `NodePosition`
+
+- `symbolToken: number` \
+  Token handle of the symbol whose declaration this position refers to; matches `NodeMetadata.symbolToken` of the corresponding child node.
+- `startLine: number` \
+  Zero-based line of the start of the declaration in the decompiled code.
+- `startCharacter: number` \
+  Zero-based character offset within `startLine`.
+- `endLine: number` \
+  Zero-based line of the end of the declaration in the decompiled code.
+- `endCharacter: number` \
+  Zero-based character offset within `endLine`.
+
 ### `DecompileResponse`
 
 - `decompiledCode?: string`
@@ -102,4 +116,4 @@ This document describes the custom LSP (JSON-RPC) requests used between the VS C
 ## Behavior notes
 
 - `shouldUpdateAssemblyList` becomes `true` when executing the request causes a change in the count of auto-loaded assemblies (for example, dependency auto-load while expanding/decompiling/searching/analyzing).
-- `outputLanguage` for `ilspy/decompileNode` supports values used by backend language settings (for example `il`, `cs-1` … `cs-12`).
+- `outputLanguage` for `ilspy/decompileNode` and `ilspy/getNodePositions` supports values used by backend language settings (for example `il`, `cs-1` … `cs-14`). Positions returned by `ilspy/getNodePositions` refer to the code produced by `ilspy/decompileNode` with the same `outputLanguage`; child declaration positions are only available for type nodes in C# output, while non-type nodes always get a single self position at (0,0).

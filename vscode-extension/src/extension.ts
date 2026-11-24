@@ -183,7 +183,11 @@ export async function activate(
       decompilerTextDocumentContentProvider,
     ),
   );
-  disposables.push(registerDecompiledDocumentSymbolProvider(ilspyBackend));
+  disposables.push(
+    registerDecompiledDocumentSymbolProvider(ilspyBackend, (uri) =>
+      decompilerTextDocumentContentProvider.getDocumentOutputLanguage(uri),
+    ),
+  );
 
   disposables.push(
     registerDecompileNodeCommand(decompilerTextDocumentContentProvider),

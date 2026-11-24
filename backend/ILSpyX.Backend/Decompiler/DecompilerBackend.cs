@@ -3,7 +3,9 @@
 
 using ICSharpCode.Decompiler;
 using ICSharpCode.Decompiler.CSharp;
+using ICSharpCode.Decompiler.CSharp.OutputVisitor;
 using ICSharpCode.Decompiler.CSharp.ProjectDecompiler;
+using ICSharpCode.Decompiler.CSharp.Syntax;
 using ICSharpCode.Decompiler.Disassembler;
 using ICSharpCode.Decompiler.Metadata;
 using ICSharpCode.Decompiler.TypeSystem;
@@ -157,6 +159,62 @@ public class DecompilerBackend(
             LanguageName.IL => DecompileResult.WithCode(await GetILCode(assemblyFile, handle)),
             _ => DecompileResult.WithCode(await GetCSharpCode(assemblyFile, handle, outputLanguage))
         };
+    }
+
+    /// <summary>
+    /// Gets the positions of the child entity declarations within the decompiled code of the given node.
+    /// Only type definitions have child declarations in their decompiled code; for any other node,
+    /// a single position for the node itself at the start of the decompiled code is returned.
+    /// For type definitions in IL output, an empty sequence is returned.
+    /// </summary>
+    public async Task<IEnumerable<NodePosition>> GetNodePositions(AssemblyFileIdentifier assemblyFile,
+        EntityHandle handle, string outputLanguage)
+    {
+        if (handle.Kind != HandleKind.TypeDefinition)
+        {
+            return [new NodePosition(MetadataTokens.GetToken(handle), 0, 0, 0, 0)];
+        }
+
+        if (outputLanguage == LanguageName.IL)
+        {
+            return [];
+        }
+
+        var decompiler = await CreateDecompiler(assemblyFile, outputLanguage);
+        if (decompiler is null)
+        {
+            return [];
+        }
+
+        var module = decompiler.TypeSystem.MainModule;
+        var typeDefinition = module.GetDefinition((TypeDefinitionHandle) handle);
+        if (typeDefinition is null)
+        {
+            return [];
+        }
+
+        SyntaxTree syntaxTree = typeDefinition.DeclaringType == null
+            ? decompiler.DecompileTypes([(TypeDefinitionHandle) handle])
+            : decompiler.Decompile(handle);
+
+        // Render exactly like DecompileTypesAsString/DecompileAsString, but with a token writer
+        // that records each node's position in the output text.
+        var settings = ilspyBackendSettings.CreateDecompilerSettings(outputLanguage);
+        var writer = new StringWriter();
+        var tokenWriter = TokenWriter.CreateWriterThatSetsLocationsInAST(writer,
+            settings.CSharpFormattingOptions.IndentationString);
+        syntaxTree.AcceptVisitor(new CSharpOutputVisitor(tokenWriter, settings.CSharpFormattingOptions));
+
+        return syntaxTree.DescendantNodes().OfType<EntityDeclaration>()
+            .Select(declaration => (declaration, entity: declaration.GetSymbol() as IEntity))
+            .Where(x => x.entity is not null)
+            .Select(x => new NodePosition(
+                MetadataTokens.GetToken(x.entity!.MetadataToken),
+                x.declaration.StartLocation.Line - 1,
+                x.declaration.StartLocation.Column - 1,
+                x.declaration.EndLocation.Line - 1,
+                x.declaration.EndLocation.Column - 1))
+            .ToList();
     }
 
     public async Task<IEntity?> GetEntityFromHandle(AssemblyFileIdentifier assemblyFile, EntityHandle handle)

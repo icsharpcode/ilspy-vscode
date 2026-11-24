@@ -5,9 +5,10 @@
 
 import * as vscode from "vscode";
 import { executeILSpyCommand } from "../commands/commandUtils";
-import { NodeType } from "../extension-types";
+import { LanguageName, NodeType } from "../extension-types";
 import IILSpyBackend from "./IILSpyBackend";
 import { ILSPY_URI_SCHEME, uriToNode } from "./nodeUri";
+import { getDefaultOutputLanguage } from "./settings";
 
 const OUTLINE_NODE_TYPES: Partial<Record<NodeType, vscode.SymbolKind>> = {
   [NodeType.Assembly]: vscode.SymbolKind.Module,
@@ -27,7 +28,11 @@ const OUTLINE_NODE_TYPES: Partial<Record<NodeType, vscode.SymbolKind>> = {
 export class DecompiledDocumentSymbolProvider
   implements vscode.DocumentSymbolProvider
 {
-  constructor(private backend: IILSpyBackend) {}
+  constructor(
+    private backend: IILSpyBackend,
+    private getOutputLanguage: (uri: vscode.Uri) => LanguageName = () =>
+      getDefaultOutputLanguage(),
+  ) {}
 
   async provideDocumentSymbols(
     document: vscode.TextDocument,
@@ -55,33 +60,96 @@ export class DecompiledDocumentSymbolProvider
       await executeILSpyCommand("ilspy.refreshAssemblyList");
     }
 
+    const positionsResponse = await this.backend.sendGetNodePositions({
+      nodeMetadata,
+      outputLanguage: this.getOutputLanguage(document.uri),
+    });
+    if (token.isCancellationRequested) {
+      return [];
+    }
+
+    if (positionsResponse?.shouldUpdateAssemblyList) {
+      await executeILSpyCommand("ilspy.refreshAssemblyList");
+    }
+
+    const positionsByToken = new Map(
+      (positionsResponse?.positions ?? []).map((position) => [
+        position.symbolToken,
+        position,
+      ]),
+    );
+
     const symbolAnchor = document.positionAt(0);
     const symbolRange = new vscode.Range(symbolAnchor, symbolAnchor);
 
-    return (response?.nodes ?? [])
-      .filter((node) => {
-        const nodeType = node.metadata?.type;
-        return nodeType !== undefined && nodeType in OUTLINE_NODE_TYPES;
-      })
-      .map(
-        (node) =>
+    const childNodes = (response?.nodes ?? []).filter((node) => {
+      const nodeType = node.metadata?.type;
+      return nodeType !== undefined && nodeType in OUTLINE_NODE_TYPES;
+    });
+
+    const childSymbols = childNodes.map((node) => {
+        const position = positionsByToken.get(node.metadata?.symbolToken ?? 0);
+        const range = position
+          ? new vscode.Range(
+              position.startLine,
+              position.startCharacter,
+              position.endLine,
+              position.endCharacter,
+            )
+          : symbolRange;
+        const selectionRange = position
+          ? new vscode.Range(
+              position.startLine,
+              position.startCharacter,
+              position.startLine,
+              position.startCharacter,
+            )
+          : symbolRange;
+        return new vscode.DocumentSymbol(
+          node.displayName || node.metadata?.name || node.description,
+          node.description,
+          OUTLINE_NODE_TYPES[node.metadata?.type ?? NodeType.Unknown] ??
+            vscode.SymbolKind.Object,
+          range,
+          selectionRange,
+        );
+      });
+
+    if (childSymbols.length === 0) {
+      const selfPosition = positionsByToken.get(nodeMetadata.symbolToken);
+      if (selfPosition) {
+        return [
           new vscode.DocumentSymbol(
-            node.displayName || node.metadata?.name || node.description,
-            node.description,
-            OUTLINE_NODE_TYPES[node.metadata?.type ?? NodeType.Unknown] ??
-              vscode.SymbolKind.Object,
-            symbolRange,
-            symbolRange,
+            nodeMetadata.name,
+            nodeMetadata.subType ?? "",
+            OUTLINE_NODE_TYPES[nodeMetadata.type] ?? vscode.SymbolKind.Object,
+            new vscode.Range(
+              selfPosition.startLine,
+              selfPosition.startCharacter,
+              selfPosition.endLine,
+              selfPosition.endCharacter,
+            ),
+            new vscode.Range(
+              selfPosition.startLine,
+              selfPosition.startCharacter,
+              selfPosition.startLine,
+              selfPosition.startCharacter,
+            ),
           ),
-      );
+        ];
+      }
+    }
+
+    return childSymbols;
   }
 }
 
 export function registerDecompiledDocumentSymbolProvider(
   ilspyBackend: IILSpyBackend,
+  getOutputLanguage?: (uri: vscode.Uri) => LanguageName,
 ) {
   return vscode.languages.registerDocumentSymbolProvider(
     { scheme: ILSPY_URI_SCHEME },
-    new DecompiledDocumentSymbolProvider(ilspyBackend),
+    new DecompiledDocumentSymbolProvider(ilspyBackend, getOutputLanguage),
   );
 }

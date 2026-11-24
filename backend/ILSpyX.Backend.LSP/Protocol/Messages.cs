@@ -91,6 +91,16 @@ namespace ILSpyX.Backend.LSP.Protocol
 
     #endregion
 
+    #region getNodePositions
+
+    [Serial, Method("ilspy/getNodePositions", Direction.ClientToServer)]
+    public record GetNodePositionsRequest(NodeMetadata NodeMetadata, string OutputLanguage)
+        : IRequest<GetNodePositionsResponse>;
+
+    public record GetNodePositionsResponse(IEnumerable<NodePosition>? Positions, bool ShouldUpdateAssemblyList);
+
+    #endregion
+
     #region resolveNodePath
 
     [Serial, Method("ilspy/resolveNodePath", Direction.ClientToServer)]

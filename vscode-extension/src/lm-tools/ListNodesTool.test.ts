@@ -43,6 +43,10 @@ import type ExportNodeResponse from "../protocol/exportNode";
 import type { ExportNodeParams } from "../protocol/exportNode";
 import type { GetNodesParams, GetNodesResponse } from "../protocol/getNodes";
 import type {
+  GetNodePositionsParams,
+  GetNodePositionsResponse,
+} from "../protocol/getNodePositions";
+import type {
   InitWithAssembliesParams,
   InitWithAssembliesResponse,
 } from "../protocol/initWithAssemblies";
@@ -74,6 +78,10 @@ function createBackend(): IILSpyBackend {
     ),
     sendGetNodes: vi.fn(
       async (_params: GetNodesParams) => null as GetNodesResponse | null,
+    ),
+    sendGetNodePositions: vi.fn(
+      async (_params: GetNodePositionsParams) =>
+        null as GetNodePositionsResponse | null,
     ),
     sendResolveNodePath: vi.fn(
       async (_params: ResolveNodePathParams) =>

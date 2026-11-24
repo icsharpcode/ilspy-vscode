@@ -3,6 +3,7 @@ using ILSpyX.Backend.LSP.Handlers;
 using ILSpyX.Backend.LSP.Protocol;
 using ILSpyX.Backend.Model;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection.Metadata.Ecma335;
 using Xunit;
 
 namespace ILSpyX.Backend.LSP.Tests;
@@ -155,6 +156,49 @@ public class LSPMessageHandlerTests
             {
                 File.Delete(outputFile);
             }
+        }
+    }
+
+    [Fact]
+    public async Task GetNodePositions()
+    {
+        var services = TestHelper.CreateTestServices();
+        var decompilerBackend = services.GetRequiredService<DecompilerBackend>();
+        var handler = new GetNodePositionsHandler(decompilerBackend);
+
+        await decompilerBackend.AddAssemblyAsync(TestHelper.AssemblyPath);
+
+        var assemblyFile = new AssemblyFileIdentifier(TestHelper.AssemblyPath);
+        var typeToken = (await decompilerBackend.ListTypes(assemblyFile, "TestAssembly"))
+            .Where(memberData => memberData.Name == "SomeClass")
+            .Select(memberData => memberData.Token)
+            .FirstOrDefault();
+        Assert.NotEqual(0, typeToken);
+
+        var response = await handler.Handle(
+            new GetNodePositionsRequest(
+                new NodeMetadata
+                {
+                    AssemblyPath = TestHelper.AssemblyPath,
+                    Type = NodeType.Class,
+                    Name = "SomeClass",
+                    SymbolToken = typeToken
+                },
+                LanguageName.CSharpLatest),
+            CancellationToken.None);
+
+        Assert.False(response.ShouldUpdateAssemblyList);
+        Assert.NotNull(response.Positions);
+        Assert.NotEmpty(response.Positions);
+
+        var code = (await decompilerBackend.GetCode(assemblyFile, MetadataTokens.EntityHandle(typeToken),
+            LanguageName.CSharpLatest)).DecompiledCode;
+        var lines = code!.Split('\n');
+        foreach (var position in response.Positions)
+        {
+            Assert.True(position.StartLine < lines.Length);
+            Assert.True(position.EndLine < lines.Length);
+            Assert.True(position.EndLine >= position.StartLine);
         }
     }
 }

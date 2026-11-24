@@ -33,6 +33,11 @@ import {
   GetNodesResponse,
 } from "../protocol/getNodes";
 import {
+  GetNodePositionsParams,
+  GetNodePositionsRequest,
+  GetNodePositionsResponse,
+} from "../protocol/getNodePositions";
+import {
   InitWithAssembliesParams,
   InitWithAssembliesRequest,
   InitWithAssembliesResponse,
@@ -92,6 +97,12 @@ export default class ILSpyBackend implements IILSpyBackend {
     params: GetNodesParams,
   ): Promise<GetNodesResponse | null> {
     return this.languageClient.sendRequest(GetNodesRequest.type, params);
+  }
+
+  public sendGetNodePositions(
+    params: GetNodePositionsParams,
+  ): Promise<GetNodePositionsResponse | null> {
+    return this.languageClient.sendRequest(GetNodePositionsRequest.type, params);
   }
 
   public sendResolveNodePath(

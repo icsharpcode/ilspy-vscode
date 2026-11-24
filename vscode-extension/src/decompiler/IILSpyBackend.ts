@@ -16,6 +16,10 @@ import { SearchParams, SearchResponse } from "../protocol/search";
 import { DecompileNodeParams } from "../protocol/decompileNode";
 import { GetNodesParams, GetNodesResponse } from "../protocol/getNodes";
 import {
+  GetNodePositionsParams,
+  GetNodePositionsResponse,
+} from "../protocol/getNodePositions";
+import {
   InitWithAssembliesParams,
   InitWithAssembliesResponse,
 } from "../protocol/initWithAssemblies";
@@ -45,6 +49,10 @@ export default interface IILSpyBackend {
   ): Promise<DecompileResponse | null>;
 
   sendGetNodes(params: GetNodesParams): Promise<GetNodesResponse | null>;
+
+  sendGetNodePositions(
+    params: GetNodePositionsParams,
+  ): Promise<GetNodePositionsResponse | null>;
 
   sendResolveNodePath(
     params: ResolveNodePathParams,

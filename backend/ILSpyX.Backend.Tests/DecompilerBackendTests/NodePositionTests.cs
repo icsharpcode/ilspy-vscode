@@ -51,6 +51,27 @@ public class NodePositionTests
     }
 
     [Fact]
+    public async Task MembersHiddenInDecompiledCodeFallBackToTypeDeclaration()
+    {
+        var services = await TestHelper.CreateTestServicesWithAssembly();
+        var decompilerBackend = services.GetRequiredService<DecompilerBackend>();
+        var assemblyFile = new AssemblyFileIdentifier(TestHelper.AssemblyPath);
+        // A1 has only an implicit default constructor, which has no declaration in the decompiled code.
+        var typeToken = await TestHelper.GetTypeToken(decompilerBackend, "A", "A1");
+        var ctorToken = await TestHelper.GetMemberToken(decompilerBackend, typeToken, "A1()");
+        Assert.NotEqual(0, ctorToken);
+
+        var code = (await decompilerBackend.GetCode(assemblyFile, MetadataTokens.EntityHandle(typeToken),
+            LanguageName.CSharpLatest)).DecompiledCode;
+        var lines = code!.Split('\n');
+
+        var position = Assert.Single(await decompilerBackend.GetNodePositions(assemblyFile,
+            MetadataTokens.EntityHandle(typeToken), LanguageName.CSharpLatest),
+            p => p.SymbolToken == ctorToken);
+        Assert.Contains("class A1", lines[position.StartLine]);
+    }
+
+    [Fact]
     public async Task NonTypeNodeReturnsSelfPositionAtDocumentStart()
     {
         var services = await TestHelper.CreateTestServicesWithAssembly();

@@ -205,7 +205,7 @@ public class DecompilerBackend(
             settings.CSharpFormattingOptions.IndentationString);
         syntaxTree.AcceptVisitor(new CSharpOutputVisitor(tokenWriter, settings.CSharpFormattingOptions));
 
-        return syntaxTree.DescendantNodes().OfType<EntityDeclaration>()
+        var positions = syntaxTree.DescendantNodes().OfType<EntityDeclaration>()
             .Select(declaration => (declaration, entity: declaration.GetSymbol() as IEntity))
             .Where(x => x.entity is not null)
             .Select(x => new NodePosition(
@@ -215,6 +215,31 @@ public class DecompilerBackend(
                 x.declaration.EndLocation.Line - 1,
                 x.declaration.EndLocation.Column - 1))
             .ToList();
+
+        // Members without a declaration in the decompiled output (e.g. implicit constructors or
+        // compiler-generated members hidden by the decompiler) fall back to the position of the
+        // enclosing type declaration.
+        var typeDeclaration = syntaxTree.DescendantNodes().OfType<EntityDeclaration>()
+            .FirstOrDefault(declaration => declaration.GetSymbol() is ITypeDefinition type &&
+                type.MetadataToken == typeDefinition.MetadataToken);
+        if (typeDeclaration is not null)
+        {
+            var positionTokens = positions.Select(p => p.SymbolToken).ToHashSet();
+            foreach (var member in typeDefinition.Members.Concat<IEntity>(typeDefinition.NestedTypes))
+            {
+                if (positionTokens.Add(MetadataTokens.GetToken(member.MetadataToken)))
+                {
+                    positions.Add(new NodePosition(
+                        MetadataTokens.GetToken(member.MetadataToken),
+                        typeDeclaration.StartLocation.Line - 1,
+                        typeDeclaration.StartLocation.Column - 1,
+                        typeDeclaration.EndLocation.Line - 1,
+                        typeDeclaration.EndLocation.Column - 1));
+                }
+            }
+        }
+
+        return positions;
     }
 
     public async Task<IEntity?> GetEntityFromHandle(AssemblyFileIdentifier assemblyFile, EntityHandle handle)

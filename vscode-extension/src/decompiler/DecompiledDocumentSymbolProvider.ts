@@ -8,6 +8,7 @@ import { executeILSpyCommand } from "../commands/commandUtils";
 import { LanguageName, NodeType } from "../extension-types";
 import IILSpyBackend from "./IILSpyBackend";
 import { ILSPY_URI_SCHEME, uriToNode } from "./nodeUri";
+import { NodePosition } from "../protocol/getNodePositions";
 import { getDefaultOutputLanguage } from "./settings";
 
 const OUTLINE_NODE_TYPES: Partial<Record<NodeType, vscode.SymbolKind>> = {
@@ -82,62 +83,55 @@ export class DecompiledDocumentSymbolProvider
     const symbolAnchor = document.positionAt(0);
     const symbolRange = new vscode.Range(symbolAnchor, symbolAnchor);
 
+    const toRange = (position: NodePosition) =>
+      new vscode.Range(
+        position.startLine,
+        position.startCharacter,
+        position.endLine,
+        position.endCharacter,
+      );
+    const toSelectionRange = (position: NodePosition) =>
+      new vscode.Range(
+        position.startLine,
+        position.startCharacter,
+        position.startLine,
+        position.startCharacter,
+      );
+
     const childNodes = (response?.nodes ?? []).filter((node) => {
       const nodeType = node.metadata?.type;
       return nodeType !== undefined && nodeType in OUTLINE_NODE_TYPES;
     });
 
     const childSymbols = childNodes.map((node) => {
-        const position = positionsByToken.get(node.metadata?.symbolToken ?? 0);
-        const range = position
-          ? new vscode.Range(
-              position.startLine,
-              position.startCharacter,
-              position.endLine,
-              position.endCharacter,
-            )
-          : symbolRange;
-        const selectionRange = position
-          ? new vscode.Range(
-              position.startLine,
-              position.startCharacter,
-              position.startLine,
-              position.startCharacter,
-            )
-          : symbolRange;
-        return new vscode.DocumentSymbol(
-          node.displayName || node.metadata?.name || node.description,
-          node.description,
-          OUTLINE_NODE_TYPES[node.metadata?.type ?? NodeType.Unknown] ??
-            vscode.SymbolKind.Object,
-          range,
-          selectionRange,
-        );
-      });
+      const position = positionsByToken.get(node.metadata?.symbolToken ?? 0);
+      return new vscode.DocumentSymbol(
+        node.displayName || node.metadata?.name || node.description,
+        node.description,
+        OUTLINE_NODE_TYPES[node.metadata?.type ?? NodeType.Unknown] ??
+          vscode.SymbolKind.Object,
+        position ? toRange(position) : symbolRange,
+        position ? toSelectionRange(position) : symbolRange,
+      );
+    });
 
-    if (childSymbols.length === 0) {
-      const selfPosition = positionsByToken.get(nodeMetadata.symbolToken);
-      if (selfPosition) {
-        return [
-          new vscode.DocumentSymbol(
-            nodeMetadata.name,
-            nodeMetadata.subType ?? "",
-            OUTLINE_NODE_TYPES[nodeMetadata.type] ?? vscode.SymbolKind.Object,
-            new vscode.Range(
-              selfPosition.startLine,
-              selfPosition.startCharacter,
-              selfPosition.endLine,
-              selfPosition.endCharacter,
-            ),
-            new vscode.Range(
-              selfPosition.startLine,
-              selfPosition.startCharacter,
-              selfPosition.startLine,
-              selfPosition.startCharacter,
-            ),
-          ),
-        ];
-      }
+    // If none of the children have a position in the decompiled code (e.g. a
+    // namespace, whose code contains no type declarations), the backend reports
+    // a position for the node itself - show that instead.
+    const selfPosition = positionsByToken.get(nodeMetadata.symbolToken);
+    const hasPositionedChild = childNodes.some((node) =>
+      positionsByToken.has(node.metadata?.symbolToken ?? 0),
+    );
+    if (!hasPositionedChild && selfPosition) {
+      return [
+        new vscode.DocumentSymbol(
+          nodeMetadata.name,
+          nodeMetadata.subType ?? "",
+          OUTLINE_NODE_TYPES[nodeMetadata.type] ?? vscode.SymbolKind.Object,
+          toRange(selfPosition),
+          toSelectionRange(selfPosition),
+        ),
+      ];
     }
 
     return childSymbols;

@@ -91,6 +91,12 @@ public class NodePositionTests
             MetadataTokens.EntityHandle(0x20000001), LanguageName.CSharpLatest));
         Assert.Equal(0x20000001, assemblyPosition.SymbolToken);
         Assert.Equal(0, assemblyPosition.StartLine);
+
+        // namespace nodes have no symbol token (nil handle)
+        var namespacePosition = Assert.Single(await decompilerBackend.GetNodePositions(assemblyFile,
+            MetadataTokens.EntityHandle(0), LanguageName.CSharpLatest));
+        Assert.Equal(0, namespacePosition.SymbolToken);
+        Assert.Equal(0, namespacePosition.StartLine);
     }
 
     [Fact]

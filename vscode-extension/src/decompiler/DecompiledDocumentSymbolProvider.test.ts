@@ -406,6 +406,63 @@ describe("DecompiledDocumentSymbolProvider", () => {
     expect(symbols[0].selectionRange.end).toEqual(new vscode.Position(0, 0));
   });
 
+  it("shows the namespace itself when its code contains no type declarations", async () => {
+    const backend = createBackend();
+    const namespaceNode = createNode({
+      displayName: "MyNamespace",
+      metadata: createNodeMetadata({
+        name: "MyNamespace",
+        type: NodeType.Namespace,
+        symbolToken: 0,
+        parentSymbolToken: 0,
+      }),
+    });
+    const typeNode = createNode({
+      displayName: "MyType",
+      metadata: createNodeMetadata({
+        name: "MyType",
+        type: NodeType.Class,
+        symbolToken: 201,
+        parentSymbolToken: 0,
+      }),
+    });
+    vi.mocked(backend.sendGetNodes).mockResolvedValue({
+      nodes: [typeNode],
+      shouldUpdateAssemblyList: false,
+    });
+    vi.mocked(backend.sendGetNodePositions).mockResolvedValue({
+      positions: [
+        {
+          symbolToken: 0,
+          startLine: 0,
+          startCharacter: 0,
+          endLine: 0,
+          endCharacter: 0,
+        },
+      ],
+      shouldUpdateAssemblyList: false,
+    });
+
+    const provider = new DecompiledDocumentSymbolProvider(
+      backend,
+      () => LanguageName.CSharpLatest,
+    );
+    const symbols = await provider.provideDocumentSymbols(
+      createDocument(namespaceNode, "namespace MyNamespace { }"),
+      { isCancellationRequested: false } as CancellationToken,
+    );
+
+    expect(symbols).toHaveLength(1);
+    expect(symbols[0]).toEqual(
+      expect.objectContaining({
+        name: "MyNamespace",
+        kind: vscode.SymbolKind.Namespace,
+      }),
+    );
+    expect(symbols[0].range.start).toEqual(new vscode.Position(0, 0));
+    expect(symbols[0].selectionRange.start).toEqual(new vscode.Position(0, 0));
+  });
+
   it("returns no symbols for non-code ilspy documents", async () => {
     const backend = createBackend();
     const provider = new DecompiledDocumentSymbolProvider(

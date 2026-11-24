@@ -125,7 +125,7 @@ export class DecompiledDocumentSymbolProvider
     if (!hasPositionedChild && selfPosition) {
       return [
         new vscode.DocumentSymbol(
-          nodeMetadata.name,
+          nodeMetadata.name || "<global>",
           nodeMetadata.subType ?? "",
           OUTLINE_NODE_TYPES[nodeMetadata.type] ?? vscode.SymbolKind.Object,
           toRange(selfPosition),
